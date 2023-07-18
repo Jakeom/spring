@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html  xmlns:th="http://www.thymeleaf.org"
+       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+       layout:decorate="layouts/hh/hhFaqLayout">
+<body>
+<div id="container-block">
+  <div layout:fragment="contents" th:remove="tag">
+          <div class="layout-content">
+            <div class="community-content">
+              <p class="center-title">자주 묻는 질문</p>
+              <div class="sub-content-head">
+                <div class="search-area">
+                  <div class="input-group">
+                    <input type="hidden" id="faqCategorySeq" name="faqCategorySeq" th:value="${faqCategorySeq}">
+                    <input type="hidden" id="faqSeq" name="faqSeq" th:value="${faqSeq}">
+                    <input type="text" class="form-control p-l-20" name="searchVal" placeholder="키워드를 입력하세요" />
+                    <div class="input-group-append">
+                      <button class="btn btn-primary btn-input-search" data-role="searchBtn" type="button">검색</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row row-0">
+                <ol class="step mt-n3">
+                  <li class="active">
+                    <a href="/hh/service/faq-individual"><span>개인회원</span></a>
+                  </li>
+                  <li class="">
+                    <a href="/hh/service/faq-headhunter"><span>헤드헌터회원</span></a>
+                  </li>
+                </ol>
+              </div>
+              <div class="faq-btn-group">
+                <th:block th:each="list, status : ${cateList}">
+                  <input type="button" name="register" th:id="'cate'+${list.faqCategorySeq}" class="btn btn-outline-dark btn-sm " th:classappend="${status.index == 0? 'active':''}" th:data-faqCategorySeq="${list.faqCategorySeq}"  th:value ="${list.categoryNm}"/>
+                </th:block>
+              </div>
+              <div class="faq-content">
+                <div class="accordion-agree">
+                  <th:block th:each="list, status : ${faqList}">
+                    <div class="item" th:id="'faq'+${list.faqSeq}" th:data-faqSeq="${list.faqSeq}">
+                      <div class="agree-top">
+                        <p th:text="${'Q. '+list.title}">Q. RESUME9에 회원가입은 어떻게 할 수 있나요?</p>
+                        <a href="javascript:;" class="toggler">
+                          <i class="icon-arrow"><span class="sr-only">자세히보기</span></i>
+                        </a>
+                      </div>
+                      <div class="agree-body">
+                      	<p th:utext="${list == null ? '' : list.content}"></p>
+                      </div>
+                    </div>
+                  </th:block>
+                </div>
+              </div>
+            </div>
+          </div>
+      </div>
+    </div>
+  </body>
+</html>

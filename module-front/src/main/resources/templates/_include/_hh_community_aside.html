@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:fragment="common">
+  <aside>
+    <ul>
+      <li th:classappend="${activeMenuURI eq '/hh/community/community-list'} ? 'active' : ''">
+        <a href="/hh/community/community-list"><span class="poppins">헤드헌터 커뮤니티</span></a>
+        <ul class="new-community">
+          <li th:classappend="${searchInfo.communityType eq 'FREE_BOARD'} ? 'active' : ''"><a href="/hh/community/board?communityType=FREE_BOARD">자유게시판</a></li>
+          <li th:classappend="${searchInfo.communityType eq 'HH_TALK'} ? 'active' : ''"><a href="/hh/community/board?communityType=HH_TALK">헤드헌터 수다</a></li>
+          <li th:classappend="${searchInfo.communityType eq 'HH_STUDY'} ? 'active' : ''"><a href="/hh/community/board?communityType=HH_STUDY">헤드헌터 실무공부</a></li>
+          <li th:classappend="${searchInfo.communityType eq 'REPORT'} ? 'active' : ''"><a href="/hh/community/board?communityType=REPORT">신고합니다</a></li>
+          <li th:classappend="${searchInfo.communityType eq 'HH_RECRUIT'} ? 'active' : ''"><a href="/hh/community/board?communityType=HH_RECRUIT">헤드헌터 모집공고</a></li>
+          <li th:classappend="${searchInfo.communityType eq 'R9_IMPROVE'} ? 'active' : ''"><a href="/hh/community/board?communityType=R9_IMPROVE">RESUME9 관련 개선사항 요청</a></li>
+        </ul>
+      </li>
+    </ul>
+  </aside>
+</div>
+</html>

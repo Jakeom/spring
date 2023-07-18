@@ -1,0 +1,399 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.hh.HhMypageMapper">
+
+    <!-- 맞춤인재 알림설정 존재여부 -->
+    <select id="selectApAlertExists" parameterType="HhNoticeSettingDTO" resultType="boolean">
+        /* com.fw.core.mapper.db1.hh.HhMypageMapper.selectApAlertExists, 맞춤인재 알림설정 존재여부, YJW, HhMypageMapper.xml */
+        SELECT EXISTS (
+                       SELECT 1
+                       FROM tb_ap_alert
+                       WHERE del_flag = 'N'
+                         AND member_id = #{frontSession.id}
+                   ) AS CNT
+    </select>
+
+    <!-- 맞춤인재 알림설정여부 수정 -->
+    <update id="updateHhApFlag" parameterType="HhNoticeSettingDTO">
+        /* com.fw.core.mapper.db1.hh.HhMypageMapper.updateHhApFlag, 맞춤인재 알림설정여부 수정, 22.12.22, YJW, HhMypageMapper.xml */
+        UPDATE member
+           SET hh_ap_flag = #{hhApFlag}
+        WHERE id = #{frontSession.id}
+    </update>
+
+    <!-- 맞춤인재 알림설정 등록 -->
+    <insert id="insertApAlert" parameterType="HhNoticeSettingDTO" >
+        /* com.fw.core.mapper.db1.hh.HhMypageMapper.insertApAlert, 맞춤인재 알림설정 등록, 22.12.22, YJW, HhMypageMapper.xml */
+        INSERT INTO tb_ap_alert (
+               industry
+             , career_st
+             , career_en
+             , age_st
+             , age_en
+             , salary_st
+             , salary_en
+             , hp1
+             , company
+             , foreign_lang
+             , certificate
+             , member_id
+             , reg_seq
+             , reg_date
+        ) VALUES (
+               #{industry}
+             , #{careerSt}
+             , #{careerEn}
+             , #{ageSt}
+             , #{ageEn}
+             , #{salarySt}
+             , #{salaryEn}
+             , #{hp1}
+             , #{company}
+             , #{foreignLang}
+             , #{certificate}
+             , #{frontSession.id}
+             , #{frontSession.id}
+             , NOW()
+        )
+        <selectKey order="AFTER" keyProperty="apAlertSeq" resultType="String">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <!-- 맞춤인재 알림설정 수정 -->
+    <update id="updateApAlert" parameterType="HhNoticeSettingDTO">
+        /* com.fw.core.mapper.db1.hh.HhMypageMapper.updateApAlert, 맞춤인재 알림설정 수정, 22.12.22, YJW, HhMypageMapper.xml */
+        UPDATE tb_ap_alert
+           SET career_st = #{careerSt}
+             , career_en = #{careerEn}
+             , age_st = #{ageSt}
+             , age_en = #{ageEn}
+             , salary_st = #{salarySt}
+             , salary_en = #{salaryEn}
+             , hp1 = #{hp1}
+             , company = #{company}
+             , foreign_lang = #{foreignLang}
+             , certificate = #{certificate}
+             , industry = #{industry}
+        WHERE ap_alert_seq = #{apAlertSeq}
+    </update>
+
+    <!-- 학력2 등록 -->
+    <insert id="insertHp2" parameterType="HhNoticeSettingDTO">
+        /* com.fw.core.mapper.db1.hh.HhMypageMapper.insertHp2, 학력2 등록, 22.12.22, YJW, HhMypageMapper.xml */
+        INSERT INTO tb_ap_hp (
+               ap_alert_seq
+             , hp2
+             , reg_date
+             , reg_seq
+        ) VALUES
+        <foreach collection="hp2List" item="item" separator="," >
+              (
+              #{apAlertSeq}
+             , #{item}
+             , NOW()
+             , #{frontSession.id}
+        )
+        </foreach>
+    </insert>
+
+    <!-- 희망근무지 등록 -->
+    <insert id="insertLoc" parameterType="HhNoticeSettingDTO">
+        /* com.fw.core.mapper.db1.hh.HhMypageMapper.updateHhAlarmSetting, 맞춤인재 알림설정 수정, 22.12.22, YJW, HhMypageMapper.xml */
+        INSERT INTO tb_ap_loc (
+               ap_alert_seq
+             , loc
+             , reg_date
+             , reg_seq
+        ) VALUES
+        <foreach collection="locList" item="item" separator=",">
+              (
+              #{apAlertSeq}
+            , #{item}
+            , NOW()
+            , #{frontSession.id}
+        )
+        </foreach>
+    </insert>
+
+    <!-- 학력2 삭제 -->
+    <delete id="deleteHp2" parameterType="HhNoticeSettingDTO">
+        /* com.fw.core.mapper.db1.hh.HhMypageMapper.deleteHp2, 학력2 삭제, 22.12.22, YJW, HhMypageMapper.xml */
+        DELETE
+        FROM tb_ap_hp
+        WHERE ap_alert_seq = #{apAlertSeq}
+    </delete>
+
+    <!-- 희망근무지 삭제 -->
+    <delete id="deleteLoc" parameterType="HhNoticeSettingDTO">
+        /* com.fw.core.mapper.db1.hh.HhMypageMapper.updateHhAlarmSetting, 희망근무지 삭제, 22.12.22, YJW, HhMypageMapper.xml */
+        DELETE
+        FROM tb_ap_loc
+        WHERE ap_alert_seq = #{apAlertSeq}
+    </delete>
+
+    <!-- 맞춤인재 알림설정 조회 -->
+    <select id="selectApAlertInfo" parameterType="HhNoticeSettingDTO" resultType="HhNoticeSettingDTO">
+        /* com.fw.core.mapper.db1.hh.HhMypageMapper.selectApAlertList, 맞춤인재 알림설정 리스트 조회, 22.12.22, YJW, HhMypageMapper.xml */
+        SELECT taa.ap_alert_seq
+             , taa.career_st
+             , taa.career_en
+             , taa.age_st
+             , taa.age_en
+             , taa.salary_st
+             , taa.salary_en
+             , taa.hp1
+             , taa.company
+             , taa.foreign_lang
+             , taa.certificate
+             , taa.member_id
+             , taa.del_flag
+             , taa.reg_seq
+             , taa.reg_date
+             , taa.industry
+             , m.hh_ap_flag
+        FROM tb_ap_alert taa
+    INNER JOIN member m ON taa.member_id = m.id
+        WHERE member_id = #{frontSession.id}
+    </select>
+
+    <!-- 학력2 리스트 조회 -->
+    <select id="selectHp2List" parameterType="HhNoticeSettingDTO" resultType="HhNoticeSettingDTO">
+        /* com.fw.core.mapper.db1.hh.HhMypageMapper.selectHp2List, 학력2 리스트 조회, 22.12.22, YJW, HhMypageMapper.xml */
+        SELECT ap_hp_seq
+             , ap_alert_seq
+             , hp2
+             , del_flag
+             , reg_seq
+             , reg_date
+        FROM tb_ap_hp
+        WHERE ap_alert_seq = #{apAlertSeq}
+    </select>
+
+    <!-- 희망근무지 리스트 조회 -->
+    <select id="selectLocList" parameterType="HhNoticeSettingDTO" resultType="HhNoticeSettingDTO">
+        /* com.fw.core.mapper.db1.hh.HhMypageMapper.selectLocList, 희망근무지 리스트 조회 , 22.12.22, YJW, HhMypageMapper.xml */
+        SELECT ap_loc_seq
+             , ap_alert_seq
+             , loc
+             , del_flag
+             , reg_seq
+             , reg_date
+        FROM tb_ap_loc
+        WHERE ap_alert_seq = #{apAlertSeq}
+    </select>
+
+    <!-- 내 포인트 조회 -->
+    <select id="selectMyPoint" parameterType="HhPointDTO" resultType="HhPointDTO">
+        /* com.fw.core.mapper.db1.hh.HhMypageMapper.selectMyPoint, 내 포인트 조회 , 22.12.26, YJW, HhMypageMapper.xml */
+        SELECT id
+             , createdAt
+             , updatedAt
+             , balance
+             , freePoint
+             , paidPoint
+             , member_id
+             , delFlag
+        FROM point
+        WHERE member_id = #{frontSession.id}
+    </select>
+
+    <!-- 포인트 사용내역 조회 -->
+    <select id="selectPointUseHistory" parameterType="HhPointUseHistoryDTO" resultType="HhPointUseHistoryDTO">
+        /* com.fw.core.mapper.db1.hh.HhMypageMapper.selectPointUseHistory, 포인트 사용내역 조회 , 22.12.27, YJW, HhMypageMapper.xml */
+        SELECT id
+             , createdAt AS createDt
+             , DATE_FORMAT(createdAt,'%Y.%m.%d') AS createdAt
+             , updatedAt
+             , reasonCd
+             , fn_get_common_cd(reasonCd,'POINT_USE',1) AS reasonNm
+             , member_id
+             , payment_id
+             , point_id
+             , freeBalance
+             , freeIncrease
+             , paidBalance
+             , paidIncrease
+             , adminReason
+             , backoffice_admin_id
+             , delFlag
+             , (freeIncrease + paidIncrease) AS pointIncrease
+        FROM point_use_history
+        WHERE member_id = #{frontSession.id}
+        <if test="selectPeriod != '' and selectPeriod != null">
+            <if test="selectPeriod eq '1month'">
+                AND createdAt BETWEEN DATE_SUB(NOW(), INTERVAL 1 MONTH) AND NOW()
+            </if>
+            <if test="selectPeriod eq '3month'">
+                AND createdAt BETWEEN DATE_SUB(NOW(), INTERVAL 3 MONTH) AND NOW()
+            </if>
+            <if test="selectPeriod eq '6month'">
+                AND createdAt BETWEEN DATE_SUB(NOW(), INTERVAL 6 MONTH) AND NOW()
+            </if>
+            <if test="selectPeriod eq '1year'">
+                AND createdAt BETWEEN DATE_SUB(NOW(), INTERVAL 1 YEAR) AND NOW()
+            </if>
+        </if>
+        <if test="useType != null and useType != ''">
+            AND reasonCd = #{useType}
+        </if>
+        ORDER BY createDt DESC
+        <include refid="common.paging" />
+    </select>
+
+    <!-- 포인트 사용내역 조회 카운트 -->
+    <select id="selectPointUseHistoryCnt" parameterType="HhPointUseHistoryDTO" resultType="int">
+        /* com.fw.core.mapper.db1.hh.HhMypageMapper.selectPointUseHistoryCnt, 포인트 사용내역 조회 카운트 , 22.12.27, YJW, HhMypageMapper.xml */
+        SELECT COUNT(1)
+        FROM point_use_history
+        WHERE member_id = #{frontSession.id}
+        <if test="selectPeriod != '' and selectPeriod != null">
+            <if test="selectPeriod eq '1month'">
+                AND createdAt BETWEEN DATE_SUB(NOW(), INTERVAL 1 MONTH) AND NOW()
+            </if>
+            <if test="selectPeriod eq '3month'">
+                AND createdAt BETWEEN DATE_SUB(NOW(), INTERVAL 3 MONTH) AND NOW()
+            </if>
+            <if test="selectPeriod eq '6month'">
+                AND createdAt BETWEEN DATE_SUB(NOW(), INTERVAL 6 MONTH) AND NOW()
+            </if>
+            <if test="selectPeriod eq '1year'">
+                AND createdAt BETWEEN DATE_SUB(NOW(), INTERVAL 1 YEAR) AND NOW()
+            </if>
+        </if>
+        <if test="useType != null and useType != ''">
+            AND reasonCd = #{useType}
+        </if>
+    </select>
+
+    <!-- 결제등록 -->
+    <insert id="insertPayment" parameterType="HhPaymentDTO">
+        INSERT INTO payment (
+               cancelledPrice
+             , createdAt
+             , method
+             , methodName
+             , orderId
+             , paymentData
+             , pg
+             , pgName
+             , price
+             , productName
+             , purchasedAt
+             , remainPrice
+             , receiptId
+             , status
+             , unit
+             , member_id
+             , point_product_id
+             , requestedAt
+             , bankCode
+             , bankName
+             , virtualAccount
+             , depositor
+             , expireDate
+             , revokedAt
+             , delFlag
+        ) VALUES (
+               #{cancelledPrice}
+             , NOW()
+             , #{method}
+             , #{methodName}
+             , #{orderId}
+             , #{paymentData}
+             , #{pg}
+             , #{pgName}
+             , #{price}
+             , #{productName}
+             , #{purchasedAt}
+             , #{remainPrice}
+             , #{receiptId}
+             , #{status}
+             , #{unit}
+             , #{frontSession.id}
+             , #{point_product_id}
+             , #{requestedAt}
+             , #{bankCode}
+             , #{bankName}
+             , #{virtualAccount}
+             , #{depositor}
+             , #{expireDate}
+             , #{revokedAt}
+             , 'N'
+        )
+    </insert>
+
+    <!-- 결제 취소 내역 조회 -->
+    <select id="selectPaymentCancelList" parameterType="HhPaymentDTO" resultType="HhPaymentDTO">
+        /* com.fw.core.mapper.db1.hh.HhMyPageMapper.selectPaymentCancelList, 결제 취소 내역 조회, YJW, HhMyPageMapper.xml */
+        SELECT id
+             , cancelledPrice
+             , createdAt
+             , method
+             , methodName
+             , orderId
+             , paymentData
+             , pg
+             , pgName
+             , price
+             , productName
+             , purchasedAt
+             , remainPrice
+             , receiptId
+             , status
+             , unit
+             , member_id
+             , point_product_id
+             , requestedAt
+             , bankCode
+             , bankName
+             , virtualAccount
+             , depositor
+             , expireDate
+             , revokedAt
+             , delFlag
+        FROM payment p
+    INNER JOIN point_use_history puh ON p.id = puh.payment_id
+        WHERE member_id = #{frontSession.id}
+          AND puh.reasonCd = #{reasonCd} /* SETTING CANCEL_PURCHASE */
+    </select>
+
+    <!-- 결제 취소 포인트(일주일이내 포인트구매 여부 조회) -->
+    <select id="selectInWeekPurchasePoint" parameterType="HhPointUseHistoryDTO" resultType="boolean">
+        /* com.fw.core.mapper.db1.hh.HhMyPageMapper.selectInWeekPurchasePoint, 결제 취소 포인트(일주일이내 포인트구매 여부 조회), sjpaik, HhMyPageMapper.xml */
+        SELECT EXISTS (
+                       SELECT 1
+                       FROM position_use_history
+                       WHERE member_id = #{frontSession.id}
+                         AND reasonCd = #{reasonCd}
+                         AND (createdAt BETWEEN DATE_ADD(NOW(),INTERVAL-1 WEEK) AND NOW())
+                   ) AS CNT
+    </select>
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

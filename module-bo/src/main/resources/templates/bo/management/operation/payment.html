@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/default}">
+
+<body>
+	<div layout:fragment="contents" th:remove="tag">
+		<main id="content" role="main">
+			<h2 class="title">결제내역 관리</h2>
+			<div class="row p-3">
+				<div class="col-12">
+					<!-- Search -->
+					<div class="">
+						<form id="searchPayment" name="searchPayment">
+							<div class="row mt-5">
+								<div class="col-4">
+									<div class="d-flex align-items-center">
+										<input type="text" id="paymentStartDt" name="paymentStartDt" class="form-control form-datepicker" placeholder="날짜 선택">
+										<div class="mr-2">~</div>
+										<input type="text" id="paymentEndDt" name="paymentEndDt" class="form-control form-datepicker" placeholder="날짜 선택">
+									</div>
+								</div>
+								<div class="col-4">
+									<div class="d-flex align-items-center">
+										<button type="button" class="btn btn-dark" id="all" name="colorChange" data-role="all">전체</button>
+										<button type="button" class="btn btn-dark" id="today" name="colorChange" data-role="today">오늘</button>
+										<button type="button" class="btn btn-dark" id="week" name="colorChange" data-role="week">7일</button>
+										<button type="button" class="btn btn-dark" id="month" name="colorChange" data-role="month">1개월</button>
+									</div>
+								</div>
+								<div class="col-4 text-right">
+									<div class="d-flex" style="float: right">
+										<select id="personalInfo" name="personalInfo" class="custom-select w-auto mr-2">
+											<option value="name">이름</option>
+											<option value="phone">휴대번호</option>
+											<option value="email">이메일주소</option>
+										</select> <input type="text" class="form-control d-inline-block w-auto" data-role="depositor" />
+										<button type="button" class="btn btn-primary" data-role="search">검색하기</button>
+									</div>
+								</div>
+								<div class="col-12 mt-3">
+									<div>
+										<select id="selectType" name="selectType" data-role="select" class="form-control w-auto">
+											<option value="">전체</option>
+											<option value="PAY_READY">결제대기</option>
+											<option value="PAY_SUCCESS">결제완료</option>
+											<option value="PAY_BEFORE_APPROVAL">결제승인전</option>
+											<option value="PAY_APPROVING">결제승인중</option>
+											<option value="CANCELED">취소</option>
+											<option value="CANCEL_FAILED">취소실패</option>
+											<option value="CANCEL_PROCEEDING">취소진행중</option>
+											<option value="PAY_ERROR">결제실패</option>
+											<option value="PAY_APPROVAL_FAILED">결제승인실패</option>
+										</select>
+									</div>
+								</div>
+							</div>
+						</form>
+						<div class="row mt-3">
+							<div class="col">
+								<table id="datatable" class="table">
+									<thead>
+										<tr>
+											<th>No.</th>
+											<th>이름</th>
+											<th>결제 일시</th>
+											<th>결제 수단</th>
+											<th>결제 금액</th>
+											<th>상태</th>
+											<th>결제 취소</th>
+										</tr>
+									</thead>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</main>
+	</div>
+</body>
+</html>

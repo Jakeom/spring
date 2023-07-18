@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layouts/hh/mainLayout}">
+<body>
+    <div id="container-block" layout:fragment="contents" th:remove="tag">
+        <div class="container">
+            <div class="sub-content">
+                <div>
+                    <div class="d-flex align-items-center justify-content-between">
+                        <ul class="nav nav-tabs border-bottom-0" id="myTab" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">진행중</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false" tabindex="-1">종료</button>
+                            </li>
+                        </ul>
+                        <div class="d-flex gap-10">
+                            <select class="select-design" style="width: 150px">
+                                <option value="TITLE" th:selected="${searchInfo.searchType eq 'TITLE'}">제목</option>
+                                <option value="REGID" th:selected="${searchInfo.searchType eq 'REGID'}">등록자</option>
+                                <option value="COWORK" th:selected="${searchInfo.searchType eq 'COWORK'}">코웍참가자</option>
+                            </select>
+                            <input type="text" class="form-control white form-md" style="width: 250px"/>
+                            <button type="button" class="btn btn-primary btn-md">검색</button>
+                        </div>
+                    </div>
+                    <div class="tab-content" id="myTabContent">
+                        <div class="tab-pane fade active show" id="home" role="tabpanel" aria-labelledby="home-tab">
+                            <div class="position-wrap">
+                                <div class="position-list">
+                                    <a href="/hh/position/position-register" class="position-card add">
+                                        <i class="icon-bg-plus"></i>
+                                        <p class="m-t-20">버튼을 눌러 새 포지션을 등록하세요.</p>
+                                    </a>
+                                    <th:block th:each="list : ${doingList}">
+                                        <a href="#" class="position-card">
+                                            <div class="position-card-head">
+                                                <div class="d-flex align-items-center gap-10">
+                                                    <th:block th:if="${list.hhPositionType ne 'PM' and list.hhPositionType ne 'CO'}">
+                                                        <span class="tag tag-sm tag-danger m-0">단독</span>
+                                                    </th:block>
+                                                    <th:block th:if="${list.hhPositionType eq 'PM'}">
+                                                        <span class="tag tag-sm tag-primary m-0">PM</span>
+                                                    </th:block>
+                                                    <th:block th:if="${list.hhPositionType eq 'CO'}">
+                                                        <span class="tag tag-sm tag-danger m-0">PM</span>
+                                                    </th:block>
+                                                    <span class="tag tag-sm tag-outline-primary m-0">진행중</span>
+                                                </div>
+                                                <th:block th:if="${list.days < 30 and list.days > 0}">
+                                                    <div class="d-flex align-items-center gap-10">
+                                                        <span class="count extend" th:text="${'D-' + list.dDay}">D-1</span>
+                                                            <button type="button" class="tag tag-sm tag-outline-danger m-0" data-bs-target="#modal-deadline" data-bs-toggle="modal">
+                                                                <i class="icon-r-time"></i> 연장
+                                                            </button>
+                                                    </div>
+                                                </th:block>
+                                            </div>
+                                            <div class="position-card-content">
+                                                <p class="title" th:text="${list.title}">대기업유통 텍스트 분석</p>
+                                                <p class="desc registration-date" th:text="${'등록일 ' + list.createdAt}">등록일 2022.09.31
+                                                    <th:block th:if="${list.days < 30 and list.days > 0}">
+                                                        <span class="plus-date">+ 30 days</span>
+                                                    </th:block>
+                                                </p>
+                                                <p class="desc expiration-date" th:text="${'만료일 ' + list.endDate}">만료일 2022.10.31</p>
+                                                <p class="desc manager" th:text="${'담당자 ' + list.manager}">담당자 이덕진</p>
+                                                <th:block th:if="${list.coCount > 0}">
+                                                    <p class="participation">
+                                                        <th:block th:if="${list.isPrivate eq '1'}">
+                                                            <i class="icon-lock"></i>
+                                                        </th:block>
+                                                        참여CO: <span th:text="${list.coCount}">1</span>명</p>
+                                                </th:block>
+                                            </div>
+                                            <div class="position-card-footer">
+                                                <div class="position-cnt-list">
+                                                    <div class="number" th:text="${list.contactCnt}">3</div>
+                                                    <p class="name">포지션 제안</p>
+                                                </div>
+                                                <div class="position-cnt-list">
+                                                    <div class="number" th:text="${list.resumeCnt}">0</div>
+                                                    <p class="name">이력서 접수</p>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </th:block>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+                            <div class="position-wrap">
+                                <div class="position-list">
+                                    <th:block th:each="list : ${endList}">
+                                        <a href="#" class="position-card">
+                                            <div class="position-card-head">
+                                                <div class="d-flex align-items-center gap-10">
+                                                    <th:block th:if="${list.hhPositionType ne 'PM' and list.hhPositionType ne 'CO'}">
+                                                        <span class="tag tag-sm tag-danger m-0">단독</span>
+                                                    </th:block>
+                                                    <th:block th:if="${list.hhPositionType eq 'PM'}">
+                                                        <span class="tag tag-sm tag-primary m-0">PM</span>
+                                                    </th:block>
+                                                    <th:block th:if="${list.hhPositionType eq 'CO'}">
+                                                        <span class="tag tag-sm tag-danger m-0">PM</span>
+                                                    </th:block>
+                                                    <span class="tag tag-sm tag-outline-gray m-0">공고마감</span>
+                                                </div>
+                                                <th:block th:if="${list.days < 30 and list.days > 0}">
+                                                    <div class="d-flex align-items-center gap-10">
+                                                        <span class="count extend" th:text="${'D-' + list.dDay}">D-1</span>
+                                                        <button type="button" class="tag tag-sm tag-outline-danger m-0" data-bs-target="#modal-deadline" data-bs-toggle="modal">
+                                                            <i class="icon-r-time"></i> 연장
+                                                        </button>
+                                                    </div>
+                                                </th:block>
+                                            </div>
+                                            <div class="position-card-content">
+                                                <p class="title" th:text="${list.title}">대기업유통 텍스트 분석</p>
+                                                <p class="desc registration-date" th:text="${'등록일 ' + list.createdAt}">등록일 2022.09.31
+                                                    <th:block th:if="${list.days < 30 and list.days > 0}">
+                                                        <span class="plus-date">+ 30 days</span>
+                                                    </th:block>
+                                                </p>
+                                                <p class="desc expiration-date" th:text="${'만료일 ' + list.endDate}">만료일 2022.10.31</p>
+                                                <p class="desc manager" th:text="${'담당자 ' + list.manager}">담당자 이덕진</p>
+                                                <th:block th:if="${list.coCount > 0}">
+                                                    <p class="participation">
+                                                        <th:block th:if="${list.isPrivate eq '1'}">
+                                                            <i class="icon-lock"></i>
+                                                        </th:block>
+                                                        참여CO: <span th:text="${list.coCount}">1</span>명</p>
+                                                </th:block>
+                                            </div>
+                                            <div class="position-card-footer">
+                                                <div class="position-cnt-list">
+                                                    <div class="number" th:text="${list.contactCnt}">3</div>
+                                                    <p class="name">포지션 제안</p>
+                                                </div>
+                                                <div class="position-cnt-list">
+                                                    <div class="number" th:text="${list.resumeCnt}">0</div>
+                                                    <p class="name">이력서 접수</p>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </th:block>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

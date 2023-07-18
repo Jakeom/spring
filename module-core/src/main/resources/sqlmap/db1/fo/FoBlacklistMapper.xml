@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.fo.FoBlacklistMapper">
+
+    <!-- 블랙리스트 cnt -->
+    <select id="selectBlacklistCntForPaging" parameterType="FoTbBlacklistDTO" resultType="int">
+        SELECT COUNT(1) AS CNT
+        FROM blacklist_hh tb
+        WHERE delFlag = 'N'
+          AND tb.applicant_id = #{frontSession.id}
+    </select>
+
+    <!-- 블랙리스트 조회 -->
+    <select id="selectBlacklist" parameterType="FoTbBlacklistDTO" resultType="FoTbBlacklistDTO">
+        SELECT @rownum:=@rownum+1 AS rownum
+        , A.*
+        FROM (
+        SELECT tb.id
+             , tb.applicant_id
+             , tb.headhunter_id
+             , tb.createdAt
+             , mm.email
+             , mm.name
+             , tb.delFlag
+             , hh.sfName
+          FROM blacklist_hh tb
+    INNER JOIN headhunter hh ON hh.member_id = tb.headhunter_id
+    INNER JOIN member mm ON tb.headhunter_id = mm.id
+         WHERE tb.delFlag = 'N'
+           AND tb.applicant_id = #{frontSession.id}
+      ORDER BY tb.createdAt DESC
+        ) AS A
+        , (SELECT @rownum:=0) TMP order by rownum DESC
+        <include refid="common.paging" />
+    </select>
+
+    <!-- 블랙리스트 확인/해제 -->
+    <update id="updateBlacklist" parameterType="FoTbBlacklistDTO">
+        UPDATE blacklist_hh
+           SET delFlag = 'Y'
+             , updatedAt = NOW()
+        WHERE id = #{id}
+    </update>
+</mapper>

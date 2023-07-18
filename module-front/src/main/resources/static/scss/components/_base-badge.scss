@@ -1,0 +1,65 @@
+.tag{
+    display: inline-flex;height: 30px;padding: 0 5px 1px 10px;border-radius: 50rem;align-items: center;background-color: $PRIMARY_COLOR;
+    color: #fff;font-size: 12px;letter-spacing: -0.05em;margin: .25rem;
+    > a{margin-left: 5px;display: block;padding: 2px 5px;}
+    &.none-border{border-radius: 0;}
+    .icon-tag-x{vertical-align: middle;margin-top: -2px;}
+    &.tag-sm{height: 24px;padding: 0 10px; line-height: 1.2;}
+    &.tag-lg{height: 30px;padding: 0 10px;font-size: 14px;padding-top: 1px;}
+    &.tag-xl{
+        height: 40px;padding: 0 16px;font-size: 18px;font-weight: 500;padding-bottom: 1px;
+> a{margin-left: 10px;}
+    }
+    &.tag-outline-primary{
+        background-color: #fff;border: 1px solid $PRIMARY_COLOR;color: $PRIMARY_COLOR;
+    }
+    &.tag-danger{
+        border: 1px solid #FFE4E5; color: #E9090A; background-color: #FFE4E5;
+    }
+    &.tag-outline-danger{
+        border: 1px solid #E9090A; color: #E9090A; background-color: transparent;
+    }
+    &.tag-orange{
+        color: #fff;
+        background-color: #ffa500;
+        border-color: #ffa500;
+    }
+    &.tag-outline-orange{
+        color: #ffa500;
+        background-color: #fff;
+        border-color: #ffa500;
+    }
+    &.tag-gray{
+        color: #fff;
+        background-color: #777;
+        border-color: #777;
+    }
+    &.tag-outline-gray{
+        color: #777;
+        background-color: #fff;
+        border-color: #777;
+    }
+}
+.item-new{
+    width: 18px;
+    height: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 11px;
+    font-family: 'Poppins';
+    background: #0078ff;
+    font-weight: 700;
+}
+@media screen and (max-width: 992px) {
+    .tag{
+        font-size: 12px; height: 24px; 
+        &.tag-sm{height: 20px; line-height: 20px;}
+        &.tag-lg{height: 24px; line-height: 24px; font-size: 12px; padding: 0 8px;}
+        &.tag-xl{
+            height: 32px;padding: 0 16px;font-size: 18px;font-weight: 500;padding-bottom: 1px;
+            > a{margin-left: 10px;}
+        }
+    }
+}

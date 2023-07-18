@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layouts/loginLayout">
+<body>
+    <div layout:fragment="contents" th:remove="tag">
+        <form name="certForm" th:action="${certServer}" method="POST" target="certForm">
+            <input type="hidden" name="tr_cert">
+            <input type="hidden" name="tr_url" th:value="${certCallbackUrl} + '?mode=findId'">
+            <input type="hidden" name="tr_add" value="N">
+        </form>
+        <form name="resultForm">
+            <input type="hidden" name="di" id="di"/>
+            <input type="hidden" name="passName" id="name"/>
+            <input type="hidden" name="passPhone" id="phone"/>
+        </form>
+        <div id="container-block">
+            <div id="container">
+                <div class="container">
+                    <div class="content-bg">
+                        <h2 class="center-title">임시회원 회원가입</h2>
+                        <ul class="nav nav-tabs" id="myTab" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">임시회원
+                                </button>
+                            </li>
+                        </ul>
+                        <div class="tab-content" id="myTabContent">
+                            <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+                                <form action="">
+                                    <fieldset>
+                                        <input type="hidden" name="certId" />
+                                        <input type="hidden" name="emailCertFlag" value="N" />
+                                        <input type="hidden" name="dtype" value="AP" />
+                                        <input type="hidden" name="prePhone" th:value="${memberInfo.phone}"/>
+                                        <input type="hidden" name="preName" th:value="${memberInfo.name}"/>
+                                        <input type="hidden" name="memberId" th:value="${memberId}"/>
+                                        <legend>로그인</legend>
+                                        <div class="form-group">
+                                            <label for="loginId" class="essential"><span>*</span>이메일(아이디)</label>
+                                            <div class="btn-form">
+                                                <input type="text" class="form-control form-xl bg-light" id="loginId" name="loginId" placeholder="이메일 주소" th:value="${memberInfo.email}" readonly/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group m-t-25">
+                                            <label for="userName" class="essential"><span>*</span>이름(실명)</label>
+                                            <input type="text" class="form-control form-xl bg-light" id="userName" name="name" placeholder="본인인증을 완료해주세요." readonly/>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="userPhone" class="essential"><span>*</span>휴대폰번호</label>
+                                            <div class="btn-form">
+                                                <input type="number" class="form-control form-xl bg-light" id="userPhone" name="phone" placeholder="본인인증을 완료해주세요." readonly/>
+                                                <button type="button" class="btn btn-outline-primary btn-xl" data-role="btnMemberCert">본인인증</button>
+                                            </div>
+                                        </div>
+                                        <div class="form-group m-t-25">
+                                            <label for="password" class="essential"><span>*</span>비밀번호</label>
+                                            <input type="password" class="form-control form-xl bg-light" id="password" name="password" placeholder="비밀번호" autocomplete="off"/>
+                                            <p class="form-text mt-2 text-danger" data-msg-target="password"></p>
+                                        </div>
+                                        <div class="form-group m-t-25">
+                                            <label for="passwordChk" class="essential"><span>*</span>비밀번호 확인</label>
+                                            <input type="password" class="form-control form-xl bg-light" id="passwordChk" name="passwordChk" placeholder="비밀번호 확인" autocomplete="off"/>
+                                            <p class="form-text mt-2 text-danger" data-msg-target="passwordChk"></p>
+                                        </div>
+                                    </fieldset>
+                                </form>
+                                <h3 class="table-title">레쥬메나인 이용약관에 동의해주세요.</h3>
+                                <div class="accordion-agree">
+                                    <div class="item">
+                                        <div class="agree-top">
+                                            <div class="check">
+                                                <div class="form-check p-0">
+                                                    <input class="form-check-input" type="checkbox" value="Y" id="nes1" name="nes1"/>
+                                                    <label class="form-check-label" for="nes1"> [필수] 만 15세 이상입니다.</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="item active">
+                                        <div class="agree-top">
+                                            <div class="check">
+                                                <div class="form-check p-0">
+                                                    <input class="form-check-input" type="checkbox" value="Y" id="nes2" name="nes2"/>
+                                                    <label class="form-check-label" for="nes2">[필수] 서비스이용약관동의 </label>
+                                                </div>
+                                            </div>
+                                            <a href="javascript:;" class="toggler">
+                                                <i class="icon-arrow"><span class="sr-only">자세히보기</span></i>
+                                            </a>
+                                        </div>
+                                        <div class="agree-body" th:utext="${policyInfo == null ? '' : policyInfo.content}"></div>
+                                    </div>
+                                    <div class="item">
+                                        <div class="agree-top">
+                                            <div class="check">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" value="Y" id="nes3" name="nes3"/>
+                                                    <label class="form-check-label" for="nes3">[필수] 개인정보처리방침 및 제3자정보제공동의</label>
+                                                </div>
+                                            </div>
+                                            <a href="javascript:;" class="toggler">
+                                                <i class="icon-arrow"><span class="sr-only">자세히보기</span></i>
+                                            </a>
+                                        </div>
+                                        <div class="agree-body" th:utext="${privacyInfo == null ? '' : privacyInfo.content}"></div>
+                                    </div>
+                                    <div class="item">
+                                        <div class="agree-top">
+                                            <div class="check">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" value="Y" id="agreeMarketing" name="agreeMarketing"/>
+                                                    <label class="form-check-label" for="agreeMarketing">[선택] 마케팅 정보 수신 제공 동의</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="item">
+                                        <div class="agree-top">
+                                            <div class="check">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" value="Y" id="agreeAd" name="agreeAd"/>
+                                                    <label class="form-check-label" for="agreeAd">[선택] 광고성 정보 수신 제공 동의</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <h3 class="table-title">개인정보 유효기간</h3>
+                                <div class="accordion-agree">
+                                    <div class="item">
+                                        <div class="agree-top justify-content-start inline-form-radio">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" value="1" id="privacyExpireOp1" name="privacyExpire" checked/>
+                                                <label class="form-check-label" for="privacyExpireOp1"> 1년</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" value="3" id="privacyExpireOp2" name="privacyExpire" />
+                                                <label class="form-check-label" for="privacyExpireOp2"> 3년</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" value="-1" id="privacyExpireOp3" name="privacyExpire"  />
+                                                <label class="form-check-label" for="privacyExpireOp3"> 탈퇴시까지</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="button" data-role="submit" class="btn btn-xl btn-outline-primary w-100 login-btn">동의하고 가입하기</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div layout:fragment="modal" th:remove="tag">
+        <div class="modal fade" id="modal-signup-agree" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+             aria-labelledby="staticBackdropLabel">
+            <div class="modal-dialog modal-comment modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header justify-content-end">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="text-form" th:utext="${noticeInfo == null ? '' : noticeInfo.content}">
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

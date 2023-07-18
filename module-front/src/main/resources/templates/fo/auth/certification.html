@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layouts/empty">
+<head>
+    <link rel="stylesheet" href="/static/cert/css/process_manager.css" />
+    <script type="text/javascript" src="/static/cert/js/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="/static/cert/js/isasscaping.js"></script>
+    <script type="text/javascript" src="/static/cert/js/json2.js"></script>
+    <script type="text/javascript" src="/static/cert/js/web_socket.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <style>
+        body {
+            font-size: 12px!important;
+        }
+
+        input {
+            font-size: 12px!important;
+        }
+    </style>
+</head>
+<body>
+    <div layout:fragment="contents" th:remove="tag">
+        <input type="hidden" id="startDt" value="20000101" />
+        <input type="hidden" id="endDt" th:value="${#calendars.format(#calendars.createNow(), 'yyyyMMdd')}" />
+        <input type="hidden" id="inputData" th:value="${data}" />
+        <input type="hidden" id="outputData" value="" />
+        <input type="hidden" id="inputName" th:value="${name}" />
+        <div class="container-fluid mt-1">
+            <div class="row">
+                <div class="col-12">
+                    <h4>경력인증</h4>
+                </div>
+            </div>
+            <div class="row">
+                <div class="row mb-3">
+                    <div class="col-12 text-right">
+                        <a class="btn btn-primary" href="/static/cert/file/NXiSAS.exe" id="install_file_btn" style="color:#FFF"><span>설치파일</span></a>
+                        <a class="btn btn-primary" href="#" id="cert_btn" style="color:#FFF"><span>경력인증</span></a>
+                    </div>
+                </div>
+                <div class="row result">
+                    <div class="col-12">
+                        <div class="alert-info p-2 mb-2" style="background: #F0F0F0">
+                            <b>[경력인증 받기 안내]</b><br/>
+- 사전준비 -<br/>
+* 범용개인 공인인증서가 설치되어 있어야 합니다.<br/>
+* 정부24 사이트에 로그인 후 약관동의가 되어 있어야 합니다.<br/>
+- 경력인증받기 순서<br/>
+1. 설치파일 다운로드 및 실행<br/>
+2. 경력인증 버튼 클릭 (인증서 비번 입력 후 인증절차 진행)<br/>
+3. 회원님이 입력한 경력사항과 경력인증결과를 비교하여 복사버튼 클릭 후 회원님의 회사명을 클릭하면 인증결과로 입력값이 변경됨<br />
+4. 회원님의 입력값을 인증결과로 모두 변경하였다면 수정사항 적용 버튼 클릭. 인증여부가 인증완료로 변경됨<br />
+5. 경력인증 적용 버튼 클릭하면 경력인증 절차 완료
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <h5>입력값</h5>
+                        <table class="table table-bordered table-center">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">회사명</th>
+                                    <th class="text-center">취득일</th>
+                                    <th class="text-center">상실일</th>
+                                    <th class="text-center">인증여부</th>
+                                </tr>
+                            </thead>
+                            <tbody id="resultArea">
+                                <tr><td colspan="4" class="text-center">경력인증을 진행해주세요</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-6">
+                        <h5>경력인증결과</h5>
+                        <table class="table table-bordered table-center">
+                            <thead>
+                            <tr>
+                                <th class="text-center">회사명</th>
+                                <th class="text-center">취득일</th>
+                                <th class="text-center">상실일</th>
+                                <th class="text-center">복사</th>
+                            </tr>
+                            </thead>
+                            <tbody id="resultParseArea">
+                                <tr><td colspan="4" class="text-center">경력인증을 진행해주세요</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 text-center">
+                    <button type="button" class="btn btn-primary" data-role="complete" style="display: none">경력인증 적용</button>
+                    <button type="button" class="btn btn-danger" data-role="register" onclick="changeData();" style="display: none">수정사항 적용</button>
+                </div>
+            </div>
+        </div>
+        <script type="text/javascript">
+            let d1, d2, d3;
+            $(document).on("click", "[data-role=copy]", function(){
+               alert("복사할 입력값을 클릭해주세요.");
+               d1 = $(this).closest("tr").find("td:eq(0)").text();
+               d2 = $(this).closest("tr").find("td:eq(1)").text();
+               d3 = $(this).closest("tr").find("td:eq(2)").text();
+            });
+
+            $("[data-role=complete]").click(function(){
+               if(confirm("경력인증을 적용하시겠습니까?")){
+                   opener.document.getElementById("resultData").value = JSON.stringify(inputData);
+                   $(opener.document).find("#resultData").click();
+                   window.close();
+               }
+            });
+
+            $(document).on("focus", "input[name=companyName], input[name=entranceYm], input[name=resignationYm]", function(){
+               if(d1 != "" && d2 != "" && d3 != "") {
+                   $(this).closest("tr").find("input[name=companyName]").val(d1);
+                   $(this).closest("tr").find("input[name=entranceYm]").val(d2);
+                   $(this).closest("tr").find("input[name=resignationYm]").val(d3);
+                   d1 = "";
+                   d2 = "";
+                   d3 = "";
+               }
+            });
+
+            function makeData(){
+                $(data[0]["Output"]["Result"]["자격이력내역서"]).each(function(){
+                    resultData.push({
+                        'companyName': this["사업장명칭"],
+                        'entranceYm': this["취득_전근일"].substring(0, 6),
+                        'resignationYm': this["상실일"] == "" ? "" : this["상실일"].substring(0, 6)
+                    });
+                });
+                parseData();
+            }
+
+            function changeData(){
+                inputData = [];
+                $(".dt").each(function(i){
+                    inputData.push({
+                        idx: $(this).find("input[name=idx]").val(),
+                        companyName: $(this).find("input[name=companyName]").val().trim(),
+                        entranceYm: $(this).find("input[name=entranceYm]").val().trim(),
+                        resignationYm: $(this).find("input[name=resignationYm]").val().trim()
+                    });
+                });
+
+                $(resultData).each(function(){
+                    this.certFlag = "N";
+                });
+
+                $("[data-role=complete]").show();
+
+                parseData();
+            }
+
+            function parseData(){
+                $(".result").show();
+                $("#resultArea").empty();
+                $("#resultParseArea").empty();
+                if($("#inputName").val() == data[0]["Output"]["Result"]["신청인_성명"]){
+                    $(inputData).each(function(){
+                        let self = this;
+                        $(resultData).each(function(){
+                            if(self.companyName == this.companyName && self.entranceYm == this.entranceYm && self.resignationYm == this.resignationYm && this.certFlag != "Y"){
+                                // 인증 된 경우
+                                this.certFlag = "Y";
+                                self.certFlag = "Y";
+                            }
+                        });
+                    });
+
+                    $(inputData).each(function(){
+                        if(this.certFlag == "Y"){
+                            let html = "<tr class='dt'><td class=\"text-center\"><input type='hidden' name='idx' value='" + this.idx + "'/><input class='form-control' name='companyName' readonly value='" + this.companyName + "' /></td><td class=\"text-center\"><input class='form-control' name='entranceYm' readonly value='" + this.entranceYm + "' /></td><td class=\"text-center\"><input class='form-control' name='resignationYm' readonly value='" + this.resignationYm + "' /></td><td class='text-center'>인증완료</td></tr>";
+                            $("#resultArea").append(html);
+                        } else {
+                            let html = "<tr class='dt'><td class=\"text-center\"><input type='hidden' name='idx' value='" + this.idx + "'/><input class='form-control' name='companyName' value='" + this.companyName + "' /></td><td class=\"text-center\"><input class='form-control' name='entranceYm' value='" + this.entranceYm + "' /></td><td class=\"text-center\"><input class='form-control' name='resignationYm' value='" + this.resignationYm + "' /></td><td class='text-center'>인증필요</td></tr>";
+                            $("#resultArea").append(html);
+                        }
+                    });
+
+                    $(resultData).each(function(){
+                        let html = "<tr><td class='text-center'>" + this.companyName + "</td><td class='text-center'>" + this.entranceYm + "</td><td class='text-center'>" + this.resignationYm + "</td><td class='text-center'><button data-role='copy' class='btn btn-sm btn-primary'>복사</button></td></tr>";
+                        $("#resultParseArea").append(html);
+                    });
+
+                    $("[data-role=register]").show();
+                } else {
+                    alert("신청인과 이력서의 본인이름이 일치하지 않아 경력인증을 하실수 없습니다.");
+                }
+            }
+
+            let certFlag = false;
+            let certificationFlag = false;
+            let timeIntv;
+            let timeIntv2;
+            let data = [];
+            let resultData = [];
+            let inputData = JSON.parse($("#inputData").val());
+
+            // 인증서 로그인
+            $("#cert_btn").click(function(){
+                clearTime();
+                $('#makeCertManager').makeCertManager(function (c){
+                    let obj = [];
+                    let obj2 = [];
+                    obj2.push({
+                            "Module":"MinWon",
+                            "Class":"민원신청조회",
+                            "Job":"로그인",
+                            "Input":{
+                                "로그인방식":"CERT",
+                                "인증서":{
+                                    "이름": c['RDN'],
+                                    "만료일자": c['ExpiryDate'],
+                                    "비밀번호": c['CertPwd']
+                                }
+                            }
+                    });
+                    obj.push(obj2);
+                    search(obj);
+                    checkTime();
+                });
+            });
+
+            function checkTime() {
+                timeIntv = setInterval(() => {
+                    if(certFlag){
+                        let obj = [];
+                        let obj2 = [];
+                        obj2.push({
+                            "Module":"MinWon",
+                            "Class":"민원신청조회",
+                            "Job":"고용보험자격이력내역서",
+                            "Input":{
+                                "조회시작일": $("#startDt").val(),
+                                "조회종료일": $("#endDt").val()
+                            }
+                        });
+                        obj.push(obj2);
+                        search(obj);
+                        clearTime();
+                        checkTime2();
+                    }
+                }, 1000);
+            }
+
+            function clearTime() {
+                clearInterval(timeIntv);
+            }
+
+            function checkTime2() {
+                timeIntv2 = setInterval(() => {
+                    if(certificationFlag){
+                        makeData();
+                        clearTime2();
+                    }
+                }, 1000);
+            }
+
+            function clearTime2() {
+                clearInterval(timeIntv2);
+            }
+
+            $(document).ready(function () {
+                /*스크래핑 모듈 초기화 */
+                CooconiSASNX.init( function (b){
+                    //실행가능여부
+                    if(!b){
+                        //설치페이지 이동
+                        alert('인증 모듈이 설치되어 있지 않습니다. 설치파일을 클릭하셔서 설치 후 이용하시기 바랍니다.');
+                        return;
+                    }
+                    CooconiSASNX.open(0, function(){
+                        CooconiSASNX.getCertList(function(certList){});
+                    } );
+                });
+            });
+
+            /**
+             * 암호화
+             **/
+            function encrypt(data){
+                var input = {} ;
+                input['Data'] = data;
+                input['Uid'] = CooconiSASNX.OpenUid;
+                input['Action'] = CooconiSASNX.OpenAction;
+                var param = "data="+ encodeURIComponent(  JSON.stringify(input) );
+                var rtn = {};
+                $.ajax({
+                    url : "/fo/common/encode",
+                    type: "POST",
+                    data : param,
+                    async: false,
+                    success: function(data, textStatus, jqXHR) {
+                        rtn = data['Result'];
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        alert("error");
+                        rtn=null;
+                    }
+                });
+                return rtn;
+            }
+
+            /* 데이터 복호화 */
+            function decrypt(data){
+                var input = {} ;
+                input['Data'] = data;
+                input['Uid'] = CooconiSASNX.OpenUid;
+                input['Action'] = CooconiSASNX.OpenAction;
+                var param = "data="+ encodeURIComponent(  JSON.stringify(input) );
+
+                var rtn = null;
+                $.ajax({
+                    url : "/fo/common/decode",
+                    type: "POST",
+                    data : param,
+                    async: false,
+                    success: function(data, textStatus, jqXHR) {
+                        rtn = data.data['Result'];
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        alert("error");
+                    }
+                });
+                return rtn;
+            }
+
+            function search(obj){
+                var input_param = obj;
+                if(!$.isArray(input_param)){
+                    alert('Input 구조를 확인하세요.');
+                    return;
+                }
+
+                var ThreadLength = input_param.length;
+
+                /**
+                 * Scraping Start
+                 */
+                $("#PROCMANAGER").makeProcessManager(ThreadLength);
+
+                /* Open시 쓰레드 갯수 정의 */
+                CooconiSASNX.open(ThreadLength , function (res){
+                    if(res.ErrorCode == "00000000" ){//Open 성공
+                        for(var ThreadIndex=0; ThreadIndex< ThreadLength ; ThreadIndex++){
+                            if(!$.isArray(input_param[ThreadIndex])){
+                                alert('Thread별 Input 구조를 확인하세요.');
+                                return;
+                            }
+
+                            CooconiSASNX.execute(input_param[ThreadIndex], ThreadIndex , function (res1, seq){
+                                /**
+                                 * 복호화 및 결과 처리
+                                 */
+                                $.each(res1, function (o){
+                                    var r = res1[o].Output;
+                                    if( r!= null && r['Result'] != null && r['Result'] != "" && typeof r['Result'] == "string"){
+                                        /**
+                                         * 스크래핑 결과 데이터 복호화
+                                         **/
+                                        r['Result'] = JSON.parse( decrypt( r['Result'] ) );
+                                    }
+                                });
+
+                                if(res1[0]["Job"] == "로그인" && res1[0]["Output"]["ErrorCode"] == "00000000"){
+                                    certFlag = true;
+                                } else if(res1[0]["Job"] == "고용보험자격이력내역서" && res1[0]["Output"]["ErrorCode"] == "00000000"){
+                                    certificationFlag = true;
+                                    data = res1;
+                                }
+                            });
+                        }
+                    } else {
+                        alert(res.ErrorCode +"\n" +res.ErrorMessage);
+                        return;
+                    }
+                });
+            }
+
+            function sortJSON(input){
+                return JSON.stringify(input, null, 4) ;
+            }
+        </script>
+    </div>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.bo.BoFaqCategoryMapper">
+
+    <!-- FAQ 카테고리 조회 -->
+    <select id="selectCategoryNm" parameterType="BoFaqCategoryDTO" resultType="BoFaqCategoryDTO">
+        /* com.fw.core.mapper.db1.bo.BoFaqCategoryMapper.selectCategoryNm, FAQ 카테고리 조회, 22.09.30, dongbeom, BoFaqCategoryMapper.xml */
+      	SELECT faq_category_seq
+              , member_type_cd
+              , category_nm
+              , del_flag
+              , create_seq
+              , create_dt
+              , update_seq
+              , update_dt
+        FROM tb_faq_category
+        WHERE del_flag = 'N'
+        <if test='memberTypeCd != null and memberTypeCd !=""'>
+            AND member_type_cd = #{memberTypeCd}
+        </if>
+        ORDER BY faq_category_seq desc
+    </select>
+    
+    <!-- FAQ 카테고리 등록 -->
+    <insert id="insertCategory" parameterType="BoFaqCategoryDTO">
+        /* com.fw.core.mapper.db1.bo.BoFaqMapper.insertCategory, FAQ 카테고리 등록, 22.09.30, dongbeom, BoFaqCategoryMapper.xml */
+        INSERT INTO tb_faq_category (
+               member_type_cd
+             , category_nm
+             , del_flag
+             , create_seq
+             , create_dt
+        ) VALUES (
+               #{memberTypeCd}
+             , #{categoryNm}
+             , 'N'
+             , #{adminSession.adminSeq}
+             , NOW()
+        )
+    </insert>
+    
+    <!-- 카테고리 삭제(delFlag Y 업데이트) -->
+    <update id="deleteCategory" parameterType="BoFaqCategoryDTO">
+        /* com.fw.core.mapper.db1.bo.BoFaqMapper.deleteCategory, 카테고리 삭제(delFlag Y 업데이트), 22.10.04, dongbeom , BoFaqCategoryMapper.xml */
+        UPDATE tb_faq_category
+        SET del_flag = 'Y'
+        WHERE faq_category_seq = #{faqCategorySeq}
+    </update>   
+
+    <!-- 카테고리 관련 FAQ 삭제(delFlag Y 업데이트) -->
+    <update id="deleteCategoryFAQ" parameterType="BoFaqCategoryDTO">
+        /* com.fw.core.mapper.db1.bo.BoFaqMapper.deleteCategory, 카테고리 삭제(delFlag Y 업데이트), 22.10.04, dongbeom , BoFaqCategoryMapper.xml */
+        UPDATE tb_faq
+        SET del_flag = 'Y'
+        WHERE faq_category_seq = #{faqCategorySeq}
+    </update>
+
+</mapper>

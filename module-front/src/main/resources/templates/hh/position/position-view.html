@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layouts/hh/mainLayout}">
+<body>
+<div id="container-block" layout:fragment="contents" th:remove="tag">
+    <div class="container">
+        <div class="sub-content">
+            <h3 class="subtitle poppins">포지션 상세보기</h3>
+            <div class="title-line mt-4 mb-5"></div>
+            <div class="apply-wrap-body write">
+                <div class="content d-flex justify-content-between">
+                    <div class="d-flex align-items-center mb-3">
+                        <h4 class="table-subtitle">테스트 포지션등록 (지원하지마세요)</h4>
+                        <span class="m-l-10">포지션 등록일:</span>
+                        <span class="m-l-5 text-danger">2022.11.01</span>
+                    </div>
+                    <div>
+                        <button type="button"><i class="icon-share"></i></button>
+                        <button type="button" class="btn btn-primary btn-md m-l-10">참여중</button>
+                    </div>
+                </div>
+                <!-- 기업정보 -->
+                <div class="content">
+                    <h4 class="table-subtitle mb-3 m-t-25">기업정보</h4>
+                    <div class="desc">
+                        <table class="table">
+                            <caption>
+                                기업정보
+                            </caption>
+                            <colgroup>
+                                <col width="15%"/>
+                                <col width="35%"/>
+                                <col width="15%"/>
+                                <col width="35%"/>
+                            </colgroup>
+                            <tbody>
+                            <tr>
+                                <th class="">기업명</th>
+                                <td class="">
+                                    <p>(주)삼성전자</p>
+                                </td>
+                                <th class="">설립일</th>
+                                <td class="">
+                                    <p>2017.04.10</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="">대표자</th>
+                                <td class="">
+                                    <p>이재용</p>
+                                </td>
+                                <th class="">도로명주소</th>
+                                <td class="">
+                                    <p>서울 구로구 디지털로 272, 1007호</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="">전화번호</th>
+                                <td class="">
+                                    <p></p>
+                                </td>
+                                <th class="">업종명 10차</th>
+                                <td class="">
+                                    <p>정상</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="">기업규모</th>
+                                <td class="">
+                                    <p>대기업</p>
+                                </td>
+                                <th class="">기업상태</th>
+                                <td class="">
+                                    <p>정상</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="">상장</th>
+                                <td class="" colspan="3">
+                                    <p>대상</p>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- end -->
+
+                <!-- 공고내용 -->
+                <div class="content">
+                    <div class="d-flex align-items-center mb-3">
+                        <h4 class="table-subtitle">공고내용</h4>
+                        <span class="m-l-10">공고내용은 사용자에게 전체공개 됩니다.</span>
+                    </div>
+                    <div class="desc border-bottom-0">
+                        <p>
+                            테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트</p>
+                    </div>
+                </div>
+                <!-- end -->
+
+                <!-- 코웍정보 -->
+                <div class="content">
+                    <div class="d-flex align-items-center mb-3">
+                        <h4 class="table-subtitle">코웍정보</h4>
+                    </div>
+                    <div class="desc border-bottom-0">
+                        <table class="table">
+                            <caption>
+                                코웍정보
+                            </caption>
+                            <colgroup>
+                                <col width="15%"/>
+                                <col width="35%"/>
+                                <col width="15%"/>
+                                <col width="35%"/>
+                            </colgroup>
+                            <tbody>
+                            <tr>
+                                <th class="">코웍 참여자 수</th>
+                                <td class="">
+                                    <p><span class="text-danger">1</span>명</p>
+                                </td>
+                                <th class="">이력서 제출 수</th>
+                                <td class="">
+                                    <p><span class="font-bold">2</span>건</p>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- end -->
+
+                <!-- 코웍조건 -->
+                <div class="content">
+                    <div class="d-flex align-items-center mb-3">
+                        <h4 class="table-subtitle">코웍조건</h4>
+                    </div>
+                    <div class="desc">
+                        <table class="table">
+                            <caption>
+                                코웍조건
+                            </caption>
+                            <colgroup>
+                                <col width="15%"/>
+                                <col width="35%"/>
+                                <col width="15%"/>
+                                <col width="35%"/>
+                            </colgroup>
+                            <tbody>
+                            <tr>
+                                <th class="">계약수수료율</th>
+                                <td class="" colspan="3">
+                                    <p>10</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="">보증기간</th>
+                                <td class="" colspan="3">
+                                    <p>6개월</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="">기타사항</th>
+                                <td class="" colspan="3">
+                                    <p>테스트 포지션 등록</p>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- end -->
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

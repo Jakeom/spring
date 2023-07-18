@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.api.ApiAlarmMapper">
+
+	<sql id="paging">
+    	<choose>
+		    <when test='sortColumn != null and sortColumn != "" and orderType != null and orderType != ""'>
+		      ORDER BY ISNULL(${sortColumn}) , ${sortColumn} ${orderType}
+		    </when>
+		    <otherwise>
+		      ORDER BY create_time DESC
+		    </otherwise>
+		</choose>
+		<if test='endRow > 0'>
+            LIMIT #{startRow}, #{endRow}
+        </if>
+    </sql>
+
+	<!-- 알림 리스트 -->
+    <select id="selectAlarmList" parameterType="ApiPushHistDTO" resultType="ApiPushHistDTO">
+        /* com.fw.core.mapper.db1.api.ApiAlarmMapper.selectAlarmList, 알림 리스트, 23.01.07, YJW, ApiAlarmMapper.xml */
+		SELECT push_hist_seq
+			 , disp_type
+			 , fn_get_common_cd(disp_type,'NOTIFICATION_TYPE','1') AS dispTypeNm
+			 , member_id
+			 , title
+			 , content
+			 , img_nm
+			 , img_path
+			 , img_size
+			 , url
+			 , phone_type
+			 , phone_token
+			 , DATE_FORMAT(send_time, '%Y-%m-%d %H:%i:%s') AS sendTime
+			 , set_time
+			 , send_yn
+			 , reserve_yn
+			 , create_id
+			 , DATE_FORMAT(create_time, '%Y-%m-%d %H:%i:%s') AS createTime
+			 , update_id
+			 , update_time
+			 , receive_yn
+			 , receive_time
+		FROM tb_push_hist
+		WHERE member_id = #{memberId}
+	 	  AND delFlag = 'N'
+	      AND disp_type NOT IN ('AP_CHAT','HH_CHAT','CHAT')
+		<include refid="paging"/>
+    </select>
+
+	<!-- 알림 카운트 -->
+	<select id="selectAlarmCnt" parameterType="ApiPushHistDTO" resultType="int">
+		/* com.fw.core.mapper.db1.api.ApiAlarmMapper.selectAlarmCnt, 알림 카운트, 23.01.07, YJW, ApiAlarmMapper.xml */
+		SELECT COUNT(1)
+		FROM tb_push_hist
+		WHERE member_id = #{memberId}
+		  AND delFlag = 'N'
+		  AND disp_type NOT IN ('AP_CHAT','HH_CHAT','CHAT')
+	</select>
+
+    <!-- 알림 수정 -->
+    <update id="updateAlarm" parameterType="ApiPushHistDTO">
+    	/* com.fw.core.mapper.db1.api.ApiAlarmMapper.updateAlarm, 알림 수정, 23.01.07, YJW, ApiAlarmMapper.xml */
+    	UPDATE tb_push_hist
+		   SET receive_time = NOW()
+		     , update_time = NOW()
+			 , receive_yn = #{receiveYn}
+		<if test="delFlag != null and delFlag !=''">
+ 			 , delFlag = #{delFlag}
+		</if>
+		WHERE push_hist_seq = #{pushHistSeq}
+    </update>
+
+    <!-- 알림설정조회 (HH) -->
+    <select id="selectAlarmSettingHh" parameterType="ApiApAlertDTO" resultType="ApiApAlertDTO">
+        /* com.fw.core.mapper.db1.api.ApiAlarmMapper.selectAlarmSettingHh, 맞춤 인재알림 설정 조회 (HH), 22.12.08, wsh, ApiAlarmMapper.xml */
+		SELECT taa.ap_alert_seq 
+			 , taa.industry																
+			 , taa.career_st																
+			 , taa.career_en																
+			 , taa.age_st																		
+			 , taa.age_en																		
+			 , taa.salary_st																
+			 , taa.salary_en																
+			 , taa.hp1
+			 , GROUP_CONCAT(DISTINCT tah.hp2) AS hp2String
+			 , taa.company																	
+			 , taa.foreign_lang																
+			 , taa.certificate																
+			 , GROUP_CONCAT(DISTINCT tal.loc) AS locString
+			 , m.hh_ap_flag		/* 맞춤인재 알림여부 */
+			 , m.hh_resu_flag	/* 이력서 접수 알림여부 */
+			 , m.hh_msg_flag	/* 메시지 알림여부 */
+			 , m.hh_ap_msg_flag	/* 후보자 메시지 알림여부 */
+			 , m.hh_comm_flag	/* 커뮤니티 알림여부 */
+			 , CASE WHEN m.agreeMarketing = '0' THEN 'N'
+					WHEN m.agreeMarketing = '1' THEN 'Y' END AS agreeMarketing
+			 , DATE_FORMAT(m.agreeMarketingAt, '%Y-%m-%d %H:%i:%s') AS agreeMarketingAt
+		FROM tb_ap_alert AS taa
+	LEFT JOIN member AS m ON taa.member_id = m.id
+	LEFT JOIN tb_ap_hp AS tah ON tah.ap_alert_seq = taa.ap_alert_seq
+	LEFT JOIN tb_ap_loc AS tal ON tal.ap_alert_seq = taa.ap_alert_seq
+		WHERE taa.del_flag = 'N' AND taa.member_id = #{memberId}
+	</select>
+
+	<!-- 알림설정 조회 (AP) -->
+	<select id="selectAlarmSettingAp" parameterType="ApiApAlertDTO" resultType="ApiApAlertDTO">
+		/* com.fw.core.mapper.db1.api.ApiAlarmMapper.selectAlarmSettingAp, 알림설정 조회 (AP), 22.12.12, YJW, ApiAlarmMapper.xml */
+		SELECT ap_posi_flag /* 맞춤 채용공고 알림여부 */
+			 , ap_alarm_flag /* 메시지 알림여부 */
+			 , ap_comm_flag /* 커뮤니티 알림여부 */
+			 , (CASE
+			        WHEN agreeMarketing = '0' THEN 'N'
+					WHEN agreeMarketing = '1' THEN 'Y'
+			    END) AS agreeMarketing /* 마케팅 동의여부 */
+			 , DATE_FORMAT(agreeMarketingAt, '%Y-%m-%d %H:%i:%s') AS agreeMarketingAt /* 마케팅 동의여부 변경날짜 */
+		FROM member
+		WHERE id = #{memberId}
+    </select>
+
+	<!-- 맞춤 채용공고 직무 리스트 (AP) -->
+	<select id="selectApIndustryList" parameterType="ApiApAlertDTO" resultType="ApiApAlertDTO">
+		/* com.fw.core.mapper.db1.api.ApiAlarmMapper.selectApIndustryList, 맞춤 채용공고 직무 리스트 (AP), 22.12.12, YJW, ApiAlarmMapper.xml */
+		SELECT position_alert_seq
+			 , industry
+		FROM tb_position_alert
+		WHERE member_id = #{memberId} AND del_flag = 'N'
+	</select>
+
+	<!-- 알림 설정 수정 (AP) -->
+	<update id="updateApAlarmFlag" parameterType="ApiApAlertDTO">
+		/* com.fw.core.mapper.db1.api.ApiAlarmMapper.updateApAlarmFlag, 알림 설정 수정 (AP), 22.12.12, YJW, ApiAlarmMapper.xml */
+		UPDATE member
+		   SET id = #{memberId}
+		<if test='apAlarmFlag != null and apAlarmFlag !=""'>
+		     , ap_alarm_flag = #{apAlarmFlag}
+		</if>
+		<if test='apCommFlag != null and apCommFlag !=""'>
+			 , ap_comm_flag = #{apCommFlag}
+		</if>
+		<if test='apPosiFlag != null and apPosiFlag !=""'>
+			 , ap_posi_flag = #{apPosiFlag}
+		</if>
+		<if test='agreeMarketing != null and agreeMarketing !=""'>
+			 , agreeMarketing = #{agreeMarketing}
+		     , agreeMarketingAt = NOW()
+		</if>
+		WHERE id = #{memberId}
+	</update>
+
+	<!-- 맞춤 채용공고 직무 삭제 (AP) -->
+	<update id="updateApIndustry" parameterType="ApiApAlertDTO">
+		/* com.fw.core.mapper.db1.api.ApiAlarmMapper.updateApIndustry, 맞춤 채용공고 직무 삭제 (AP), 22.12.12, YJW, ApiAlarmMapper.xml */
+		UPDATE tb_position_alert
+		   SET del_flag = 'Y'
+		WHERE position_alert_seq = #{positionAlertSeq} AND member_id = #{memberId}
+	</update>
+
+	<!-- 맞춤 채용공고 직무 등록 (AP)-->
+	<insert id="insertApIndustry" parameterType="ApiApAlertDTO">
+		/* com.fw.core.mapper.db1.api.ApiAlarmMapper.insertApIndustry, 맞춤 채용공고 직무 등록 (AP), 22.12.12, YJW, ApiAlarmMapper.xml */
+		INSERT INTO tb_position_alert (
+		       industry
+		     , member_id
+		     , del_flag
+		     , reg_seq
+		     , reg_date
+		) VALUES (
+		 	   #{industry}
+		 	 , #{memberId}
+		 	 , 'N'
+		 	 , #{memberId}
+		 	 , NOW()
+		)
+	</insert>
+
+	<!-- 알림 설정 수정 (HH) -->
+	<update id="updateHhAlarmFlag" parameterType="ApiApAlertDTO">
+		/* com.fw.core.mapper.db1.api.ApiAlarmMapper.updateHhAlarmFlag, 알림 설정 수정 (HH), 22.12.12, YJW, ApiAlarmMapper.xml */
+		UPDATE member
+		   SET id = #{memberId}
+		<if test='hhResuFlag != null and hhResuFlag !=""'>
+			, hh_resu_flag = #{hhResuFlag}
+		</if>
+		<if test='hhMsgFlag != null and hhMsgFlag != ""'>
+			, hh_msg_flag = #{hhMsgFlag}
+		</if>
+		<if test='hhApMsgFlag != null and hhApMsgFlag != ""'>
+			, hh_ap_msg_flag = #{hhApMsgFlag}
+		</if>
+		<if test='hhCommFlag != null and hhCommFlag != ""'>
+			, hh_comm_flag = #{hhCommFlag}
+		</if>
+		<if test='agreeMarketing != null and agreeMarketing != ""'>
+			, agreeMarketing = #{agreeMarketing}
+			, agreeMarketingAt = NOW()
+		</if>
+		<if test='hhApFlag != null and hhApFlag != ""'>
+			, hh_ap_flag = #{hhApFlag}
+		</if>
+		WHERE id = #{memberId}
+	</update>
+
+	<!-- 맞춤 인재 알림 존재여부(등록/수정 분별) -->
+	<select id="selectApAlertCheck" parameterType="ApiApAlertDTO" resultType="boolean">
+		/* com.fw.core.mapper.db1.fo.ApiAlarmMapper.selectApAlertCheck, 맞춤 인재 알림 존재여부(등록/수정 분별), YJW, ApiAlarmMapper.xml */
+		SELECT EXISTS (
+					   SELECT 1
+					   FROM tb_ap_alert
+					   WHERE del_flag = 'N'
+						 AND member_id = #{memberId}
+				   ) AS CNT
+	</select>
+
+    <!-- 맞춤 인재 알림 설정 등록 (HH) -->
+    <insert id="insertHhAlarmSetting" parameterType="ApiApAlertDTO" >
+    	/* com.fw.core.mapper.db1.api.ApiAlarmMapper.insertHhAlarmSetting, 맞춤 인재 알림 설정 등록 (HH), 22.12.12, YJW, ApiAlarmMapper.xml */
+   		INSERT INTO tb_ap_alert (
+   		       industry
+   		     , career_st
+   		     , career_en
+   		     , age_st
+   		     , age_en
+   		     , salary_st
+   		     , salary_en
+   		     , hp1
+   		     , company
+   		     , foreign_lang
+   		     , certificate
+   		     , member_id
+   		     , reg_seq
+   		     , reg_date
+   		) VALUES (
+   		       #{industry}
+   		     , #{careerSt}
+   		     , #{careerEn}
+   		     , #{ageSt}
+   		     , #{ageEn}
+   		     , #{salarySt}
+   		     , #{salaryEn}
+   		     , #{hp1}
+   		     , #{company}
+   		     , #{foreignLang}
+   		     , #{certificate}
+   		     , #{memberId}
+   		     , #{memberId}
+   		     , NOW()
+   		)
+		<selectKey order="AFTER" keyProperty="apAlertSeq" resultType="String">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+   	</insert>
+
+	<!-- 맞춤인재 알림설정 수정 (HH) -->
+	<update id="updateHhAlarmSetting" parameterType="ApiApAlertDTO">
+		/* com.fw.core.mapper.db1.api.ApiAlarmMapper.updateHhAlarmSetting, 맞춤인재 알림설정 수정 (HH), 22.12.08, wsh, ApiAlarmMapper.xml */
+		UPDATE tb_ap_alert
+		   SET industry = #{industry}
+			 , career_st = #{careerSt}
+			 , career_en = #{careerEn}
+			 , age_st = #{ageSt}
+			 , age_en = #{ageEn}
+			 , salary_st = #{salarySt}
+			 , salary_en = #{salaryEn}
+			 , hp1 = #{hp1}
+			 , company = #{company}
+			 , foreign_lang = #{foreignLang}
+			 , certificate = #{certificate}
+		WHERE member_id = #{memberId}
+	</update>
+
+   	<!-- hp2 등록(HH) -->
+   	<insert id="insertHp2" parameterType="ApiApAlertDTO" >
+   		/* com.fw.core.mapper.db1.api.ApiAlarmMapper.insertHp2, hp2 등록(HH), 22.12.12, YJW, ApiAlarmMapper.xml */
+   	 	INSERT INTO tb_ap_hp
+   	 	(
+   	 	  ap_alert_seq
+   	 	, hp2 
+   	 	) VALUES 
+   	 	<foreach collection="hp2" item="item" separator="," >
+   	 	(
+   	 	  #{apAlertSeq}
+   	 	, #{item}
+   	 	)
+   	 	</foreach>
+   	</insert>
+
+   	<!-- loc 등록(HH) -->
+   	<insert id="insertLoc" parameterType="ApiApAlertDTO" >
+   		/* com.fw.core.mapper.db1.api.ApiAlarmMapper.insertLoc, loc 등록(HH), 22.12.12, YJW, ApiAlarmMapper.xml */
+   	 	INSERT INTO tb_ap_loc
+   	 	(
+   	 	  ap_alert_seq
+   	 	, loc 
+   	 	) VALUES 
+   	 	<foreach collection="loc" item="item" separator=",">
+   	 	(
+   	 	  #{apAlertSeq}
+		, #{item}
+   	 	)
+   	 	</foreach>
+   	</insert>
+
+	<!-- hp2 삭제(HH) -->
+	<delete id="deleteHp2" parameterType="ApiApAlertDTO" >
+		/* com.fw.core.mapper.db1.api.ApiAlarmMapper.deleteHp2, hp2 삭제(HH), 22.12.12, YJW, ApiAlarmMapper.xml */
+		DELETE
+		FROM tb_ap_hp
+		WHERE ap_alert_seq = #{apAlertSeq}
+	</delete>
+
+	<!-- loc 삭제(HH) -->
+	<delete id="deleteLoc" parameterType="ApiApAlertDTO" >
+		/* com.fw.core.mapper.db1.api.ApiAlarmMapper.deleteLoc, loc 삭제(HH), 22.12.12, YJW, ApiAlarmMapper.xml */
+		DELETE
+		FROM tb_ap_loc
+		WHERE ap_alert_seq = #{apAlertSeq}
+	</delete>
+
+	<!-- ApAlertSeq 조회 (수정 시) -->
+	<select id="selectApAlertSeq" parameterType="ApiApAlertDTO" resultType="ApiApAlertDTO">
+		/* com.fw.core.mapper.db1.api.ApiAlarmMapper.selectApAlertSeq,  ApAlertSeq 조회 (수정 시), 22.12.12, YJW, ApiAlarmMapper.xml */
+		SELECT ap_alert_seq
+		FROM tb_ap_alert
+		WHERE del_flag = 'N' AND member_id = #{memberId}
+	</select>
+</mapper>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/default}">
+<body>
+	<div layout:fragment="contents" th:remove="tag">
+		<input type="hidden" id="bannerDetailBannerSeq"
+			th:value="${bannerDetail.bannerSeq}" />
+		<main id="content" role="main">
+			<h2 class="title">배너 상세</h2>
+			<div class="row p-3">
+            	<div class="col-12">
+					<table class="table table-bordered">
+						<colgroup>
+							<col style="width:120px" />
+							<col />
+						</colgroup>
+						<tbody>
+							<tr>
+								<th class="text-center none-sort">배너종류</th>
+								<td th:text="${bannerDetail.bannerType}"></td>
+							</tr>
+							<tr>
+								<th class="text-center none-sort">배너이름</th>
+								<td th:text="${bannerDetail.bannerNm}"></td>
+							</tr>
+							<tr>
+								<th class="text-center none-sort">배너순서</th>
+								<td th:text="${bannerDetail.bannerOrder}"></td>
+							</tr>
+							<tr>
+								<th class="text-center none-sort">사용여부</th>
+								<td th:text="${bannerDetail.useFlag}"></td>
+							</tr>
+							<tr>
+								<th class="text-center none-sort">배너 시작일자</th>
+								<td th:text="${bannerDetail.bannerStartDt}"></td>
+							</tr>
+							<tr>
+								<th class="text-center none-sort">배너 종료일자</th>
+								<td th:text="${bannerDetail.bannerEndDt}"></td>
+							</tr>
+							<tr>
+								<th class="text-center none-sort">링크 URL</th>
+								<td th:text="${bannerDetail.linkUrl}"></td>
+							</tr>
+							<tr>
+								<th class="text-center none-sort">첨부파일</th>
+								<td><th:block th:unless="${#lists.isEmpty(file)}"
+										th:each="list : ${file}">
+										<a th:name="${list.id}" th:text="${list.originName}"
+											th:href="${list.url}"></a>
+										<p></p>
+										<img th:src="${list.url}" style='width:500px;'>
+									</th:block></td>
+							</tr>
+						</tbody>
+					</table>
+					<div class="m-t-5 text-right">
+						<button type="button" class="btn btn-dark"
+							data-role="update">수정하기</button><!--
+						<button type="button" class="btn btn-dark"
+							data-role="delete">삭제하기</button>-->
+						<button type="button" class="btn btn-dark"
+							data-role="list">목록</button>
+					</div>
+				</div>
+			</div>
+		</main>
+	</div>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/default}">
+
+<body>
+	<div layout:fragment="contents" th:remove="tag">
+		<main id="content" role="main">
+			<h2 class="title">정보 등록</h2>
+			<div class="row p-3">
+	            <div class="col-12">
+					<!-- form -->
+					<form id="insertInfo" name="insertInfo">
+						<table class="table table-bordered">
+							<colgroup>
+								<col style="width:120px" />
+								<col />
+							</colgroup>
+							<tr>
+								<th class="text-center">종류</th>
+								<td>
+									<select id="selectType" name="selectType" data-role="select"
+										class="form-control w-auto bg-secondary" data-url="/bo/cd/INFO "
+										data-default-option="선택">
+									</select>
+								</td>
+							</tr>
+							<tr>
+								<td colspan="2">
+									<textarea id="infoContent" name="infoContent"
+										placeholder="내용을 입력하세요" class="form-control ckeditor" rows="12"
+										cols="50"></textarea>
+								</td>
+							</tr>
+						</table>
+						<div class="m-t-10 text-right">
+							<button type="button" class="btn btn-primary float-right" id="Save" data-role="save">등록</button>
+							<button type="button" class="btn btn-danger float-right" id="list" data-role="list">취소</button>
+						</div>
+					</form>
+					<!-- form -->
+				</div>
+			</div>
+		</main>
+	</div>
+</body>
+</html>

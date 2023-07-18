@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/applicationLayout}">
+<body>
+<div id="container-block">
+    <div layout:fragment="contents" th:remove="tag">
+        <form name="reportFormBasic" th:action="${reportDomain} + '/report/ubi4/ubihtml_1.jsp?jrf=report4.jrf'" method="POST" enctype="application/json" target="reportFormBasic">
+          <input type="hidden" name="data">
+        </form>
+        <div class="layout-content">
+            <h3 class="subtitle poppins">취업활동증명서 발급</h3>
+            <div class="title-line mt-4 mb-5"></div>
+            <div class="row row-0">
+                <ol class="step mt-n3">
+                    <li class="">
+                        <a href="/fo/user/application/past-support"><span>과거 지원 결과</span></a>
+                    </li>
+                    <li class="active">
+                        <a href="/fo/user/application/employment-certificate"><span>취업활동증명서 발급</span></a>
+                    </li>
+                </ol>
+            </div>
+            <div class="example-form">
+                <ul>
+                    <li>Resume에서 온라인으로 입사지원한 내용을 증명하는 문서로, 취업활동 확인자료로 사용할 수 있습니다.</li>
+                    <li>홈페이지, 우편, FAX, 전화, 방문지원의 경우 본 시스템과 연동되어 있지 않으니 해당 기업에 직접 요청하시기 바랍니다.</li>
+                    <li>삭제되거나 삭제한 채용정보는 증명서 내용에 포함할 수 없습니다.</li>
+                </ul>
+            </div>
+            <form name="searchForm">
+                <input type="hidden" name="page" th:value="${searchInfo.page}"/>
+            </form>
+            <div class="fake-table">
+                <div class="fake-table-head">
+                    <div class="fake-table-cell">선택</div>
+                    <div class="fake-table-cell">지원일</div>
+                    <div class="fake-table-cell">회사명</div>
+                    <div class="fake-table-cell">연락처</div>
+                    <div class="fake-table-cell">주소</div>
+                </div>
+                <th:block th:if="${#lists.isEmpty(positionList)}">
+                    <div class="fake-table-column none-data">
+                        <div class="fake-table-cell">
+                            <p></p>
+                        </div>
+                        <div class="fake-table-cell">
+                            <p></p>
+                        </div>
+                        <div class="fake-table-cell">
+                            <p></p>
+                        </div>
+                        <div class="fake-table-cell">
+                            <p class="none-data__desc">데이터가 없습니다.</p>
+                        </div>
+                        <div class="fake-table-cell">
+                            <p></p>
+                        </div>
+                    </div>
+                </th:block>
+                <th:block th:each="list : ${positionList}">
+                    <div class="fake-table-column">
+                        <div class="fake-table-cell">
+                            <div class="form-check p-0">
+                                <input class="form-check-input" name="id" th:value="${list.id}" type="checkbox"
+                                       id="multipleCheck"/>
+                            </div>
+                        </div>
+                        <div class="fake-table-cell" th:text="${list.createdAt}">2022.10.19</div>
+                        <div class="fake-table-cell" th:text="${list.companyName}">앤쉬컨설팅(주)</div>
+                        <div class="fake-table-cell" th:text="${list.phone}">***-****-****</div>
+                        <div class="fake-table-cell" th:text="${list.address}">서울특별시 강남구 테헤란로16길 9</div>
+                    </div>
+                </th:block>
+            </div>
+            <div class="d-flex justify-content-end m-t-15">
+                <a href="javascript:void(0);" data-role="openReport" class="btn btn-outline-primary btn-md">PDF 다운로드</a>
+            </div>
+            <div class="d-flex justify-content-center mt-5">
+                <th:block
+                        th:include="common/paging :: paging_Fragment(fnc=*{'fn_go_page(this)'}, pageId=*{'pageName1'})"/>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

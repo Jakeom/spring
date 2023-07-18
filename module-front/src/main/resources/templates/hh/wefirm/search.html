@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layouts/hh/hhWefirmLayout">
+<body>
+<div id="container-block">
+    <div layout:fragment="contents" th:remove="tag">
+        <div class="layout-content">
+            <h3 class="subtitle">We펌 검색</h3>
+            <div class="title-line mt-4 mb-5"></div>
+            <form name="searchForm" action="/hh/wefirm/search">
+                <input type="hidden" name="page" th:value="${searchInfo.page}"/>
+                <div class="sub-content-head">
+                    <div class="search-area">
+                        <div class="input-group">
+                            <input type="text" class="form-control p-l-20" name="searchValue" th:value="${searchInfo.searchValue}" placeholder="서치펌명으로 검색하세요."/>
+                            <div class="input-group-append">
+                                <button class="btn btn-primary btn-input-search" type="button" data-role="search">검색</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-end m-b-15 p-0">
+                    <select class="select-design" name="orderType" style="width: 150px">
+                        <option value="SEQUENCE" th:selected="${'SEQUENCE' eq searchInfo.orderType}">가나다순</option>
+                        <option value="CREATED" th:selected="${'CREATED' eq searchInfo.orderType}">개설일순</option>
+                    </select>
+                </div>
+            </form>
+            <th:block th:if="${#lists.isEmpty(wefirmList)}">
+                <div class="fake-table-none text-center">We펌 리스트가 없습니다.</div>
+            </th:block>
+            <div class="d-flex justify-content-center mt-5 mb-5"></div>
+            <div class="business-card">
+                <th:block th:each="list : ${wefirmList}">
+                    <div class="business-card-list">
+                        <div class="company">
+                            <a href="#" class="text-underline" th:text="${list.name}" data-role="apply" th:data-id="${list.id}">(주)블록체인글로벌</a>
+                            <th:block th:each="item : ${list.commonFileList}">
+                                <img th:src="${item.url eq null ? '/static/images/logo.svg' : item.url}" alt="We펌 로고"/>
+                            </th:block>
+                        </div>
+                        <div class="desc">
+                            <p th:text="${list.description}">이건 상세 설명 칸</p>
+                        </div>
+                    </div>
+                </th:block>
+            </div>
+            <div class="d-flex justify-content-center mt-5">
+                <th:block th:include="common/paging :: paging_Fragment(fnc=*{'fn_go_page(this)'}, pageId=*{'pageName1'})"/>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

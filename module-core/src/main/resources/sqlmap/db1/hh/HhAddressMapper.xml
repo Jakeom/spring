@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.hh.HhAddressMapper">
+
+
+
+    <!-- 내 주소록 - 연락처 추가 -->
+    <insert id="insertContact">
+    /* com.fw.core.mapper.db1.hh.HhAddressMapper.insertContact, 내 주소록 -  연락처 추가, yhEom, HhAddressMapper.xml */
+     INSERT INTO hh_contacts (email, memo, name, phone, group_id, createdAt, updatedAt) 
+     VALUES 
+     (#{email}, #{memo}, #{name}, #{phone}, #{groupId}, NOW(), NOW());
+
+    </insert>
+
+    <!-- 내 주소록 - 연락처 그룹이동/ 수정 / 삭제 -->
+    <update id="updateContact" parameterType="HhContactsGroupDTO">
+    /* com.fw.core.mapper.db1.hh.HhAddressMapper.updateContact, 내 주소록 -  연락처 수정/삭제, yhEom, HhAddressMapper.xml */
+      UPDATE hh_contacts A
+      INNER JOIN (
+        <foreach item="item" index="index" collection="checkFieldArr"
+              open="" separator="union" close="">
+                SELECT #{item} AS id
+          </foreach>
+      ) B ON A.id = B.id
+      SET 
+      updatedAt = NOW()
+      <if test="name != null and name != ''">
+          ,A.name=#{name} 
+      </if>
+
+      <if test="email != null and email != ''">
+          ,A.email=#{email} 
+      </if>
+
+      <if test="email != null and email != ''">
+          ,A.memo=#{memo} 
+      </if>
+
+      <if test="groupId != null and groupId != ''">
+          ,A.group_id=#{groupId} 
+      </if>
+      
+      <if test="delFlag != null and delFlag != ''">
+          , A.delFlag =#{delFlag}
+      </if>     
+    </update>
+
+    <!-- 내 주소록 - 그룹생성 -->
+    <insert id="insertContactgroup">
+    /* com.fw.core.mapper.db1.hh.HhAddressMapper.insertContactgroup, 내 주소록 -  그룹생성, yhEom, HhAddressMapper.xml */
+     INSERT INTO hh_contacts_group (createdAt, updatedAt, name, member_id) 
+     VALUES 
+     (NOW(), NOW(), #{name}, #{frontSession.id})
+    </insert>
+    
+    <!-- 내 주소록 -  그룹 수정 -->
+    <update id="updateContactgroup" parameterType="HhContactsGroupDTO">
+    /* com.fw.core.mapper.db1.hh.HhAddressMapper.updateContactgroup, 내 주소록 -  그룹 수정, yhEom, HhAddressMapper.xml */
+      UPDATE hh_contacts_group 
+      SET 
+      name=#{name} 
+      <if test="delFlag != null and delFlag != ''">
+          , delFlag =#{delFlag}
+      </if>
+      WHERE  id = #{id};
+    </update>
+
+    <!-- 내 주소록 - 그룹리스트 취득 -->
+    <select id="selectContractGroup" resultType="HhContactsGroupDTO">
+    /* com.fw.core.mapper.db1.hh.HhAddressMapper.selectContractGroup, 내 주소록 -  그룹리스트 취득, yhEom, HhAddressMapper.xml */
+      SELECT * FROM hh_contacts_group
+      WHERE member_id = #{frontSession.id}
+        AND delFlag = 'N'
+    </select>
+
+    <!-- 내 주소록 -  주소록 개수 -->
+    <select id="selectHhContactsListCount" resultType="int">
+    /* com.fw.core.mapper.db1.hh.HhAddressMapper.selectHhContactsListCount, 내 주소록 -  주소록 개수 , yhEom, HhAddressMapper.xml */
+      SELECT COUNT(1) FROM hh_contacts A
+      LEFT JOIN hh_contacts_group B ON B.id = A.group_id AND B.delFlag = 'N'
+      WHERE B.member_id =#{frontSession.id} AND A.delFlag = 'N'
+        <if test="groupId != null and groupId != ''">
+            AND A.group_id = #{groupId}
+        </if>
+
+        <if test="keyword != null and keyword != '' and searchType =='PHONE'">
+            AND A.phone LIKE CONCAT('%',#{keyword},'%')
+        </if>
+
+        <if test="keyword != null and keyword != '' and searchType =='EMAIL'">
+            AND A.email LIKE CONCAT('%',#{keyword},'%')
+        </if>
+
+        <if test="keyword != null and keyword != '' and searchType =='NAME'">
+            AND A.name LIKE CONCAT('%',#{keyword},'%')
+        </if>
+
+        <if test="email != null and email != ''">
+            AND A.email = #{email}
+        </if>
+
+        <if test="phone != null and phone != ''">
+            AND A.phone = #{phone}
+        </if>
+        
+    </select>
+
+    <!-- 내 주소록 -  주소록 취득 -->
+    <select id="selectHhContactsList" resultType="HhContactsDTO">
+    /* com.fw.core.mapper.db1.hh.HhAddressMapper.selectHhContactsListCount, 내 주소록 -  주소록 취득 , yhEom, HhAddressMapper.xml */
+      SELECT A.id
+           , A.email
+           , A.memo
+           , A.name
+           , A.phone
+           , A.position
+           , A.group_id
+           , DATE_FORMAT(A.createdAt,'%Y-%m-%d') AS createdAt
+           , A.updatedAt
+           , A.company
+           , A.delFlag
+           , B.name AS groupNm
+           , DATE_FORMAT((SELECT hsm.createdAt FROM hh_send_msg hsm INNER JOIN hh_send_msg_target hsmt on hsmt.msg_id = hsm.id WHERE hsmt.name = A.name ORDER BY hsm.createdAt DESC LIMIT 1),'%Y-%m-%d') AS lastSendAt
+      FROM hh_contacts A
+      LEFT JOIN hh_contacts_group B ON B.id = A.group_id AND B.delFlag = 'N'
+      WHERE B.member_id =#{frontSession.id} AND A.delFlag = 'N'
+
+        <if test="groupId != null and groupId != ''">
+            AND A.group_id = #{groupId}
+        </if>
+
+        <if test="keyword != null and keyword != '' and searchType =='PHONE'">
+            AND A.phone LIKE CONCAT('%',#{keyword},'%')
+        </if>
+
+        <if test="keyword != null and keyword != '' and searchType =='EMAIL'">
+            AND A.email LIKE CONCAT('%',#{keyword},'%')
+        </if>
+
+        <if test="keyword != null and keyword != '' and searchType =='NAME'">
+            AND A.name LIKE CONCAT('%',#{keyword},'%')
+        </if>
+
+        <include refid="common.paging" />
+    </select>
+
+
+</mapper>

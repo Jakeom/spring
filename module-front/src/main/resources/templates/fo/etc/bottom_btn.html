@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/mainLayout">
+<div id="container-block" layout:fragment="contents" th:remove="tag">
+    <th:block th:if="${alarmCnt != null}">
+        <a href="javascript:void(0)" class="chat-notice" th:classappend="${alarmCnt > 0 ? 'active' : ''}">
+            <i class="icon-chat-notice"></i>
+        </a>
+    </th:block>
+    <a href="#" class="top-btn">
+        <i class="icon-top-btn"></i>
+    </a>
+</div>
+</body>
+</html>

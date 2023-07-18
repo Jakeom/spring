@@ -1,0 +1,56 @@
+spring:
+  profiles:
+    active: local
+    include:
+      - app
+      - db
+      - file
+  mvc:
+    static-path-pattern: /static/**
+  config:
+    messages:
+      basename: messages/fo/message
+      encoding: UTF-8
+  thymeleaf:
+    cache: false
+    check-template-location: true
+    prefix: classpath:/templates/
+    suffix: .html
+
+---
+# local
+spring:
+  config:
+    activate:
+      on-profile: local
+server:
+  port: 8079
+  servlet:
+    session:
+      cookie:
+        name: FO-JSESSIONID
+api:
+  url: http://localhost:8081
+service:
+  mail_path: C:/Users/MyCom/mail/
+
+# JWT Setting
+# AccessToken = Minute, RefreshToken = Day
+jwt:
+  secret:
+    key: xxx
+  access:
+    token:
+      expiration: 10
+  refresh:
+    token:
+      expiration: 30
+
+app-config:
+  host-url: http://localhost:3000
+  bootpay:
+    rest-application-id: xxx
+    web-application-id: xxx
+    private-key: "xxx="
+
+---

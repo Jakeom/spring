@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/empty">
+<body>
+    <div layout:fragment="contents" th:remove="tag">
+        <form name="searchForm">
+            <input type="hidden" name="page" th:value="${searchInfo.page}"/>
+            <div class="tbl-head address-tool">
+                <div class="d-flex align-items-center gap-10">
+                    <button type="button" class="btn btn-outline-gray btn-md" data-role="deleteMsg"><i class="icon-trash m-r-5"></i> 선택삭제</button>
+                    <button type="button" class="btn btn-outline-gray btn-md" data-role="resendMsg">선택 재발송</button>
+                </div>
+                <div class="d-flex gap-10">
+                    <!-- 검색 시 처리 필요 -->
+                    <select class="select-design" name="rowSize">
+                        <option value="10">10개씩</option>
+                        <option value="30" th:selected="${searchInfo.endRow eq 30}">30개씩</option>
+                        <option value="50" th:selected="${searchInfo.endRow eq 50}">50개씩</option>
+                    </select>
+                    <select class="select-design" name="searchType" style="width: 120px">
+                        <option value="name" th:selected="${searchInfo.searchType} eq 'name'">받는사람</option>
+                        <option value="titleContent" th:selected="${searchInfo.searchType} eq 'titleContent'">제목+내용</option>
+                    </select>
+                    <input type="text" class="form-control white form-md" th:value="${searchInfo.searchValue}" name="searchValue" style="width: 200px"/>
+                    <button type="button" class="btn btn-outline-gray btn-md" data-role="search">검색</button>
+                </div>
+            </div>
+        </form>
+        <table class="table m-t-15 border-top-1">
+            <colgroup>
+                <col style="width:15%" />
+                <col style="width:15%" />
+                <col style="width:40%" />
+                <col style="width:15%" />
+                <col style="width:15%" />
+            </colgroup>
+            <thead>
+            <tr>
+                <th class="text-center">
+                    <div class="form-check p-0">
+                        <label for="msgAllChk"></label>
+                        <input class="form-check-input" type="checkbox" value="" id="msgAllChk" name="msgAllChk" />
+                    </div>
+                </th>
+                <th class="text-center">수신인</th>
+                <th class="text-center">내용</th>
+                <th class="text-center">형태</th>
+                <th class="text-center">발송일시</th>
+            </tr>
+            </thead>
+            <tbody>
+            <th:block th:if="${#lists.isEmpty(msgList)}">
+                <tr>
+                    <td colspan="8" class="text-center">발송한 문자내역이 없습니다.</td>
+                </tr>
+            </th:block>
+            <tr th:each="list : ${msgList}">
+                <td class="text-center">
+                    <div class="form-check p-0">
+                        <label for="msgChk"></label>
+                        <input class="form-check-input" th:value="${list.id}" th:data-media="${list.media}" type="checkbox" id="msgChk" name="msgChk" />
+                    </div>
+                </td>
+                <td class="text-center">
+                    <p th:text="${list.name}">곽정석</p>
+                </td>
+                <td class="text-center sms-hover">
+                    <!-- 마우스 오버 시 전체 내용 노출 -->
+                    <p class="off" th:text="${list.content}">
+                        합격통보합니다. ….
+                    </p>
+                    <p class="on" th:text="${list.content}">
+                        합격통보합니다. ….
+                    </p>
+                </td>
+                <td class="text-center">
+                    <p th:text="${#strings.length(list.content) > 60  ? 'LMS' : 'SMS'}">SMS/LMS/MMS</p>
+                </td>
+                <td class="text-center">
+                    <p th:text="${list.createdAt}">11-08 12:36:27</p>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <div class="d-flex justify-content-center mt-5">
+            <th:block th:include="common/paging :: paging_Fragment(fnc=*{'fn_go_page(this)'}, pageId=*{'pageName1'})"/>
+        </div>
+    </div>
+</body>
+</html>

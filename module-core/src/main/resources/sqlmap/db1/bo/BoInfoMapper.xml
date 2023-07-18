@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.bo.BoInfoMapper">
+
+    <!--정보  리스트 조회-->
+    <select id="selectInfoList" resultType="BoInfoDTO" >
+        /* com.fw.core.mapper.db1.bo.BoInfoMapper.selectInfoList, selectInfoList, 2022.11.15, Ghazal, BoInfoMapper.xml */
+        SELECT main_display_seq
+             , info_type
+             , fn_get_common_cd(info_type, 'INFO', 1) AS infoTypeCd
+             , content
+             , file_seq
+             , use_flag
+             , del_flag
+             , reg_seq
+             , date_format(reg_date, '%Y-%m-%d %H:%i') as reg_date
+        FROM tb_info
+        WHERE del_flag = 'N'
+    </select>
+
+    <!--정보  검색-->
+    <select id="searchInfoList" resultType="BoInfoDTO">
+        /* com.fw.core.mapper.db1.bo.BoInfoMapper.searchInfoList, searchInfoList, 2022.11.15, Ghazal, BoInfoMapper.xml */
+        SELECT main_display_seq
+             , info_type
+             , fn_get_common_cd(info_type, 'INFO', 1) AS infoTypeCd
+             , content
+             , file_seq
+             , use_flag
+             , del_flag
+             , reg_seq
+             , date_format(reg_date, '%Y-%m-%d %H:%i') as reg_date
+        FROM tb_info
+        WHERE date_format(reg_date, '%Y-%m-%d') BETWEEN #{searchStart} AND #{searchEnd}
+        AND del_flag = 'N'
+    </select>
+
+    <!--정보  상세조회-->
+    <select id="selectInfoDetail" parameterType="BoInfoDTO" resultType="BoInfoDTO">
+        /* com.fw.core.mapper.db1.bo.BoInfoMapper.selectInfoDetail, selectInfoDetail, 2022.11.15, Ghazal, BoInfoMapper.xml */
+        SELECT main_display_seq
+             , info_type
+             , fn_get_common_cd(info_type, 'INFO', 1) AS infoTypeCd
+             , content
+             , file_seq
+             , use_flag
+             , del_flag
+             , reg_seq
+             , date_format(reg_date, '%Y-%m-%d %H:%i') as reg_date
+        FROM tb_info
+        WHERE del_flag = 'N'
+          AND main_display_seq = #{mainDisplaySeq}
+    </select>
+    <!-- 정보  상세 modify -->
+    <select id="selectInfoModify" parameterType="BoInfoDTO" resultType="BoInfoDTO">
+        /* com.fw.core.mapper.db1.bo.InfoMapper.selectInforModify, 정보  상세 조회, 2022.11.15, Ghazal , InfoMapper.xml */
+        SELECT main_display_seq
+             , info_type
+             , fn_get_common_cd(info_type, 'INFO', 1) AS infoTypeCd
+             , content
+             , file_seq
+             , use_flag
+             , del_flag
+             , reg_seq
+             , date_format(reg_date, '%Y-%m-%d %H:%i') as reg_date
+        FROM tb_info
+        WHERE main_display_seq = #{mainDisplaySeq}
+        AND del_flag = 'N'
+    </select>
+
+    <!-- 정보  등록-->
+    <insert id="insertInfo" parameterType="BoInfoDTO">
+        /* com.fw.core.mapper.db1.bo.InfoMapper.insertInfo, 정보 등록, 2022.11.15, Ghazal , InfoMapper.xml */
+        INSERT INTO tb_info (
+                             info_type
+                            , content
+                            , del_flag
+                            , reg_date
+                            , use_flag
+                            , reg_seq
+        ) VALUES (
+                 #{infoType}
+                 , #{content}
+                 , 'N'
+                 , NOW()
+                 , 'N'
+                 , #{adminSession.adminSeq}
+                 )
+    </insert>
+
+    <!-- 정보  수정-->
+    <update id="updateInfo" parameterType="BoInfoDTO">
+        /* com.fw.core.mapper.db1.bo.InfoMapper.updateInfo, 정보 수정, 2022.11.15, Ghazal  , InfoMapper.xml */
+        UPDATE tb_info
+        SET
+           content= #{content}
+          , reg_date = NOW()
+          , reg_seq = #{adminSession.adminSeq}
+        WHERE main_display_seq = #{mainDisplaySeq}
+    </update>
+
+    <!-- 정보  삭제 -->
+    <delete id="deleteInfo" parameterType="BoInfoDTO">
+        /* com.fw.core.mapper.db1.bo.InfoMapper.deleteInfo, 정보 삭제, 2022.11.15, Ghazal , InfoMapper.xml */
+        UPDATE tb_info
+        SET del_flag = 'Y'
+        WHERE main_display_seq = #{mainDisplaySeq}
+    </delete>
+
+</mapper>

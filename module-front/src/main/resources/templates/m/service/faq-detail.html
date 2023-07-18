@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/mLayout">
+<body>
+<div id="container-block" layout:fragment="contents" th:remove="tag">
+  <div class="container">
+    <div class="sub-content">
+      <div class="row row-40 align-items-center">
+        <h3 class="subtitle">FAQ 상세</h3>
+        <div class="title-line mt-4 mb-4"></div>
+        <div class="poting-detail-wrap">
+          <div class="d-flex justify-content-between">
+            <div class="announcement-wrap">
+              <input type="hidden" name="id" th:value="${faqInfo.faqSeq}">
+              <div class="title" th:text="${'Q. '+faqInfo.title}"></div>
+            </div>
+            <div></div>
+          </div>
+          <div class="desc" th:utext="${faqInfo == null ? '' : faqInfo.content}"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

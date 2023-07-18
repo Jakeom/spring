@@ -1,0 +1,437 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.bo.BoApprovalMapper">
+
+    <!-- headhunter 리스트 조회-->
+    <select id="selectHeadhunterRequestList" resultType="BoHhApprovalRequestDTO">
+        /* com.fw.core.mapper.db1.bo.BoApprovalMapper.selectHeadhunterRequestList,  selectHeadhunterRequestList,  2022.10.24,  Ghazal,  BoApprovalMapper.xml */
+        SELECT  h.id as id
+             , date_format(h.createdAt, '%Y-%m-%d %H:%i') as createdAt
+             , date_format(h.updatedAt, '%Y-%m-%d %H:%i') as updatedAt
+             , date_format(h.completedAt, '%Y-%m-%d %H:%i') as completedAt
+             , h.denyReason as denyReason
+             , h.status
+             , h.backoffice_admin_id
+             , h.hh_member_id as memberId
+             , h.delFlag
+             , m.name as memberName
+             , ta.admin_nm as adminName
+             , m.id memberId
+        FROM hh_approval_request h JOIN member m ON h.hh_member_id = m.id LEFT JOIN tb_admin ta ON h.backoffice_admin_id = ta.admin_seq
+        WHERE h.delFlag != 'Y'
+        AND m.deleted != 1
+    </select>
+
+    <!-- headhunter 검색-->
+    <select id="saerchHeadhunterRequestList" resultType="BoHhApprovalRequestDTO">
+        /* com.fw.core.mapper.db1.bo.BoApprovalMapper.saerchHeadhunterRequestList,  saerchHeadhunterRequestList,  2022.10.24,  Ghazal,
+        BoApprovalMapper.xml */
+        SELECT  h.id
+        , date_format(h.createdAt, '%Y-%m-%d %H:%i') as createdAt
+        , date_format(h.updatedAt, '%Y-%m-%d %H:%i') as updatedAt
+        , date_format(h.completedAt, '%Y-%m-%d %H:%i') as completedAt
+        , h.denyReason as denyReason
+        , h.status
+        , h.backoffice_admin_id
+        , h.hh_member_id as memberId
+        , h.delFlag
+        , m.name as memberName
+        , ta.admin_nm as adminName
+        , m.id memberId
+        FROM hh_approval_request h JOIN member m ON h.hh_member_id = m.id LEFT JOIN tb_admin ta ON h.backoffice_admin_id = ta.admin_seq
+        <where>
+            AND h.delFlag != 'Y'
+            AND m.deleted != 1
+            <if test="searchStart != '' and searchStart!=null and searchEnd !='' and searchEnd!=null">
+                AND date_format(h.createdAt, '%Y-%m-%d') BETWEEN #{searchStart} AND #{searchEnd}
+            </if>
+            <if test="adminName != null and adminName!=''">
+                AND ta.admin_nm LIKE CONCAT('%', #{adminName}, '%')
+            </if>
+            <if test="memberEmail != null and memberEmail!=''">
+                AND m.email LIKE CONCAT('%', #{memberEmail}, '%')
+            </if>
+            <if test="memberName != null and memberName !='' ">
+                AND m.name LIKE CONCAT('%', #{memberName}, '%')
+            </if>
+            <if test=" memberPhone!='' and memberPhone!=null ">
+                AND m.phone LIKE CONCAT('%', #{memberPhone}, '%')
+            </if>
+            <if test="status!='' and status != null">
+                AND h.status = #{status}
+            </if>
+        </where>
+    </select>
+
+    <!-- headhunter status 검색-->
+    <select id="searchHeadhunter" resultType="BoHhApprovalRequestDTO">
+        /* com.fw.core.mapper.db1.bo.BoApprovalMapper.searchHeadhunterStatus,  searchHeadhunterStatus,  2022.10.24,  Ghazal,
+        BoApprovalMapper.xml */
+        SELECT  h.id
+             , date_format(h.createdAt, '%Y-%m-%d %H:%i') as createdAt
+             , date_format(h.updatedAt, '%Y-%m-%d %H:%i') as updatedAt
+             , date_format(h.completedAt, '%Y-%m-%d %H:%i') as completedAt
+             , h.denyReason as denyReason
+             , h.status
+             , h.backoffice_admin_id
+             , h.hh_member_id as memberId
+             , h.delFlag
+             , m.name as memberName
+             , ta.admin_nm as adminName
+        FROM hh_approval_request h JOIN member m ON h.hh_member_id = m.id LEFT JOIN tb_admin ta ON h.backoffice_admin_id = ta.admin_seq
+        WHERE h.id = #{id}
+    </select>
+
+
+    <!--headhunter 접수 내용 상세-->
+    <select id="selecthhRequestDetail" resultType="BoHhApprovalRequestDTO" >
+        /* com.fw.core.mapper.db1.bo.BoApprovalMapper.hhRequestDetail,  hhRequestDetail,  2022.10.24,  Ghazal, BoApprovalMapper.xml */
+        SELECT
+            h.id as id
+             , date_format(h.createdAt, '%Y-%m-%d %H:%i') as createdAt
+             , h.hh_member_id as memberId
+             , m.name as memberName
+             , m.email
+             , m.phone
+             , hh.sfCeoName
+             , hh.sfHomepageUrl
+             , hh.sfName
+             , hh.sfPhone
+             , hh.sfWorkerListFileId
+        FROM hh_approval_request h
+                 LEFT JOIN member m ON h.hh_member_id = m.id
+                 LEFT JOIN headhunter hh ON h.hh_member_id = hh.member_id
+        WHERE hh_member_id = #{memberId}
+    </select>
+
+    <!--headhunter 요청 거절 -->
+    <update id="updateRejectRequest" parameterType="BoOrgDTO">
+        /* com.fw.core.mapper.db1.bo.BoApprovalMapper.updateRejectRequest,  updateRejectRequest,  2022.10.24,  Ghazal,
+        BoApprovalMapper.xml */
+        UPDATE hh_approval_request
+        SET status = #{status}
+          , denyReason = #{denyReason}
+          , completedAt = NOW()
+          , backoffice_admin_id = #{adminSession.adminSeq}
+        WHERE id = #{id}
+    </update>
+    <!--headhunter 요청 승인 -->
+    <update id="updateAcceptRequest" parameterType="BoOrgDTO">
+        /* com.fw.core.mapper.db1.bo.BoApprovalMapper.updateAcceptRequest,  updateAcceptRequest,  2022.10.24,  Ghazal,
+        BoApprovalMapper.xml */
+        UPDATE hh_approval_request
+        SET status = #{status}
+          , completedAt = NOW()
+          , backoffice_admin_id = #{adminSession.adminSeq}
+        WHERE id = #{id}
+    </update>
+
+    <!-- wefirm 리스트 조회 -->
+    <select id="selectWefirmRequestList" resultType="BoWefirmRequestHistoryDTO">
+        /* com.fw.core.mapper.db1.bo.BoApprovalMapper.selectWefirmRequestList,  selectWefirmRequestList,  2022.10.24,  Ghazal,  BoApprovalMapper.xml */
+        SELECT
+            wh.id
+             , date_format(wh.createdAt, '%Y-%m-%d %H:%i') as createdAt
+             , date_format(wh.updatedAt, '%Y-%m-%d %H:%i') as updatedAt
+             , date_format(wh.completedAt, '%Y-%m-%d %H:%i') as completedAt
+             , wh.wefirm_id
+             , wh.backoffice_admin_id
+             , wh.requestType
+             , wh.denyReason
+             , w.ceo_member_id AS memberId
+             , wh.status
+             , wh.delFlag
+             , m.name as memberName
+             , ta.admin_nm as adminName
+        FROM wefirm_request_history wh
+            LEFT JOIN wefirm w ON w.id = wh.wefirm_id
+            LEFT JOIN tb_admin ta ON wh.backoffice_admin_id = ta.admin_seq LEFT JOIN member m ON w.ceo_member_id = m.id
+        WHERE wh.delFlag != 'Y'
+        AND m.deleted != 1
+
+    </select>
+
+    <!--위펌 접수 내용 상세-->
+    <select id="selectWefirmDetail" resultType="BoWefirmRequestHistoryDTO" >
+        /* com.fw.core.mapper.db1.bo.BoApprovalMapper.selectWefirmDetail,  selectWefirmDetail,  2022.10.24,  Ghazal, BoApprovalMapper.xml */
+        SELECT
+               date_format(wh.createdAt, '%Y-%m-%d %H:%i') as createdAt
+             , wh.requestType
+             , m.name as memberName
+             , m.email AS memberEmail
+             , m.phone AS memberPhone
+             , w.ceoName AS ceoName
+             , w.websiteUrl AS websiteUrl
+             , w.name
+             , w.logo_file_id AS fileId
+             , w.ceo_member_id
+        FROM wefirm_request_history wh
+                 LEFT JOIN wefirm w ON w.id = wh.wefirm_id
+                 LEFT JOIN member m ON w.ceo_member_id = m.id
+        WHERE wh.id = #{id}
+        AND m.deleted != 1
+    </select>
+
+    <!--wefirm 검색-->
+    <select id="saerchWefirmRequestList" resultType="BoWefirmRequestHistoryDTO">
+        /* com.fw.core.mapper.db1.bo.BoApprovalMapper.saerchWefirmRequestList,  saerchWefirmRequestList,  2022.10.24,  Ghazal,
+        BoApprovalMapper.xml */
+        SELECT  wh.id
+        , date_format(wh.createdAt, '%Y-%m-%d %H:%i') as createdAt
+        , date_format(wh.updatedAt, '%Y-%m-%d %H:%i') as updatedAt
+        , wh.wefirm_id
+        , wh.backoffice_admin_id
+        , wh.requestType
+        , wh.denyReason
+        , w.ceo_member_id
+        , wh.status
+        , m.id memberId
+        , date_format(wh.completedAt, '%Y-%m-%d %H:%i') as completedAt
+        , wh.delFlag
+        , m.name as memberName
+        , ta.admin_nm as adminName
+        FROM wefirm_request_history wh LEFT JOIN wefirm w ON w.id = wh.wefirm_id
+        LEFT JOIN tb_admin ta ON wh.backoffice_admin_id = ta.admin_seq LEFT JOIN member m ON w.ceo_member_id = m.id
+        <where>
+            AND wh.delFlag != 'Y'
+            AND m.deleted != 1
+            <if test="searchStart != '' and searchStart!=null and searchEnd !='' and searchEnd!=null">
+                AND date_format(wh.createdAt, '%Y-%m-%d') BETWEEN #{searchStart} AND #{searchEnd}
+            </if>
+            <if test=" adminName!='' and adminName!=null ">
+                AND ta.admin_nm LIKE CONCAT('%', #{adminName}, '%')
+            </if>
+            <if test="memberEmail != null and memberEmail!=''">
+                AND m.email LIKE CONCAT('%', #{memberEmail}, '%')
+            </if>
+            <if test="memberName != null and memberName !='' ">
+                AND m.name LIKE CONCAT('%', #{memberName}, '%')
+            </if>
+            <if test=" memberPhone!='' and memberPhone!=null ">
+                AND m.phone LIKE CONCAT('%', #{memberPhone}, '%')
+            </if>
+            <if test=" status!='' and status!=null ">
+                AND wh.status = #{status}
+            </if>
+        </where>
+    </select>
+
+    <!-- 위펌 요청 거절 -->
+    <update id="updateWefirmRejectRequest" parameterType="BoOrgDTO">
+        /* com.fw.core.mapper.db1.bo.BoApprovalMapper.updateWefirmRejectRequest,  updateWefirmRejectRequest,  2022.10.24,  Ghazal,
+        BoApprovalMapper.xml */
+        UPDATE wefirm_request_history
+        SET status = #{status}
+          , completedAt = NOW()
+          , denyReason = #{denyReason}
+          , backoffice_admin_id = #{adminSession.adminSeq}
+        WHERE id = #{id}
+    </update>
+    <!--위펌 요청 승인 -->
+    <update id="updateWefirmAcceptRequest" parameterType="BoOrgDTO">
+        /* com.fw.core.mapper.db1.bo.BoApprovalMapper.updateWefirmAcceptRequest,  updateWefirmAcceptRequest,  2022.10.24,  Ghazal,
+        BoApprovalMapper.xml */
+        UPDATE wefirm_request_history
+        SET status = #{status}
+          , completedAt = NOW()
+          , updatedAt = NOW()
+          , backoffice_admin_id = #{adminSession.adminSeq}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 서치펌 리스트 조회-->
+    <select id="selectSFRequestList" resultType="BoSfChangeRequestDTO">
+        /* com.fw.core.mapper.db1.bo.BoApprovalMapper.selectSFRequestList,  selectSFRequestList,  2022.10.24,  Ghazal,  BoApprovalMapper.xml */
+        SELECT
+            sf.id
+             , date_format(sf.createdAt, '%Y-%m-%d %H:%i') as createdAt
+             , date_format(sf.updatedAt, '%Y-%m-%d %H:%i') as updatedAt
+             , sf.member_id as memberId
+             , sf.status
+             , date_format(sf.completedAt, '%Y-%m-%d %H:%i') as completedAt
+             , sf.delFlag
+             , m.name as memberName
+             , ta.admin_nm as adminName
+        FROM sf_change_request sf
+        LEFT JOIN member m ON sf.member_id = m.id
+        LEFT JOIN tb_admin ta ON sf.backoffice_admin_id = ta.admin_seq
+        WHERE sf.delFlag = 'N'
+        AND m.deleted != 1
+    </select>
+
+    <!-- 서치펌 리스트 상세 조회-->
+    <select id="selectSFRequest" resultType="BoSfChangeRequestDTO">
+        /* com.fw.core.mapper.db1.bo.BoApprovalMapper.selectSFRequest,  selectSFRequest,  2022.10.24,  Ghazal,  BoApprovalMapper.xml */
+        SELECT
+            sf.id
+             , date_format(sf.createdAt, '%Y-%m-%d %H:%i') as createdAt
+             , date_format(sf.updatedAt, '%Y-%m-%d %H:%i') as updatedAt
+             , sf.member_id as memberId
+             , sf.status
+             , date_format(sf.completedAt, '%Y-%m-%d %H:%i') as completedAt
+             , sf.delFlag
+             , m.name as memberName
+             , ta.admin_nm as adminName
+        FROM sf_change_request sf
+        LEFT JOIN member m ON sf.member_id = m.id
+        LEFT JOIN tb_admin ta ON sf.backoffice_admin_id = ta.admin_seq
+        WHERE sf.delFlag = 'N'
+        AND sf.id = #{id}
+        AND m.deleted != 1
+    </select>
+
+    <!--서치펌 접수 내용 상세-->
+    <select id="selectSearchFirmDetail" resultType="BoSfChangeRequestDTO" >
+        /* com.fw.core.mapper.db1.bo.BoApprovalMapper.selectSearchFirmDetail,  selectSearchFirmDetail,  2022.10.24,  Ghazal, BoApprovalMapper.xml */
+        SELECT
+               sf.id as id
+             , date_format(sf.createdAt, '%Y-%m-%d %H:%i') as createdAt
+             , sf.member_id as memberId
+             , m.name as memberName
+             , m.email
+             , m.phone
+             , sf.sfCeoName
+             , sf.sfHomepageUrl
+             , sf.sfName
+             , sf.sfPhone
+             , sf.sfWorkerListFileId
+        FROM sf_change_request sf
+        LEFT JOIN member m ON sf.member_id = m.id
+        LEFT JOIN headhunter hh ON sf.member_id = hh.member_id
+        WHERE sf.member_id = #{memberId}
+    </select>
+
+    <!--서치펌 검색-->
+    <select id="saerchSFRequestList" resultType="BoSfChangeRequestDTO">
+        /* com.fw.core.mapper.db1.bo.BoApprovalMapper.saerchSFRequestList,  saerchSFRequestList,  2022.10.24,  Ghazal,
+        BoApprovalMapper.xml */
+        SELECT
+        sf.id
+        , date_format(sf.createdAt, '%Y-%m-%d %H:%i') as createdAt
+        , date_format(sf.updatedAt, '%Y-%m-%d %H:%i') as updatedAt
+        , sf.member_id as memberId
+        , sf.status
+        , date_format(sf.completedAt, '%Y-%m-%d %H:%i') as completedAt
+        , sf.delFlag
+        , m.name as memberName
+        , ta.admin_nm as adminName
+        FROM sf_change_request sf LEFT JOIN member m ON sf.member_id = m.id LEFT JOIN tb_admin ta ON sf.backoffice_admin_id = ta.admin_seq
+        <where>
+            sf.delFlag = 'N'
+            AND m.deleted != 1
+            <if test="searchStart != '' and searchStart!=null and searchEnd !='' and searchEnd!=null">
+                AND date_format(sf.createdAt, '%Y-%m-%d') BETWEEN #{searchStart} AND #{searchEnd}
+            </if>
+            <if test=" adminName!='' and adminName!=null ">
+                AND ta.admin_nm LIKE CONCAT('%', #{adminName}, '%')
+            </if>
+            <if test="memberEmail != null and memberEmail!=''">
+                AND m.email LIKE CONCAT('%', #{memberEmail}, '%')
+            </if>
+            <if test="memberName != null and memberName !='' ">
+                AND m.name LIKE CONCAT('%', #{memberName}, '%')
+            </if>
+            <if test=" memberPhone!='' and memberPhone!=null ">
+                AND m.phone LIKE CONCAT('%', #{memberPhone}, '%')
+            </if>
+            <if test=" status!='' and status!=null ">
+                AND sf.status = #{status}
+            </if>
+        </where>
+    </select>
+
+    <!--서치펌 요청 거절 -->
+    <update id="updateSFRejectRequest" parameterType="BoOrgDTO">
+        /* com.fw.core.mapper.db1.bo.BoApprovalMapper.updateSFRejectRequest,  updateSFRejectRequest,  2022.10.24,  Ghazal,
+        BoApprovalMapper.xml */
+        UPDATE sf_change_request
+        SET status = #{status}
+          , completedAt = NOW()
+          , denyReason = #{denyReason}
+          , backoffice_admin_id = #{adminSession.adminSeq}
+        WHERE id = #{id}
+    </update>
+    <!--서치펌 요청 승인 -->
+    <update id="updateSFAcceptRequest" parameterType="BoOrgDTO">
+        /* com.fw.core.mapper.db1.bo.BoApprovalMapper.updateSFAcceptRequest,  updateSFAcceptRequest,  2022.10.24,  Ghazal,
+        BoApprovalMapper.xml */
+        UPDATE sf_change_request
+        SET status = #{status}
+          , completedAt = NOW()
+          , backoffice_admin_id = #{adminSession.adminSeq}
+        WHERE id = #{id}
+    </update>
+
+    <!-- wefirm_request_history 조회 by id -->
+    <select id="selectWefirmRequestHistory" parameterType="BoWefirmRequestHistoryDTO" resultType="BoWefirmRequestHistoryDTO">
+        /* com.fw.core.mapper.db1.bo.BoApprovalMapper.selectWefirmRequestHistory,  selectWefirmRequestHistory,  2023.01.01,  YJW, BoApprovalMapper.xml */
+        SELECT id
+             , createdAt
+             , updatedAt
+             , completedAt
+             , denyReason
+             , requestType
+             , status
+             , backoffice_admin_id
+             , wefirm_id
+             , delFlag
+        FROM wefirm_request_history
+        WHERE id = #{id}
+    </select>
+
+    <!-- 위펌 관리자 조회 -->
+    <select id="selectWefirmAdminList" parameterType="BoWefirmRequestHistoryDTO" resultType="BoWefirmRequestHistoryDTO">
+        /* com.fw.core.mapper.db1.bo.BoApprovalMapper.selectWefirmAdminList,  위펌 관리자 조회,  2023.01.01,  YJW, BoApprovalMapper.xml */
+        SELECT member_id
+        FROM wefirm_admin
+        WHERE wefirm_id = #{wefirmId}
+          AND delFlag = 'N'
+
+        UNION
+
+        SELECT ceo_member_id
+        FROM wefirm
+        WHERE id = #{wefirmId}
+    </select>
+
+    <update id="updateWefirmApprovalHh" parameterType="BoWefirmRequestHistoryDTO">
+        UPDATE headhunter
+        SET wefirm_id = #{wefirmId}
+          , updatedAt = NOW()
+          , updateSeq = #{adminSession.adminSeq}
+        WHERE member_id = #{memberId}
+    </update>
+
+    <update id="updateWefirmApproval" parameterType="BoWefirmRequestHistoryDTO">
+        UPDATE wefirm
+        SET approveStatusCd = 1
+          , closed = 0
+          , updatedAt = NOW()
+        WHERE id = #{wefirmId}
+    </update>
+
+    <update id="updateWefirmRejectHh" parameterType="BoWefirmRequestHistoryDTO">
+        UPDATE headhunter
+        SET wefirm_id = null
+          , updatedAt = NOW()
+          , updateSeq = #{adminSession.adminSeq}
+        WHERE wefirm_id = #{wefirmId}
+    </update>
+
+    <update id="updateWefirmReject" parameterType="BoWefirmRequestHistoryDTO">
+        UPDATE wefirm
+        SET approveStatusCd = 0
+          , closed = 1
+          , updatedAt = NOW()
+        WHERE id = #{wefirmId}
+    </update>
+
+    <update id="updateHhApproved" parameterType="BoHhApprovalRequestDTO">
+        UPDATE headhunter
+        SET approved = 1
+          , updatedAt = NOW()
+          , updateSeq = #{adminSession.adminSeq}
+        WHERE member_id = #{memberId}
+    </update>
+
+</mapper>

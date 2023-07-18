@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/default}">
+
+<body>
+	<div layout:fragment="contents" th:remove="tag">
+		<input type="hidden" id="faqDetailSeq" th:value="${detail.faqSeq}" />
+		<main id="content" role="main">
+			<h2 class="title">상세보기</h2>
+			<div class="row p-3">
+            	<div class="col-12">
+					<!-- table -->
+					<table class="table table-bordered">
+						<colgroup>
+							<col style="width:120px" />
+							<col />
+						</colgroup>
+						<tbody>
+							<tr>
+								<th class="text-center">등록일</th>
+								<td>[[${detail.createDt}]]</td>
+							</tr>
+							<tr>
+								<th class="text-center">회원 타입</th>
+								<td>[[${detail.memberTypeCd}]] / [[${detail.categoryNm}]]</td>
+							</tr>
+							<tr>
+								<th class="text-center">제목</th>
+								<td>[[${detail.title}]]</td>
+							</tr>
+							<tr>
+								<td colspan="2" class="p-5" th:utext="${detail.content}">
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<div class="m-t-10 text-right">
+						<button type="button" class="btn btn-dark" data-role="faqModify" id="Update">수정하기</button>
+						<button type="button" class="btn btn-dark" data-role="delete" id="Delete">삭제하기</button>
+						<button type="button" class="btn btn-dark" data-role="faqList">목록</button>
+					</div>
+				</div>
+			</div>
+		</main>
+	</div>
+</body>
+</html>

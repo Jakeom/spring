@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/default}">
+<body>
+	<div layout:fragment="contents" th:remove="tag">
+		<main id="content" role="main">
+			<h2 class="title">공지사항 관리</h2>
+			<div class="row p-3">
+				<div class="col-12">
+					<table class="table table-bordered" id="displayDatatable">
+						<thead>
+						<tr>
+							<th class="text-center">No</th>
+							<th class="text-center">구분</th>
+							<th class="text-center">제목</th>
+							<th class="text-center">등록일시</th>
+							<th class="text-center">등록자</th>
+							<th class="text-center">삭제</th>
+						</tr>
+						</thead>
+						<tbody>
+							<tr id="row1">
+								<td>1</td>
+							</tr>
+							<tr id="row2">
+								<td>2</td>
+							</tr>
+							<tr id="row3">
+								<td>3</td>
+							</tr>
+							<tr id="row4">
+								<td>4</td>
+							</tr>
+							<tr id="row5">
+								<td>5</td>
+							</tr>
+						</tbody>
+					</table>
+					<!-- /위 테이블 -->
+					
+					<form id="searchNotice" name="searchNotice">
+						<div class="row mt-5">
+			                <div class="col-4">
+				                <div class="d-flex align-items-center">
+				                    <input type="text" id="noticeStartDt" name="noticeStartDt" class="form-control form-datepicker" placeholder="날짜 선택">
+				                    <div class="mr-2">~</div>
+				                    <input type="text" id="noticeEndDt" name="noticeEndDt" class="form-control form-datepicker" placeholder="날짜 선택">
+				                </div>
+			                </div>
+			                <div class="col-4">
+			                	<div class="d-flex align-items-center">
+				                	<button type="button" class="btn btn-dark" data-role="all">전체</button>
+									<button type="button" class="btn btn-dark" data-role="today">오늘</button>
+									<button type="button" class="btn btn-dark" data-role="week">7일</button>
+									<button type="button" class="btn btn-dark" data-role="month">1개월</button>
+			                    </div>
+			                </div>
+			                <div class="col-4 text-right">
+			                    <select id="selectType" name="selectType" class="custom-select w-auto mr-2" data-url="/bo/cd/BOARD_TYPE" data-default-option="선택"></select>
+			                    <button type="button" class="btn btn-primary" data-role="search">검색하기</button>
+			                    <button type="button" class="btn btn-dark" data-role="saveDisplay">메인등록</button>
+			                    <button type="button" class="btn btn-dark " id="noticeForm" data-role="form">공지 등록</button>
+			                </div>
+			            </div>
+			        </form>
+		
+					<div class="row mt-3">
+		              		<div class="col">
+							<!-- 아래 테이블 -->
+							<table id="datatable" class="table">
+								<thead>
+									<tr>
+										<th>
+											<input type="checkbox" class="form-check-input m-0 align-middle" th:id="mainCheckbox"/>
+										</th>
+										<th>No.</th>
+										<th>구분</th>
+										<th>제목</th>
+										<th>작성일시</th>
+										<th>작성자</th>
+										<th>수정일시</th>
+										<th>수정자</th>
+										<th>조회수</th>
+									</tr>
+								</thead>
+							</table>
+							<!-- /아래 테이블 -->
+						</div>
+					</div>
+				</div>
+			</div>
+		</main>
+	</div>
+</body>
+</html>

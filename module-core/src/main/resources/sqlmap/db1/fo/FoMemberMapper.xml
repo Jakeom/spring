@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.fo.FoMemberMapper">
+
+    <!-- 회원정보 등록 -->
+    <insert id="insertMember" parameterType="FoMemberDTO">
+        /* com.fw.core.mapper.db1.fo.FoMemberMapper.insertMember, 회원정보 등록, sjpaik, FoMemberMapper.xml */
+        INSERT INTO member (
+        loginId
+        , email
+        , name
+        , password
+        , phone
+        , createdAt
+        , agreeMarketing
+        , agreeMarketingAt
+        , agreeAd
+        , agreeAdAt
+        , DTYPE
+        , privacyExpire
+        , isTemp
+        , di
+        ) VALUES (
+        #{loginId}
+        , #{loginId}
+        , #{name}
+        , #{password}
+        , #{phone}
+        , NOW()
+        , #{agreeMarketing}
+        ,<choose>
+        <when test="agreeMarketing eq '1'.toString()">NOW()</when>
+        <otherwise>null</otherwise>
+    </choose>
+        , #{agreeAd}
+        ,<choose>
+        <when test="agreeAd eq '1'.toString()">NOW()</when>
+        <otherwise>null</otherwise>
+    </choose>
+        , #{dtype}
+        , #{privacyExpire}
+        , #{isTemp}
+        , #{di}
+        )
+        <selectKey order="AFTER" keyProperty="id" resultType="String">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <!-- 회원정보 중복 조회 -->
+    <select id="selectMemberNameDuplicateCheck" parameterType="FoMemberDTO" resultType="boolean">
+        /* com.fw.core.mapper.db1.fo.FoMemberMapper.selectMemberNameDuplicateCheck, 회원정보 중복 조회, sjpaik, FoMemberMapper.xml */
+        SELECT EXISTS (
+                       SELECT 1
+                       FROM member
+                       WHERE deleted = 0
+                         AND name = #{name}
+                         AND phone = #{phone}
+                   ) AS CNT
+    </select>
+
+    <!-- 중복 이메일 가입 조회 -->
+    <select id="selectMemberEmailDuplicateCheck" parameterType="FoMemberDTO" resultType="FoMemberDTO">
+        /* com.fw.core.mapper.db1.fo.FoMemberMapper.selectMemberEmailDuplicateCheck, 중복 이메일 가입 조회, sjpaik, FoMemberMapper.xml */
+        SELECT m.DTYPE
+             , m.id
+             , m.createdAt
+             , m.updatedAt
+             , m.agreeMarketing
+             , m.agreeMarketingAt
+             , m.deleted
+             , m.email
+             , m.isTemp
+             , m.loginId
+             , m.name
+             , m.passwordChangeDate
+             , m.phone
+             , m.privacyExpire
+             , m.privacyExpireDate
+             , m.profilePictureFileId
+             , m.deletedAt
+             , m.lastChangePassword
+             , m.pushToken
+             , m.useAppPush
+             , m.isStop
+             , m.passwordFailCount
+             , m.agreeAd
+             , m.agreeAdAt
+             , m.phoneType
+             , m.di
+             , m.ap_alarm_flag
+             , m.ap_comm_flag
+             , m.ap_posi_flag
+             , m.hh_resu_flag
+             , m.hh_msg_flag
+             , m.hh_ap_msg_flag
+             , m.hh_comm_flag
+             , m.hh_ap_flag
+             , a.birth
+             , a.findingJob
+             , a.genderCd
+             , a.resumeRestricted
+             , a.member_id
+             , a.isPrivateAgreement
+             , a.hhReferralCode
+             , a.contactExceptHoliday
+             , a.contactableTime
+             , a.resumeSettingAt
+             , a.delFlag
+        FROM member m
+   LEFT JOIN applicant a ON a.member_id = m.id
+       WHERE m.deleted != 1
+         AND loginId = #{loginId}
+    </select>
+
+    <!-- 기존 비밀번호 조회 -->
+    <select id="selectMemberPassword" parameterType="FoMemberDTO" resultType="FoMemberDTO">
+        /* com.fw.core.mapper.db1.fo.FoMemberMapper.updateChangePassword, 기존 비밀번호 조회, sjpaik, FoMemberMapper.xml */
+        SELECT password
+          FROM member
+         WHERE id = #{frontSession.id}
+    </select>
+
+    <!-- 새로운 비밀번호 설정 -->
+    <update id="updateChangePassword" parameterType="FoMemberDTO">
+        /* com.fw.core.mapper.db1.fo.FoMemberMapper.updateChangePassword, 새로운 비밀번호 설정, sjpaik, FoMemberMapper.xml */
+        UPDATE member
+           SET password = #{newPassword}
+             , lastChangePassword = NOW()
+             , passwordChangeDate = NOW()
+             , passwordFailCount = 0
+         WHERE id = #{frontSession.id}
+    </update>
+
+    <!-- 회원상세정보 조회 -->
+    <select id="selectProfileInfo" parameterType="FoMemberDTO" resultType="FoMemberDTO">
+        /* com.fw.core.mapper.db1.fo.FoMemberMapper.selectMemberEmailDuplicateCheck, 회원상세정보 조회, sjpaik, FoMemberMapper.xml */
+        SELECT m.DTYPE
+             , m.id
+             , m.createdAt
+             , m.updatedAt
+             , m.agreeMarketing
+             , m.agreeMarketingAt
+             , m.deleted
+             , m.email
+             , m.isTemp
+             , m.loginId
+             , m.name
+             , m.password
+             , m.passwordChangeDate
+             , m.phone
+             , m.privacyExpire
+             , m.privacyExpireDate
+             , m.profilePictureFileId
+             , m.deletedAt
+             , m.lastChangePassword
+             , m.pushToken
+             , m.useAppPush
+             , m.isStop
+             , m.passwordFailCount
+             , m.agreeAd
+             , m.agreeAdAt
+             , m.phoneType
+             , m.di
+             , m.ap_alarm_flag
+             , m.ap_comm_flag
+             , m.ap_posi_flag
+             , m.hh_resu_flag
+             , m.hh_msg_flag
+             , m.hh_ap_msg_flag
+             , m.hh_comm_flag
+             , m.hh_ap_flag
+             , a.birth
+             , a.findingJob
+             , a.genderCd
+             , a.resumeRestricted
+             , a.member_id
+             , a.isPrivateAgreement
+             , a.hhReferralCode
+             , a.contactExceptHoliday
+             , a.contactableTime
+             , a.resumeSettingAt
+             , a.delFlag
+          FROM member m
+     LEFT JOIN applicant a ON a.member_id = m.id
+         WHERE m.deleted != 1
+           AND m.id = #{frontSession.id}
+         <if test="phone != null and phone != '' and name != null and name != ''">
+           AND m.phone = #{phone} AND m.name = #{name}
+         </if>
+    </select>
+
+    <!-- 회원 정보 수정 -->
+    <update id="updateMember" parameterType="FoMemberDTO">
+        /* com.fw.core.mapper.db1.fo.FoMemberMapper.updateMember, 회원 정보 수정, sjpaik, FoMemberMapper.xml */
+        UPDATE member
+           SET updatedAt = NOW()
+        <if test="profilePictureFileId != null and profilePictureFileId != ''">
+             , profilePictureFileId = #{profilePictureFileId}
+        </if>
+        <if test="preDi != di">
+             , name = #{name}
+        </if>
+        <if test="preDi != di">
+             , phone = #{phone}
+        </if>
+        <if test="preDi != di">
+             , di = #{di}
+        </if>
+             , privacyExpire = #{privacyExpire}
+         WHERE id = #{memberId}
+    </update>
+
+    <!-- 임시회원 회원가입 -->
+    <update id="updateTempMember" parameterType="FoMemberDTO">
+        /* com.fw.core.mapper.db1.fo.FoMemberMapper.updateTempMember, 임시회원 회원가입, YJW, FoMemberMapper.xml */
+        UPDATE member
+        SET updatedAt = NOW()
+            , name = #{name}
+            , phone = #{phone}
+            , di = #{di}
+            , privacyExpire = #{privacyExpire}
+            , password = #{password}
+            , lastChangePassword = NOW()
+            , passwordChangeDate = NOW()
+            , passwordFailCount = 0
+            , agreeAd = #{agreeAd}
+            , agreeAdAt = NOW()
+            , agreeMarketing = #{agreeMarketing}
+            , agreeMarketingAt = NOW()
+            , isTemp = #{isTemp}
+        WHERE id = #{memberId}
+    </update>
+
+    <!-- 비밀번호 재설정 -->
+    <update id="updatePassword" parameterType="FoMemberDTO">
+        /* com.fw.core.mapper.db1.fo.FoMemberMapper.updateChangePassword, updatePassword, YJW, FoMemberMapper.xml */
+        UPDATE member
+        SET password = #{password}
+          , lastChangePassword = NOW()
+          , passwordChangeDate = NOW()
+          , passwordFailCount = 0
+        WHERE name = #{name} AND phone = #{phone}
+    </update>
+
+    <!-- 아이디 조회 (아이디 찾기) -->
+    <select id="selectLoginId" parameterType="FoMemberDTO" resultType="FoMemberDTO">
+        /* com.fw.core.mapper.db1.fo.FoMemberMapper.selectLoginId, selectLoginId, YJW, FoMemberMapper.xml */
+        SELECT loginId
+        FROM member
+        WHERE deleted != 1
+        <if test="phone != null and phone != '' and name != null and name != ''">
+            AND phone = #{phone} AND name = #{name}
+        </if>
+    </select>
+
+    <!-- 탈퇴 -->
+    <update id="updateDeleteMember" parameterType="FoMemberDTO">
+        /* com.fw.core.mapper.db1.fo.FoMemberMapper.updateDeleteMember, updateDeleteMember, jung, FoMemberMapper.xml */
+        UPDATE member
+           SET deleted = 1
+             , deletedAt = NOW()
+         WHERE id = #{frontSession.id}
+    </update>
+
+    <!-- DTYPE 조회 -->
+    <select id="selectDtype" parameterType="String" resultType="String">
+        /* com.fw.core.mapper.db1.fo.FoMemberMapper.selectDtype, selectDtype, YJW, FoMemberMapper.xml */
+        SELECT DTYPE
+        FROM member
+        WHERE deleted != 1 AND id = #{memberId}
+    </select>
+
+    <!-- 블랙리스트 조회 조회 -->
+    <select id="selectMemberBlackList" parameterType="FoMemberDTO" resultType="boolean">
+        /* com.fw.core.mapper.db1.fo.FoMemberMapper.selectMemberBlackList,블랙리스트 조회 조회, yj, FoMemberMapper.xml */
+        SELECT EXISTS (
+                       SELECT 1
+                         FROM tb_blacklist
+                        WHERE del_flag = 'N'
+                          AND use_flag = 1
+                          AND ( phone = #{phone} OR email = #{loginId} )
+                   ) AS CNT
+    </select>
+
+</mapper>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+		xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+		layout:decorate="~{layouts/default}">
+<body>
+	<div layout:fragment="contents" th:remove="tag">
+		<div id="container-block">
+			<main id="content" role="main">
+				<h2 class="title">전용이력서 관리</h2>
+				<div class="p-3">
+					<div class="row-3">
+						<button type="button" class="btn btn-outline-secondary" data-role="moveStatus">이력서 현황</button>
+						<button type="button" class="btn btn-outline-secondary" data-role="moveError">오류신고(AP)</button>
+						<button type="button" class="btn btn-outline-secondary" data-role="moveRequest">이력서 등록신청(HH)</button>
+						<button type="button" class="btn btn-outline-dark">전용이력서 등록신청(HH)</button>
+					</div>
+					<div class="p-3">
+						<form id="searchMember" name="searchMember">
+							<table class="table table-bordered">
+								<tr>
+									<th class="active">등록기간</th>
+									<td>
+										<div class="input-group m-1">
+											<div class=" input-group date">
+												<div class="form-group">
+													<input	type="text" id="memberStartDt" name="memberStartDt" class="form-control form-datepicker" placeholder="날짜 선택" >
+												</div>
+												<div class="form-group">
+													<input type="text" id="memberEndDt" name="memberEndDt" class="form-control form-datepicker" placeholder="날짜 선택" >
+												</div>
+											</div>
+											<div class="form-group float-right">
+												<button type="button" class="btn btn-primary" id="all" name="colorChange" data-role="all">전체</button>
+												<button type="button" class="btn btn-secondary" id="today" name="colorChange" data-role="today">오늘</button>
+												<button type="button" class="btn btn-secondary" id="week" name="colorChange" data-role="week">7일</button>
+												<button type="button" class="btn btn-secondary" id="month" name="colorChange" data-role="month">1개월</button>
+											</div>
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<th class="active">등록자</th>
+									<td><select name="searchSelect" id="searchSelect">
+										<option value="name">이름</option>
+										<option value="phone">휴대번호</option>
+										<option value="email">이메일주소</option>
+									</select> <input data-role="enter" type="text" id="inputSelect" /></td>
+								</tr>
+							</table>
+						</form>
+					</div>
+					<div class="row p-t-35 p-b-20">
+						<div class="col text-center">
+							<button id="search" type="submit" class="btn btn-primary" data-role="search">조회하기</button>
+						</div>
+					</div>
+					<div class="row p-l-30 text-left">
+						<div class="col">
+							<select data-role="divisionSelect" id="divisionSelect">
+								<option value="ALL">전체</option>
+								<option value="WAITING_CONFIRM">확인 대기중</option>
+								<option value="USE_ABLE">이용가능</option>
+								<option value="REGIST_IMPOSSIBLE">등록 불가</option>
+								<option value="DELETED">삭제</option>
+								<option value="CANCEL">등록 취소</option>
+							</select>
+						</div>
+					</div>
+					<div class="row p-r-30 p-l-30">
+						<div class="col">
+							<table id="datatable">
+								<thead>
+								<tr>
+									<th>No.</th>
+									<th>신청자</th>
+									<th>신청일시</th>
+									<th>신청파일</th>
+									<th>상태</th>
+									<th>처리자</th>
+									<th>처리일시</th>
+									<th>처리</th>
+									<th>비고</th>
+								</tr>
+								</thead>
+							</table>
+						</div>
+					</div>
+				</div>
+				<div class="modal fade" id="refuseModal" tabindex="-1" role="dialog" aria-hidden="true">
+					<div class="modal-dialog modal-dialog-centered" role="document">
+						<div class="modal-content">
+							<div class="modal-header">
+								<p>처리불가 사유 입력</p>
+							</div>
+							<div class="modal-body">
+								<div class="container">
+									<div class="row m-3">
+										<div class="col-12">
+											<input class="form-control" id="refuseContent" placeholder="내용을 입력해주세요.">
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="modal-footer">
+								<div class="container">
+									<div class="row">
+										<div class="col text-center">
+											<button type="button" class="btn btn-info" data-dismiss="modal">취소</button>
+											<button class="btn btn-primary" id="modalSave" data-dismiss="modal">확인</button>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</main>
+		</div>
+	</div>
+</body>
+</html>

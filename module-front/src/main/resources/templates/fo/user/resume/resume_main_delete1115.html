@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html  xmlns:th="http://www.thymeleaf.org"
+       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+       layout:decorate="layouts/resumeLayout">
+<body>
+    <div id="container-block">
+      <div layout:fragment="contents" th:remove="tag">
+        <div class="layout-content">
+            <h3 class="subtitle poppins">내 이력서 현황</h3>
+            <div class="title-line mt-4 mb-5"></div>
+            <div class="apply-dashbaord">
+              <div class="row row-0">
+                <div class="col">
+                  <a href="javascript:;" class="active">
+                    <strong>8</strong>
+                    <span>제안 요청</span>
+                  </a>
+                </div>
+                <div class="col">
+                  <a href="javascript:;">
+                    <strong>2</strong>
+                    <span>이력서 열람</span>
+                  </a>
+                </div>
+                <div class="col">
+                  <a href="javascript:;">
+                    <strong>2</strong>
+                    <span>지원완료</span>
+                  </a>
+                </div>
+                <div class="col">
+                  <a href="javascript:;">
+                    <strong>0</strong>
+                    <span>과거 지원 이력</span>
+                  </a>
+                </div>
+                <div class="col">
+                  <a href="javascript:;">
+                    <strong>0</strong>
+                    <span>스크랩 공고</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">지원한 공고</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false" tabindex="-1">스크랩 공고</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact" type="button" role="tab" aria-controls="contact" aria-selected="false" tabindex="-1">최근열람 공고</button>
+              </li>
+            </ul>
+
+            <div class="tab-content w-100" id="myTabContent">
+              <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+                <div class="resume-form">
+                  <div class="resume-form-list resume-main-form w-100">
+                    <div class="headhunter-wrap">
+                      <p class="h-tag">취소/중단</p>
+                      <p class="state">지원취소</p>
+                    </div>
+                    <div class="announcement-wrap">
+                      <p class="scale">중소기업</p>
+                      <a href="" class="title">MIS/인사시스템관리,IT운영-CC파트 콜센터운영/전사/기획 서버 및 DB관리 MIS/인사시스템관리,IT운영-CC파트 콜센터운영/전사/기획 서버 및 DB관리 MIS/인사시스템관리,IT운영-CC파트 콜센터운영/전사/기획 서버 및 DB관리</a>
+                      <p class="date"><span>지원일</span><span>2022.10.21 (금)</span></p>
+                    </div>
+                    <div class="btn-group">
+                      <a href="" class="btn btn-outline-primary btn-md">지원현황 보기</a>
+                    </div>
+                  </div>
+                  <div class="resume-form-list resume-main-form w-100">
+                    <div class="headhunter-wrap">
+                      <p class="h-tag">취소/중단</p>
+                      <p class="state">지원취소</p>
+                    </div>
+                    <div class="announcement-wrap">
+                      <p class="scale">중소기업</p>
+                      <a href="" class="title">MIS/인사시스템관리,IT운영-CC파트 콜센터운영/전사/기획 서버 및 DB관리 MIS/인사시스템관리,IT운영-CC파트 콜센터운영/전사/기획 서버 및 DB관리 MIS/인사시스템관리,IT운영-CC파트 콜센터운영/전사/기획 서버 및 DB관리</a>
+                      <p class="date"><span>지원일</span><span>2022.10.21 (금)</span></p>
+                    </div>
+                    <div class="btn-group">
+                      <a href="" class="btn btn-outline-primary btn-md">지원현황 보기</a>
+                    </div>
+                  </div>
+                </div>
+                <div class="d-flex justify-content-center mt-5">
+                  <div class="pagination">
+                    <a href=""><i class="icon-pager-prev"></i></a>
+                    <a href="" class="active">1</a>
+                    <a href="">2</a>
+                    <a href="">3</a>
+                    <a href="">4</a>
+                    <a href="">5</a>
+                    <a href="">6</a>
+                    <a href="">7</a>
+                    <a href="">8</a>
+                    <a href="">9</a>
+                    <a href="">10</a>
+                    <a href=""><i class="icon-pager-next"></i></a>
+                  </div>
+                </div>
+              </div>
+
+              <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+                <div class="resume-form">
+                  <div class="resume-form-list resume-main-form w-100">
+                    <div class="announcement-wrap">
+                      <p class="scale">중소기업</p>
+                      <a href="" class="title">MIS/인사시스템관리,IT운영-CC파트 콜센터운영/전사/기획 서버 및 DB관리 MIS/인사시스템관리,IT운영-CC파트 콜센터운영/전사/기획 서버 및 DB관리 MIS/인사시스템관리,IT운영-CC파트 콜센터운영/전사/기획 서버 및 DB관리</a>
+                      <p class="date"><span>공고마감일</span><span>2022.10.21 (금)</span><span class="deadline">(D-24)</span></p>
+                    </div>
+                    <div class="btn-group">
+                      <a href="" class="btn btn-outline-primary btn-md">즉시지원</a>
+                    </div>
+                  </div>
+                  <div class="resume-form-list resume-main-form w-100">
+                    <div class="announcement-wrap">
+                      <p class="scale">중소기업</p>
+                      <a href="" class="title">MIS/인사시스템관리,IT운영-CC파트 콜센터운영/전사/기획 서버 및 DB관리 MIS/인사시스템관리,IT운영-CC파트 콜센터운영/전사/기획 서버 및 DB관리 MIS/인사시스템관리,IT운영-CC파트 콜센터운영/전사/기획 서버 및 DB관리</a>
+                      <p class="date"><span>공고마감일</span><span>2022.10.21 (금)</span><span class="deadline">(D-24)</span></p>
+                    </div>
+                    <div class="btn-group">
+                      <a href="" class="btn btn-outline-primary btn-md">즉시지원</a>
+                    </div>
+                  </div>
+                </div>
+                <div class="d-flex justify-content-center mt-5">
+                  <div class="pagination">
+                    <a href=""><i class="icon-pager-prev"></i></a>
+                    <a href="" class="active">1</a>
+                    <a href="">2</a>
+                    <a href="">3</a>
+                    <a href="">4</a>
+                    <a href="">5</a>
+                    <a href="">6</a>
+                    <a href="">7</a>
+                    <a href="">8</a>
+                    <a href="">9</a>
+                    <a href="">10</a>
+                    <a href=""><i class="icon-pager-next"></i></a>
+                  </div>
+                </div>
+              </div>
+              <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
+                <div class="resume-form">
+                  <div class="resume-form-list resume-main-form w-100">
+                    <div class="announcement-wrap">
+                      <p class="scale">중소기업</p>
+                      <a href="" class="title">MIS/인사시스템관리,IT운영-CC파트 콜센터운영/전사/기획 서버 및 DB관리 MIS/인사시스템관리,IT운영-CC파트 콜센터운영/전사/기획 서버 및 DB관리 MIS/인사시스템관리,IT운영-CC파트 콜센터운영/전사/기획 서버 및 DB관리</a>
+                      <p class="date"><span>공고마감일</span><span>2022.10.21 (금)</span><span class="deadline">(D-24)</span></p>
+                    </div>
+                    <div class="btn-group">
+                      <a href="" class="btn btn-outline-primary btn-md disabled">지원마감</a>
+                    </div>
+                  </div>
+                  <div class="resume-form-list resume-main-form w-100">
+                    <div class="announcement-wrap">
+                      <p class="scale">중소기업</p>
+                      <a href="" class="title">MIS/인사시스템관리,IT운영-CC파트 콜센터운영/전사/기획 서버 및 DB관리 MIS/인사시스템관리,IT운영-CC파트 콜센터운영/전사/기획 서버 및 DB관리 MIS/인사시스템관리,IT운영-CC파트 콜센터운영/전사/기획 서버 및 DB관리</a>
+                      <p class="date"><span>공고마감일</span><span>2022.10.21 (금)</span><span class="deadline">(D-24)</span></p>
+                    </div>
+                    <div class="btn-group">
+                      <a href="" class="btn btn-outline-primary btn-md disabled">지원마감</a>
+                    </div>
+                  </div>
+                </div>
+                <div class="d-flex justify-content-center mt-5">
+                  <div class="pagination">
+                    <a href=""><i class="icon-pager-prev"></i></a>
+                    <a href="" class="active">1</a>
+                    <a href="">2</a>
+                    <a href="">3</a>
+                    <a href="">4</a>
+                    <a href="">5</a>
+                    <a href="">6</a>
+                    <a href="">7</a>
+                    <a href="">8</a>
+                    <a href="">9</a>
+                    <a href="">10</a>
+                    <a href=""><i class="icon-pager-next"></i></a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+      </div>
+    </div>
+  </body>
+</html>

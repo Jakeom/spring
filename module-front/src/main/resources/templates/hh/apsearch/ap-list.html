@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layouts/hh/mainLayout}">
+<body>
+<div id="container-block" layout:fragment="contents" th:remove="tag">
+    <div class="container">
+        <div class="sub-content">
+            <!-- <p class="center-title">검색 가능한 인재수 : 총 <span class="text-primary">10,823</span>명</p> -->
+
+            <form name="searchForm">
+                <div class="">
+                    <input type="hidden" name="page" id="page">
+                    <input type="hidden" name="StartFlag" id="StartFlag" value="search">
+                    <div class="human-resources-filter">
+                        <div class="resources-search-content">
+                            <input type="hidden" id="careerSt" th:value="${searchInfo.careerSt}">
+                            <input type="hidden" id="careerEn" th:value="${searchInfo.careerEn}">
+                            <p class="title">경력</p>
+                            <div class="d-flex align-items-center m-b-10">
+                                <select class="select-design" style="width: 130px" name="careerSt">
+                                    <option value="">선택</option>
+                                </select>
+                            </div>
+                            <p class="m-l-10">~</p>
+                            <div class="">
+                                <select class="select-design" style="width: 130px" name="careerEn">
+                                    <option value="">선택</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="resources-search-content">
+                            <input type="hidden" id="ageSt" th:value="${searchInfo.ageSt}">
+                            <input type="hidden" id="ageEn" th:value="${searchInfo.ageEn}">
+                            <p class="title">연령</p>
+                            <div class="d-flex align-items-center m-b-10">
+                                <select class="select-design" style="width: 130px" name="ageSt">
+                                    <option value="">선택</option>
+                                </select>
+                            </div>
+                            <p class="m-l-10">~</p>
+                            <div class="">
+                                <select class="select-design" style="width: 130px" name="ageEn">
+                                    <option value="">선택</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="resources-search-content">
+                            <input type="hidden" id="salarySt" th:value="${searchInfo.salarySt}">
+                            <input type="hidden" id="salaryEn" th:value="${searchInfo.salaryEn}">
+                            <p class="title">최종연봉</p>
+                            <div class="d-flex align-items-center m-b-10">
+                                <select class="select-design" style="width: 130px" name="salarySt">
+                                    <option value="">선택</option>
+                                </select>
+                            </div>
+                            <p class="m-l-10">~</p>
+                            <div class="">
+                                <select class="select-design" style="width: 130px" name="salaryEn">
+                                    <option value="">선택</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="resources-search-content" style="min-width: 185px;">
+                            <p class="title">학력</p>
+                            <div class="d-flex align-items-center m-b-10">
+                                <select class="select-design" style="width: 100%" name="edu1">
+                                    <option value="">전체</option>
+                                    <option value="PHD" th:selected="${searchInfo.edu1 eq 'PHD'}">박사</option>
+                                    <option value="MASTER" th:selected="${searchInfo.edu1 eq 'MASTER'}">석사</option>
+                                    <option value="COLLEGE" th:selected="${searchInfo.edu1 eq 'COLLEGE'}">대학교 (4년)</option>
+                                    <option value="JUNIOR_COLLEGE" th:selected="${searchInfo.edu1 eq 'JUNIOR_COLLEGE'}">대학(2-3년)</option>
+                                    <option value="HIGH" th:selected="${searchInfo.edu1 eq 'HIGH'}">고졸</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="resources-search-content edu2">
+                            <input type="hidden" id="edu2" th:value="${searchInfo.edu2}">
+                            <p class="title">학력2</p>
+                            <div class="check-badge-wrap">
+                                <div>
+                                    <input type="checkbox" class="check-badge" name="edu2" id="edu2a" value="OVERSEAS"/>
+                                    <label for="edu2a" class="check-badge-label">해외</label>
+                                </div>
+                                <div>
+                                    <input type="checkbox" class="check-badge" name="edu2" id="edu2b" value="SKY"/>
+                                    <label for="edu2b" class="check-badge-label">SKY</label>
+                                </div>
+                                <div>
+                                    <input type="checkbox" class="check-badge" name="edu2" id="edu2c" value="SEOUL"/>
+                                    <label for="edu2c" class="check-badge-label">인서울</label>
+                                </div>
+                                <div>
+                                    <input type="checkbox" class="check-badge" name="edu2" id="edu2d" value="REGION"/>
+                                    <label for="edu2d" class="check-badge-label">지방국공립</label>
+                                </div>
+                                <div>
+                                    <input type="checkbox" class="check-badge" name="edu2" id="edu2e" value="NATION"/>
+                                    <label for="edu2e" class="check-badge-label">정규4년제</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="resources-search-content workplace">
+                            <input type="hidden" id="workplace" th:value="${searchInfo.workplace}">
+                            <p class="title">희망근무지</p>
+                            <div class="check-badge-wrap">
+                                <div>
+                                    <input type="checkbox" class="check-badge" name="workplace" id="workplace1"
+                                           value="ALL"/>
+                                    <label for="workplace1" class="check-badge-label">전국</label>
+                                </div>
+                                <div>
+                                    <input type="checkbox" class="check-badge" name="workplace" id="workplace2"
+                                           value="SEOUL"/>
+                                    <label for="workplace2" class="check-badge-label">서울</label>
+                                </div>
+                                <div>
+                                    <input type="checkbox" class="check-badge" name="workplace" id="workplace3"
+                                           value="IN"/>
+                                    <label for="workplace3" class="check-badge-label">수도권</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="resources-search-content">
+                            <p class="title">출신회사</p>
+                            <div class="resources-input search-box p-0">
+                                <input type="text" maxlength="100" class="form-control form-sm" name="company"
+                                       id="companyName" th:value="${searchInfo.company}"/>
+                            </div>
+                            <div class="search-result-list company">
+                                <ul>
+                                </ul>
+                            </div>
+                            <p class="title m-t-15">외국어</p>
+                            <div class="resources-input">
+                                <input type="text" maxlength="100" class="form-control form-sm" name="language"
+                                       id="language" th:value="${searchInfo.language}"/>
+                            </div>
+                            <p class="title m-t-15">자격증</p>
+                            <div class="resources-input">
+                                <input type="text" maxlength="100" class="form-control form-sm" name="license"
+                                       id="license" th:value="${searchInfo.license}"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="human-resources-search">
+                        <div class="resources-search-wrap">
+                            <input type="text" maxlength="100" placeholder="핵심역량 키워드를 입력해주세요."
+                                   class="form-control form-md" id="keyword" name="keyword"
+                                   th:value="${searchInfo.keyword}"/>
+                            <!-- <div class="form-check">
+                              <input class="form-check-input" type="checkbox" value="" id="multipleCheck2" />
+                              <label class="form-check-label" for="multipleCheck2"> 결과 내 검색</label>
+                            </div> -->
+                        </div>
+                        <button type="button" class="btn btn-primary btn-md m-l-10" data-role="search">검색하기</button>
+                    </div>
+
+                    <div class="human-resources-search">
+                        <a href="#" data-role="reset">초기화</a>
+                        &nbsp;&nbsp;
+                        <a href="" onclick="saveFrom();return false;">조건저장</a>
+                    </div>
+                </div>
+
+                <div class="tbl-head" th:if="${searchInfo.StartFlag != null}">
+                    <!-- <p class="tbl-head-cnt">총 <span th:text="${searchInfo.totalCount}"></span>건의 인재가 있습니다.</p> -->
+                    <div class="">
+                        <select class="select-design" style="width: 100%" name="rowSize" id="rowSize">
+                            <option value="10">10개씩 보기</option>
+                            <option value="30" th:selected="${searchInfo.endRow eq 30}">30개씩 보기</option>
+                            <option value="50" th:selected="${searchInfo.endRow eq 50}">50개씩 보기</option>
+                        </select>
+                    </div>
+                </div>
+            </form>
+            <div class="fake-table m-t-10" th:if="${searchInfo.StartFlag != null}">
+                <div class="fake-table-head">
+                    <div class="fake-table-cell"></div>
+                    <div class="fake-table-cell">이름</div>
+                    <div class="fake-table-cell">총경력</div>
+                    <div class="fake-table-cell">
+                        최종회사<br/>
+                        최장회사
+                    </div>
+                    <div class="fake-table-cell">최종학교</div>
+                    <div class="fake-table-cell">핵심역량</div>
+                    <div class="fake-table-cell">이직횟수</div>
+                    <div class="fake-table-cell">최근 로그인</div>
+                </div>
+                <th:block th:each="data : ${detailList}">
+                    <div class="fake-table-column">
+                        <div class="fake-table-cell">
+                            <p class="text-primary"><!--내 인재--><span th:if="${data.id}">내 인재</span></p>
+                        </div>
+                        <div class="fake-table-cell">
+                            <p>
+                                <a th:href="'/m/resume/resume-detail-hh?resumeId='+${data.resumeId} + '&memberId=' + ${#authentication.principal.id}"
+                                   th:text="${data.name}"><!--김희선--></a></p>
+                            <p th:text="${data.birthNm}"><!-- 1975 (19) , 남 --></p>
+                        </div>
+                        <div class="fake-table-cell">
+                            <p th:text="${data.totalCareerNm}"><!--13년 2개월--></p>
+                        </div>
+                        <div class="fake-table-cell">
+                            <p th:text="${data.finalCompany}"><!-- 락앤락 --></p>
+                            <p th:text="${data.longestCompany}"><!-- 락앤락 --></p>
+                        </div>
+                        <div class="fake-table-cell" th:utext="${data.finalSchool}">
+                            <!--<p >중앙대학교</p>-->
+                            <!--<p>(경기도)</p>-->
+                        </div>
+                        <div class="fake-table-cell">
+                            <div class="form-cell cell-2"
+                                 th:each="_d,status : ${#strings.arraySplit(data.coreAbility, '|')}">
+                                <p th:text="${_d}"></p>
+                            </div>
+                        </div>
+                        <div class="fake-table-cell">
+                            <p th:text="|${data.turnoverCnt}회|"><!--7회--></p>
+                        </div>
+                        <div class="fake-table-cell">
+                            <p th:text="${data.lastLoginAt}"><!--2022-09-09--></p>
+                        </div>
+                    </div>
+                </th:block>
+            </div>
+            <div class="d-flex justify-content-center mt-5">
+                <th:block
+                        th:include="common/paging :: paging_Fragment(fnc=*{'fn_go_page(this)'}, pageId=*{'pageName1'})"/>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

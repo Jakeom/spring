@@ -1,0 +1,394 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.bo.BoPointMapper">
+
+    <!--리스트 조회-->
+    <select id="selectPointList" resultType="BoPointUseHistoryDTO">
+        /* com.fw.core.mapper.db1.bo.BoPointMapper.selectPointList,  selectPointList, 2022.10.24,  Ghazal,  BoPointMapper.xml */
+        SELECT p.id
+             , p.member_id
+             , date_format(p.createdAt, '%Y-%m-%d %H:%i') as createdAt
+             , date_format(p.updatedAt, '%Y-%m-%d %H:%i') as updatedAt
+             , p.paidBalance
+             , p.freeBalance
+             , p.delFlag
+             , p.paidIncrease
+             , p.freeIncrease
+             , (select fn_get_common_cd(p.reasonCd, 'POINT_USE', 1))  AS reasonCd
+             , p.point_id
+             , p.payment_id
+             , p.adminReason
+             , p.backoffice_admin_id
+             , m.name AS memberName
+             , m.DTYPE AS memberType
+        FROM point_use_history p JOIN member m ON p.member_id = m.id
+        WHERE delFlag = 'N'
+    </select>
+
+    <!--포인트 상세-->
+    <select id="selectPointMemberDetail" resultType="BoPointUseHistoryDTO">
+        /* com.fw.core.mapper.db1.bo.BoPointMapper.selectPointMemberDetail,  selectPointMemberDetail, 2022.10.24,  Ghazal,  BoPointMapper.xml */
+        SELECT p.id
+             , p.updatedAt
+             , p.balance
+             , p.freePoint
+             , p.paidPoint
+             , p.member_id
+             , m.name memberName
+             , m.DTYPE memberType
+             , #{pointStartDt} AS pointStartDt
+             , #{pointEndDt} AS pointEndDt
+             , #{paidPayType} AS paidPayType
+             , #{freePayType} AS freePayType
+             , #{pointType} AS pointType
+        FROM point p
+                 INNER JOIN member m on p.member_id = m.id
+        WHERE p.member_id = #{id}
+    </select>
+
+    <!-- 포인트 상제 조회-->
+    <select id="selectPointDetail" resultType="BoPointUseHistoryDTO">
+        /* com.fw.core.mapper.db1.bo.BoPointMapper.selectPointDetail, selectPointDetail, 2022.10.25,  Ghazal,  BoPointMapper.xml */
+        SELECT p.id
+             , p.member_id
+             , date_format(p.createdAt, '%Y-%m-%d %H:%i') as createdAt
+             , date_format(p.updatedAt, '%Y-%m-%d %H:%i') as updatedAt
+             , p.paidBalance
+             , p.freeBalance
+             , p.delFlag
+             , p.paidIncrease
+             , p.freeIncrease
+             , (select fn_get_common_cd(p.reasonCd, 'POINT_USE', 1))  AS reasonCd
+             , p.point_id
+             , p.payment_id
+             , p.adminReason
+             , p.backoffice_admin_id
+             , m.name AS memberName
+             , m.DTYPE AS memberType
+        FROM point_use_history p JOIN member m ON p.member_id = m.id
+        <where>
+            delFlag = 'N'
+            AND p.member_id = #{id}
+            <if test="pointStartDt != '' and pointStartDt!=null and pointEndDt !='' and pointEndDt!=null">
+                AND date_format(p.createdAt, '%Y-%m-%d %H:%i') BETWEEN #{pointStartDt} AND #{pointEndDt}
+            </if>
+            <if test=" pointType!='' and pointType!=null ">
+                AND p.reasonCd = #{pointType}
+            </if>
+            <if test=" freePayType!='' and freePayType!=null ">
+                <if test=" freePayType == 'increase' ">
+                    AND freeIncrease > 0
+                </if>
+                <if test=" freePayType == 'decrease' ">
+                    AND 0 > freeIncrease
+                </if>
+            </if>
+            <if test=" paidPayType!='' and paidPayType!=null ">
+                <if test=" paidPayType == 'increase' ">
+                    AND paidIncrease > 0
+                </if>
+                <if test=" paidPayType == 'decrease' ">
+                    AND 0 > paidIncrease
+                </if>
+            </if>
+        </where>
+        ORDER BY p.createdAt desc
+    </select>
+
+    <!--검색-->
+    <select id="searchPointList" resultType="BoPointUseHistoryDTO">
+        /* com.fw.core.mapper.db1.bo.BoPointMapper.searchPointList, searchPointList, 2022.10.24, Ghazal,
+        BoPointMapper.xml */
+        SELECT p.id
+        , p.member_id
+        , date_format(p.createdAt, '%Y-%m-%d %H:%i') as createdAt
+        , date_format(p.updatedAt, '%Y-%m-%d %H:%i') as updatedAt
+        , p.paidBalance
+        , p.freeBalance
+        , p.delFlag
+        , p.paidIncrease
+        , p.freeIncrease
+        , (select fn_get_common_cd(p.reasonCd, 'POINT_USE', 1))  AS reasonCd
+        , p.point_id
+        , p.payment_id
+        , p.adminReason
+        , p.backoffice_admin_id
+        , m.name AS memberName
+        , m.DTYPE AS memberType
+        FROM point_use_history p JOIN member m ON p.member_id = m.id
+        <where>
+            delFlag = 'N'
+            <if test="searchStart != '' and searchStart!=null and searchEnd !='' and searchEnd!=null">
+                AND date_format(p.createdAt, '%Y-%m-%d %H:%i') BETWEEN #{searchStart} AND #{searchEnd}
+            </if>
+            <if test="memberEmail != null and memberEmail!=''">
+                AND m.email LIKE CONCAT('%', #{memberEmail}, '%')
+            </if>
+            <if test="memberName != null and memberName !='' ">
+                AND m.name LIKE CONCAT('%', #{memberName}, '%')
+            </if>
+            <if test=" memberPhone!='' and memberPhone!=null ">
+                AND m.phone LIKE CONCAT('%', #{memberPhone}, '%')
+            </if>
+            <if test=" memberType!='' and memberType!=null ">
+                AND m.DTYPE = #{memberType}
+            </if>
+            <if test=" pointType!='' and pointType!=null ">
+                AND p.reasonCd = #{pointType}
+            </if>
+            <if test=" freePayType!='' and freePayType!=null ">
+                <if test=" freePayType == 'increase' ">
+                    AND freeIncrease > 0
+                </if>
+                <if test=" freePayType == 'decrease' ">
+                    AND 0 > freeIncrease
+                </if>
+            </if>
+            <if test=" paidPayType!='' and paidPayType!=null ">
+                <if test=" paidPayType == 'increase' ">
+                    AND paidIncrease > 0
+                </if>
+                <if test=" paidPayType == 'decrease' ">
+                    AND 0 > paidIncrease
+                </if>
+            </if>
+        </where>
+    </select>
+
+    <!--구분 검색 -->
+    <select id="searchStatus" resultType="BoPointUseHistoryDTO">
+        /* com.fw.core.mapper.db1.bo.BoPointMapper.searchStatus,  searchStatus, 2022.10.24,  Ghazal,
+        BoPointMapper.xml */
+        SELECT
+               p.id
+             , p.member_id
+             , date_format(p.createdAt, '%Y-%m-%d %H:%i') as createdAt
+             , date_format(p.updatedAt, '%Y-%m-%d %H:%i') as updatedAt
+             , p.paidBalance
+             , p.freeBalance
+             , p.delFlag
+             , p.paidIncrease
+             , p.freeIncrease
+             , p.reasonCd
+             , p.point_id
+             , p.payment_id
+             , p.adminReason
+             , p.backoffice_admin_id
+             , m.name AS memberName
+             , m.DTYPE AS memberType
+        FROM point_use_history p JOIN member m ON p.member_id = m.id
+        <where>
+          AND delFlag = 'N'
+
+        <if test=" reasonCd!='' and reasonCd!=null ">
+            AND p.reasonCd = #{reasonCd}
+        </if>
+        <if test=" memberType!='' and memberType!=null ">
+            AND m.DTYPE = #{memberType}
+        </if>
+        </where>
+    </select>
+
+    <!--리뭐드 mall 리스트 조회-->
+    <select id="selectRewardMallList" resultType="BoRewardMallDTO">
+        /* com.fw.core.mapper.db1.bo.BoPointMapper.selectRewardMallList,  selectRewardMallList, 2022.11.11,  Ghazal,  BoPointMapper.xml */
+        SELECT r.id
+             , date_format(r.create_dt, '%Y-%m-%d %H:%i') as create_dt
+             , date_format(r.update_dt, '%Y-%m-%d %H:%i') as update_dt
+             , r.point
+             , r.delFlag
+             , r.goodNm
+             , r.goodComp
+             , r.goodDetail
+             , r.create_seq
+             , r.update_seq
+             , r.file_seq
+             , (SELECT COUNT(*) FROM reward_history h WHERE h.reward_goods_id = r.id) AS count
+        FROM reward_goods r
+        <where>
+            delFlag = 'N'
+            <if test="searchStart != '' and searchStart!=null and searchEnd !='' and searchEnd!=null">
+                AND date_format(create_dt, '%Y-%m-%d') BETWEEN #{searchStart} AND #{searchEnd}
+            </if>
+        </where>
+        ORDER BY r.update_dt desc
+    </select>
+    <!--리뭐드 상세 조회-->
+    <select id="selectRewardDetail" resultType="BoRewardMallDTO">
+        /* com.fw.core.mapper.db1.bo.BoPointMapper.selectRewardDetail,  selectRewardDetail, 2022.11.11,  Ghazal,  BoPointMapper.xml */
+        SELECT r.id
+             , date_format(r.create_dt, '%Y-%m-%d %H:%i') as create_dt
+             , date_format(r.update_dt, '%Y-%m-%d %H:%i') as update_dt
+             , r.point
+             , r.delFlag
+             , r.goodNm
+             , r.goodComp
+             , r.goodDetail
+             , r.create_seq
+             , r.update_seq
+             , r.file_seq
+        FROM reward_goods r
+        WHERE delFlag = 'N' AND r.id = #{id}
+    </select>
+    <!--  리뭐드 mall 등록-->
+    <insert id="insertRewardMall" parameterType="BoRewardMallDTO">
+        /* com.fw.core.mapper.db1.bo.pointMapper.insertRewardMall,  리뭐드 mall 등록, 2022.11.11 Ghazal, RewardMapper.xml */
+        INSERT INTO reward_goods (
+                               point
+                              , goodDetail
+                              , goodNm
+                              , goodComp
+                              , delFlag
+                              , create_dt
+                              , create_seq
+                              , file_seq
+         )VALUES (
+                #{point}
+               , #{goodDetail}
+               , #{goodNm}
+               , #{goodComp}
+               , 'N'
+               , NOW()
+               , #{adminSession.adminSeq}
+               , #{fileSeq}
+               )
+    </insert>
+    <!-- 리워드 정보  수정-->
+    <update id="updateReward" parameterType="BoRewardMallDTO">
+        /* com.fw.core.mapper.db1.bo.pointMapper.updateReward, 정보 수정, 2022.11.17, Ghazal  , BoPointMapper.xml */
+        UPDATE reward_goods
+        SET
+            goodNm = #{goodNm}
+            , goodComp = #{goodComp}
+            , goodDetail = #{goodDetail}
+            , point = #{point}
+            , update_dT = NOW()
+            , update_seq = #{adminSession.adminSeq}
+        <if test='fileCheck != "Y"'>
+            , file_seq = #{fileSeq}
+        </if>
+        WHERE id = #{id}
+    </update>
+
+    <!--리워드 정보  삭제 -->
+    <delete id="deleteReward" parameterType="BoRewardMallDTO">
+        /* com.fw.core.mapper.db1.bo.pointMapper.deleteReward, 정보 삭제, 2022.11.15, Ghazal , InfoMapper.xml */
+        UPDATE reward_goods
+        SET delFlag = 'Y'
+          , updateSeq = #{adminSession.adminSeq}
+        WHERE id = #{id}
+    </delete>
+
+    <!--검색-->
+    <select id="searchRewardMall" resultType="BoRewardMallDTO">
+        /* com.fw.core.mapper.db1.bo.BoPointMapper.searchRewardMall, searchRewardMall, 2022.11.17, Ghazal,
+        BoPointMapper.xml */
+        SELECT r.id
+        , date_format(r.create_dt, '%Y-%m-%d %H:%i') as create_dt
+        , date_format(r.update_dt, '%Y-%m-%d %H:%i') as update_dt
+        , r.point
+        , r.delFlag
+        , r.goodNm
+        , r.goodComp
+        , r.goodDetail
+        , r.create_seq
+        , r.update_seq
+        , (SELECT COUNT(*) FROM reward_history h WHERE h.reward_goods_id = r.id) AS count
+        FROM reward_goods r
+        <where>
+            delFlag = 'N'
+            <if test="searchStart != '' and searchStart!=null and searchEnd !='' and searchEnd!=null">
+                AND date_format(create_dt, '%Y-%m-%d') BETWEEN #{searchStart} AND #{searchEnd}
+            </if>
+        </where>
+    </select>
+
+    <!--주문 상세 조회-->
+    <select id="selectOrderDetail" resultType="BoRewardHistoryDTO">
+        /* com.fw.core.mapper.db1.bo.BoPointMapper.selectOrderDetail,  selectOrderDetail, 2022.11.11,  Ghazal,  BoPointMapper.xml */
+        SELECT r.id
+             , r.applicant_id
+             , date_format(r.createdAt, '%Y-%m-%d %H:%i') as createdAt
+             , date_format(r.updatedAt, '%Y-%m-%d %H:%i') as updatedAt
+             , r.balance
+             , r.delFlag
+             , r.goodsCd
+             , r.increase
+             , r.reasonCd
+             , r.trId
+             , r.headhunter_id
+             , r.reward_id AS rewardId
+             , r.adminReason
+             , r.backoffice_admin_id
+             , m.name AS memberName
+             , m.phone as memberPhone
+             , g.goodNm
+             , g.point
+             , g.goodComp
+             , r.sendFlag
+             , m.loginId
+        FROM reward_history r JOIN member m ON r.applicant_id = m.id  JOIN  reward_goods g ON g.id = r.reward_goods_id
+        WHERE r.delFlag = 'N'
+        <if test='id != null and id !=""'>
+          AND g.id = #{id}
+        </if>
+    </select>
+
+    <!-- SMS 발송여부 업데이트 -->
+    <update id="rewardSendUpdate" parameterType="BoRewardHistoryDTO">
+        /* com.fw.core.mapper.db1.bo.BoPointMapper.rewardSendUpdate,  rewardSendUpdate, 2023.01.20,  dongbeom,  BoPointMapper.xml */
+        UPDATE reward_history
+        SET sendFlag = 'Y'
+          , backoffice_admin_id = #{adminSession.adminSeq}
+        WHERE id = #{id}
+    </update>
+
+    <!--포인트 지급 회수-->
+    <insert id="insertPointUseHistory" parameterType="BoPointUseHistoryDTO">
+        /* com.fw.core.mapper.db1.bo.BoPointMapper.insertPointUseHistory,  insertPointUseHistory, 2023.01.20,  dongbeom,  BoPointMapper.xml */
+        INSERT INTO point_use_history(createdAt, updatedAt, reasonCd, member_id, point_id, freeBalance, freeIncrease, paidBalance, paidIncrease, backoffice_admin_id)
+        SELECT NOW()
+             , NOW()
+             , #{reasonCd}
+             , member_id
+             , id
+             , freePoint + #{freeIncrease}
+             , #{freeIncrease}
+             , paidPoint + #{paidIncrease}
+             , #{paidIncrease}
+             , #{adminSession.adminSeq}
+        FROM point
+        WHERE member_id = #{memberId}
+    </insert>
+
+    <!--포인트 balance 조정-->
+    <update id="updatePointBalance" parameterType="BoPointUseHistoryDTO">
+        /* com.fw.core.mapper.db1.bo.BoPointMapper.updatePointBalance,  updatePointBalance, 2023.01.20,  dongbeom,  BoPointMapper.xml */
+        UPDATE point
+        SET freePoint = ((SELECT freePoint + #{freeIncrease}))
+          , balance = ((SELECT balance + #{freeIncrease}) + #{paidIncrease})
+          , paidPoint = ((SELECT paidPoint + #{paidIncrease}))
+          , updatedAt = NOW()
+        WHERE member_id = #{memberId}
+    </update>
+
+    <!-- 회원의 최초 포인트 지급 여부 확인 -->
+    <select id="selectHavePointCnt" parameterType="BoPointUseHistoryDTO" resultType="int">
+        /* com.fw.core.mapper.db1.bo.BoPointMapper.selectHavePointCnt,  selectHavePointCnt, 2023.01.20,  dongbeom,  BoPointMapper.xml */
+        SELECT COUNT(1)
+        FROM point
+        WHERE member_id = #{memberId}
+    </select>
+
+    <!-- 포인트 생성 -->
+    <insert id="insertPoint" parameterType="BoPointUseHistoryDTO">
+        /* com.fw.core.mapper.db1.bo.BoPointMapper.insertPoint,  insertPoint, 2023.01.20,  dongbeom,  BoPointMapper.xml */
+        INSERT INTO point(createdAt, updatedAt, member_id)
+        VALUES(
+                NOW()
+              , NOW()
+              , #{memberId}
+              )
+    </insert>
+
+</mapper>

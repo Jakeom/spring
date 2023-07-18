@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layouts/hh/hhMypageLayout">
+<body>
+	<div id="container-block">
+		<div layout:fragment="contents" th:remove="tag">
+			<div class="layout-content">
+				<div class="row row-40 align-items-center">
+					<h3 class="subtitle">나를 PICK한 후보자</h3>
+					<div class="title-line mt-4 mb-5"></div>
+					<form name="searchForm" action="/hh/mypage/pick-ap">
+						<input type="hidden" name="page" th:value="${searchInfo.page}" />
+						<div class="tbl-head address-tool justify-content-end">
+							<div class="d-flex gap-10">
+								<select class="select-design" style="width: 150px" name="orderType">
+									<option value="">전체</option>
+									<option value="interest" th:selected="${searchInfo.orderType} == 'interest'">관심헤드헌터</option>
+									<option value="phone" th:selected="${searchInfo.orderType} == 'phone'">연락처보기</option>
+								</select>
+							</div>
+						</div>
+					</form>
+				</div>
+					<table class="table m-t-15 border-top-1">
+						<thead>
+							<tr>
+								<th class="text-center">이름</th>
+								<th class="text-center">경력</th>
+								<th class="text-center">최종회사</th>
+								<th class="text-center">최종학교</th>
+								<th class="text-center">등록일</th>
+							</tr>
+						</thead>
+						<tbody>
+							<th:block th:if="${#lists.isEmpty(pickApList)}">
+								<tr>
+									<td colspan="8" class="text-center">나를 pick한 후보자가 없습니다.</td>
+								</tr>
+							</th:block>
+							<tr th:each="list : ${pickApList}">
+								<td class="text-center"><a th:href="${list.resumeUrl}">
+										<p th:text="${list.name}">곽*석</p>
+										<p th:text="${list.birthYear + '(' + list.age + ')' + ', ' + (#strings.isEmpty(list.gender) ? '-' : list.gender)}">1975(48), 남</p>
+								</a></td>
+								<td class="text-center">
+									<p th:text="${#strings.isEmpty(list.totalCareerNm)? '-': list.totalCareerNm}">11년 11개월</p>
+								</td>
+								<td class="text-center">
+									<p th:text="${#strings.isEmpty(list.finalCompany)? '-': list.finalCompany}">(주)하드퍼즐</p>
+								</td>
+								<td class="text-center">
+									<p th:text="${#strings.isEmpty(list.finalSchool)? '-':list.finalSchool}">고려대학교</p>
+									<p th:text="${#strings.isEmpty(list.locationCd)? '': '(' + list.locationCd + ')'}">(서울특별시)</p>
+								</td>
+								<td class="text-center">
+									<p th:text="${list.regDate}">2020-12-16</p>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

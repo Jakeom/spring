@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:fragment="common">
+  <aside>
+    <ul>
+      <li th:classappend="${activeMenuURI eq '/fo/community/community-list'} ? 'active' : ''">
+        <a href="/fo/community/community-list"><span class="poppins">자유게시판</span></a>
+        <ul class="new-community">
+          <li th:classappend="${searchInfo.communityType eq 'WORKER_TALK'} ? 'active' : ''"><a href="/fo/community/board?communityType=WORKER_TALK">직장인 수다</a></li>
+          <li th:classappend="${searchInfo.communityType eq 'WORKER_WORRY'} ? 'active' : ''"><a href="/fo/community/board?communityType=WORKER_WORRY">직장인 고민</a></li>
+          <li th:classappend="${searchInfo.communityType eq 'WORKER_ALL'} ? 'active' : ''"><a href="/fo/community/board?communityType=WORKER_ALL">면접/이직/퇴사</a></li>
+        </ul>
+      </li>
+      <li>
+        <a href="javascript:void(0)"><span class="poppins">회사 정보</span></a>
+        <ul class="new-community">
+          <li class="pass-review" th:classappend="${searchInfo.communityType eq 'PASS_REVIEW'} ? 'active' : ''">
+            <a href="/fo/community/board?communityType=PASS_REVIEW">합격 후기</a>
+            <div class="tooltip">
+              <p>최종합격한 회원이 합격후기를 적어주시면 3,000포인트를 드립니다.</p>
+            </div>
+          </li>
+          <li  class="company-curious" th:classappend="${searchInfo.communityType eq 'COMPANY_CURIOUS'} ? 'active' : ''"><a href="/fo/community/board?communityType=COMPANY_CURIOUS">이 회사가 궁금해요</a>
+            <div class="tooltip">
+              <p>(객관적이고 정확한 정보 확인을 위하여) 궁금한 회사에 대해 질문하시면,
+                실제로 해당 회사에 구인의뢰를 받아 헤드헌터 업무를 수행하였던 헤드헌터만 답변을 드릴 수 있습니다.</p>
+            </div>
+          </li>
+        </ul>
+      </li>
+    </ul>
+    <div class="add">광고</div>
+  </aside>
+</div>
+</html>

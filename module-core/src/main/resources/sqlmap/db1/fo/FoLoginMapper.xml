@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.fo.FoLoginMapper">
+
+    <!-- 유저 상세 조회 -->
+    <select id="selectAccountInfo" resultType="FoSessionDTO">
+        /* com.fw.core.mapper.db1.fo.FoLoginMapper.selectAccountInfo , 유저 상세 조회, jung, FoLoginMapper.xml */
+        SELECT r.role_name
+             , m.dType
+             , m.id
+             , m.createdAt
+             , m.updatedAt
+             , m.agreeMarketing
+             , m.agreeMarketingAt
+             , m.deleted
+             , m.email
+             , m.isTemp
+             , m.loginId
+             , m.name
+             , m.password
+             , m.passwordChangeDate
+             , m.phone
+             , m.privacyExpire
+             , m.privacyExpireDate
+             , m.profilePictureFileId
+             , m.deletedAt
+             , m.lastChangePassword
+             , m.pushToken
+             , m.useAppPush
+             , m.isStop
+             , m.passwordFailCount
+             , (SELECT balance FROM reward WHERE applicant_id = m.id AND delFlag = 'N' LIMIT 1) AS balance
+             , (SELECT balance FROM point WHERE member_id = m.id AND delFlag = 'N' LIMIT 1) AS hhBalance
+             , (SELECT resumeRestricted FROM applicant A WHERE A. member_id = m.id AND delFlag = 'N' LIMIT 1) AS resumeRestricted
+          FROM member m
+    INNER JOIN member_role mr ON m.id = mr.member_id
+    INNER JOIN role r ON mr.role_id = r.id
+         WHERE m.deleted = 0
+           AND loginId = #{loginId}
+    </select>
+
+    <!-- 관리자 상세 조회 -->
+    <select id="selectDoSimpleLoginInfo" resultType="FoSessionDTO">
+        /* com.fw.core.mapper.db1.fo.FoLoginMapper.selectDoSimpleLoginInfo ,간편로그인 정보 취득,jung, FoLoginMapper.xml */
+        SELECT dType
+             , id
+             , createdAt
+             , updatedAt
+             , agreeMarketing
+             , agreeMarketingAt
+             , deleted
+             , email
+             , isTemp
+             , loginId
+             , name
+             , password
+             , passwordChangeDate
+             , phone
+             , privacyExpire
+             , privacyExpireDate
+             , profilePictureFileId
+             , deletedAt
+             , lastChangePassword
+             , pushToken
+             , useAppPush
+             , isStop
+             , passwordFailCount
+             , (SELECT balance FROM reward WHERE applicant_id = #{id} AND delFlag = 'N') AS balance
+          FROM member
+        <where>
+            <if test="id != null and id != ''">
+                AND id = #{id}
+            </if>
+        </where>
+    </select>
+
+    <!-- 자동로그인 여부 -->
+    <select id="selectAutoLogin" resultType="FoSimpleLoginDTO">
+        /* com.fw.core.mapper.db1.fo.FoLoginMapper.selectAutoLogin, 자동로그인 여부, jung, FoLoginMapper.xml */
+        SELECT simple_auth_seq
+             , member_id
+             , simple_auth_cd
+             , simple_auth_val
+             , del_flag
+             , reg_seq
+             , reg_date
+          FROM tb_simple_auth
+         WHERE del_flag = 'N'
+           AND simple_auth_cd = 'AUTO_WEB'
+           AND member_id = #{id}
+    </select>
+
+    <!-- 로그아웃시 자동로그인 상태 del_flag N -->
+    <update id="updateDeleteAutoLogin" >
+        /* com.fw.core.mapper.db1.fo.FoLoginMapper.updateDeleteAutoLogin, 로그아웃시 자동로그인 상태 del_flag N , jung, FoLoginMapper.xml */
+        UPDATE tb_simple_auth
+           SET del_flag = 'Y'
+         WHERE member_id = #{memberId}
+           AND simple_auth_cd = 'AUTO_WEB'
+    </update>
+
+    <!-- 블랙리스트 여부 찾기 -->
+    <select id="selectBlack" resultType="int">
+        /* com.fw.core.mapper.db1.fo.FoLoginMapper.selectBlack, 블랙리스트 여부 찾기, jung, FoLoginMapper.xml */
+        SELECT COUNT(1)
+        FROM tb_blacklist
+        WHERE del_flag = 'N'
+          AND member_id = #{id}
+    </select>
+
+    <!-- 임시회원여부 -->
+    <select id="selectTempMember" resultType="FoSessionDTO" parameterType="String">
+        /* com.fw.core.mapper.db1.fo.FoLoginMapper.selectTempMember, 임시회원여부, jung, FoLoginMapper.xml */
+        SELECT id
+             , isTemp
+          FROM member
+         WHERE deleted = 0
+           AND loginId = #{loginId}
+           AND isTemp = 1
+    </select>
+
+    <!-- 헤드헌터 승인여부 체크 -->
+    <select id="selectHhApproved" parameterType="FoSessionDTO" resultType="String">
+        /* com.fw.core.mapper.db1.fo.FoLoginMapper.selectHhApproved, 헤드헌터 승인여부 체크, yj, FoMemberMapper.xml */
+        SELECT approved
+          FROM headhunter
+         WHERE delFlag = 'N'
+           AND member_id = (SELECT id FROM member WHERE loginId = #{loginId} )
+    </select>
+
+    <!-- 로그인 일자 수정 -->
+    <update id="updateLoginInfo" parameterType="FoSessionDTO">
+        /* com.fw.core.mapper.db1.fo.FoLoginMapper.updateLoginInfo, 로그인 일자 수정, sjpaik, FoMemberMapper.xml */
+        UPDATE member
+           SET updatedAt = NOW()
+         WHERE id = #{id}
+    </update>
+
+</mapper>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layouts/hh/hhWefirmLayout">
+<body>
+	<div id="container-block">
+		<div layout:fragment="contents" th:remove="tag">
+			<div class="layout-content">
+				<h3 class="subtitle">가입신청 승인</h3>
+				<div class="title-line mt-4 mb-5"></div>
+				<form name="searchForm" action="/hh/wefirm/subscription-approval">
+					<input type="hidden" name="page" th:value="${searchInfo.page}" />
+					<div class="tbl-head justify-content-end">
+						<div class="d-flex gap-10">
+							<input type="text" class="form-control white form-md" name="searchValue" th:value="${searchInfo.searchValue}" style="width: 250px"
+								placeholder="검색어를 입력하세요." />
+							<button type="button" class="btn btn-outline-gray btn-md" data-role="search">검색</button>
+						</div>
+					</div>
+				</form>
+				<table class="table border-top-1 m-t-15">
+					<thead>
+						<tr>
+							<th class="text-center">
+								<div class="form-check p-0">
+									<input class="form-check-input" type="checkbox" value="" name="checkAll" />
+								</div>
+							</th>
+							<th class="text-center">No.</th>
+							<th class="text-center">사진</th>
+							<th class="text-center">이름</th>
+							<th class="text-center">연락처</th>
+							<th class="text-center">이메일</th>
+							<th class="text-center">가입신청일</th>
+							<th class="text-center">관리</th>
+						</tr>
+					</thead>
+					<tbody>
+						<th:block th:if="${#lists.isEmpty(wefirmNoHeadhunterList)}">
+                            <tr>
+                              <td colspan="8" class="text-center">가입을 신청한 헤드헌터가 없습니다.</td>
+                           </tr>
+                         </th:block>
+						<tr th:each="list : ${wefirmNoHeadhunterList}">
+							<td class="text-center">
+								<div class="form-check p-0">
+									<input class="form-check-input" type="checkbox" th:value="${list.memberId}" name="check" />
+								</div>
+							</td>
+							<td class="text-center">
+								<p th:text="${list.rowNum}">1</p>
+							</td>
+							<td class="text-center">
+								<div class="img-box"
+									th:style="${!#lists.isEmpty(list.commonFileList)? 'background-image: url('+ list.commonFileList[0].url+');background-size:100% 100%': 'background-image: url(/static/images/no-img.png);background-size:100% 100%'}">
+								</div>
+							</td>
+							<td class="text-center">
+								<p th:text="${list.name}">홍길동</p>
+							</td>
+							<td class="text-center">
+								<p th:text="${list.phone}">010-1234-5678</p>
+							</td>
+							<td class="text-center">
+								<p th:text="${list.email}">asdb@naver.com</p>
+							</td>
+							<td class="text-center">
+								<p th:text="${list.createdAt}">2020.12.01</p>
+							</td>
+							<td class="text-center">
+								<button type="button" class="btn btn-outline-gray btn-md" data-role="approval" th:value="${list.memberId}">승인</button>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				<div class="d-flex justify-content-end m-t-15">
+					<button type="button" class="btn btn-outline-gray btn-md" data-role="AllApproval">일괄승인</button>
+				</div>
+				<div class="d-flex justify-content-center mt-5">
+					<th:block th:include="common/paging :: paging_Fragment(fnc=*{'fn_go_page(this)'}, pageId=*{'pageName1'})" />
+				</div>
+			</div>
+		</div>
+	</div>
+
+</body>
+</html>

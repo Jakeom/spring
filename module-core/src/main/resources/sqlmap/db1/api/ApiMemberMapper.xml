@@ -1,0 +1,690 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.api.ApiMemberMapper">
+
+    <!-- 회원정보 수정-->
+    <update id="updateMember" parameterType="ApiMemberDTO">
+        /* com.fw.core.mapper.db1.api.ApiMemberMapper.updateMember,회원정보 수정 , ApiMemberMapper.xml */
+        UPDATE  member
+        SET id = #{memberId}
+        <if test='passwordFailCount == null and passwordFailCount != ""'>
+            , updatedAt = NOW()
+        </if>
+        <if test='passwordFailCount != null and passwordFailCount != ""'>
+            , passwordFailCount = #{passwordFailCount}
+        </if>
+        <if test='name != null and name != ""'>
+            , name = #{name}
+        </if>
+        <if test='pushToken != null and pushToken != ""'>
+            , pushToken = #{pushToken}
+        </if>
+        <if test='password != null and password != ""'>
+            , password = #{password}
+            , lastChangePassword = NOW()
+            , passwordFailCount = 0
+        </if>
+        <if test='phone != null and phone != ""'>
+            , phone = #{phone}
+        </if>
+        <if test='profilePictureFileId != null and profilePictureFileId != ""'>
+            , profilePictureFileId = #{profilePictureFileId}
+        </if>
+        <if test='agreeAd != null and agreeAd != ""'>
+            , agreeAd = #{agreeAd}
+            , agreeAdAt = NOW()
+        </if>
+        <if test='agreeMarketing != null and agreeMarketing != ""'>
+            , agreeMarketing = #{agreeMarketing}
+            , agreeMarketingAt = NOW()
+        </if>
+        <!-- privacyExpire 수정 시 privacyExpireDate 계산 ? TODO-->
+        <if test='privacyExpire != null and privacyExpire != ""'>
+            , privacyExpire = #{privacyExpire}
+            , privacyExpireDate = #{privacyExpireDate}
+        </if>
+        <if test='phoneType != null and phoneType != ""'>
+            , phoneType = #{phoneType}
+        </if>
+        WHERE 1=1 AND id = #{memberId}
+    </update>
+
+    <!-- 회원정보 등록-->
+    <insert id="insertMember" parameterType="ApiMemberDTO">
+        /* com.fw.core.mapper.db1.api.ApiMemberMapper.insertMember, 회원정보 등록 , ApiMemberMapper.xml */
+        INSERT INTO member (
+               loginId
+             , email
+             , name
+             , password
+             , phone
+             , createdAt
+             , agreeMarketing
+             , agreeMarketingAt
+             , agreeAd
+             , agreeAdAt
+             , DTYPE
+             , privacyExpire
+             , isTemp
+             , di
+        )
+        VALUES (
+               #{email}
+             , #{email}
+             , #{name}
+             , #{password}
+             , #{phone}
+             , NOW()
+             , #{agreeMarketing}
+             , <choose>
+                  <when test="agreeMarketing eq '1'.toString()">NOW()</when>
+                  <otherwise>null</otherwise>
+               </choose>
+             , #{agreeAd}
+             , <choose>
+                  <when test="agreeAd eq '1'.toString()">NOW()</when>
+                  <otherwise>null</otherwise>
+               </choose>
+             , #{DTYPE}
+             , #{privacyExpire}
+             , #{isTemp}
+             , #{di}
+        )
+
+        <selectKey order="AFTER" keyProperty="id" resultType="String">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <!-- 추천코드 확인 -->
+    <select id="selectHeadhunterByRefferalCd" parameterType="ApiMemberDTO" resultType="boolean">
+        /* com.fw.core.mapper.db1.api.ApiMemberMapper.selectHeadhunterByRefferalCd, 추천코드 확인, YJW, ApiMemberMapper.xml */
+        SELECT EXISTS (
+                       SELECT 1
+                       FROM headhunter
+                       WHERE referralCode = #{referralCode}
+                   ) AS CNT
+    </select>
+
+    <!-- 지원자 정보 등록-->
+    <insert id="insertApplicant" parameterType="ApiMemberDTO">
+        /* com.fw.core.mapper.db1.api.ApiMemberMapper.insertApplicant, 지원자 정보 등록 , YJW, ApiMemberMapper.xml */
+        INSERT INTO applicant (
+               member_id
+             , hhReferralCode
+        ) VALUES (
+               #{memberId}
+             , #{referralCode}
+        )
+    </insert>
+
+    <!-- 지원자 역할 등록-->
+    <insert id="insertMemberRole" parameterType="ApiMemberDTO">
+        /* com.fw.core.mapper.db1.api.ApiMemberMapper.insertMemberRole, 지원자 역할 등록 , YJW, ApiMemberMapper.xml */
+        INSERT INTO member_role (
+               member_id
+             , role_id
+        ) VALUES (
+               #{memberId}
+             , #{roleId}
+        )
+    </insert>
+
+    <!-- 인재검색 -->
+    <select id="selectMemberByResume" parameterType="ApiMemberDTO" resultType="ApiMemberDTO">
+        /* com.fw.core.mapper.db1.api.ApiMemberMapper.selectMemberByResume, 인재검색 , ApiMemberMapper.xml */
+        SELECT xx.id AS resumeId
+             , xx.member_id AS memberId
+             , hrrh.id
+             , xx.name
+             , xx.genderCd
+             , m.phone
+             , xx.picture_file_id
+             , fn_get_common_cd(xx.genderCd, 'GENDER', 1) as gender
+             , DATE_FORMAT(m.updatedAt,'%Y.%m.%d') AS recentLoginTime
+             , xx.birth
+             , IF(EXISTS(SELECT * FROM hh_resume_reading_history hrrh WHERE hrrh.resume_id = xx.id AND hrrh.member_id = #{memberId} AND hrrh.expireAt >= NOW()),'Y','N') AS myApFlag
+             , xx.totalCareer
+             , IFNULL((SELECT companyName FROM resume_career WHERE delFlag='N' AND resignationYm is NULL AND resume_id = xx.id),(SELECT companyName FROM resume_career WHERE delFlag='N' AND resume_id = xx.id ORDER BY holdOffice DESC, resignationYm DESC LIMIT 1)) AS finalCompany
+             , (SELECT name FROM resume_academic_background WHERE resume_id = xx.id and resume_academic_background.delFlag = 'N' ORDER BY entranceYm DESC LIMIT 1) AS finalSchool
+        FROM resume xx
+    LEFT JOIN hh_resume_reading_history hrrh ON xx.id = hrrh.resume_id AND hrrh.delFlag = 'N' AND hrrh.member_id = #{memberId}
+    LEFT JOIN member m ON xx.member_id = m.id
+        <if test="companyName != null and companyName != ''">
+        -- 출신회사 검색의 경우
+        INNER JOIN (
+            SELECT resume_id FROM resume_career
+            WHERE delFlag = 'N' AND certFlag = 'Y' AND companyName LIKE CONCAT('%',#{companyName},'%')
+        GROUP BY resume_id
+        ) company ON xx.id = company.resume_id
+        </if>
+        <if test="hp1 != null and hp1 != ''">
+        -- 학력 검색의 경우
+        INNER JOIN (
+            SELECT resume_id FROM resume_academic_background
+            WHERE delFlag = 'N' AND graduationStatusCd = 'GRADUATION' AND degreeCd = #{hp1}
+        GROUP BY resume_id
+        ) rabb ON xx.id = rabb.resume_id
+        </if>
+        <if test="hp2 != null and hp2 != '' and hp2.length != 0">
+        -- 학력2 검색의 경우
+        INNER JOIN (
+            SELECT resume_id FROM resume_filtering
+            WHERE delFlag = 'N'
+            AND (
+                <foreach item="item" index="index" collection="hp2" open="" separator="OR" close="">
+                    filterCd =#{item}
+                </foreach>
+                )
+            GROUP BY resume_id
+            ) rf ON xx.id = rf.resume_id
+        </if>
+        <if test="loc != null and loc != '' and loc.length != 0">
+        -- 희망근무지 검색의 경우
+        INNER JOIN (
+            SELECT resume_id FROM resume_location
+            WHERE delFlag = 'N'
+              AND location_cd IN (
+                <foreach item="item" index="index" collection="loc" open="" separator="," close="">
+                    #{item}
+                </foreach>
+            )
+            GROUP BY resume_id
+            ) rl ON xx.id = rl.resume_id
+        </if>
+        <if test="language != null and language != ''">
+        -- 외국어 검색의 경우
+        INNER JOIN (
+            SELECT resume_id FROM resume_language
+            WHERE delFlag = 'N'
+              AND  languageInput LIKE CONCAT('%',#{language},'%')
+            GROUP BY resume_id
+        ) rlan ON xx.id = rlan.resume_id
+        </if>
+        <if test="license != null and license != ''">
+        -- 자격증 검색의 경우
+        INNER JOIN (
+            SELECT resume_id FROM resume_license
+            WHERE  delFlag = 'N'
+              AND name LIKE CONCAT('%',#{license},'%')
+            GROUP BY resume_id
+        ) rlic ON xx.id = rlic.resume_id
+        </if>
+        <if test="keyword != null and keyword != ''">
+        -- 키워드 검색의 경우
+        INNER JOIN (
+            SELECT resume_id FROM resume_spec
+            WHERE  delFlag = 'N'
+              AND (
+                    spec LIKE CONCAT('%',#{keyword},'%')
+                  )
+            GROUP BY resume_id
+        ) rs ON xx.id = rs.resume_id
+        </if>
+        WHERE xx.representation = 1 AND xx.delflag= 'N' AND xx.opened = 1
+        <if test="ageSt != null and ageSt != ''">
+            -- 연령 검색의 경우
+            AND LEFT(DATE_FORMAT(NOW(), '%Y%m%d') - xx.birth, 2) >= #{ageSt}
+        </if>
+        <if test="ageEn != null and ageEn != ''">
+            AND #{ageEn} >= LEFT(DATE_FORMAT(NOW(), '%Y%m%d') - xx.birth, 2)
+        </if>
+        <if test="salarySt != null and salarySt != ''">
+            -- 희망연봉 검색의 경우
+            AND last_salary >= #{salarySt}
+        </if>
+        <if test="salaryEn != null and salaryEn != ''">
+            AND #{salaryEn} >= last_salary
+        </if>
+        <if test="careerSt != null and careerSt != ''">
+            AND totalCareer >= (#{careerSt} * 12)
+        </if>
+        <if test="careerEn != null and careerEn != ''">
+            AND (#{careerEn} * 12) >= totalCareer
+        </if>
+        <include refid="common.paging" />
+    </select>
+
+    <!-- 인재검색 COUNT -->
+    <select id="selectMemberByResumeCnt" parameterType="ApiMemberDTO" resultType="int">
+        /* com.fw.core.mapper.db1.api.ApiMemberMapper.selectMemberByResumeCnt, 인재검색 COUNT , ApiMemberMapper.xml */
+        SELECT COUNT(1)
+        FROM resume xx
+    LEFT JOIN hh_resume_reading_history hrrh ON xx.id = hrrh.resume_id AND hrrh.delFlag = 'N' AND hrrh.member_id = #{memberId}
+    LEFT JOIN member m ON xx.member_id = m.id
+        <if test="companyName != null and companyName != ''">
+        -- 출신회사 검색의 경우
+        INNER JOIN (
+            SELECT resume_id FROM resume_career
+            WHERE delFlag = 'N' AND certFlag = 'Y' AND companyName LIKE CONCAT('%',#{companyName},'%')
+        GROUP BY resume_id
+        ) company ON xx.id = company.resume_id
+        </if>
+        <if test="hp1 != null and hp1 != ''">
+        -- 학력 검색의 경우
+        INNER JOIN (
+            SELECT resume_id FROM resume_academic_background
+            WHERE delFlag = 'N' AND graduationStatusCd = 'GRADUATION' AND degreeCd = #{hp1}
+        GROUP BY resume_id
+        ) rabb ON xx.id = rabb.resume_id
+        </if>
+        <if test="hp2 != null and hp2 != '' and hp2.length != 0">
+         -- 학력2 검색의 경우
+        INNER JOIN (
+            SELECT resume_id FROM resume_filtering
+            WHERE delFlag = 'N'
+              AND (
+                    <foreach item="item" index="index" collection="hp2" open="" separator="OR" close="">
+                        filterCd =#{item}
+                    </foreach>
+                    )
+        GROUP BY resume_id
+        ) rf ON xx.id = rf.resume_id
+        </if>
+        <if test="loc != null and loc != '' and loc.length != 0">
+        -- 희망근무지 검색의 경우
+        INNER JOIN (
+            SELECT resume_id FROM resume_location
+            WHERE delFlag = 'N'
+              AND location_cd IN (
+                    <foreach item="item" index="index" collection="loc" open="" separator="," close="">
+                    #{item}
+                    </foreach>
+                    )
+        GROUP BY resume_id
+        ) rl ON xx.id = rl.resume_id
+        </if>
+        <if test="language != null and language != ''">
+        -- 외국어 검색의 경우
+        INNER JOIN (
+            SELECT resume_id FROM resume_language
+            WHERE delFlag = 'N'
+              AND languageInput LIKE CONCAT('%',#{language},'%')
+        GROUP BY resume_id
+        ) rlan ON xx.id = rlan.resume_id
+        </if>
+        <if test="license != null and license != ''">
+        -- 자격증 검색의 경우
+        INNER JOIN (
+            SELECT resume_id FROM resume_license
+            WHERE  delFlag = 'N'
+              AND name LIKE CONCAT('%',#{license},'%')
+        GROUP BY resume_id
+        ) rlic ON xx.id = rlic.resume_id
+        </if>
+        <if test="keyword != null and keyword != ''">
+        -- 키워드 검색의 경우
+        INNER JOIN (
+            SELECT resume_id FROM resume_spec
+            WHERE  delFlag = 'N'
+              AND (
+                    spec LIKE CONCAT('%',#{keyword},'%')
+                  )
+        GROUP BY resume_id
+        ) rs ON xx.id = rs.resume_id
+        </if>
+        WHERE xx.representation = 1 AND xx.delflag= 'N' AND xx.opened = 1
+        <if test="ageSt != null and ageSt != ''">
+            AND LEFT(DATE_FORMAT(NOW(), '%Y%m%d') - xx.birth, 2) >= #{ageSt}
+        </if>
+        <if test="ageEn != null and ageEn != ''">
+            AND #{ageEn} >= LEFT(DATE_FORMAT(NOW(), '%Y%m%d') - xx.birth, 2)
+        </if>
+        <if test="salarySt != null and salarySt != ''">
+            AND last_salary >= #{salarySt}
+        </if>
+        <if test="salaryEn != null and salaryEn != ''">
+            AND #{salaryEn} >= last_salary
+        </if>
+        <if test="careerSt != null and careerSt != ''">
+            AND totalCareer >= (#{careerSt} * 12)
+        </if>
+        <if test="careerEn != null and careerEn != ''">
+            AND (#{careerEn} * 12) >= totalCareer
+        </if>
+    </select>
+
+    <!-- 지원자 정보 수정-->
+    <insert id="updateApplicant" parameterType="ApiMemberDTO">
+        /* com.fw.core.mapper.db1.api.ApiMemberMapper.updateApplicant, 지원자 정보 수정 , ApiMemberMapper.xml */
+        UPDATE applicant
+        SET member_id = #{memberId}
+        <if test='contactExceptHoliday != null and contactExceptHoliday != ""'>
+            , contactExceptHoliday = #{contactExceptHoliday}
+        </if>
+        <if test='contactableTime != null and contactableTime != ""'>
+            , contactableTime = #{contactableTime}
+        </if>
+        <if test='findingJob != null and findingJob != ""'>
+            , findingJob = #{findingJob}
+        </if>
+        <if test='isPrivateAgreement != null and isPrivateAgreement != ""'>
+            , isPrivateAgreement = #{isPrivateAgreement}
+        </if>
+        <if test='resumeRestricted != null and resumeRestricted != ""'>
+            , resumeRestricted = #{resumeRestricted}
+        </if>
+        WHERE member_id = #{memberId}
+    </insert>
+
+    <!-- 간편 로그인 설정(등록) -->
+    <insert id="insertMemberSimpleAuth" parameterType="ApiMemberDTO">
+        /* com.fw.core.mapper.db1.api.ApiMemberMapper.insertMemberSimpleAuth, 간편 로그인 설정(등록) , ApiMemberMapper.xml */
+        INSERT INTO tb_simple_auth (
+               member_id
+             , simple_auth_cd
+             , simple_auth_val
+             , del_flag
+             , reg_seq
+             , reg_date
+        ) VALUES (
+               #{memberId}
+             , #{simpleAuthCd}
+             , #{simpleAuthVal}
+             , 'N'
+             , #{memberId}
+             , NOW()
+        )
+    </insert>
+
+    <!-- 간편 인증 삭제 등록-->
+    <update id="updateMemberSimpleAuthDel" parameterType="ApiMemberDTO">
+        UPDATE tb_simple_auth
+        SET del_flag = 'Y'
+        WHERE 1=1
+          AND member_id = #{memberId}
+          AND simple_auth_cd = #{simpleAuthCd}
+          AND del_flag = 'N'
+    </update>
+
+    <!-- 간편 로그인 설정(조회) -->
+    <select id="selectMemeberSimpleAuth" resultType="ApiMemberDTO">
+        /* com.fw.core.mapper.db1.api.ApiMemberMapper.selectLoginInfo, 간편 로그인 설정(조회) , ApiMemberMapper.xml */
+        SELECT simple_auth_seq
+             , member_id
+             , simple_auth_val
+             , del_flag
+             , simple_auth_cd
+             , DATE_FORMAT(reg_date,'%Y-%m-%d %H:%i:%s') AS regDate
+        FROM tb_simple_auth
+        WHERE del_flag = 'N'
+        <if test='memberId != null and memberId != ""'>
+            AND member_id = #{memberId}
+        </if>
+        <if test='simpleAuthVal != null and simpleAuthVal != ""'>
+            AND simple_auth_val = #{simpleAuthVal}
+        </if>
+        <if test='simpleAuthCd != null and simpleAuthCd != ""' >
+            AND simple_auth_cd = #{simpleAuthCd}
+        </if>
+        <if test='autoLogin != null and autoLogin != ""'>
+            AND simple_auth_cd = 'AUTO'
+            AND simple_auth_val = #{autoLogin}
+        </if>
+    </select>
+
+    <!-- 자동로그인 토큰 조회 -->
+    <select id="selectAutoLoginToken" parameterType="ApiMemberDTO" resultType="ApiMemberDTO">
+        /* com.fw.core.mapper.db1.api.ApiMemberMapper.selectAutoLoginToken, 자동로그인 토큰 조회 , ApiMemberMapper.xml */
+        SELECT simple_auth_seq
+             , member_id
+             , simple_auth_val
+             , simple_auth_cd
+        FROM tb_simple_auth
+        WHERE del_flag = 'N'
+          AND member_id = #{memberId}
+          AND simple_auth_cd = 'AUTO'
+    </select>
+
+    <!-- 로그인 유저 정보 취득-->
+    <select id="selectLoginInfo" resultType="ApiMemberDTO">
+        /* com.fw.core.mapper.db1.api.ApiMemberMapper.selectLoginInfo, 로그인 유저 정보 취득 , ApiMemberMapper.xml */
+        SELECT A.DTYPE
+             , A.id
+             , A.email
+             , A.name
+             , A.password
+             , A.phone
+             , A.isStop
+             , A.isTemp
+             , (CASE
+                     WHEN A.agreeMarketing = '0' THEN 'N'
+                     WHEN A.agreeMarketing = '1' THEN 'Y'
+                END) AS agreeMarketing
+             , DATE_FORMAT(A.agreeMarketingAt,'%Y-%m-%d %H:%i:%s') AS agreeMarketingAt
+             , A.privacyExpire
+             , A.privacyExpireDate
+             , (CASE
+                     WHEN A.deleted = '0' THEN 'N'
+                     WHEN A.deleted = '1' THEN 'Y'
+                END) AS deleted
+             , DATE_FORMAT(A.deletedAt,'%Y-%m-%d %H:%i:%s') AS deletedAt
+             , DATE_FORMAT(A.lastChangePassword,'%Y-%m-%d %H:%i:%s') AS lastChangePassword
+             , (CASE
+                     WHEN A.isStop = '0' THEN 'N'
+                     WHEN A.isStop = '1' THEN 'Y'
+                END) AS isStop
+             , DATE_FORMAT(A.createdAt,'%Y-%m-%d %H:%i:%s') AS createdAt
+             , DATE_FORMAT(A.updatedAt,'%Y-%m-%d %H:%i:%s') AS updatedAt
+             , B.url as imagePath
+             , D.sfName
+             , D.approved
+        FROM member A
+    LEFT JOIN file_mgr B ON A.profilePictureFileId = B.id
+    LEFT JOIN tb_simple_auth C ON A.id = C.member_id
+    LEFT JOIN headhunter D ON A.id = D.member_id
+        WHERE 1=1
+          AND A.deleted != 1
+      <if test='memberId != null and memberId != ""'>
+          AND A.id = #{memberId}
+      </if>
+      <if test='loginId != null and loginId != ""'>
+          AND A.loginId = #{loginId}
+      </if>
+      <if test='simpleAuthCd != null and simpleAuthVal != null and simpleAuthCd != "" and simpleAuthVal != ""'>
+          AND C.simple_auth_cd = #{simpleAuthCd}
+          AND C.simple_auth_val = #{simpleAuthVal}
+      </if>
+        LIMIT 1
+    </select>
+
+    <!-- 스크랩된 공고 카운트 -->
+    <select id="selectMyScrapPositionCnt" parameterType="ApiScrapPositionDTO" resultType="int">
+        /* com.fw.core.mapper.db1.api.ApiMemberMapper.selectMyScrapPositionCnt, 스크랩된 공고 카운트 , 22.11.28, yjw, ApiMemberMapper.xml */
+        SELECT COUNT(*)
+        FROM scrap_position xx
+    LEFT JOIN position p ON p.id = xx.position_id
+    LEFT JOIN hr_company hc ON hc.id = p.hr_company_id
+        WHERE xx.applicant_id = #{memberId} AND xx.delFlag = 'N'
+    </select>
+
+    <!-- 스크랩된 공고 조회 -->
+    <select id="selectMyScrapPosition" parameterType="ApiScrapPositionDTO" resultType="ApiScrapPositionDTO">
+        /* com.fw.core.mapper.db1.api.ApiMemberMapper.selectMyScrapPosition, 스크랩된 공고 조회 , 22.11.28, yjw, ApiMemberMapper.xml */
+        SELECT p.id AS positionId
+             , DATE_FORMAT(p.createdAt,'%Y-%m-%d %H:%i:%s') AS createdAt
+             , DATE_FORMAT(p.endDate,'%Y-%m-%d %H:%i:%s') AS endDate
+             , hc.companyName
+             , hc.companyScale
+             , hc.companyStatus
+             , fn_get_common_cd(p.status, 'POSITION_STATUS', 1) AS status
+             , p.status AS statusCd
+             , p.title
+             , IF(EXISTS(SELECT * FROM position_applicant pa WHERE pa.position_id = xx.position_id AND pa.ap_member_id = #{memberId}),'Y','N') AS applyFlag
+             , p.jopDescription
+             , p.pmComment
+        FROM scrap_position xx
+    LEFT JOIN position p ON p.id = xx.position_id
+    LEFT JOIN hr_company hc ON hc.id = p.hr_company_id
+        WHERE xx.applicant_id = #{memberId} AND xx.delFlag = 'N'
+        ORDER BY xx.createdAt DESC /* 스크랩 등록 최신순 정렬 */
+        <if test='endRow > 0'>
+            LIMIT #{startRow}, #{endRow}
+        </if>
+    </select>
+
+    <!-- 회원 일련번호로 AP/HH 구분 -->
+    <select id="selectUsertype" parameterType="String" resultType="String">
+        /* com.fw.core.mapper.db1.api.ApiMemberMapper.selectUsertype, 회원 일련번호로 AP/HH 구분 , 22.11.28, yjw, ApiMemberMapper.xml */
+        SELECT DTYPE
+        FROM member
+        WHERE id = #{memberId} AND deleted = '0'
+    </select>
+
+    <!-- 회원찾기 TODO 회원리스트를 조회할 때 다른 테이블에 더 필요한 데이터는 없는가 확인 -->
+    <select id="selectSearchMember" parameterType="ApiMemberDTO" resultType="ApiMemberDTO">
+        SELECT m.DTYPE
+             , m.id
+             , m.email
+             , (CASE
+                    WHEN m.isTemp = '0' THEN 'N'
+                    WHEN m.isTemp = '1' THEN 'Y'
+                END) AS isTemp
+             , m.name
+             , m.phone
+             , m.profilePictureFileId
+             , (CASE
+                    WHEN m.agreeAd = '0' THEN 'N'
+                    WHEN m.agreeAd = '1' THEN 'Y'
+                END) AS agreeAd
+             , DATE_FORMAT(m.agreeAdAt,'%Y-%m-%d %H:%i:%s') AS agreeAdAt
+             , (CASE
+                    WHEN m.agreeMarketing = '0' THEN 'N'
+                    WHEN m.agreeMarketing = '1' THEN 'Y'
+                END) AS agreeMarketing
+             , DATE_FORMAT(m.agreeMarketingAt,'%Y-%m-%d %H:%i:%s') AS agreeMarketingAt
+             , m.privacyExpire
+             , m.privacyExpireDate
+             , (CASE
+                    WHEN m.deleted = '0' THEN 'N'
+                    WHEN m.deleted = '1' THEN 'Y'
+                END) AS deleted
+             , m.deletedAt
+             , DATE_FORMAT(m.lastChangePassword,'%Y-%m-%d %H:%i:%s') AS lastChangePassword
+             , (CASE
+                    WHEN m.isStop = '0' THEN 'N'
+                    WHEN m.isStop = '1' THEN 'Y'
+                END) AS isStop
+             , DATE_FORMAT(m.createdAt,'%Y-%m-%d %H:%i:%s') AS createdAt
+             , DATE_FORMAT(m.updatedAt,'%Y-%m-%d %H:%i:%s') AS updatedAt
+             , a.contactAbleTime
+        FROM member m
+    LEFT JOIN applicant a ON m.id = a.member_id
+        <where>
+            <if test="memberId != null and memberId !=''">
+                AND id = #{memberId}
+            </if>
+            <if test="name != null and name != ''">
+                AND name = #{name}
+            </if>
+            <if test="phone != null and phone != ''">
+                AND phone = #{phone}
+            </if>
+        </where>
+    </select>
+
+    <!-- 아이디(이메일) 중복확인 -->
+    <select id="selectDuplicateLoginId" parameterType="ApiMemberDTO" resultType="boolean">
+        /* com.fw.core.mapper.db1.api.ApiMemberMapper.selectDuplicateLoginId, 아이디(이메일) 중복확인, YJW, ApiMemberMapper.xml */
+        SELECT EXISTS (
+                       SELECT 1
+                       FROM member
+                       WHERE loginId = #{email}
+                   ) AS CNT
+    </select>
+
+    <!-- 헤드헌터 정보조회 -->
+    <select id="selectHhInfo" parameterType="ApiMemberDTO" resultType="ApiMemberDTO">
+        /* com.fw.core.mapper.db1.api.ApiMemberMapper.selectHhInfo, 헤드헌터 정보조회, YJW, ApiMemberMapper.xml */
+        SELECT m.name
+             , m.phone
+             , m.loginId
+             , m.profilePictureFileId
+             , h.sfName
+             , h.referralCode
+             , h.greeting
+             , GROUP_CONCAT(hpf.fieldCd) AS fieldCd
+        FROM member m
+    INNER JOIN headhunter h ON m.id = h.member_id
+    INNER JOIN hh_position_field hpf ON h.member_id = hpf.member_id AND hpf.type = 'SPECIAL' AND hpf.delFlag = 'N'
+        WHERE m.id = #{memberId}
+    </select>
+
+    <!-- 헤드헌터 정보수정(member) -->
+    <update id="updateMemberHh" parameterType="ApiMemberDTO">
+        /* com.fw.core.mapper.db1.api.ApiMemberMapper.updateMemberHh, 헤드헌터 정보수정(member), YJW, ApiMemberMapper.xml */
+        UPDATE member
+            SET id = #{memberId}
+        <if test="di != null and di != '' and name != null and name != ''">
+              , name = #{name}
+        </if>
+        <if test="di != null and di != '' and phone != null and phone != ''">
+              , phone = #{phone}
+        </if>
+        <if test="di != null and di != ''">
+              , di = #{di}
+        </if>
+              , updatedAt = NOW()
+        <if test="profilePictureFileId != null and profilePictureFileId != ''">
+              , profilePictureFileId = #{profilePictureFileId}
+        </if>
+        WHERE id = #{memberId}
+    </update>
+
+    <!-- 헤드헌터 정보수정(headhunter) -->
+    <update id="updateHeadhunter" parameterType="ApiMemberDTO">
+        /* com.fw.core.mapper.db1.api.ApiMemberMapper.updateHeadhunter, 헤드헌터 정보수정(headhunter), YJW, ApiMemberMapper.xml */
+        UPDATE headhunter
+            SET greeting = #{greeting}
+              , updateSeq = #{memberId}
+              , updatedAt = NOW()
+        WHERE member_id = #{memberId}
+    </update>
+
+    <!-- 헤드헌터 정보삭제(hh_position_field) -->
+    <delete id="deleteHhPositionField" parameterType="ApiMemberDTO">
+        /* com.fw.core.mapper.db1.api.ApiMemberMapper.deleteHhPositionField, 헤드헌터 정보삭제(hh_position_field), YJW, ApiMemberMapper.xml */
+        DELETE
+        FROM hh_position_field
+        WHERE member_id = #{memberId}
+    </delete>
+
+    <!-- 헤드헌터 정보등록(hh_position_field) -->
+    <insert id="insertHhPositionField" parameterType="ApiMemberDTO">
+        /* com.fw.core.mapper.db1.api.ApiMemberMapper.insertHhPositionField, 헤드헌터 정보등록(hh_position_field), YJW, ApiMemberMapper.xml */
+        INSERT INTO hh_position_field (
+           createdAt
+         , fieldCd
+         , type
+         , member_id
+        ) VALUES
+        <foreach collection="specialField" item="item" separator=",">
+        (
+           NOW()
+         , #{item}
+         , 'SPECIAL'
+         , #{memberId}
+        )
+        </foreach>
+    </insert>
+
+    <!-- 회원 존재여부 -->
+    <select id="selectMemberExsists" parameterType="ApiMemberDTO" resultType="ApiMemberDTO">
+        /* com.fw.core.mapper.db1.api.ApiMemberMapper.selectMemberExsists, 회원 존재여부, YJW, ApiMemberMapper.xml */
+        SELECT EXISTS (
+                       SELECT 1
+                       FROM member
+                       WHERE deleted = 0
+                         AND loginId = #{loginId}
+                   ) AS CNT
+    </select>
+
+    <!-- 푸쉬토큰 갱신 -->
+    <update id="updatePushInfo" parameterType="ApiMemberDTO">
+        /* com.fw.core.mapper.db1.api.ApiMemberMapper.updatePushInfo, 푸쉬토큰 수정, YJW, ApiMemberMapper.xml */
+        UPDATE member
+           SET pushToken = #{pushToken}
+             , phoneType = #{phoneType}
+        WHERE id = #{memberId}
+    </update>
+</mapper>

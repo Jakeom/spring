@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html  xmlns:th="http://www.thymeleaf.org"
+       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+       layout:decorate="~{layouts/applicationLayout}">
+<body>
+<div id="container-block">
+  <div layout:fragment="contents" th:remove="tag">
+          <div class="layout-content">
+            <h3 class="subtitle poppins">받은 포지션 제안</h3>
+            <div class="title-line mt-4 mb-5"></div>
+            <div class="row row-0">
+              <ol class="step mt-n3">
+                <li class="active">
+                  <a href="/fo/user/application/job-position"><span>포지션 제안내역</span></a>
+                </li>
+                <li>
+                  <a href="/fo/user/application/job-browse"><span>내 이력서 열람 내역</span></a>
+                </li>
+              </ol>
+            </div>
+            <form name="searchForm">
+              <input type="hidden" name="page" th:value="${searchInfo.page}"/>
+              <div class="d-flex align-items-center justify-content-between">
+                <div class="btn-group date-list" role="group">
+                  <p class="m-r-20 hidden-mobile">조회기간</p>
+                  <input type="hidden" name="selectPeriod" th:value="${searchInfo.selectPeriod}"/>
+                  <button type="button" class="btn btn-outline-primary" th:classappend="${searchInfo.selectPeriod} =='1month'? 'active':'' " data-role="selectPeriod" data-period="1month">1개월</button>
+                  <button type="button" class="btn btn-outline-primary" th:classappend="${searchInfo.selectPeriod} =='3month'? 'active':'' " data-role="selectPeriod" data-period="3month">3개월</button>
+                  <button type="button" class="btn btn-outline-primary" th:classappend="${searchInfo.selectPeriod} =='6month'? 'active':'' " data-role="selectPeriod" data-period="6month">6개월</button>
+                  <button type="button" class="btn btn-outline-primary" th:classappend="${searchInfo.selectPeriod} =='12month'? 'active':'' " data-role="selectPeriod"data-period="12month">1년</button>
+                </div>
+            </div>
+            </form>
+            <div class="fake-table">
+              <th:block th:if="${#lists.isEmpty(positionList)}">
+                <div class="fake-table-column none-data">
+                  <div class="fake-table-cell">
+                    <p></p>
+                  </div>
+                  <div class="fake-table-cell">
+                    <p class="none-data__desc">데이터가 없습니다.</p>
+                  </div>
+                  <div class="fake-table-cell">
+                    <p></p>
+                  </div>
+                </div>
+              </th:block>
+              <th:block  th:each="list : ${positionList}">
+                <div class="fake-table-column">
+                  <div class="fake-table-cell text-start">
+                    <div class="headhunter-wrap">
+                      <a href="" class="hunter-name" th:text="${list.name}">홍길동</a>
+                      <p class="state" th:text="${list.sfName}"></p>
+                    </div>
+                  </div>
+                  <div class="fake-table-cell text-start">
+                    <div class="announcement-wrap">
+                      <p class="scale">
+                        <span th:text="${list.companyScale}"></span>
+                        <span class="company" th:text="${list.publicCd} == '0' ? ${list.companyName} : '***'">삼성전자</span>
+                      </p>
+                      <a th:if="${list.proposalStatus eq 'PROPOSAL'}" th:href="'/fo/user/jop/posting/detail?id='+${list.postingId}+'&applicantId='+${list.id}+'&mode=PROPOSAL'" class="title" th:text="${list.title}">테스트 공고</a>
+                      <a th:if="${list.proposalStatus ne 'PROPOSAL'}" class="title" th:text="${list.title}">테스트 공고</a>
+                      <p class="date"><span>제안일</span><span th:text="${list.createdAt}">2022.10.21 10:57:17</span></p>
+                    </div>
+                  </div>
+                  <div class="fake-table-cell text-start">
+                    <div class="headhunter-wrap text-center">
+                      <p class="text-danger" th:if="${list.proposalStatus eq 'PROPOSAL'}">제안</p>
+                      <p class="text-danger" th:if="${list.proposalStatus ne 'PROPOSAL' and list.proposalStatus ne 'REJECT'}">승인</p>
+                      <p class="text-danger" th:if="${list.proposalStatus eq 'REJECT'}">거부</p>
+                    </div>
+                  </div>
+                </div>
+              </th:block>
+            </div>
+            <div class="d-flex justify-content-center mt-5">
+              <th:block th:include="common/paging :: paging_Fragment(fnc=*{'fn_go_page(this)'}, pageId=*{'pageName1'})"/>
+            </div>
+          </div>
+      </div>
+    </div>
+  </body>
+</html>

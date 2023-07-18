@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html
+    lang="ko"
+    xmlns:th="http://www.thymeleaf.org"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<head>
+    <th:block th:include="_include/_head :: commonMetaAndTitle" />
+    <th:block th:include="_include/_head :: commonStyle" />
+    <th:block layout:fragment="head" th:remove="tag" />
+</head>
+
+
+<body >
+    <div class="wrap">
+        <div th:include="_include/_headhunter_main_header :: common" th:remove="tag"></div>
+        <div id="container">
+        <!--<th:block th:include="_include/_aside :: common" th:remove="tag"/>-->
+        <!-- Content Wrapper. Contains page content -->
+        <th:block layout:fragment="contents" />
+
+            <!-- 알림 버튼 -->
+            <th:block th:if="${alarmCnt != null}">
+                <a href="javascript:void(0)" class="chat-notice" th:classappend="${alarmCnt > 0 ? 'active' : ''}">
+                    <i class="icon-chat-notice"></i>
+                </a>
+            </th:block>
+            <a href="#" class="top-btn">
+                <i class="icon-top-btn"></i>
+            </a>
+            <!--// 알림 버튼 -->
+
+        </div>
+    </div>
+    <th:block layout:fragment="modal" />
+    <!--/* 각 페이지에서 추가되는 모달 영역 */-->
+    <div th:include="_include/_modal :: common" th:remove="tag"></div>
+
+    <div th:include="common/javascript :: common" th:remove="tag"></div>
+
+    <script>
+        const mainSwiper = new Swiper('.main-content__join .swiper-container', {
+            // If we need pagination
+            slidesPerView: 1,
+            pagination: {
+                el: '.main-content__join .swiper-pagination',
+            },
+            
+            autoplay:{
+                delay: 5000,
+            },
+
+            // Navigation arrows
+            navigation: {
+                nextEl: '.main-content__join .swiper-button-next',
+                prevEl: '.main-content__join .swiper-button-prev',
+            },
+        });
+
+        const announcementSwiper = new Swiper('.main-content__announcement .swiper-container', {
+            // If we need pagination
+            slidesPerView: 1,
+            
+            autoplay:{
+                delay: 5000,
+            },
+            
+            // Navigation arrows
+            navigation: {
+                nextEl: '.main-content__announcement .swiper-button-next',
+                prevEl: '.main-content__announcement .swiper-button-prev',
+            },
+        });
+
+        const searchSwiper = new Swiper('.swiper-search .swiper-container', {
+            // If we need pagination
+            breakpoints: {
+                996: {
+                    slidesPerView: 4,
+                    spaceBetween: 24,
+                },
+            },
+            slidesPerView: 1,
+            spaceBetween: 0,
+            autoplay:{
+                delay: 5000,
+            },
+            // Navigation arrows
+            navigation: {
+                nextEl: '.swiper-search .swiper-button-next',
+                prevEl: '.swiper-search .swiper-button-prev',
+            },
+
+            scrollbar: {
+                el: '.swiper-search .swiper-scrollbar',
+            },
+        });
+        const customerSwiper = new Swiper('.swiper-customer .swiper-container', {
+            // If we need pagination
+            breakpoints: {
+                996: {
+                    slidesPerView: 4,
+                    spaceBetween: 24,
+                },
+            },
+            slidesPerView: 1,
+            spaceBetween: 0,
+            autoplay:{
+                delay: 5000,
+            },
+            // Navigation arrows
+            navigation: {
+                nextEl: '.swiper-customer .swiper-button-next',
+                prevEl: '.swiper-customer .swiper-button-prev',
+            },
+
+            scrollbar: {
+                el: '.swiper-customer .swiper-scrollbar',
+            },
+        });
+        const platformSwiper = new Swiper('.main-content__platform .swiper-container', {
+            // If we need pagination
+            breakpoints: {
+                996: {
+                    slidesPerView: 'auto',
+                    spaceBetween: 140,
+                    centeredSlides: true,
+                    loop: true,
+                },
+            },
+            autoplay:{
+                delay: 5000,
+            },
+            slidesPerView: 1,
+            navigation: {
+                nextEl: '.main-content__platform .swiper-button-next',
+                prevEl: '.main-content__platform .swiper-button-prev',
+            },
+            pagination: {
+                el: '.main-content__platform .swiper-pagination',
+                clickable: true,
+                renderBullet: function (index, className) {
+                    return '<span class="' + className + '">' + (index + 1) + '</span>';
+                },
+            },
+        });
+
+        // datepicker
+        $('#end-datepicker').datepicker({
+        changeMonth: true,
+        changeYear: true,
+        nextText: '다음 달',
+        prevText: '이전 달',
+        currentText: '오늘 날짜',
+        closeText: '닫기',
+        dateFormat: 'yy-mm-dd',
+        showMonthAfterYear: true,
+        dayNamesMin: ['월', '화', '수', '목', '금', '토', '일'],
+        monthNamesShort: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
+        beforeShow: function (input) {
+          let i_offset = $(input).offset(); //클릭된 input의 위치값 체크
+          console.log(i_offset);
+          setTimeout(function () {
+            $('#ui-datepicker-div').css({ top: 53 + '%', bottom: '', left: i_offset.left }); //
+          });
+        },
+      });
+    </script>
+    <footer>
+        <th:block th:include="_include/_hh_footer :: commonMetaAndTitle" />
+        <th:block layout:fragment="footer" th:remove="tag" />
+    </footer>
+</body>
+</html>

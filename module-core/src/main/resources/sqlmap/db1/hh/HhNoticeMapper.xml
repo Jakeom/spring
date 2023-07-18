@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.hh.HhNoticeMapper">
+
+    <!-- 공고 조회 카운트 취득-->
+    <select id="selectNoticeListCntForPaging" resultType="int">
+        /*com.fw.core.mapper.db1.hh.HhNoticeMapper.selectPositionListCntForPaging,  채용공고 조회 카운트 취득 , 2022.11 , skayhlj@gmail.com, FoJopMapper.xml*/
+        SELECT COUNT(*) AS cnt
+          FROM tb_notice
+          WHERE del_flag = 'N'
+    </select>
+
+    <!-- 공고 조회 페이징-->
+    <select id="selectNoticeListPaging" resultType="HhNoticeDTO">
+        /*com.fw.core.mapper.db1.hh.HhNoticeMapper.selectPositionListPaging, 채용공고 조회 페이징 , 2022.11 , skayhlj@gmail.com, FoJopMapper.xml*/
+        SELECT @rownum:=@rownum+1 AS rownum
+             , A.*
+        FROM (
+        SELECT
+        notice_seq
+        , fn_get_common_cd(notice_type_cd , 'BOARD_TYPE' , '1') AS noticeTypeCd
+        , title
+        , content
+        , file_seq
+        , hit
+        , del_flag
+        , create_seq
+        , DATE_FORMAT(create_dt,'%Y.%m.%d') createDt
+        , update_seq
+        , update_dt
+        FROM tb_notice
+        where del_flag = 'N'
+        <if test="sortColumn != '' and sortColumn != null">
+            <if test="sortColumn eq 'endDate'">
+            ORDER BY ${sortColumn} DESC LIMIT 18446744073709551615
+            </if>
+            <if test="sortColumn eq 'createdAt'">
+                ORDER BY ${sortColumn} LIMIT 18446744073709551615
+            </if>
+        </if>
+          ) AS A
+             , (SELECT @rownum:=0) TMP order by rownum DESC
+        <include refid="common.paging" />
+    </select>
+
+    <!-- 메인 공지사항-->
+    <select id="selectNoticeList" resultType="HhNoticeDTO">
+        /*com.fw.core.mapper.db1.hh.HhNoticeMapper.selectPositionListPaging, 메인 공지사항 , 2022.11 , skayhlj@gmail.com, FoJopMapper.xml*/
+        SELECT notice_seq
+        	 , fn_get_common_cd(notice_type_cd , 'BOARD_TYPE' , '1') AS noticeTypeCd
+        	 , title
+        	 , content
+        	 , file_seq
+        	 , hit
+        	 , del_flag
+        	 , create_seq
+        	 , DATE_FORMAT(create_dt,'%Y.%m.%d') createDt
+        	 , update_seq
+        	 , update_dt
+        	 , display_order
+        FROM tb_notice
+        WHERE del_flag = 'N' AND display_order IS NOT NULL
+        	LIMIT 5
+    </select>
+
+    <!--채용공고 상세보기-->
+    <select id="selectNoticeInfo" resultType="HhNoticeDTO">
+        /*com.fw.core.mapper.db1.hh.HhNoticeMapper.selectPositionInfo, 채용공고 상세보기징 , 2022.11 , skayhlj@gmail.com, FoJopMapper.xml*/
+        SELECT
+                 notice_seq AS noticeSeq
+                , fn_get_common_cd(notice_type_cd , 'BOARD_TYPE' , '1') AS noticeTypeCd
+                , title
+                , content
+                , file_seq
+                , hit
+                , del_flag
+                , create_seq
+                , DATE_FORMAT(create_dt,'%Y.%m.%d') createDt
+                , update_seq
+                , update_dt
+        FROM tb_notice
+        where del_flag = 'N'
+        AND notice_seq = #{noticeSeq}
+    </select>
+    
+    <!-- 공지사항 조회수 증가 -->
+    <update id="updateNoticeHit" parameterType="HhNoticeDTO">
+        UPDATE tb_notice
+        SET hit = hit + 1
+        WHERE notice_seq = #{noticeSeq}
+    </update>
+</mapper>

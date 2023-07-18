@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+	 xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+	 layout:decorate="~{layouts/default}">
+<body>
+<div layout:fragment="contents" th:remove="tag">
+	<div id="container-block">
+		<input type="hidden" id="groupDetailGroupId" th:value="${detail.groupId}"/>
+		<main id="content" role="main">
+			<h2 class="title">그룹 상세</h2>
+				<div class="p-3">
+					<table class="table table-bordered">
+                    <colgroup>
+                        <col style="width:15%">
+                        <col style="width:35%">
+                    </colgroup>
+                    <tbody>
+                    <tr>
+                        <th class="text-center none-sort">그룹아이디</th>
+                        <td th:text="${detail.groupId}"></td>
+                   	</tr>
+                   	<tr>
+                        <th class="text-center none-sort">그룹명</th>
+                        <td th:text="${detail.groupNm}"></td>
+                    </tr>
+                    <tr>
+                        <th class="text-center none-sort">사용여부</th>
+                        <td th:text="${detail.useFlag}"></td>
+                    </tr>
+                    </tbody>
+                	</table>
+                       	<button type="button" class="btn btn-dark" data-role="update">수정</button>
+           				<button type="button" class="btn btn-dark"  data-role="list" style="float: right;">목록</button>
+           				<button type="button" class="btn btn-danger"  data-role="delete">삭제</button>
+				</div>
+		</main>
+	</div>
+	<div layout:fragment="modal" th:remove="tag"></div>
+</div>
+</body>
+</html>

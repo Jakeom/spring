@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layouts/empty">
+    <body>
+        <div layout:fragment="contents" th:remove="tag">
+            <form name="certForm" th:action="${certServer}" method="POST">
+                <input type="hidden" name="tr_cert" th:value="${certInfo}">
+                <input type="hidden" name="tr_url" th:value="${certCallbackUrl} + '?mode=' + ${mode}">
+                <input type="hidden" name="tr_add" value="Y">
+            </form>
+            <script src="/static/lib/jquery/jquery.min.js"></script>
+            <script>
+                $("form[name=certForm]").submit();
+            </script>
+        </div>
+    </body>
+</html>

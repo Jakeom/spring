@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/mypageLayout">
+<body>
+<div id="container-block">
+    <div layout:fragment="contents" th:remove="tag">
+        <div class="layout-content">
+            <div class="community-content">
+                <div class="sub-content-head">
+                    <h3 class="subtitle">리워드 mall</h3>
+                </div>
+                <div class="reword-wrap">
+                    <p class="reword-wrap-title">
+                        헤드헌터 내 이력서 상세정보를 열람할 때다<br/>
+                        <b>1,000포인트</b>의 <b class="text-primary">리워드 적립</b>됩니다.
+                    </p>
+                    <p class="desc">RESUME에 이력서 등록하고 리워드 mall에서 쇼핑도 하세요!</p>
+
+                    <div class="now-point">
+                        <i class="icon-point"></i>
+                        <span>내 리워드</span>
+                        <p class="my-point"><b class="text-primary"
+                                               th:text="${#authentication.principal.balance == null? '0':#numbers.formatInteger(#authentication.principal.balance,0,'COMMA')}">1,350</b>P
+                        </p>
+                    </div>
+                </div>
+                <form name="searchForm">
+                    <input type="hidden" name="page" th:value="${searchInfo.page}"/>
+                </form>
+                <div class="reword-list">
+                    <div class="reword-product-list">
+                        <th:block th:each="list : ${rewardList}">
+                            <div class="reword-product" data-role="rewardDetail" th:data-id="${list.id}">
+                                <div class="img"
+                                     th:style="${!#lists.isEmpty(list.commonFileList)? 'background-image : url('+ list.commonFileList[0].url+')':'background-image : url(/static/images/about-01.png)'}"></div>
+                                <p class="company" th:text="${list.goodComp}">스타벅스</p>
+                                <p class="product-name" th:text="${list.goodNm}">아이스 카페 아메리카노</p>
+                                <p class="need-point"><span th:text="${list.point}">4,100</span>P</p>
+                            </div>
+                        </th:block>
+                    </div>
+                    <!-- <button type="button" class="more-btn">VIEW MORE <span>(1/100)</span> <i class="icon-primary-plus"></i></button>-->
+                </div>
+                <div class="d-flex justify-content-center mt-5">
+                    <th:block
+                            th:include="common/paging :: paging_Fragment(fnc=*{'fn_go_page(this)'}, pageId=*{'pageName1'})"/>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.m.MServiceMapper">
+
+    <!-- webview 공지사항 상세 -->
+    <select id="selectNoticeInfoM" parameterType="MserviceDTO" resultType="MserviceDTO">
+        /*com.fw.core.mapper.db1.m.MServiceMapper.selectNoticeInfoM, webview 공지사항 상세 , 2022.12 , YJW, MServiceMapper.xml*/
+        SELECT notice_seq AS noticeSeq
+             , fn_get_common_cd(notice_type_cd , 'BOARD_TYPE' , '1') AS noticeTypeCd
+             , title
+             , content
+             , file_seq
+             , hit
+             , del_flag
+             , create_seq
+             , DATE_FORMAT(create_dt,'%Y.%m.%d') createDt
+             , update_seq
+             , update_dt
+        FROM tb_notice
+        WHERE del_flag = 'N'
+          AND notice_seq = #{noticeSeq}
+    </select>
+
+    <!-- webview FAQ 상세 -->
+    <select id="selectFaqInfoM" parameterType="MserviceDTO" resultType="MserviceDTO">
+        /*com.fw.core.mapper.db1.m.MServiceMapper.selectFaqInfoM, webview FAQ 상세 , 2022.12 , YJW, MServiceMapper.xml*/
+        SELECT faq_seq
+             , faq_category_seq
+             , title
+             , content
+             , file_seq
+             , hit
+             , del_flag
+             , create_seq
+             , date_format(create_dt, '%Y-%m-%d %H:%i:%s') AS create_dt
+             , update_seq
+             , date_format(update_dt, '%Y-%m-%d %H:%i:%s') AS update_dt
+        FROM tb_faq
+        WHERE faq_seq = #{faqSeq}
+          AND del_flag ='N'
+    </select>
+</mapper>

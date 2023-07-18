@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:fragment="common">
+<aside>
+  <ul>
+    <li>
+      <a href="/fo/mypage/application-status"><span class="poppins">입사지원/제안관리</span></a>
+      <ul>
+        <li th:classappend="${activeMenuURI eq '/fo/mypage/application-status'} ? 'active' : ''">
+          <a href="/fo/mypage/application-status">입사지원 현황</a>
+        </li>
+        <li th:classappend="${activeMenuURI eq '/fo/user/application/job-position'} ? 'active' : ''">
+          <a href="/fo/user/application/job-position">포지션 제안내역</a>
+        </li>
+        <li th:classappend="${activeMenuURI eq '/fo/user/application/job-browse'} ? 'active' : ''">
+          <a href="/fo/user/application/job-browse">내 이력서 열람내역</a>
+        </li>
+        <li th:classappend="${activeMenuURI eq '/fo/user/application/past-support'} ? 'active' : ''">
+          <a href="/fo/user/application/past-support">과거 지원 결과</a>
+        </li>
+        <li th:classappend="${activeMenuURI eq '/fo/user/application/employment-certificate'} ? 'active' : ''">
+          <a href="/fo/user/application/employment-certificate">취업활동증명서 발급</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</aside>
+</div>
+</html>

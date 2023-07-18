@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.api.ApiCommonMapper">
+
+	<!-- 배너리스트 조회 -->
+	<select id="selectBannerList" parameterType="BoBannerDTO" resultType="BoBannerDTO">
+		/* com.fw.core.mapper.db1.apu.CommonMapper.selectBannerList, 배너리스트 조회 22.10.31, yjw, CommonMapper.xml */
+		SELECT tb.banner_nm AS bannerNm
+	  		  ,tb.content
+	  		  ,tb.banner_order AS bannerOrder
+	  		  ,tb.link_url AS linkUrl
+			  ,fm.originName
+			  ,fm.url AS fileUrl
+		FROM tb_banner tb
+		INNER JOIN file_mgr fm ON tb.file_seq = fm.id
+		WHERE tb.banner_type_cd = #{bannerTypeCd} AND tb.use_flag = "Y" AND tb.del_flag = "N"
+	</select>
+
+	<!-- 공통코드 리스트 조회 -->
+	<select id="selectCommonCd" parameterType="ApiCommonCdDTO" resultType="ApiCommonCdDTO">
+		SELECT upper_cd
+			 , group_nm
+	         , cd
+		     , cd_nm
+		FROM tb_common_cd
+		<where>
+			<if test="upperCd != null and upperCd != ''">
+				upper_cd = #{upperCd}
+			</if>
+		</where>
+	</select>
+</mapper>

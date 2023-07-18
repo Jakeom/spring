@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/default}">
+
+<body>
+	<div layout:fragment="contents" th:remove="tag">
+		<main id="content" role="main">
+			<h2 class="title">정보 관리</h2>
+			<!-- Search -->
+			<div class="row p-3">
+				<div class="col-12">
+					<form id="searchInfo" name="searchInfo">
+						<div class="row mt-5">
+							<div class="col-4">
+								<div class="d-flex align-items-center">
+									<input type="text" id="infoStartDt" name="infoStartDt"
+												class="form-control form-datepicker" placeholder="날짜 선택">
+									<div class="mr-2">~</div>
+									<input type="text" id="infoEndDt" name="infoEndDt"
+												class="form-control form-datepicker" placeholder="날짜 선택">
+								</div>
+							</div>
+							<div class="col-2">
+								<div class="d-flex align-items-center">
+									<button type="button" class="btn btn-dark" data-role="all">전체</button>
+									<button type="button" class="btn btn-dark" data-role="today">오늘</button>
+									<button type="button" class="btn btn-dark" data-role="week">7일</button>
+									<button type="button" class="btn btn-dark" data-role="month">1개월</button>
+								</div>
+							</div>
+							<div class="col-6">
+								<div class="d-flex" style="float: right">
+									<button type="button" class="btn btn-primary"
+										data-role="search">검색</button>
+								</div>
+							</div>
+						</div>
+					</form>
+					<div class="row mt-3">
+						<div class="col">
+							<table id="datatable" class="table">
+								<thead>
+									<tr>
+										<th>No.</th>
+										<th>생성/수정 일시</th>
+										<th>노출종류</th>
+										<th>컨텐츠</th>
+									</tr>
+								</thead>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</main>
+	</div>
+</body>
+</html>

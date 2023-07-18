@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.m.MResumeMapper">
+
+    <!-- 보유 포인트 조회 -->
+    <select id="selectMyPoint" parameterType="FoPointDTO" resultType="FoPointDTO">
+        /* com.fw.core.mapper.db1.m.MPointMapper.selectMyPoint, 보유 포인트 조회, 22.12.14, YJW, MPointMapper.xml */
+        SELECT p.balance
+             , m.id
+             , p.paidPoint
+             , p.freePoint
+        FROM point p
+                 RIGHT OUTER JOIN member m ON m.id = p.member_id
+        WHERE m.id = #{memberId}
+    </select>
+
+    <!-- 열람권 구매 시 포인트 업데이트 -->
+    <update id="updatePoint" parameterType="FoPointDTO">
+        /* com.fw.core.mapper.db1.m.MPointMapper.updatePoint, 열람권 구매 시 포인트 업데이트, 22.12.14, YJW, MPointMapper.xml */
+        UPDATE point
+           SET balance = balance - #{amount}
+             , freePoint = freePoint + #{freeIncrease}
+             , paidPoint = paidPoint + #{paidIncrease}
+             , updatedAt = NOW()
+        WHERE member_id = #{memberId}
+    </update>
+
+    <!-- 열람권 구매 시 포인트 사용내역 추가 -->
+    <insert id="insertPointUseHistory" parameterType="FoPointDTO">
+        /* com.fw.core.mapper.db1.m.MPointMapper.insertPointUseHistory, 열람권 구매 시 포인트 사용내역 추가 , 22.12.14, YJW, MPointMapper.xml */
+        INSERT INTO point_use_history (
+               createdAt
+             , updatedAt
+             , reasonCd
+             , member_id
+             , point_id
+             , freeBalance
+             , freeIncrease
+             , paidBalance
+             , paidIncrease
+        )
+        SELECT NOW()
+             , NOW()
+             , #{type}
+             , member_id
+             , id
+             , freePoint
+             , #{freeIncrease}
+             , paidPoint
+             , #{paidIncrease}
+        FROM point
+        WHERE member_id = #{memberId}
+    </insert>
+
+    <!-- 열람권 구매 시 이력서 열람내역 추가 -->
+    <insert id="insertHhResumeReadingHistory" parameterType="FoPointDTO">
+        /* com.fw.core.mapper.db1.m.MPointMapper.insertHhResumeReadingHistory, 열람권 구매 시 이력서 열람내역 추가 , 22.12.14, YJW, MPointMapper.xml */
+        INSERT INTO hh_resume_reading_history (
+               createdAt
+             , updatedAt
+             , expireAt
+             , registerPathCd
+             , member_id
+             , resume_id
+             , group_id
+             , delFlag
+        ) VALUES (
+               NOW()
+             , NOW()
+             , DATE_ADD(NOW(), INTERVAL 3 MONTH)
+             , #{registerPathCd}
+             , #{memberId}
+             , #{resumeId}
+             /* 그룹 아이디 처리 필요 */
+             , (SELECT id FROM hh_resume_reading_history_group WHERE member_id = #{memberId} LIMIT 1)
+             , 'N'
+        )
+    </insert>
+
+    <!-- 열람권 구매 시 열람이력 존재 시 만료일 업데이트 -->
+    <insert id="updateHhResumeReadingHistory" parameterType="FoPointDTO">
+        /* com.fw.core.mapper.db1.m.MPointMapper.updateHhResumeReadingHistory, 열람권 구매 시 열람이력 존재 시 만료일 업데이트 , 23.01.11, YJW, MPointMapper.xml */
+        UPDATE hh_resume_reading_history
+           SET expireAt = DATE_ADD(NOW(), INTERVAL 3 MONTH)
+             , updatedAt = NOW()
+        WHERE member_id = #{memberId}
+          AND resume_id = #{resumeId}
+          AND registerPathCd = #{registerPathCd}
+    </insert>
+
+    <!-- 열람권 유효 확인 -->
+    <select id="selectTicketInfo" parameterType="FoResumeDTO" resultType="FoResumeDTO">
+        /* com.fw.core.mapper.db1.m.MPointMapper.selectTicketInfo, 열람권 유효 확인 , 22.12.14, YJW, MPointMapper.xml */
+        SELECT DATE_FORMAT(expireAt,'%Y-%m-%d %H:%i:%s') AS expireAt
+        FROM hh_resume_reading_history
+        WHERE delFlag = 'N'
+          AND member_id = #{memberId}
+          AND resume_id = #{resumeId}
+    </select>
+
+    <!-- 열람권 존재 여부 -->
+    <select id="selectTicketExist" parameterType="FoResumeDTO" resultType="boolean">
+        /* com.fw.core.mapper.db1.m.MPointMapper.selectTicketExist, 열람권 존재 여부 , 22.12.14, YJW, MPointMapper.xml */
+        SELECT EXISTS (
+                       SELECT 1
+                       FROM hh_resume_reading_history
+                       WHERE delFlag = 'N'
+                         AND member_id = #{memberId}
+                         AND resume_id = #{resumeId}
+                   ) AS CNT
+    </select>
+
+    <!-- 내 인재 삭제 -->
+    <update id="deleteMyPool" parameterType="FoResumeDTO">
+        /* com.fw.core.mapper.db1.m.MPointMapper.deleteMyPool, 내 인재 삭제 , 23.01.02, YJW, MPointMapper.xml */
+        UPDATE hh_resume_reading_history
+        SET delFlag = 'Y'
+        WHERE member_id = #{memberId}
+          AND resume_id = #{resumeId}
+    </update>
+
+    <!-- 리워드 조회 -->
+    <select id="selectReward" parameterType="FoResumeDTO" resultType="FoResumeDTO">
+        /* com.fw.core.mapper.db1.m.MPointMapper.selectReward, 리워드 조회, sjpaik, MPointMapper.xml */
+        SELECT id
+             , createdAt
+             , updatedAt
+             , balance
+             , applicant_id
+             , delFlag
+         FROM reward
+        WHERE applicant_id = (SELECT member_id FROM resume WHERE id = #{resumeId})
+          AND delFlag = 'N'
+        LIMIT 1
+    </select>
+
+    <!-- 리워드 등록 -->
+    <insert id="insertReward" parameterType="FoResumeDTO">
+        /* com.fw.core.mapper.db1.m.MPointMapper.selectReward, 리워드 등록, sjpaik, MPointMapper.xml */
+        INSERT INTO reward (
+               applicant_id
+             , balance
+             , updatedAt
+             , createdAt
+        ) VALUES (
+               (SELECT member_id FROM resume WHERE id = #{resumeId})
+             , 0
+             , NOW()
+             , NOW()
+        )
+        <selectKey order="AFTER" keyProperty="rewardId" resultType="String">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <!-- 리워드 부여 -->
+    <update id="updateReward" parameterType="FoResumeDTO">
+        /* com.fw.core.mapper.db1.m.MPointMapper.selectReward, 리워드 부여, sjpaik, MPointMapper.xml */
+        UPDATE reward
+           SET balance = balance + #{balance}
+         WHERE applicant_id = (SELECT member_id FROM resume WHERE id = #{resumeId})
+    </update>
+
+    <!-- 리워드 기록 등록 -->
+    <insert id="insertRewardHistory" parameterType="FoResumeDTO">
+        /* com.fw.core.mapper.db1.m.MPointMapper.insertRewardHistory, 리워드 부여, sjpaik, MPointMapper.xml */
+        INSERT INTO reward_history (
+               createdAt
+             , updatedAt
+             , balance
+             , goodsCd
+             , increase
+             , reasonCd
+             , trId
+             , applicant_id
+             , headhunter_id
+             , reward_id
+             , adminReason
+             , backoffice_admin_id
+             , delFlag
+             , reward_goods_id
+        ) VALUES (
+               NOW()
+             , NOW()
+             , (SELECT balance FROM reward WHERE applicant_id = (SELECT member_id FROM resume WHERE id = #{resumeId}))
+             , #{goodsCd}
+             , #{increase}
+             , #{reasonCd}
+             , #{trId}
+             , (SELECT member_id FROM resume WHERE id = #{resumeId})
+             , #{memberId}
+             , #{rewardId}
+             , NULL
+             , NULL
+             , 'N'
+             , #{rewardGoodsId}
+        )
+    </insert>
+
+</mapper>

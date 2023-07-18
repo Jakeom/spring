@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.bo.BoWefirmMapper">
+
+    <!-- 위펌 리스트 조회-->
+    <select id="selectWefirmList" resultType="BoWefirmDTO">
+        /* com.fw.core.mapper.db1.bo.BoWefirmMapper.selectWefirmList, selectWefirmList, 2022.10.21 Ghazal, BoWefirmMapper.xml */
+        SELECT w.id
+             , date_format(w.createdAt, '%Y-%m-%d %H:%i') as createdAt
+             , date_format(w.updatedAt, '%Y-%m-%d %H:%i') as updatedAt
+             , w.ceo_member_id
+             , w.logo_file_id
+             , w.name
+             , w.description
+             , w.ceoName
+             , w.websiteUrl
+             , w.wefirmUrl
+             , w.establishYear
+             , w.address
+             , w.approveStatusCd
+             , w.closed
+             , (SELECT COUNT(1) FROM wefirm w2 JOIN headhunter h ON h.wefirm_id= w2.id WHERE w2.id = w.id) joinHeadhunter
+             , (SELECT COUNT(1) FROM position p INNER JOIN headhunter h on p.member_id = h.member_id where isCowork = '1' AND status = 'DOING' AND h.wefirm_id = w.id AND p.endDate > NOW()) joinPosition
+             , date_format(wh.completedAt, '%Y-%m-%d %H:%i') as completedAt
+        FROM wefirm w JOIN wefirm_request_history wh ON w.id = wh.wefirm_id
+        WHERE  w.delFlag = 'N'
+        GROUP BY w.id
+    </select>
+    <!-- 위펌 상태 조회-->
+    <select id="selectWefirmStatus" resultType="BoWefirmDTO">
+        /* com.fw.core.mapper.db1.bo.BoWefirmMapper.selectWefirmStatus, selectWefirmStatus, 2022.10.21 Ghazal, BoWefirmMapper.xml */
+        SELECT w.id
+             , date_format(w.createdAt, '%Y-%m-%d %H:%i') as createdAt
+             , date_format(w.updatedAt, '%Y-%m-%d %H:%i') as updatedAt
+             , w.ceo_member_id
+             , w.logo_file_id
+             , w.name
+             , w.description
+             , w.ceoName
+             , w.websiteUrl
+             , w.wefirmUrl
+             , w.establishYear
+             , w.address
+             , w.approveStatusCd
+             , w.closed
+             , date_format(wh.completedAt, '%Y-%m-%d %H:%i') as completedAt
+        FROM wefirm w JOIN wefirm_request_history wh ON w.id = wh.wefirm_id
+        WHERE w.closed = #{closed}
+        AND  w.delFlag = 'N'
+    </select>
+    <!-- 위펌 검색-->
+    <select id="searchWefirmList" resultType="BoWefirmDTO">
+        /* com.fw.core.mapper.db1.bo.BoWefirmMapper.searchWefirmList, searchWefirmList, 2022.10.21 Ghazal, BoWefirmMapper.xml */
+        SELECT w.id
+        , date_format(w.createdAt, '%Y-%m-%d %H:%i') as createdAt
+        , date_format(w.updatedAt, '%Y-%m-%d %H:%i') as updatedAt
+        , w.ceo_member_id
+        , w.logo_file_id
+        , w.name
+        , w.description
+        , w.ceoName
+        , w.websiteUrl
+        , w.wefirmUrl
+        , w.establishYear
+        , w.address
+        , w.approveStatusCd
+        , w.closed
+        , (SELECT COUNT(1) FROM wefirm w2 JOIN headhunter h ON h.wefirm_id= w2.id WHERE w2.id = w.id) joinHeadhunter
+        , (SELECT COUNT(1) FROM position p INNER JOIN headhunter h on p.member_id = h.member_id where isCowork = '1' AND status = 'DOING' AND h.wefirm_id = w.id AND p.endDate > NOW()) joinPosition
+        , date_format(wh.completedAt, '%Y-%m-%d %H:%i') as completedAt
+        FROM wefirm w JOIN wefirm_request_history wh ON w.id = wh.wefirm_id JOIN member m ON w.ceo_member_id = m.id
+        <where>
+            w.delFlag = 'N'
+            <if test="searchStart != '' and searchStart!=null and searchEnd !='' and searchEnd!=null">
+                AND date_format(wh.completedAt, '%Y-%m-%d') BETWEEN #{searchStart} AND #{searchEnd}
+            </if>
+            <if test="memberEmail != null and memberEmail!=''">
+                AND m.email= #{memberEmail}
+            </if>
+            <if test="ceoName != null and ceoName !='' ">
+                AND w.ceoName= #{ceoName}
+            </if>
+            <if test=" memberPhone!='' and memberPhone!=null ">
+                AND m.phone= #{memberPhone}
+            </if>
+            <if test=" closed!='' and closed!=null ">
+                AND w.closed= #{closed}
+            </if>
+        </where>
+        GROUP BY w.id
+    </select>
+
+    <!-- 위펌 상세조회-->
+    <select id="selectWefirmDetail" parameterType="BoWefirmDTO" resultType="BoWefirmDTO">
+        /* com.fw.core.mapper.db1.bo.BoWefirmMapper.selectWefirmDetail, selectWefirmDetail, 2022.10.21 Ghazal, BoWefirmMapper.xml */
+        SELECT w.id
+             , date_format(w.createdAt, '%Y-%m-%d %H:%i') as createdAt
+             , date_format(w.updatedAt, '%Y-%m-%d %H:%i') as updatedAt
+             , w.ceo_member_id
+             , w.logo_file_id
+             , w.name
+             , w.description AS description
+             , w.ceoName
+             , w.websiteUrl
+             , w.wefirmUrl
+             , w.establishYear
+             , w.address
+             , w.approveStatusCd
+             , w.closed
+             , m.phone AS memberPhone
+             , m.email AS memberEmail
+             , m.name AS memberName
+             , hh.sfNAme AS sfName
+             , hh.sfHomepageUrl AS sfHomepageUrl
+             , hh.sfRegNumber AS sfRegNumber
+        FROM wefirm w
+                 LEFT JOIN member m on w.ceo_member_id = m.id
+                 LEFT JOIN headhunter hh on hh.wefirm_id = w.id and hh.member_id= m.id
+        WHERE w.id = #{id}
+          AND w.delFlag = 'N'
+        group by w.id
+    </select>
+    <!-- 위펌 헤드헌터 상세조회-->
+    <select id="selectHeadhunterDetail" parameterType="BoWefirmDTO" resultType="BoWefirmDTO">
+        /* com.fw.core.mapper.db1.bo.BoWefirmMapper.selectHeadhunterDetail, selectHeadhunterDetail, 2022.10.21 Ghazal, BoWefirmMapper.xml */
+        Select
+            h.member_id
+             , date_format(wjr.createdAt, '%Y-%m-%d %H:%i') as createdAt
+             , m.name AS memberName
+             , m.phone AS memberPhone
+             , m.email AS memberEmail
+             , (SELECT COUNT(id) FROM resume r WHERE r.create_member_id = h.member_id and delFlag = 'N' ) resumeCnt
+             , (SELECT COUNT(1) FROM position WHERE member_id = h.member_id AND deleted = 0 AND endDate > NOW()) AS positionCnt
+        From wefirm w Join headhunter h ON h.wefirm_id= w.id
+                      INNER JOIN member m on h.member_id = m.id
+                      LEFT JOIN wefirm_join_request wjr on h.member_id = wjr.member_id
+        WHERE w.id = #{id}
+        AND h.delFlag = 'N'
+        <if test="memberName != '' and memberName != null">
+            AND m.name LIKE CONCAT('%', #{memberName}, '%')
+        </if>
+        <if test="memberPhone != '' and memberPhone != null">
+            AND m.phone LIKE CONCAT('%', #{memberPhone}, '%')
+        </if>
+        <if test="memberEmail != '' and memberEmail != null">
+            AND m.email LIKE CONCAT('%', #{memberEmail}, '%')
+        </if>
+        GROUP BY h.member_id
+    </select>
+    <!-- 위펌 포지션 상세조회-->
+    <select id="selectRecruitDetail" parameterType="BoWefirmDTO" resultType="BoWefirmDTO">
+        /* com.fw.core.mapper.db1.bo.BoWefirmMapper.selectRecruitDetail, selectRecruitDetail, 2022.10.21 Ghazal, BoWefirmMapper.xml */
+        SELECT p.id
+             , date_format(p.createdAt, '%Y-%m-%d %H:%i') createdAt
+             , p.title
+             , m.name AS memberName
+             , p.status
+             , fn_get_common_cd(p.status, 'POSITION_STATUS', 1) positionCd
+             , date_format(p.endDate, '%Y-%m-%d %H:%i') endDate
+        FROM position p
+                 INNER JOIN headhunter h on p.member_id = h.member_id
+                 INNER JOIN member m on p.member_id = m.id
+        where status = 'DOING'
+          AND h.wefirm_id = #{id}
+          AND p.endDate > NOW()
+        <if test="searchStart != '' and searchStart!=null and searchEnd !='' and searchEnd!=null">
+          AND date_format(p.createdAt, '%Y-%m-%d') BETWEEN #{searchStart} AND #{searchEnd}
+        </if>
+    </select>
+    <!-- 위펌 게시판 상세조회-->
+    <select id="selectWefirmNotice" parameterType="BoWefirmDTO" resultType="BoWefirmDTO">
+        /* com.fw.core.mapper.db1.bo.BoWefirmMapper.selectWefirmNotice, selectWefirmNotice, 2022.10.21 Ghazal, BoWefirmMapper.xml */
+        SELECT bc.id AS bcId
+             , date_format(bc.createdAt, '%Y-%m-%d %H:%i') AS bcCreatedAt
+             , bc.subject As bcSubject
+             , m.name AS memberName
+             , bc.hitCnt
+        FROM wefirm w
+                 INNER JOIN board b ON b.wefirm_id = w.id
+                 INNER JOIN board_content bc ON bc.board_id = b.id
+                 JOIN member m ON bc.member_id = m.id
+        WHERE b.wefirm_id = #{id}
+    </select>
+    <!-- /위펌 상세조회-->
+    <!--  위펌 상세 modify -->
+    <select id="selectWefirmModify" parameterType="BoWefirmDTO" resultType="BoWefirmDTO">
+        /* com.fw.core.mapper.db1.bo.WefirmMapper.selectWefirmrModify,  위펌 상세 조회, 2022.10.21 Ghazal, WefirmMapper.xml */
+        SELECT wefirm_seq
+             , wefirm_type_cd
+             , title
+             , content
+             , file_seq
+             , hit
+             , del_flag
+             , create_seq
+             , date_format(create_dt, '%Y-%m-%d %H:%i') as create_dt
+             , update_seq
+             , date_format(update_dt, '%Y-%m-%d %H:%i') as update_dt
+        FROM wefirm
+        WHERE wefirm_seq = #{id}
+    </select>
+
+    <!--  위펌 등록-->
+    <insert id="insertWefirm" parameterType="BoWefirmDTO">
+        /* com.fw.core.mapper.db1.bo.WefirmMapper.insertWefirm,  위펌등록, 2022.10.21 Ghazal, WefirmMapper.xml */
+        INSERT INTO wefirm ( wefirm_type_cd
+                              , title
+                              , content
+                              , file_seq
+                              , hit
+                              , del_flag
+                              , create_seq
+                              , create_dt)
+        VALUES ( #{wefirmTypeCd}
+               , #{title}
+               , #{content}
+               , #{fileSeq}
+               , 0
+               , 'N'
+               , #{adminSession.adminSeq}
+               , NOW())
+    </insert>
+
+    <!--  위펌 상태 수정-->
+    <update id="updateWefirmStatus" parameterType="BoWefirmDTO">
+        /* com.fw.core.mapper.db1.bo.WefirmMapper.updateWefirmstatus,  위펌상태 수정, 2022.10.21 Ghazal, WefirmMapper.xml */
+        UPDATE wefirm w
+        SET w.closed = #{closed}
+        WHERE w.id = #{id}
+    </update>
+
+    <!--  위펌 상태 수정-->
+    <update id="updateWefirmStatusHH" parameterType="BoWefirmDTO">
+        /* com.fw.core.mapper.db1.bo.WefirmMapper.updateWefirmstatus,  위펌상태 수정, 2022.10.21 Ghazal, WefirmMapper.xml */
+        UPDATE wefirm w
+        SET w.closed = #{closed}
+        WHERE w.id = #{id}
+    </update>
+
+    <!--  위펌 상태 수정-->
+    <update id="updateHHWefirm" parameterType="BoWefirmDTO">
+        /* com.fw.core.mapper.db1.bo.WefirmMapper.updateWefirmstatus,  위펌상태 수정, 2022.10.21 Ghazal, WefirmMapper.xml */
+        UPDATE headhunter
+        SET wefirm_id = null
+          , updateSeq = #{adminSession.adminSeq}
+        WHERE wefirm_id = #{id}
+    </update>
+
+    <!--  위펌 상세 수정-->
+    <update id="updateWefirm" parameterType="BoWefirmDTO">
+        /* com.fw.core.mapper.db1.bo.WefirmMapper.updateWefirm,  위펌수정, 2022.10.21 Ghazal, WefirmMapper.xml */
+        UPDATE headhunter h, wefirm w
+        SET h.sfPhone = #{sfPhone}
+          , h.sfRegNumber = #{sfRegNumber}
+          , h.sfName = #{sfName}
+          , h.updateSeq = #{adminSession.adminSeq}
+          , h.updatedAt = NOW()
+        WHERE wefirm_id = #{id}
+        AND w.id = h.wefirm_id
+        AND h.member_id = w.ceo_member_id
+    </update>
+    <!--  위펌 삭제 -->
+    <delete id="deleteWefirm" parameterType="BoWefirmDTO">
+        /* com.fw.core.mapper.db1.bo.WefirmMapper.deleteWefirm,  위펌삭제, 2022.10.21 Ghazal, WefirmMapper.xml */
+        UPDATE wefirm
+        SET del_flag = 'Y'
+        WHERE wefirm_seq = #{id}
+    </delete>
+
+</mapper>

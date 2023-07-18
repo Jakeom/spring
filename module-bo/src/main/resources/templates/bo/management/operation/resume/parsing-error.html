@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/default}">
+<body>
+	<div layout:fragment="contents" th:remove="tag">
+		<main id="content" role="main">
+			<h2 class="title">이력서 관리</h2>
+			<div class="row p-3">
+				<div class="col-12">
+					<ul class="nav nav-pills">
+						<li class="active"><a class="btn btn-outline-dark" style="min-width: 160px" href="status">이력서 현황</a></li>
+						<li><a class="btn btn-outline-dark active" style="min-width: 160px" href="parsing-error">오류신고(AP)</a></li>
+						<li><a class="btn btn-outline-dark" style="min-width: 160px" href="request-regist-resume">이력서 등록신청(HH)</a></li>
+					</ul>
+					<div>
+						<form id="searchMember" name="searchMember">
+							<div class="row mt-5">
+								<div class="col-4">
+									<div class="d-flex align-items-center">
+										<input type="text" id="memberStartDt" name="memberStartDt" class="form-control form-datepicker" placeholder="날짜 선택"> <span>~</span> <input
+											type="text" id="memberEndDt" name="memberEndDt" class="form-control form-datepicker" placeholder="날짜 선택">
+									</div>
+								</div>
+								<div class="col-2">
+									<div class="d-flex align-items-center">
+										<button type="button" class="btn btn-dark" id="all" name="colorChange" data-role="all">전체</button>
+										<button type="button" class="btn btn-dark" id="today" name="colorChange" data-role="today">오늘</button>
+										<button type="button" class="btn btn-dark" id="week" name="colorChange" data-role="week">7일</button>
+										<button type="button" class="btn btn-dark" id="month" name="colorChange" data-role="month">1개월</button>
+									</div>
+								</div>
+								<div class="col-6 text-right">
+									<div class="d-flex" style="float: right">
+										<select id="personalInfo" name="personalInfo" class="custom-select w-auto mr-2">
+											<option value="name">이름</option>
+											<option value="phone">휴대번호</option>
+											<option value="email">이메일주소</option>
+										</select> <input type="text" id="inputSelect" class="form-control d-inline-block w-auto mr-2" data-role="enter" />
+										<input type="text" id="inputAdminName" class="form-control d-inline-block w-auto" data-role="enter" name="admin" placeholder="처리자"/>
+										<button type="button" class="btn btn-primary" id="search" data-role="search">검색하기</button>
+									</div>
+								</div>
+								<div class="col-12 mt-3">
+									<div>
+										<select id="divisionSelect" name="divisionSelect" class="form-control w-auto">
+											<option value="">전체</option>
+											<option value="ACCEPT_COMPLETE">처리중</option>
+											<option value="REGIST_COMPLETE">완료</option>
+											<option value="REGIST_IMPOSSIBLE">등록불가</option>
+										</select>
+									</div>
+								</div>
+							</div>
+						</form>
+						<div class="row mt-3">
+							<div class="col">
+								<table id="datatable">
+									<thead>
+										<tr>
+											<th>No.</th>
+											<th>신고자</th>
+											<th>신고일시</th>
+											<th>신청파일</th>
+											<th>오류내용</th>
+											<th>상태</th>
+											<th>처리자</th>
+											<th>처리일시</th>
+											<th>처리완료메일</th>
+										</tr>
+									</thead>
+								</table>
+							</div>
+						</div>
+					</div>
+					<div class="modal fade" id="errorModal" tabindex="-1" role="dialog" aria-hidden="true">
+						<div class="modal-dialog modal-dialog-centered" role="document">
+							<div class="modal-content">
+								<div class="modal-header">
+									<p>오류 내용</p>
+								</div>
+								<div class="modal-body">
+									<div class="container">
+										<div class="row m-3">
+											<div class="col" id="modalContent"></div>
+										</div>
+									</div>
+								</div>
+								<div class="modal-footer">
+									<div class="container">
+										<div class="row">
+											<div class="col text-center">
+												<button type="button" class="btn btn-secondary" data-dismiss="modal">확인</button>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</main>
+	</div>
+</body>
+</html>

@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/mLayout">
+<body>
+<div id="container-block" layout:fragment="contents" th:remove="tag">
+    <form name="reportFormBasic" th:action="${reportDomain} + '/report/ubi4/ubihtml_2.jsp?jrf=default.jrf'"
+          method="POST" enctype="application/json" target="reportFormBasic">
+        <input type="hidden" name="data">
+    </form>
+    <form name="reportFormLine" th:action="${reportDomain} + '/report/ubi4/ubihtml_2.jsp?jrf=line.jrf'"
+          method="POST" enctype="application/json" target="reportFormLine">
+        <input type="hidden" name="data">
+    </form>
+    <form name="reportFormTable" th:action="${reportDomain} + '/report/ubi4/ubihtml_2.jsp?jrf=table.jrf'"
+          method="POST" enctype="application/json" target="reportFormTable">
+        <input type="hidden" name="data">
+    </form>
+    <div class="container">
+        <div class="sub-content m-container" style="padding-bottom:70px;">
+            <div class="row row-40 align-items-center">
+                <div class="d-flex align-items-center justify-content-between">
+                    <h3 class="subtitle">이력서 상세</h3>
+                    <!--data-bs-toggle="modal" data-target="#modal-default-link"-->
+                    <!-- 열람 전 -->
+                    <!-- // -->
+                    <!-- 열람 후 -->
+                    <!-- <div class="btn-group">
+                      <button type="button" class="btn btn-outline-dark btn-md" data-bs-toggle="modal" data-bs-target="#modal-select-position">포지션 추천</button>
+                      <button type="button" class="btn btn-outline-dark btn-md" data-bs-toggle="modal" data-bs-target="#modal-default">내 인재 삭제</button>
+                    </div> -->
+                    <!-- // -->
+                </div>
+                <!-- 헤드헌터 -> 포지션 컨택리스트 -> 상세 start -->
+                <!-- <div class="btn-group m-t-30 d-flex align-items-center justify-content-between">
+                  <div>
+                    <button type="button" class="btn btn-outline-dark btn-md">수정요청</button>
+                    <button type="button" class="btn btn-gray btn-md">직접수정</button>
+                    <button type="button" class="btn btn-outline-danger btn-md">추천예정</button>
+                  </div>
+                  <div>
+                    <p>채용사에 인재를 추천하기 위해서는 추천용 pdf 파일을 등록해야 합니다.</p>
+                    <div class="d-flex justify-content-end m-t-10">
+                      <a href="javascript:void(0)" download="" class="btn btn-md btn-outline-primary">파일 내려받기</a>
+                      <button type="button" class="btn btn-primary btn-md">추천용 이력서 등록</button>
+                    </div>
+                  </div>
+                </div> -->
+                <th:block th:if="${#strings.equals('recommend', searchInfo.mode)}">
+                    <div class="btn-group m-t-30 d-flex align-items-center justify-content-between">
+                        <div>
+                            <div class="d-flex justify-content-end m-t-10">
+                                <th:block th:if="${searchInfo.f} eq 'Y' and ${#strings.equals('null', searchInfo.submitResumeFileId)}">
+                                    <a th:href="|/m/resume/resume-update?resumeId=${resumeInfo.id}&applicantId=${applicantId}|"
+                                       class="btn btn-md btn-outline-primary m-r-10">이력서 수정</a>
+                                </th:block>
+                                <th:block th:if="${#strings.isEmpty(searchInfo.submitResumeFileId) or #strings.equals('null', searchInfo.submitResumeFileId)}">
+                                    <a href="javascript:void(0)" class="btn btn-md btn-outline-primary m-r-10"
+                                       data-bs-toggle="modal" data-bs-target="#modal-resume-form"
+                                       th:data-id="${resumeInfo.id}">파일 내려받기</a>
+                                    <a href="javascript:void(0)" class="btn btn-md btn-outline-primary"
+                                       data-bs-toggle="modal" data-bs-target="#modal-upload-form">추천용 파일 업로드</a>
+                                </th:block>
+                            </div>
+                        </div>
+                    </div>
+                </th:block>
+                <!-- 헤드헌터 -> 포지션 컨택리스트 -> 상세 end  -->
+                <div class="title-line mt-4 mb-4"></div>
+                <div class="apply-wrap">
+                    <div class="apply-wrap-head">
+                        <div class="img-upload">
+                            <div class="upload-img" name="img">
+                                <th:block th:if="${!#lists.isEmpty(resumeInfo.commonFileList)}">
+                                    <img th:src="${resumeInfo.commonFileList[0].url}" alt=""/>
+                                </th:block>
+                                <th:block th:if="${#lists.isEmpty(resumeInfo.commonFileList)}">
+                                    <img src="/static/images/icon-login.svg" alt=""/>
+                                </th:block>
+                            </div>
+                        </div>
+                        <div class="resume-info">
+                            <div class="resume-info-top">
+                                <div class="list">
+                                    <span class="name" th:text="${resumeInfo.name}">홍길동</span>
+                                    <span class="birth"
+                                          th:text="${#strings.isEmpty(resumeInfo.year)? '-' : resumeInfo.year+'년'+'('+resumeInfo.age+'세'+')'}">941019(29세)</span>
+                                    <span class="birth" th:if="${resumeInfo.genderCd eq 'MALE'}">남</span>
+                  					<span class="birth" th:if="${resumeInfo.genderCd eq 'FEMALE'}">여</span>
+                                    <span class="work" th:text="${resumeInfo.holdOffice eq true ? '재직중' : '구직중'}">재직중</span>
+                                    <input type="hidden" id="representation" th:value="${resumeInfo.representation}">
+                                </div>
+                                <div class="list">
+                                    <span class="address" th:text="${resumeInfo.address}"><i class="icon-home"></i>서울특별시 서울특별시 서울특별시</span>
+                                    <span class="phone" id="phone" name="phone" th:text="${resumeInfo.phone}"><i
+                                            class="icon-phone"></i>010-1234-5678</span>
+                                    <span class="email" th:text="${resumeInfo.email}"><i class="icon-email"></i>abcd1234@naver.com</span>
+                                    <span class="">상시</span>
+                                </div>
+                            </div>
+                            <div class="rInfo_3">
+                                <ul>
+                                    <li>
+                                        <div class="_lab">최종학력</div>
+                                        <div class="_cont">
+                                            <p th:text="${#strings.isEmpty(resumeInfo.finalSchool)? '-' : resumeInfo.finalSchool}">
+                                                서울대학교</p> <!-- 최종학교 -->
+                                            <p th:text="${#strings.isEmpty(resumeInfo.finalSchoolLocationCd)? '-' : resumeInfo.finalSchoolLocationCd}">
+                                                경영학과(박사)</p> <!-- 학교소재지 -->
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="_lab">최종경력</div>
+                                        <div class="_cont">
+                                            <th:block th:if="${!#lists.isEmpty(finalCareerInfo)}">
+                                                <p th:text="${finalCareerInfo.companyName}">삼성전자</p> <!-- 최종회사 -->
+                                                <p th:if="${finalCareerInfo.holdOffice eq '0'}"
+                                                   th:text="${finalCareerInfo.finalCareer+' '+','+' '+finalCareerInfo.holdOfficeNm}"></p>
+                                                <p th:if="${finalCareerInfo.holdOffice eq '1'}"
+                                                   th:text="${finalCareerInfo.currentCareer+' '+','+' '+finalCareerInfo.holdOfficeNm}"></p>
+                                            </th:block>
+                                        </div>
+                                    </li>
+                                    <li>
+										<div class="_lab">희망연봉</div>
+										<div class="_cont">
+											<th:block th:if="${resumeInfo.bylaws} eq '0'">
+												<p
+													th:text="${#strings.isEmpty(resumeInfo.desiredSalary) or resumeInfo.desiredSalary eq '0'? '-':#numbers.formatInteger(resumeInfo.desiredSalary, 0, 'COMMA')+'만원'}">
+												</p>
+												<p></p>
+											</th:block>
+											<th:block th:if="${resumeInfo.bylaws} eq '1'">
+												<p>내규에 따름</p>
+												<p></p>
+											</th:block>
+										</div>
+									</li>
+                                    <li>
+                                        <div class="_lab">희망근무지</div>
+                                        <div class="_cont">
+                                            <th:block th:if="${!#lists.isEmpty(desiredLocationInfo)}">
+                                                <p th:text="${#strings.isEmpty(desiredLocationInfo.desiredLocationCd)? '-':desiredLocationInfo.desiredLocationNm}">
+                                                    -</p>
+                                            </th:block>
+                                            <th:block th:if="${#lists.isEmpty(desiredLocationInfo)}">
+                                                <p>-</p>
+                                            </th:block>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="apply-wrap-body">
+                        <div class="content m-t-30">
+                            <h4 class="table-subtitle mb-3">핵심역량</h4>
+                            <div class="desc">
+                                <th:block th:each="list : ${specInfo}">
+                                    <div class="row row-line">
+                                        <div class="col-1">
+                                            <div class="">
+                                                <p class="text-center" th:text="${list.specNm}"></p>
+                                            </div>
+                                        </div>
+                                        <div class="col-10">
+                                            <div class="detail-info">
+                                                <p class="" th:text="${list.spec}">직무능력 및 업무상 강점이 20자 내로 서술 됐다.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </th:block>
+                            </div>
+                        </div>
+                        <!-- 핵심역량 end -->
+
+                        <!-- 학력 -->
+                        <div class="content exception">
+								<h4 class="table-subtitle mb-3">학력</h4>
+								<div class="desc">
+									<th:block th:each="list : ${academicInfo}">
+										<div class="row row-line">
+											<div class="col-2">
+												<div class="">
+													<p th:if="${list.degreeCd eq 'HIGH'}" th:text="${list.graduationYm}">2010.03~ 2016.08</p>
+													<p th:if="${list.degreeCd ne 'HIGH'}" th:text="${list.entranceYm+'~'+list.graduationYm}">2010.03~ 2016.08</p>
+													<p class="text-primary m-t-5" th:if="${list.degreeCd eq 'HIGH'}" th:text="${list.graduationStatusNm}">졸업</p>
+													<p class="text-primary m-t-5" th:if="${list.degreeCd ne 'HIGH'}" th:text="${list.degreeNm +', '+list.graduationStatusNm}">졸업</p>
+												</div>
+											</div>
+											<div class="col-10">
+												<div class="detail-info">
+													<p class="title" th:text="${list.schoolName}+${'('+list.locationCd+')'}"></p>
+													<ul class="detail-list">
+														<li th:if="${list.degreeCd ne 'HIGH'}"><span class="key">주전공</span> <span class="value m-1" th:text="${#strings.isEmpty(list.majorName)? '-':list.majorName}"></span></li>
+														<li th:if="${list.degreeCd ne 'HIGH'}"><span class="key m-1">학점</span> <span class="value m-1" th:text="${#strings.isEmpty(list.grades)? '-':list.grades}"></span></li>
+													</ul>
+												</div>
+											</div>
+										</div>
+									</th:block>
+								</div>
+							</div>
+                        <!-- 학력 end -->
+
+                        <!-- 경력 TODO - 직급/직책 처리 -->
+                        <div class="content">
+                            <h4 class="table-subtitle mb-3">경력
+                            	<span class="text-primary m-4" th:text="${'총' + '  ' + resumeInfo.totalCareers}"></span>
+                            </h4> 
+                            <!-- 총 경력 필요 totalCareer -->
+                            <div class="desc">
+                                <th:block th:each="list : ${careerInfo}">
+                                    <div class="row row-line">
+                                        <div class="col-2">
+                                            <div class="">
+                                                <th:block th:if="${list.holdOffice eq '1'}">
+                                                    <p th:text="${list.entranceYmCareer+' '+'~'+' '+list.holdOfficeNm}"></p>
+                                                    <p name="currentCareer" class="text-primary m-t-5"
+                                                       th:text="${list.currentCareer}"></p>
+                                                </th:block>
+                                                <th:block th:if="${list.holdOffice eq '0'}">
+                                                    <p th:text="${list.entranceYmCareer+' '+'~'+' '+list.resignationYmCareer}"></p>
+                                                    <p name="finalCareer" class="text-primary m-t-5"
+                                                       th:text="${list.finalCareer}"></p>
+                                                </th:block>
+                                                <th:block th:if="${list.certFlag eq 'Y'}">
+														<button type="button" class="btn btn-danger">경력인증</button>
+												</th:block>
+                                            </div>
+                                        </div>
+                                        <div class="col-10">
+                                            <div class="detail-info">
+                                                <p class="title" th:text="${list.companyName}"></p>
+                                                <ul class="detail-list">
+                                                    <li>
+                                                        <span class="key">부서명</span>
+                                                        <span class="value m-1"
+                                                              th:text="${#strings.isEmpty(list.departmentName)? '-':list.departmentName}"></span>
+                                                    </li>
+                                                    <li>
+                                                        <span class="key m-1">직급</span>
+                                                        <span class="value m-1"
+                                                              th:text="${#strings.isEmpty(list.positionInput)? '-':list.positionInput}"></span>
+                                                    </li>
+                                                    <li>
+                                                        <span class="key m-1">직책</span>
+                                                        <span class="value m-1"
+                                                              th:text="${#strings.isEmpty(list.dutyInput)? '-':list.dutyInput}"></span>
+                                                    </li>
+                                                    <li>
+                                                        <span class="key m-1">최종연봉</span>
+                                                        <span class="value m-1"
+                                                              th:text="${#strings.isEmpty(list.salary)? '-':#numbers.formatInteger(list.salary, 0, 'COMMA')+'만원'}"></span>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </th:block>
+                            </div>
+                        </div>
+                        <!-- 경력 end-->
+
+                        <!-- 경력기술서 -->
+                        <div class="content">
+                            <h4 class="table-subtitle mb-3">경력기술서</h4>
+                            <div class="career" style="">
+                                <div class="row align-items-center">
+                                    <div class="col-12 col">
+                                        <div class="desc result m-t-30">
+                                            <th:block th:each="list : ${careerInfo}">
+                                                <div class="row row-line">
+                                                    <ul class="detail-list mt-1">
+                                                        <li>
+                                                            <th:block th:if="${list.holdOffice eq '1'}">
+                                                                <span class="text-primary m-t-5"
+                                                                      th:text="${list.entranceYmCareer+' '+'~'+' '+list.holdOfficeNm+' / '}"></span>
+                                                                <span name="currentCareer" class="text-primary m-t-5"
+                                                                      th:text="${list.currentCareer}"></span>
+                                                            </th:block>
+                                                            <th:block th:if="${list.holdOffice eq '0'}">
+                                                                <span class="text-primary m-t-5"
+                                                                      th:text="${list.entranceYmCareer+' '+'~'+' '+list.resignationYmCareer+' / '}"></span>
+                                                                <span name="finalCareer" class="text-primary m-t-5"
+                                                                      th:text="${list.finalCareer}"></span>
+                                                            </th:block>
+                                                        </li>
+                                                        <li>
+                                                            <p class="company text-dark font-bold"
+                                                               th:text="${list.companyName}">(주)소프트퍼즐</p>
+                                                        </li>
+                                                        <li>
+                                                            <span class="key text-dark font-bold">부서명</span>
+                                                            <span class="value department-name m-1"
+                                                                  th:text="${#strings.isEmpty(list.departmentName)? '-':list.departmentName}">개발팀</span>
+                                                        </li>
+                                                        <li>
+                                                            <span class="key text-dark font-bold m-1">직급</span>
+                                                            <span class="value position-input m-1"
+                                                                  th:text="${#strings.isEmpty(list.positionInput)? '-':list.positionInput}">사원</span>
+                                                        </li>
+                                                        <li>
+                                                            <span class="key text-dark font-bold m-1">직책</span>
+                                                            <span class="value duty-input m-1"
+                                                                  th:text="${#strings.isEmpty(list.dutyInput)? '-':list.dutyInput}">사원</span>
+                                                        </li>
+                                                        <li>
+                                                            <span class="key text-dark font-bold m-1">최종연봉</span>
+                                                            <span class="value salary m-1"
+                                                                  th:text="${#strings.isEmpty(list.salary)? '-':#numbers.formatInteger(list.salary, 0, 'COMMA')+'만원'}">11만원</span>
+                                                        </li>
+                                                    </ul>
+                                                    <div class="career-txt"
+                                                         th:text="${#strings.isEmpty(list.task)? '': list.task}">개발개발
+                                                    </div>
+                                                </div>
+                                            </th:block>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 경력기술서 end -->
+
+                        <!-- 희망근무조건 -->
+                        <div class="content">
+                            <h4 class="table-subtitle mb-3">희망근무조건</h4>
+                            <div class="desc">
+                                <div class="row row-line">
+                                    <ul class="detail-list mt-0">
+                                        <li>
+                                            <span class="key text-dark font-bold">고용형태</span>
+                                            <span class="value m-1"
+                                                  th:text="${#strings.isEmpty(resumeInfo.desiredHire)? '-':resumeInfo.desiredHireNm}"></span>
+                                        </li>
+                                        <li>
+                                            <span class="key text-dark font-bold m-1">희망근무지</span>
+                                            <th:block th:if="${!#lists.isEmpty(desiredLocationInfo)}">
+                                                <span class="value m-1"
+                                                      th:text="${#strings.isEmpty(desiredLocationInfo.desiredLocationCd)? '-': desiredLocationInfo.desiredLocationNm}"></span>
+                                            </th:block>
+                                            <th:block th:if="${#lists.isEmpty(desiredLocationInfo)}">
+                                                <span class="value m-1">-</span>
+                                            </th:block>
+                                        </li>
+                                        <li>
+                                            <span class="key text-dark font-bold m-1">희망직급</span>
+                                            <span class="value m-1"
+                                                  th:text="${#strings.isEmpty(resumeInfo.desiredPosition)? '-':resumeInfo.desiredPosition}"></span>
+                                        </li>
+                                        <li>
+                      						<span class="key text-dark font-bold m-1">희망연봉</span>
+                      							<th:block th:if="${resumeInfo.bylaws} eq '0'">
+													<span
+														th:text="${#strings.isEmpty(resumeInfo.desiredSalary) or resumeInfo.desiredSalary eq '0'? '-':#numbers.formatInteger(resumeInfo.desiredSalary, 0, 'COMMA')+'만원'}">
+													</span>
+												</th:block>
+												<th:block th:if="${resumeInfo.bylaws} eq '1'">
+													<span>내규에 따름</span>
+												</th:block>
+                    					</li>
+                                        <li>
+                                            <span class="key text-dark font-bold m-1">입사가능시기</span>
+                                            <span class="value m-1"
+                                                  th:text="${#strings.isEmpty(resumeInfo.joinDateNm)? '-':resumeInfo.joinDateNm}"></span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 희망근무조건 end -->
+
+                        <!-- 채용우대자격 -->
+                        <div class="content">
+                            <h4 class="table-subtitle mb-3">채용우대자격</h4>
+                            <div class="desc">
+                                <div class="row row-line">
+                                    <div class="col-2">
+                                        <div class="">
+                                            <p>보훈대상</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-10">
+                                        <div class="detail-info">
+                                            <p class="" th:text="${resumeInfo.isVeterans eq '0'}? '-':'대상'">-</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row row-line">
+                                    <div class="col-2">
+                                        <div class="">
+                                            <p>장애</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-10">
+                                        <div class="detail-info">
+                                            <p class="" th:text="${resumeInfo.disability eq '0'}? '-':'대상'">-</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row row-line">
+                                    <div class="col-2">
+                                        <div class="">
+                                            <p>병역여부</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-10">
+                                        <div class="detail-info">
+                                            <p class=""
+                                               th:text="${#strings.isEmpty(resumeInfo.militaryServiceNm)? '-':resumeInfo.militaryServiceNm}"></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 채용우대자격 end -->
+
+                        <!-- 어학 -->
+                        <div class="content">
+                            <h4 class="table-subtitle mb-3">어학(회화)</h4>
+                            <div class="desc">
+                                <th:block th:each="list : ${languageInfo}">
+                                    <div class="row row-line">
+                                        <ul class="default-list mt-0">
+                                            <li>
+                                                <span class="txt" th:text="${list.languageInput}"></span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </th:block>
+                            </div>
+                        </div>
+                        <!-- 어학 end -->
+
+                        <!-- 자격증 -->
+                        <div class="content">
+                            <h4 class="table-subtitle mb-3">자격증</h4>
+                            <div class="desc">
+                                <th:block th:each="list : ${licenseInfo}">
+                                    <div class="row row-line">
+                                        <ul class="default-list mt-0">
+                                            <li>
+                                                <span class="txt" th:text="${list.licenseName}"></span>
+                                                <!-- <span class="txt" th:text="${list.agency}"></span>
+                                                 <span class="txt" th:text="${list.obtainYm}"></span>-->
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </th:block>
+                            </div>
+                        </div>
+                        <!-- 자격증 end -->
+
+                        <!-- 수상 -->
+                        <div class="content">
+                            <h4 class="table-subtitle mb-3">수상</h4>
+                            <div class="desc">
+                                <th:block th:each="list : ${awardInfo}">
+                                    <div class="row row-line">
+                                        <ul class="default-list mt-0">
+                                            <li>
+                                                <span class="txt" th:text="${list.awardName}"></span>
+                                                <!-- <span class="txt" th:text="${list.awardAgency}"></span>
+                                                 <span class="txt" th:text="${list.awardYm}"></span>-->
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </th:block>
+                            </div>
+                        </div>
+                        <!-- 수상 end -->
+
+                        <!-- 대외활동 -->
+                        <div class="content">
+                            <h4 class="table-subtitle mb-3">대외활동</h4>
+                            <div class="desc">
+                                <th:block th:each="list : ${activityInfo}">
+                                    <div class="row row-line">
+                                        <ul class="default-list mt-0">
+                                            <li>
+                                                <span class="txt" th:text="${list.content}">엄청 활발히 대외활동 함</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </th:block>
+                            </div>
+                        </div>
+                        <!-- 대외활동 end -->
+
+                        <!-- 포트폴리오 -->
+                        <div class="content">
+                            <h4 class="table-subtitle mb-3">포트폴리오</h4>
+                            <div class="desc">
+                                <th:block th:each="list : ${portfolioInfo}">
+                                    <div class="row row-line" th:if="${list.attachType eq 'URL'}">
+                                        <ul class="default-list mt-0">
+                                            <li>
+                                                <a th:href="${list.url}" th:text="${list.url}"></a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="row row-line" th:if="${list.attachType eq 'FILE'}">
+                                        <ul class="default-list mt-0">
+                                            <li>
+                                                <a th:href="${list.commonFileList[0].url}" th:text="${list.commonFileList[0].originName}" download></a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </th:block>
+                            </div>
+                        </div>
+                        <!-- 포트폴리오 end -->
+
+                        <!-- 영문이력서 -->
+                        <div class="content">
+                            <h4 class="table-subtitle mb-3">영문이력서</h4>
+                            <div class="desc">
+                                <th:block th:if="${!#lists.isEmpty(englishResumeInfo)}">
+                                    <th:block th:if="${!#lists.isEmpty(englishResumeInfo.commonFileList)}">
+                                        <div class="row row-line">
+                                            <ul class="default-list mt-0">
+                                                <li>
+                                                    <a th:href="${englishResumeInfo.commonFileList[0].url}"
+                                                       th:text="${englishResumeInfo.commonFileList[0].originName}"
+                                                       download></a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </th:block>
+                                </th:block>
+                            </div>
+                        </div>
+                        <!-- 영문이력서 end -->
+
+                        <!-- 자기소개서 -->
+                        <div class="content">
+                            <h4 class="table-subtitle mb-3">자기소개서</h4>
+                            <div class="desc">
+                                <th:block th:if="${!#lists.isEmpty(resumeInfo)}">
+                                    <th:block th:if="${!#lists.isEmpty(resumeInfo.selfIntroduction)}">
+                                        <p class="introduce-text"
+                                           th:utext="${resumeInfo.selfIntroduction.replaceAll('\n','<br/>')}">
+                                        </p>
+                                    </th:block>
+                                </th:block>
+                            </div>
+                        </div>
+                        <!-- 자기소개서 end -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div layout:fragment="modal" th:remove="tag">
+        <!-- 이력서 양식 선택 -->
+        <div class="modal fade" id="modal-resume-form" tabindex="-1" aria-labelledby="exampleModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog modal-comment modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="">이력서 양식 선택</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="text-form text-center">미리보기 할 이력서의 양식을 선택해 주세요.</div>
+                        <div class="d-flex justify-content-center m-b-25 gap-30">
+                            <input type="hidden" name="openReportResumeId" value="">
+                            <div class="form-check block">
+                                <input class="form-check-input" type="radio" value="basic" id="multipleCheck1"
+                                       name="resumeFormChoice"/>
+                                <label class="form-check-label" for="multipleCheck1">
+                                    <p>R9 기본이력서</p>
+                                    <img src="/static/images/resume-case-1.png" alt=""/>
+                                </label>
+                            </div>
+                            <div class="form-check block">
+                                <input class="form-check-input" type="radio" value="line" id="multipleCheck2"
+                                       name="resumeFormChoice"/>
+                                <label class="form-check-label" for="multipleCheck2">
+                                    <p>선 형식 이력서</p>
+                                    <img src="/static/images/resume-case-2.png" alt=""/>
+                                </label>
+                            </div>
+                            <div class="form-check block">
+                                <input class="form-check-input" type="radio" value="table" id="multipleCheck3"
+                                       name="resumeFormChoice"/>
+                                <label class="form-check-label" for="multipleCheck3">
+                                    <p>표 형식 이력서</p>
+                                    <img src="/static/images/resume-case-3.png" alt=""/>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">취소
+                            </button>
+                            <button type="button" class="btn btn-primary" data-role="openReport">선택</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- 추천용 이력서 업로드 -->
+        <div class="modal fade" id="modal-upload-form" tabindex="-1" aria-labelledby="exampleModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog modal-comment modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">추천용 이력서 업로드</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="text-form text-center">업로드할 이력서를 선택해주세요</div>
+                        <div class="d-flex justify-content-center m-b-25 gap-30">
+                            <input type="hidden" name="applicantId" th:value="${searchInfo.applicantId}">
+                            <div class="form-upload">
+                                <input type="file" class="" name="files" id="form-file"/>
+                                <label for="form-file"><span class="file-name m-r-10"><i
+                                        class="icon-input-add"></i></label>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">취소
+                            </button>
+                            <button type="button" class="btn btn-primary" data-role="uploadResume">선택</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

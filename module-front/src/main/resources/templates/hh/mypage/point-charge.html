@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/hh/hhMypageLayout">
+<body>
+<div id="container-block">
+    <div layout:fragment="contents" th:remove="tag">
+        <div class="layout-content">
+            <h3 class="subtitle">포인트 충전</h3>
+            <div class="title-line mt-4 mb-5"></div>
+            <div>
+                <!--결제 applicantId 서버별-->
+                <input type="hidden" name="paymentApplicationId" id="paymentApplicationId"
+                       th:value="${@environment.getProperty('app-config.bootpay.web-application-id')}"> <input
+                    type="hidden" name="paymentUserName"
+                    id="paymentUserName" th:value="${#authentication.principal.name}"> <input type="hidden"
+                                                                                              name="paymentUserEmail"
+                                                                                              id="paymentUserEmail"
+                                                                                              th:value="${#authentication.principal.email}">
+                <input type="hidden" name="paymentUserPhone" id="paymentUserPhone"
+                       th:value="${#authentication.principal.phone}">
+                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home"
+                                type="button" role="tab" aria-controls="home"
+                                aria-selected="true" data-mode="point">포인트 충전하기
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile"
+                                type="button" role="tab" aria-controls="profile" aria-selected="false" tabindex="-1"
+                                data-url="/hh/mypage/point-use-history">포인트내역/입금정보
+                        </button>
+                    </li>
+                    <!-- data-url="/hh/mypage/point/point-history" -->
+                    <!-- data-url="/hh/mypage/point/cancel" -->
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact"
+                                type="button"
+                                role="tab" aria-controls="contact" aria-selected="false">결제취소
+                        </button>
+                    </li>
+                </ul>
+                <div class="tab-content" id="myTabContent">
+                    <div class="tab-pane fade active show" id="home" role="tabpanel" aria-labelledby="home-tab">
+                        <div class="reword-wrap">
+                            <p class="reword-wrap-title">
+                                R9포인트로 이력서 열람, 나만의 이력서 양식 만들기 등<br/> <b>유료서비스</b>를 <b class="text-primary">더욱 간편하게 </b>
+                                이용하세요.
+                            </p>
+                            <p class="desc">
+                                충전 시 <b>최대2.5% 추가적립 혜택</b>도 놓치지 마세요!
+                            </p>
+
+                            <div class="now-point">
+                                <i class="icon-point"></i> <span>내 포인트</span>
+                                <p class="my-point">
+                                    <th:block th:if="${#lists.isEmpty(pointInfo)}">
+                                    <b class="text-primary">0</b>P
+                                    </th:block>
+                                    <th:block th:unless="${#lists.isEmpty(pointInfo)}">
+                                        <b class="text-primary"
+                                           th:text="${pointInfo.balance == null? '0' :#numbers.formatInteger(pointInfo.balance,0,'COMMA')}"></b>P
+                                    </th:block>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="tbl-head">
+                            <h4 class="table-subtitle">충전 포인트 선택</h4>
+                        </div>
+                        <table class="table m-t-15 border-top-1">
+                            <colgroup>
+                                <col style="width: 25%"/>
+                                <col style="width: 25%"/>
+                                <col style="width: 25%"/>
+                                <col style="width: 25%"/>
+                            </colgroup>
+                            <thead>
+                            <tr>
+                                <th class="text-center"></th>
+                                <th class="text-center">결제금액<br/>(부가세포함)
+                                </th>
+                                <th class="text-center">추가 적립 포인트</th>
+                                <th class="text-center">총 충전 포인트</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td class="text-center">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" value="11000" id="ChargeOpt1"
+                                               name="amount" data-name="10,000원권"/>
+                                    </div>
+                                </td>
+                                <td class="text-center"><b>11,000원</b></td>
+                                <td class="text-center">
+                                    <p>+0p</p>
+                                </td>
+                                <td class="text-center"><b>10,000P</b></td>
+                            </tr>
+                            <tr>
+                                <td class="text-center">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" value="33000" id="ChargeOpt2"
+                                               name="amount" data-name="30,000원권"/>
+                                    </div>
+                                </td>
+                                <td class="text-center"><b>33,000원</b></td>
+                                <td class="text-center">
+                                    <p>+500p</p>
+                                </td>
+                                <td class="text-center"><b>30,500P</b></td>
+                            </tr>
+                            <tr>
+                                <td class="text-center">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" value="55000" id="ChargeOpt3"
+                                               name="amount" data-name="50,000원권"/>
+                                    </div>
+                                </td>
+                                <td class="text-center"><b>55,000원</b></td>
+                                <td class="text-center">
+                                    <p>+1,000p</p>
+                                </td>
+                                <td class="text-center"><b>51,000P</b></td>
+                            </tr>
+                            <tr>
+                                <td class="text-center">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" value="110000" id="ChargeOpt4"
+                                               name="amount" data-name="100,000원권"/>
+                                    </div>
+                                </td>
+                                <td class="text-center"><b>110,000원</b></td>
+                                <td class="text-center">
+                                    <p>+2,500p</p>
+                                </td>
+                                <td class="text-center"><b>102,500P</b></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <div class="tbl-head">
+                            <h4 class="table-subtitle">결제수단 선택</h4>
+                        </div>
+                        <div class="payment-wrap">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="paymentType" data-method="card"
+                                       value="CREDIT" id="creditCard"/> <label
+                                    class="form-check-label" for="creditCard"> 신용카드 </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="paymentType" data-method="phone"
+                                       value="PHONE" id="phone"/> <label
+                                    class="form-check-label" for="phone"> 휴대폰 결제 </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="paymentType" data-method="bank"
+                                       value="BANK_TRANSFER" id="bankTransfer"/> <label
+                                    class="form-check-label" for="bankTransfer"> 실시간 계좌이체 </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="paymentType" data-method="vbank"
+                                       value="VIRTUAL_ACCOUNT" id="virtualAccount"
+                                       disabled="disabled"/> <label class="form-check-label" for="virtualAccount"> 가상계좌
+                                입금 </label>
+                            </div>
+                        </div>
+                        <div class="example-form m-t-30 font-size-14">
+                            <ul>
+                                <li>R9포인트의 유효기간은 결제일로부터 5년이며, 5년 이내에 사용하지 않은 포인트는 < 상법 제64 조 상사채권 소멸시효 > 조항에 따라 자동
+                                    소멸됩니다.
+                                </li>
+                                <li>결제 후 7일 이내에 사용내역이 없이 결제를 취소할 경우 수수료를 차감하지 않습니다.</li>
+                                <li>환불 시, 환불 금액은 결제 시 추가로 지급한 포인트와 가입축하 등 무상지급 포인트, 환불 수수료 (결제금액의 5%)를 제외한 결제금액에서 사용금액을
+                                    차감한 나머지 차액입니다.
+                                </li>
+                                <li>휴대폰결제는 당월결제만 취소가 가능합니다.</li>
+                                <li>자세한 내용은 '자주 묻는 질문' 에서 확인해 주세요.</li>
+                            </ul>
+                        </div>
+                        <div class="d-flex justify-content-center">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="" id="notiCheck"
+                                       name="notiCheck"/> <label class="form-check-label" for="notiCheck">
+                                구매 유의사항을 모두 확인했으며 이에 동의합니다. </label>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-center m-t-30">
+                            <button type="button" class="btn btn-primary btn-md" data-role="charge">포인트 충전하기</button>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+                        <div class="reword-wrap">
+                            <p class="reword-wrap-title">
+                                R9포인트로 이력서 열람, 나만의 이력서 양식 만들기 등<br/>
+                                <b>유료서비스</b>를 <b class="text-primary">더욱 간편하게 </b> 이용하세요.
+                            </p>
+                            <p class="desc">충전 시 <b>최대2.5% 추가적립 혜택</b>도 놓치지 마세요!</p>
+
+                            <div class="now-point">
+                                <i class="icon-point"></i>
+                                <span>내 포인트</span>
+                                <th:block th:if="${#lists.isEmpty(pointInfo)}">
+                                    <p class="my-point"><b class="text-primary">0</b>P</p>
+                                </th:block>
+                                <th:block th:unless="${#lists.isEmpty(pointInfo)}">
+                                    <p class="my-point"><b class="text-primary"
+                                       th:text="${pointInfo.balance == null? '0' :#numbers.formatInteger(pointInfo.balance,0,'COMMA')}"></b>P</p>
+                                </th:block>
+                            </div>
+                        </div>
+                        <form id="sleep">
+
+                        </form>
+                    </div>
+                    <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
+                        <div class="reword-wrap">
+                            <p class="desc">
+                                최근 7일 이내에 충전결제한 내역 중<br/> 일체의 사용 내역(추가지급 포인트 포함)이 없는 경우 결제를 취소할 수 있으며,<br/> 취소에 따른 수수료가
+                                발생하지 않습니다.
+                            </p>
+                            <div class="now-point">
+                                <i class="icon-point"></i> <span>취소가능 포인트</span>
+                                <p class="my-point">
+                                    <b class="text-primary" id="refundPoint">1,350</b>P
+                                </p>
+                            </div>
+                        </div>
+                        <div class="tbl-head">
+                            <h4 class="table-subtitle">결제취소내역</h4>
+                        </div>
+                        <table class="table m-t-15 border-top-1">
+                            <colgroup>
+                                <col style="width: 20%"/>
+                                <col style="width: 20%"/>
+                                <col style="width: 20%"/>
+                                <col style="width: 20%"/>
+                                <col style="width: 20%"/>
+                            </colgroup>
+                            <thead>
+                            <tr>
+                                <th class="text-center">결제일시</th>
+                                <th class="text-center">주문번호</th>
+                                <th class="text-center">결제액</th>
+                                <th class="text-center">충전포인트</th>
+                                <th class="text-center">취소신청</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <th:block th:if="${#lists.isEmpty(purchaseList) and #lists.isEmpty(doneRefundList)}">
+                                <tr>
+                                    <td class="text-center" colspan="5">
+                                        <p class="m-t-30 m-b-30">환불가능 포인트 결제내역이 없습니다.</p>
+                                    </td>
+                                </tr>
+                            </th:block>
+                            <th:block th:if="${!#lists.isEmpty(purchaseList)}">
+                                <th:block th:each="list : ${purchaseList}">
+                                    <tr class="canDoRefund" th:data-point="${paidMoney}"
+                                        th:with="paidMoney = ${#numbers.formatInteger(list.paidIncrease, 8)}+${#numbers.formatInteger(list.freeIncrease, 8)}">
+                                        <td class="text-center">
+                                            <p th:text="${list.createdAt}">2022.11.01</p>
+                                        </td>
+                                        <td class="text-center">
+                                            <p th:text="${list.orderId}">13213535321</p>
+                                        </td>
+                                        <td class="text-center">
+                                            <p th:text="${list.remainPrice}">50,000원</p>
+                                        </td>
+                                        <td class="text-center">
+                                            <p th:text="'+'+${paidMoney}">+ 1,000P</p>
+                                        </td>
+                                        <td class="text-center">
+                                            <button href="javascript:void(0)" th:data-receipt-id="${list.receiptId}"
+                                                    th:data-payment-id="${list.paymentId}"
+                                                    th:data-price="${list.remainPrice}" th:data-history-id="${list.id}"
+                                                    data-role="cancelPurchase" class="btn btn-outline-primary btn-md">
+                                                취소하기
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </th:block>
+                            </th:block>
+                            <th:block th:if="${!#lists.isEmpty(doneRefundList)}">
+                                <th:block th:each="list : ${doneRefundList}">
+                                    <tr>
+                                        <td class="text-center">
+                                            <p th:text="${list.createdAt}">2022.11.01</p>
+                                        </td>
+                                        <td class="text-center">
+                                            <p th:text="${list.orderId}">13213535321</p>
+                                        </td>
+                                        <td class="text-center">
+                                            <p th:text="${list.cancelledPrice}">50,000원</p>
+                                        </td>
+                                        <td class="text-center"
+                                            th:with="paidMoney = ${#numbers.formatInteger(list.paidIncrease, 8)}+${#numbers.formatInteger(list.freeIncrease, 8)}">
+                                            <p th:text="${paidMoney}">+ 1,000P</p>
+                                        </td>
+                                        <td class="text-center">
+                                            <p>취소완료</p>
+                                        </td>
+                                    </tr>
+                                </th:block>
+                            </th:block>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

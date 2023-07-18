@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/default}">
+<body>
+	<div layout:fragment="contents" th:remove="tag">
+		<main id="content" role="main">
+			<input type="hidden" id="recruitId" th:value="${detail.id}" /> <input
+				type="hidden" id="coWork" th:value="${detail.isCowork}" /> <input
+				type="hidden" id="status" th:value="${detail.status}" />
+			<h2 class="title">포지션 상세보기</h2>
+			<div class="row p-3">
+				<div class="col-12">
+					<!--테스트 포지션 등록 -->
+					<div class="m-5">
+						<div class="row no-gutters border-bottom">
+							<div class="col-2">
+								<p>
+									포지션 등록일 : <span th:text="${detail.createdAt}"> </span>
+								</p>
+							</div>
+							<div class="col-8">
+								<p class="h4" th:text="${detail.title}"></p>
+							</div>
+		
+							<div class="col">
+								<div class="float-right ">
+									<select id="selectType" name="selectType" data-role="select"
+										class="form-control w-auto">
+										<option th:if="${detail.status eq 'DOING'}" value="DOING">진행중</option>
+										<option value="END">마감</option>
+										<option th:if="${detail.status eq 'CLOSE'}" value="CLOSE">종료</option>
+										<option th:if="${detail.status eq 'DEL'}" value="DEL">삭제</option>
+									</select>
+								</div>
+								<div class="float-right ">
+									<span class="m-2">상태 </span>
+								</div>
+							</div>
+						</div>
+						<!--기업정보 table -->
+						<div class="m-t-20">
+							<p class="h4">기업정보</p>
+							<table class="table table-bordered">
+								<tr>
+									<th>기업명</th>
+									<td th:text="${detail.companyName}"></td>
+									<th>설립일</th>
+									<td th:text="${detail.establishDate}"></td>
+								</tr>
+								<tr>
+									<th>대표자</th>
+									<td th:text="${detail.ceo}"></td>
+									<th>도로명주소</th>
+									<td th:text="${detail.address}"></td>
+								</tr>
+								<tr>
+									<th>전화번호</th>
+									<td th:text="${detail.phone}"></td>
+									<th>기업상태</th>
+									<td th:text="${detail.companyStatus}"></td>
+								</tr>
+								<tr>
+									<th>상장</th>
+									<td colspan="7" th:text="${detail.marketListing}"></td>
+								</tr>
+								</tbody>
+							</table>
+						</div>
+						<!-- /table-->
+						<!--공고내용 -->
+						<div class="m-t-20">
+							<div>
+								<div class="row no-gutters border-bottom">
+									<div class="col-1">
+										<p class="h4">공고내용</p>
+										<span> </span>
+									</div>
+									<div class="col">
+										<p class="h-5">공고내용은 사용자에게 전체공개됩니다.</p>
+										<span> </span>
+									</div>
+								</div>
+							</div>
+							<div class="row no-gutters p-t-20 p-b-20">
+								<p th:text="${detail.jopDescription}"></p>
+							</div>
+						</div>
+						<!--/공고내용 -->
+						<!--코윅정보 -->
+						<div class="no-gutters" id="coWorkDetail">
+							<div class="m-t-20">
+								<div class="row no-gutters">
+									<p class="h4">코윅정보</p>
+								</div>
+								<div class="m-t-10">
+									<div class="row no-gutters border">
+										<div class="col-2 bg-light">
+											<span> 코윅 참여자 수</span>
+										</div>
+										<div class="col">
+											<!-- modal trigger-->
+											<button type="button" class="btn text-danger"
+												data-toggle="modal" data-target="#coModal"
+												data-role="modalTrigger">
+												<a th:text="${detail.count}"></a>
+											</button>
+		
+										</div>
+									</div>
+								</div>
+							</div>
+							<!--/코윅정보 -->
+							<!--코윅조건-->
+							<div class="m-t-25">
+								<table class="table table-bordered">
+									<p class="h4">코윅조건</p>
+									<br>
+									<tr>
+										<th class="col-2">계약수수료율</th>
+										<td th:text="${detail.feeInfo}"></td>
+									</tr>
+									<tr>
+										<th>보증기간</th>
+										<td th:text="${detail.warrantyTerm}"></td>
+									</tr>
+									<tr>
+										<th>기타사항</th>
+										<td th:text="${detail.etc}"></td>
+									</tr>
+									</tbody>
+								</table>
+							</div>
+							<!--/코윅조건 -->
+							<!--PM 코멘트 -->
+							<div class="m-t-20">
+								<div>
+									<div class="row no-gutters border-bottom">
+										<div class="col-1">
+											<p class="h4">PM 코멘트</p>
+											<span> </span>
+										</div>
+										<div class="col">
+											<p class="h-5">코웍 진행시 PM, 코워커(CO)만 확인할 수 있는 내용입니다.</p>
+		
+										</div>
+									</div>
+								</div>
+		
+								<div class="row no-gutters p-t-20 p-b-20">
+									<div>
+										<p th:text="${detail.pmComment}"></p>
+									</div>
+								</div>
+							</div>
+						</div>
+						<!--/PM 코멘트 -->
+						<!--modal-->
+						<div class="modal fade" id="coModal" tabindex="-1" role="dialog"
+							aria-hidden="true">
+							<div class="modal-dialog modal-dialog-centered" role="document">
+								<div class="modal-content">
+									<div class="modal-header">
+										<p class="font-size-18px">코웍 참여자</p>
+										<button type="button" class="close" data-dismiss="modal"
+											aria-label="Close">
+											<span aria-hidden="true">&times;</span>
+										</button>
+									</div>
+									<div class="modal-body">
+										<table class="table table-bordered">
+											<thead>
+												<tr>
+													<th>참여일시</th>
+													<th>참여일자</th>
+												<tr>
+											</thead>
+											<th:block th:each="list : ${participant}">
+												<tr>
+													<td th:text="${list.joinDate}"></td>
+													<td th:text="${list.participantName}"></td>
+												</tr>
+											</th:block>
+											</tbody>
+										</table>
+									</div>
+									<div class="modal-footer">
+										<button type="button" class="btn btn-secondary"
+											data-dismiss="modal">Close</button>
+									</div>
+								</div>
+							</div>
+						</div>
+						<!--/modal-->
+						<div class="mb-3 text-center">
+							<button type="button" class="btn btn-primary" data-role="moveList">목록으로</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</main>
+	</div>
+</body>
+</html>

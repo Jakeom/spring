@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/hh/hhMypageLayout">
+<body>
+<div id="container-block">
+    <div layout:fragment="contents" th:remove="tag">
+        <div class="layout-content">
+            <h3 class="subtitle poppins">자주쓰는 메일/SMS</h3>
+            <div class="title-line mt-4 mb-5"></div>
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home"
+                            type="button" role="tab" aria-controls="home"
+                            aria-selected="true">SMS/MMS
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile"
+                            type="button" role="tab" aria-controls="profile"
+                            aria-selected="false" tabindex="-1">이메일
+                    </button>
+                </li>
+            </ul>
+            <div class="tab-content" id="myTabContent">
+                <div class="tab-pane fade active show" id="home" role="tabpanel" aria-labelledby="home-tab">
+                    <div class="row m-t-30">
+                        <div class="col-3">
+                            <aside>
+                                <ul>
+                                    <li><a data-role="createTemplate" class="headhunter-side-title"><i
+                                            class="icon-file-active m-r-5"></i> 템플릿 추가하기</a>
+                                        <ul>
+                                            <th:block th:each="list : ${smsTemplateList}">
+                                                <li style="line-height:2.5">
+                                                    <input type="checkbox" class="check-box m-r-5" data-role="checkBox"
+                                                           th:name="${list.id}"/>
+                                                    <a data-role="clickName" th:text="${list.name}"><i
+                                                            class="icon-file-default m-r-5"></i> 테스트0303</a> <input
+                                                        type="hidden" name="contentId" th:value="${list.id}">
+                                                    <input type="hidden" name="subject" th:value="${list.subject}"/>
+                                                    <input type="hidden" name="content" th:value="${list.content}"/>
+                                                </li>
+                                            </th:block>
+                                        </ul>
+                                    </li>
+                                </ul>
+                                <button th:if="${smsTemplateList.size() ne 0}" type="button" class="btn btn-primary"
+                                        data-role="deleteTemplate">템플릿 삭제
+                                </button>
+                            </aside>
+                        </div>
+                        <div class="col-9">
+                            <table class="table border-top-1">
+                                <colgroup></colgroup>
+                                <tbody>
+                                <tr>
+                                    <td class=""><input type="text" id="smsName" class="form-control form-lg" value=""
+                                                        placeholder="템플릿의 타이틀을 입력하는 부분입니다."/>
+                                        <div class="m-t-10">
+                                            <input type="text" id="smsSubject" class="form-control form-lg"
+                                                   value=""
+                                                   placeholder="MMS/LMS에 한하여 제목을 입력할 수 있습니다. 제목 입력시, MMS/LMS로 발송됩니다."/>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="">
+                                        <div class="d-flex align-items-center justify-content-end m-b-5 position-relative">
+                                            <button type="button" class="btn btn-primary btn-sm"
+                                                    data-role="replacement-btn">
+                                                치환태그 삽입
+                                            </button>
+                                            <div class="replacement-tag-notice">
+                                                <div class="replacement-tag">
+                                                    <p class="title">치환태그 방식</p>
+                                                    <a href="javascript:void(0)" class="close"><i
+                                                            class="icon-g-close"></i></a>
+                                                </div>
+                                                <table class="table">
+                                                    <thead>
+                                                    <tr>
+                                                        <th class="text-center">필드명</th>
+                                                        <th class="text-center">태그명</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    <tr data-role="name" data-value="name">
+                                                        <td class="text-center" >
+                                                            수신자이름
+                                                        </td>
+                                                        <td class="text-center text-primary">{$수신자이름$}</td>
+                                                    </tr>
+                                                    <tr data-role="name" data-value="title">
+                                                        <td class="text-center" >
+                                                            포지션제목
+                                                        </td>
+                                                        <td class="text-center text-primary">{$포지션제목$}</td>
+                                                    </tr>
+                                                    <tr data-role="name" data-value="companyNm">
+                                                        <td class="text-center" >
+                                                            채용사이름
+                                                        </td>
+                                                        <td class="text-center text-primary">{$채용사이름$}</td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <div class="form-textarea m-0">
+                                            <textarea id="smsContent" cols="30" rows="10" placeholder="내용을 입력하세요."
+                                                      class=""></textarea>
+                                        </div>
+                                        <p class="text-end font-size-14">
+                                            <span id="textCnt">0</span>/2000자
+                                        </p>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <div class="d-flex align-items-center justify-content-end m-t-30">
+                                <div class="d-flex gap-10">
+                                    <button type="button" data-role="smsSave" class="btn btn-primary">저장</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+                    <div class="row m-t-30">
+                        <div class="col-3">
+                            <aside>
+                                <ul>
+                                    <li><a data-role="createTemplate" class="headhunter-side-title"><i
+                                            class="icon-file-active m-r-5"></i> 템플릿 추가하기</a>
+                                        <ul>
+                                            <th:block th:each="list : ${emailTemplateList}">
+                                                <li style="line-height:2.5">
+                                                    <input type="checkbox" class="check-box m-r-5" data-role="checkBox"
+                                                           th:name="${list.id}"/>
+                                                    <a data-role="clickNameEmail" th:text="${list.name}">
+                                                        <i class="icon-file-default m-r-5"></i> 초대 메일 (기본 그룹)
+                                                    </a> <input type="hidden" name="contentId" th:value="${list.id}">
+                                                    <input type="hidden" name="subject" th:value="${list.subject}"/>
+                                                    <input type="hidden" name="content" th:value="${list.content}"/>
+                                                </li>
+                                            </th:block>
+                                        </ul>
+                                    </li>
+                                </ul>
+                                <button th:if="${emailTemplateList.size() ne 0}" type="button" class="btn btn-primary"
+                                        data-role="deleteTemplate">템플릿 삭제
+                                </button>
+                            </aside>
+                        </div>
+                        <div class="col-9">
+                            <table class="table border-top-1">
+                                <colgroup></colgroup>
+                                <tbody>
+                                <tr>
+                                    <td class="">
+                                        <input type="text" id="emailName" class="form-control form-lg" value=""
+                                               placeholder="템플릿의 타이틀을 입력하는 부분입니다."/>
+                                        <div class="m-t-10">
+                                            <input type="text" id="emailSubject" class="form-control form-lg"
+                                                   value=""
+                                                   placeholder="제목"/>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="">
+                                        <div class="d-flex align-items-center justify-content-end m-b-5 position-relative">
+                                            <button type="button" class="btn btn-primary btn-sm"
+                                                    data-role="replacement-btn">
+                                                치환태그 삽입
+                                            </button>
+                                            <div class="replacement-tag-notice">
+                                                <div class="replacement-tag">
+                                                    <p class="title">치환태그 방식</p>
+                                                    <a href="javascript:void(0)" class="close"><i
+                                                            class="icon-g-close"></i></a>
+                                                </div>
+                                                <table class="table">
+                                                    <thead>
+                                                    <tr>
+                                                        <th class="text-center">필드명</th>
+                                                        <th class="text-center">태그명</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    <tr data-role="name" data-value="name">
+                                                        <td class="text-center">
+                                                            수신자이름
+                                                        </td>
+                                                        <td class="text-center text-primary">{$수신자이름$}</td>
+                                                    </tr>
+                                                    <tr data-role="name" data-value="title">
+                                                        <td class="text-center">
+                                                            포지션제목
+                                                        </td>
+                                                        <td class="text-center text-primary">{$포지션제목$}</td>
+                                                    </tr>
+                                                    <tr data-role="name" data-value="companyNm">
+                                                        <td class="text-center">
+                                                            채용사이름
+                                                        </td>
+                                                        <td class="text-center text-primary">{$채용사이름$}</td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <div id="editor">
+                                            <textarea id="emailContent" name="emailContent"></textarea>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="form-upload">
+                                            <input type="file" id="form-file"/>
+                                            <!-- select 박스에 따라서 -->
+                                            <label id="fileLabel" for="form-file"><i class="icon-input-add"></i></label>
+                                        </div>
+                                        <div id="fileArea"></div>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <div class="d-flex align-items-center justify-content-end m-t-30">
+                                <div class="d-flex gap-10">
+                                    <button type="button" data-role="emailSave" class="btn btn-primary">저장</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

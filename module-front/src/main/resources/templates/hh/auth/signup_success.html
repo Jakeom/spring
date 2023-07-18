@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/mainLayout">
+  <body>
+  <div layout:fragment="contents" th:remove="tag">
+    <div id="container-block">
+      <div class="container">
+        <div class="sub-content">
+          <h3 class="center-title">회원가입</h3>
+          <div class="signup-success-wrap">
+            <div class="headhunter-profile-img"></div>
+            <p class="comment">Resume9 회원이 되신 걸 환영합니다.</p>
+            <p class="success-msg"><span class="text-primary">홍길동</span>님 가입이 완료되었습니다.</p>
+          </div>
+          <div class="signup-success-content">
+            <p class="system-comment">이력서를 바로 등록 하시겠습니까?</p>
+            <div class="success-btn-group">
+              <button type="button" class="btn btn-outline-dark btn-lg">나중에</button>
+              <a href="/static" class="btn btn-dark btn-lg">홈화면으로 이동</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </body>
+</html>

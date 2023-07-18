@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.hh.HhSendMsgMapper">
+
+    <!-- 헤드헌터 메시지 발송 이력 저장 -->
+    <insert id="insertHhSendMsg" parameterType="HhSendMsgDTO">
+        /*com.fw.core.mapper.db1.hh.HhSendMsgMapper.insertHhSendMsg, 헤드헌터 메시지 발송 이력 저장, sjpaik, HhSendMsgMapper.xml */
+        INSERT INTO hh_send_msg (
+               createdAt
+             , updatedAt
+             , content
+             , kindCd
+             , media
+             , subject
+             , member_id
+             , recipientName
+             , success
+             , delFlag
+        ) VALUES (
+               NOW()
+             , #{updatedAt}
+             , #{content}
+             , #{kindCd}
+             , #{media}
+             , #{subject}
+             , #{memberId}
+             , #{recipientName}
+             , 0
+             , 'N'
+        )
+        <selectKey keyProperty="id" resultType="String" order="AFTER">
+            SELECT LAST_INSERT_ID() FROM DUAL
+        </selectKey>
+    </insert>
+
+    <!-- 헤드헌터 메시지 발송 대상 저장 -->
+    <insert id="insertHhSendMsgTarget" parameterType="HhSendMsgDTO">
+        /*com.fw.core.mapper.db1.hh.HhSendMsgMapper.insertHhSendMsgTarget, 헤드헌터 메시지 발송 대상 저장, yj, HhSendMsgMapper.xml */
+        INSERT INTO hh_send_msg_target (
+               isRead    /*not null*/
+             , name
+             , success
+             , msg_id
+             , target
+             , delFlag
+             , val
+        ) VALUES (
+               #{isRead}
+             , #{name}
+             , #{success}
+             , #{msgId}
+             , #{target}
+             , 'N'
+             , #{val}
+        )
+    </insert>
+
+    <!-- 헤드헌터 메시지 발송 파일 시쿼스 저장 -->
+    <insert id="insertHhSendMsgFile" parameterType="HhSendMsgDTO">
+        /*com.fw.core.mapper.db1.hh.HhSendMsgMapper.insertHhSendMsgFile, 헤드헌터 메시지 발송 파일 시쿼스 저장, yj, HhSendMsgMapper.xml */
+        INSERT INTO hh_send_msg_file (
+               file_id
+             , msg_id
+             , delFlag
+
+
+        ) VALUES (
+               #{fileId}
+             , #{msgId}
+             , 'N'
+        )
+    </insert>
+
+</mapper>
+

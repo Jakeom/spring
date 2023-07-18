@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.bo.BoTicketMapper">
+
+    <!--리스트 조회-->
+    <select id="selectTicketList" resultType="BoTicketUseHistoryDTO">
+        /* com.fw.core.mapper.db1.bo.BoTicketMapper.selectTicketList, t. selectTicketList, t. 2022.10.24, t. Ghazal, t. BoTicketMapper.xml */
+        SELECT
+                t.id
+                , date_format(t.createdAt, '%Y-%m-%d %H:%i') as createdAt
+                , date_format(t.updatedAt, '%Y-%m-%d %H:%i') as updatedAt
+                , t.member_id
+                , t.delFlag
+                , t.increase
+                , t.balance
+                , m.name AS memberName
+                , t.ticket_id
+                , t.id
+                , t.reason
+                , t.backoffice_admin_id
+                , t.adminReason
+        FROM ticket_use_history t
+        JOIN ticket tt ON t.ticket_id = tt.id
+        JOIN member m ON tt.member_id = m.id
+        WHERE t.delFlag = 'N'
+    </select>
+
+    <!--검색-->
+    <select id="searchTicketList" resultType="BoTicketUseHistoryDTO">
+        /* com.fw.core.mapper.db1.bo.BoTicketMapper.searchTicketList, t. searchTicketList, t. 2022.10.24, t. Ghazal, t.
+        BoTicketMapper.xml */
+        SELECT
+        t.id
+        , date_format(t.createdAt, '%Y-%m-%d %H:%i') as createdAt
+        , date_format(t.updatedAt, '%Y-%m-%d %H:%i') as updatedAt
+        , t.member_id
+        , t.delFlag
+        , t.increase
+        , t.balance
+        , m.name AS memberName
+        , t.ticket_id
+        , t.id
+        , t.reason
+        , t.backoffice_admin_id
+        , t.adminReason
+        FROM ticket_use_history t
+        JOIN ticket tt ON t.ticket_id = tt.id
+        JOIN member m ON tt.member_id = m.id
+        <where>
+        <if test="searchStart != '' and searchStart!=null and searchEnd !='' and searchEnd!=null">
+            AND date_format(t.createdAt, '%Y-%m-%d') BETWEEN #{searchStart} AND #{searchEnd}
+        </if>
+        <if test="memberEmail != null and memberEmail!=''">
+            AND m.email= #{memberEmail}
+        </if>
+        <if test="memberName != null and memberName !='' ">
+            AND m.name= #{memberName}
+        </if>
+        <if test=" memberPhone!='' and memberPhone!=null ">
+            AND m.phone= #{memberPhone}
+        </if>
+        </where>
+    </select>
+
+    <!--status 검색-->
+    <select id="searchStatus" resultType="BoTicketUseHistoryDTO">
+        /* com.fw.core.mapper.db1.bo.BoTicketMapper.searchTicketList, t. searchTicketList, t. 2022.10.24, t. Ghazal, t.
+        BoTicketMapper.xml */
+        SELECT
+            t.id
+             , date_format(t.createdAt, '%Y-%m-%d %H:%i') as createdAt
+             , date_format(t.updatedAt, '%Y-%m-%d %H:%i') as updatedAt
+             , t.member_id
+             , t.delFlag
+             , t.increase
+             , t.balance
+             , m.name AS memberName
+             , t.ticket_id
+             , t.id
+             , t.reason
+             , t.backoffice_admin_id
+             , t.adminReason
+        FROM ticket_use_history t
+                 JOIN ticket tt ON t.ticket_id = tt.id
+                 JOIN member m ON tt.member_id = m.id
+        WHERE delFlag = 'N'
+        AND status = #{status}
+    </select>
+
+</mapper>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/blank}">
+<head>
+</head>
+<body>
+<div layout:fragment="contents" th:remove="tag">
+    <h4 class="text-center m-3">LOGIN LOG</h4>
+    <table class="table table-bordered table-center" id="showLoginLogList">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>RESULT</th>
+            <th>ACCESS IP</th>
+            <th>LOGIN TIME</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="list : ${loginLog}">
+            <td th:text="${list.adminId}"></td>
+            <th:block th:switch="${list.resultFlag}">
+                <td th:case="N" style="color:red;">Fail</td>
+                <td th:case="Y" style="color:blue;">Success</td>
+            </th:block>
+            <td th:text="${list.accessIp}"></td>
+            <td th:text="${list.createDt}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

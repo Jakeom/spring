@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/default}">
+
+<body>
+<div layout:fragment="contents" th:remove="tag">
+    <div id="container-block">
+        <main id="content" role="main">
+
+            <h2 class="title">포인트 상세</h2>
+            <!-- Search -->
+            <form name="searchForm" th:action="${'/bo/management/operation/point/detail?id=' + detailMember.memberId}" method="POST">
+                <fieldset>
+                    <div class="p-5 m-1">
+                    <input type="hidden" name="id" th:value="${detailMember.memberId}">
+                    <table class="table table-bordered">
+                        <tr>
+                            <th class="active">기간</th>
+                            <td>
+                                <div class="input-group m-1 form-inline">
+                                    <div class=" input-group date">
+                                        <div class="form-group m-r-5">
+                                            <input th:value="${detailMember.pointStartDt}" type="text" id="pointStartDt" name="pointStartDt"
+                                                   class="form-control form-datepicker" placeholder="날짜 선택">
+                                        </div>
+                                        <div class="form-group m-r-5">
+                                            <input th:value="${detailMember.pointEndDt}" type="text" id="pointEndDt" name="pointEndDt"
+                                                   class="form-control form-datepicker" placeholder="날짜 선택">
+                                        </div>
+                                    </div>
+                                    <div class="form-group float-right ">
+                                        <button type="button" class="btn btn-outline-primary m-r-5" data-role="all">전체</button>
+                                        <button type="button" class="btn btn-outline-primary m-r-5" data-role="today">오늘</button>
+                                        <button type="button" class="btn btn-outline-primary m-r-5" data-role="week">7일</button>
+                                        <button type="button" class="btn btn-outline-primary m-r-5" data-role="month">1개월</button>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        </table>
+                        <div class="form-group d-flex justify-content-center m-1 p-5">
+                            <button type="button" class="btn btn-outline-danger form-control col-1" data-role="search">검색하기</button>
+                        </div>
+                    </div>
+            <!-- /Search -->
+            <!-- select-->
+                    <div class="m-1 p-5 m-b-20">
+                        <div class="float-left form-inline">
+                        <p th:text="${detailMember.memberId + ' (' + detailMember.memberType + ') ' + detailMember.memberName + ' 회원님 잔여포인트 : ' + #numbers.formatInteger(detailMember.balance, 0, 'COMMA')+ ' P'}">26978 (AP) 곽정석 회원님 잔여포인트 1,000 P</p>
+                            <button type="button" class="btn btn-light btn-lg" data-toggle="modal" data-target="#myModal" data-role="manage">포인트관리</button>
+                        </div>
+                        <div class="form-inline float-right">
+                            <div class="m-1 ">
+                                <select id="pointType" name="pointType" class="form-control w-auto" data-url="/bo/cd/POINT_USE" th:data-selected="${detailMember.pointType}" data-default-option="전체"></select>
+                            </div>
+                            <div class="m-1 ">
+                                <select id="freePayType" name="freePayType" class="form-control selectChange">
+                                    <option value="">전체</option>
+                                    <option th:selected="${detailMember.freePayType eq 'increase'}" value="increase">무상지급 포인트 증가</option>
+                                    <option th:selected="${detailMember.freePayType eq 'decrease'}" value="decrease">무상지급 포인트 감소</option>
+                                </select>
+                            </div>
+                            <div class="m-1 ">
+                                <select id="paidPayType" name="paidPayType" class="form-control selectChange">
+                                    <option value="">전체</option>
+                                    <option th:selected="${detailMember.paidPayType eq 'increase'}" value="increase">결제 포인트 증가</option>
+                                    <option th:selected="${detailMember.paidPayType eq 'decrease'}" value="decrease">결제 포인트 감소</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </form>
+            <!-- /select-->
+            <!-- table-->
+            <div class="m-1 p-5">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>일시</th>
+                        <th>활동</th>
+                        <th>무상지급 포인트 증감</th>
+                        <th>결제 포인트 증감</th>
+                        <th>상세보기</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <th:block th:if="${#lists.isEmpty(detailList)}">
+                        <tr>
+                            <td colspan="10" class="text-center">데이터가 없습니다.</td>
+                        </tr>
+                    </th:block>
+
+                    <th:block th:each="list : ${detailList}">
+                        <input type="hidden" id="memberId" th:value="${list.memberId}"/>
+                        <input type="hidden" id="memberName" th:value="${list.memberName}"/>
+                        <tr>
+                            <td th:text="${list.createdAt}"></td>
+                            <td th:text="${list.reasonCd}" data-role="type"></td>
+                            <td th:text="${list.paidIncrease}" data-role="type"></td>
+                            <td th:text="${list.freeIncrease}" data-role="type"></td>
+                            <td th:text="상세"></td>
+                        </tr>
+                    </th:block>
+                    </tbody>
+                </table>
+                </tr>
+            </div>
+            <!--modal-->
+            <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header"></div>
+                        <div class="modal-body">
+                            <table class="table table-bordered">
+                                <tr>
+                                    <th>ID</th>
+                                    <td th:text="${detailMember.id}" ></td>
+                                    <th>이름</th>
+                                    <td th:text="${detailMember.memberName}"></td>
+                                    <th>포인트</th>
+                                    <td th:text="${#numbers.formatInteger(detailMember.balance, 0, 'COMMA')}"></td>
+                                <tr>
+                                <tr>
+                                    <th>포인트관리</th>
+                                <td colspan="5">
+                                    <label class="form-check-label" >지급</label>
+                                    <input value="1" class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1" checked>
+                                    <br>
+                                    <label class="form-check-label" >차감</label>
+                                    <input value="0" class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2">
+                                </td>
+
+                                </tr>
+                                <tr>
+                                    <th>포인트입력</th>
+                                    <td colspan="5"> <input class="form-control" type="text" name="insertPoint"> </td>
+                                </tr>
+
+                            </table>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-role="save" data-dismiss="modal">등록</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">취소</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--/modal-->
+        </main>
+    </div>
+</div>
+</body>
+</html>

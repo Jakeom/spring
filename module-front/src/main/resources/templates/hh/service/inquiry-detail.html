@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/hh/hhFaqLayout">
+<body>
+<div id="container-block" layout:fragment="contents" th:remove="tag">
+    <div class="container">
+        <div class="sub-content">
+            <div class="row row-40 align-items-center">
+                <h3 class="subtitle">상세</h3>
+                <div class="title-line mt-4 mb-4"></div>
+                <div class="poting-detail-wrap">
+                    <div class="d-flex justify-content-between">
+                        <div class="announcement-wrap">
+                            <input type="hidden" name="id" th:value="${detail.id}">
+                            <div class="title" th:text="${detail.subject}"></div>
+                            <p class="date">
+                                <span>작성일</span>
+                                <span th:text="${detail.createdAt}"></span>
+                            </p>
+                        </div>
+                        <div></div>
+                    </div>
+                    <div class="desc" th:text="${detail.content}"></div>
+                    <th:block th:each="list : ${detail.commonFileList}">
+                        <a th:href="${list.url}" th:text="${list.originName}" download></a>
+                    </th:block>
+
+                </div>
+            </div>
+        </div>
+        <div class="d-flex justify-content-between m-b-20 ">
+            <a data-role="goBack" class="btn btn-primary btn-xl">목록</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

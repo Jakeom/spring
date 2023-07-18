@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.bo.BoBlacklistMapper">
+
+    <!-- 회원 리스트 조회 -->
+    <select id="selectMemberList" parameterType="BoMemberDTO" resultType="BoMemberDTO">
+        /* com.fw.core.mapper.db1.bo.BoBlacklistMapper.selectMemberList, 회원 리스트 조회, 22.11.14, dongbeom, BoBlacklistMapper.xml */
+        SELECT m.id
+             , m.name
+             , m.phone
+             , m.email
+        FROM member m
+        WHERE ((SELECT COUNT(1) FROM tb_blacklist t where t.member_id = m.id and t.del_flag = 'N') = 0)
+          AND m.DTYPE = 'HH'
+        <if test='idOption != null and idOption !=""'>
+            AND m.id LIKE CONCAT('%',#{idOption},'%')
+        </if>
+        <if test='nameOption != null and nameOption !=""'>
+            AND m.name LIKE CONCAT('%',#{nameOption},'%')
+        </if>
+        <if test='phoneOption != null and phoneOption !=""'>
+            AND m.phone LIKE CONCAT('%',#{phoneOption},'%')
+        </if>
+        <if test='emailOption != null and emailOption !=""'>
+            AND m.email LIKE CONCAT('%',#{emailOption},'%')
+        </if>
+    </select>
+
+    <!-- 회원 리스트 조회 -->
+    <select id="selectMemberCnt" parameterType="BoMemberDTO" resultType="int">
+        /* com.fw.core.mapper.db1.bo.BoBlacklistMapper.selectMemberList, 회원 리스트 조회, 22.11.14, dongbeom, BoBlacklistMapper.xml */
+        SELECT COUNT(1)
+        FROM member m
+        LEFT OUTER JOIN tb_blacklist tb on id = tb.member_id
+        WHERE (tb.blacklist_type != 'MEMBER'
+           OR tb.blacklist_type is null)
+          AND m.DTYPE = 'HH'
+        <if test='idOption != null and idOption !=""'>
+            AND m.id LIKE CONCAT('%',#{idOption},'%')
+        </if>
+        <if test='nameOption != null and nameOption !=""'>
+            AND m.name LIKE CONCAT('%',#{nameOption},'%')
+        </if>
+        <if test='phoneOption != null and phoneOption !=""'>
+            AND m.phone LIKE CONCAT('%',#{phoneOption},'%')
+        </if>
+        <if test='emailOption != null and emailOption !=""'>
+            AND m.email LIKE CONCAT('%',#{emailOption},'%')
+        </if>
+    </select>
+
+    <!-- 회원 상세보기  -->
+    <select id="selectBlacklistDetail" parameterType="BoTbBlacklistDTO" resultType="BoTbBlacklistDTO">
+        /* com.fw.core.mapper.db1.bo.BoBlacklistMapper.selectBlacklistDetail, 회원 상세보기 , 22.11.14, dongbeom, BoBlacklistMapper.xml */
+        SELECT member_id
+             , name
+             , phone
+             , email
+             , use_flag
+             , date_format(reg_date, '%Y-%m-%d') AS reg_date
+             , date_format(update_dt, '%Y-%m-%d') AS update_dt
+             , blacklist_seq
+        FROM tb_blacklist
+        WHERE blacklist_seq = #{blacklistSeq}
+    </select>
+
+    <!-- 블랙리스트 추가 -->
+    <insert id="insertBlacklist" parameterType="BoTbBlacklistDTO">
+        /* com.fw.core.mapper.db1.bo.BoBlacklistMapper.insertBlacklist, Blacklist 추가, 22.11.16, dongbeom, BoBlacklistMapper.xml */
+        INSERT INTO tb_blacklist
+            (blacklist_seq, member_id, blacklist_type, name, phone, email, use_flag, reg_seq)
+        SELECT COALESCE(
+                       (SELECT MAX(blacklist_seq) + 1
+                        FROM tb_blacklist), '1')
+             , id
+             , 'MEMBER'
+             , m.name
+             , m.phone
+             , m.email
+             , 0
+             , #{adminSession.adminSeq}
+        FROM member m
+        WHERE id = #{memberId}
+    </insert>
+
+    <!-- 블랙리스트 GUSET 추가 -->
+    <insert id="insertBlacklistGuest" parameterType="BoTbBlacklistDTO">
+        /* com.fw.core.mapper.db1.bo.BoBlacklistMapper.insertBlacklistGuest, Blacklist 추가, 22.11.16, dongbeom, BoBlacklistMapper.xml */
+        INSERT INTO tb_blacklist
+            (blacklist_type, name, phone, email, use_flag, reg_seq)
+        VALUES ( #{blacklistType}
+               , #{name}
+               , #{phone}
+               , #{email}
+               , 0
+               , #{adminSession.adminSeq}
+               )
+    </insert>
+
+    <!-- 블랙리스트 리스트 조회 -->
+    <select id="selectBlacklistList" parameterType="BoTbBlacklistDTO" resultType="BoTbBlacklistDTO">
+        /* com.fw.core.mapper.db1.bo.BoBlacklistMapper.selectBlacklistList, 블랙리스트 리스트 조회, 22.11.16, dongbeom, BoBlacklistMapper.xml */
+        SELECT blacklist_seq
+             , member_id
+             , name
+             , phone
+             , email
+             , use_flag
+             , reg_date
+        FROM tb_blacklist
+        WHERE date_format(reg_date, '%Y-%m-%d') BETWEEN #{startDate} AND #{endDate}
+        AND del_flag = 'N'
+        <if test='idOption != null and idOption !=""'>
+            AND member_id LIKE CONCAT('%',#{idOption},'%')
+        </if>
+        <if test='nameOption != null and nameOption !=""'>
+            AND name LIKE CONCAT('%',#{nameOption},'%')
+        </if>
+        <if test='phoneOption != null and phoneOption !=""'>
+            AND phone LIKE CONCAT('%',#{phoneOption},'%')
+        </if>
+        <if test='emailOption != null and emailOption !=""'>
+            AND email LIKE CONCAT('%',#{emailOption},'%')
+        </if>
+        <if test='useFlag != null and useFlag !=""'>
+            AND use_flag = #{useFlag}
+        </if>
+        <if test='blacklistType != null and blacklistType !=""'>
+            AND blacklist_type = #{blacklistType}
+        </if>
+        ORDER BY use_flag asc, reg_date desc
+    </select>
+
+    <!-- Blacklist 업데이트 -->
+    <update id="updateBlacklist" parameterType="BoTbBlacklistDTO">
+        /* com.fw.core.mapper.db1.bo.BoBlacklistMapper.updateBlacklist, Blacklist 업데이트, 22.11.14, dongbeom, BoBlacklistMapper.xml */
+        UPDATE tb_blacklist
+        SET use_flag = #{useFlag}
+          , update_seq = #{adminSession.adminSeq}
+          , update_dt = NOW()
+        WHERE blacklist_seq = #{blacklistSeq}
+    </update>
+
+    <!-- Blacklist 삭제 -->
+    <delete id="deleteBlacklist" parameterType="BoTbBlacklistDTO">
+        /* com.fw.core.mapper.db1.bo.BoBlacklistMapper.deleteBlacklist, Blacklist 삭제, 22.11.14, dongbeom, BoBlacklistMapper.xml */
+        UPDATE tb_blacklist
+        SET del_flag = 'Y'
+          , update_seq = #{adminSession.adminSeq}
+          , update_dt = NOW()
+        WHERE blacklist_seq = #{blacklistSeq}
+    </delete>
+
+</mapper>

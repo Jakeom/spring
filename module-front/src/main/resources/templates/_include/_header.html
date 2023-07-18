@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+    <div th:fragment="common">
+        <header id="header">
+            <div class="container">
+                <div class="inner">
+                    <div class="col">
+                        <div class="row align-items-center justify-content-between gx-0">
+                            <div class="col-7 d-flex align-items-center">
+                                <div class="header-logo" onclick="location.href='/'" style="cursor:pointer">
+                                    <img src="/static/images/logo.svg" alt="Resume9"/>
+                                </div>
+                                <ul class="gnb-list hidden-flex-mobile">
+                                    <li class="gnb-depth">
+                                        <a href="/fo/position/position-list">채용공고</a>
+                                    </li>
+                                    <li class="gnb-depth">
+                                        <a href="/fo/headhunter/headhunter-list">헤드헌터검색</a>
+                                    </li>
+                                    <li class="gnb-depth">
+                                        <a href="/fo/mypage/resume-list">내 이력서</a>
+                                    </li>
+                                    <li class="gnb-depth">
+                                        <a href="/fo/mypage/application-status">지원현황</a>
+                                    </li>
+                                    <li class="gnb-depth">
+                                        <a href="/fo/community/community-list">커뮤니티</a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-5 d-flex align-items-center justify-content-end">
+                                <form name="mainSearchForm" action="/fo/main/position/position-list">
+                                    <div class="search-form hidden-mobile">
+                                        <input type="text" name="searchVal" class="form-control form-lg"/>
+                                        <button type="button" name="" class="btn search-btn" data-role="mainSearch"><i class="icon-search"></i></button>
+                                    </div>
+                                </form>
+                                <ul class="sign-list hidden-flex-mobile">
+                                    <li class="sign-depth">
+                                        <a href="/fo/service/inquiry">1:1 문의</a>
+                                    </li>
+                                    <li class="sign-depth">
+                                        <a href="/fo/service/faq-individual">고객센터</a>
+                                    </li>
+                                    <li class="sign-depth mypage">
+                                        <th:block sec:authorize="isAnonymous()">
+                                            <a href="/fo/auth/login">로그인</a>
+                                        </th:block>
+                                        <th:block sec:authorize="hasRole('ROLE_AP')">
+                                            <a href="javascript:void(0)" data-role="mypage-con" class="mypage-con">MY</a>
+                                            <i class="icon-login m-l-10" th:style="'background: url(' + ${#authentication.principal.profileUrl eq null ? '/static/images/icon-login.svg' : #authentication.principal.profileUrl} + '); background-size: 100% 100%'"></i>
+                                            <div class="my-info" style="display: none">
+                                                <div class="my-info__head">
+                                                    <div class="info-head__my">
+                                                        <a href="/fo/mypage/profile-info">
+                                                            <p class="info-head__name" th:text="${#authentication.principal.name}">홍길동</p>
+                                                        </a>
+                                                        <a href="javascript:void(0)" th:data-id="${#authentication.principal.id}" data-role="logOut" class="info-head__logout"> 로그아웃 <i class="icon-logout"></i> </a>
+                                                    </div>
+                                                    <div class="info-head__point">
+                                                        <i class="icon-point"></i>
+                                                        <span class="my-reword">내 리워드</span>
+                                                        <span class="content-cnt" th:text="${#authentication.principal.balance == null? '0':#numbers.formatInteger(#authentication.principal.balance,0,'COMMA') + 'P'}"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="my-info__list">
+                                                    <ul>
+                                                        <li>
+                                                            <span class="info-list__title">회원정보 수정</span>
+                                                        </li>
+                                                        <li th:classappend="${activeMenuURI eq '/fo/mypage/profile-info'} ? 'active' : ''">
+                                                            <a href="/fo/mypage/profile-info" class="category">회원정보 수정</a>
+                                                        </li>
+                                                        <li th:classappend="${activeMenuURI eq '/fo/mypage/password'} ? 'active' : ''">
+                                                            <a href="/fo/mypage/password" class="category">비밀번호 변경</a>
+                                                        </li>
+                                                        <li th:classappend="${activeMenuURI eq '/fo/mypage/blacklist'} ? 'active' : ''">
+                                                            <a href="/fo/mypage/blacklist" class="category">블랙리스트 관리</a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                                <div class="my-info__list">
+                                                    <ul>
+                                                        <li>
+                                                            <span class="info-list__title">보안</span>
+                                                        </li>
+                                                        <li th:classappend="${activeMenuURI eq '/fo/mypage/login-log'} ? 'active' : ''">
+                                                            <a href="/fo/mypage/login-log" class="category">로그인 기록</a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                                <div class="my-info__list">
+                                                    <ul>
+                                                        <li>
+                                                            <span class="info-list__title">리워드</span>
+                                                        </li>
+                                                        <li th:classappend="${activeMenuURI eq '/fo/mypage/reward-point'} ? 'active' : ''">
+                                                            <a href="/fo/mypage/reward-point" class="category">적립/사용내역</a>
+                                                        </li>
+                                                        <li th:classappend="${activeMenuURI eq '/fo/mypage/reward'} ? 'active' : ''">
+                                                            <a href="/fo/mypage/reward" class="category">리워드 Mall</a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                                <div class="my-info__list">
+                                                    <ul>
+                                                        <li>
+                                                            <span class="info-list__title">관심/맞춤제안</span>
+                                                        </li>
+                                                        <li th:classappend="${activeMenuURI eq '/fo/mypage/attention-headhunter'} ? 'active' : ''">
+                                                            <a href="/fo/mypage/attention-headhunter" class="category">관심 헤드헌터</a>
+                                                        </li>
+                                                        <li th:classappend="${activeMenuURI eq '/fo/mypage/resume-scrap' or activeMenuURI eq '/fo/mypage/resume-reading-notice'} ? 'active' : ''">
+                                                            <a href="/fo/mypage/resume-scrap" class="category">스크랩/최근열람 공고</a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </th:block>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+    </div>
+</html>

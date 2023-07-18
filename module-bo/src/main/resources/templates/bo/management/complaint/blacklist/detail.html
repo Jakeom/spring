@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/default}">
+<body>
+	<div layout:fragment="contents" th:remove="tag">
+		<input type="hidden" id="blacklistUseFlag" name="blacklistUseFlag" th:value="${detail.useFlag}" />
+		<input type="hidden" id="blacklistSeq" name="blacklistSeq" th:value="${detail.blacklistSeq}" />
+		<main id="content" role="main">
+			<h2 class="title">블랙리스트 > 상세</h2>
+			<div class="row p-3">
+				<div class="col-12">
+					<table class="table table-bordered">
+						<tr>
+							<th>회원ID</th>
+							<td th:if="${detail.memberId ne null}">
+								[[${detail.memberId}]]</td>
+							<td th:if="${detail.memberId eq null}">비회원</td>
+						</tr>
+						<tr>
+							<th>이름</th>
+							<td>[[${detail.name}]]</td>
+						</tr>
+						<tr>
+							<th>휴대폰번호</th>
+							<td>[[${detail.phone}]]</td>
+						</tr>
+						<tr>
+							<th>이메일</th>
+							<td>[[${detail.email}]]</td>
+						</tr>
+						<tr>
+							<th>상태</th>
+							<td>
+								<label class="mr-3"><input type="radio" name="status" value="0"> 비활성</label>
+								<label><input type="radio" name="status" value="1"> 활성</label>
+							</td>
+						</tr>
+						<tr>
+							<th>등록일</th>
+							<td>[[${detail.regDate}]]</td>
+						</tr>
+						<tr>
+							<th>수정일</th>
+							<td>[[${detail.updateDt}]]</td>
+						</tr>
+					</table>
+					<!-- table -->
+	
+					<div class="row">
+						<div class="col text-right m-t-10">
+							<button class="btn btn-primary" data-role="save">저장</button>
+							<button class="btn btn-danger" data-role="delete">삭제</button>
+							<button class="btn btn-dark" data-role="blacklist">목록</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</main>
+	</div>
+</body>
+</html>

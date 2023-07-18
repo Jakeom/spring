@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.m.MCommunityMapper">
+
+    <!-- 커뮤니티 상세 조회 -->
+    <select id="selectCommunityDetail" parameterType="FoTbCommunityDTO" resultType="FoTbCommunityDTO">
+        SELECT tc.community_seq
+             , tc.community_type
+             , fn_get_common_cd(tc.community_type,'COMMUNITY_TYPE',1) AS communityTypeNm
+             , tc.dtype
+             , tc.title
+             , tc.content
+             , tc.secret_flag
+             , tc.company_seq
+             , (SELECT companyName FROM hr_company WHERE id = tc.company_seq) AS companyName
+             , FORMAT(tc.hit, 0) hit
+             , tc.recommend
+             , tc.file_seq
+             , tc.del_flag
+             , replace(m.name, substr(name, 2, 2), '**') maskingName
+             , m.name
+             , tc.create_seq
+             , date_format(tc.create_dt, '%Y-%m-%d %H:%i') create_dt
+             , tc.update_seq
+             , tc.update_dt
+             , (SELECT COUNT(*) FROM tb_community_comment tcc WHERE tc.community_seq = tcc.community_seq) commentCnt
+        FROM tb_community tc
+    INNER JOIN member m on m.id = tc.create_seq
+        WHERE tc.del_flag = 'N'
+        AND tc.community_seq = #{communitySeq}
+    <if test="communityType != null and communityType != ''">
+        AND tc.community_type = #{communityType}
+    </if>
+        ORDER BY tc.community_seq desc
+    </select>
+
+    <!-- 댓글 리스트 조회 -->
+    <select id="selectCommunityCommentList" parameterType="FoTbCommunityCommentDTO" resultType="FoTbCommunityCommentDTO">
+        SELECT tcc.community_comment_seq
+             , TIMESTAMPDIFF(MINUTE, create_dt, NOW()) dateDiff
+             , tcc.community_seq
+             , tcc.content
+             , tcc.depth
+             , tcc.parent_community_comment_seq
+             , replace(m.name, substr(name, 2, 2), '**') maskingName
+             , m.name
+             , tcc.recommend
+             , tcc.del_flag
+             , tcc.create_seq
+             , tcc.create_dt
+             , tcc.update_seq
+             , tcc.update_dt
+             , (SELECT COUNT(*) FROM tb_community_comment t WHERE t.parent_community_comment_seq = tcc.community_comment_seq) commentCnt
+        FROM tb_community_comment tcc
+                 INNER JOIN member m on m.id = tcc.create_seq
+        WHERE del_flag = 'N'
+          AND community_seq = #{communitySeq}
+        ORDER BY community_comment_seq desc
+    </select>
+
+    <!-- MAX AND parentSeq AND maxCommentSeq-->
+    <select id="selectCommentMaxDepth" parameterType="FoTbCommunityCommentDTO" resultType="FoTbCommunityCommentDTO">
+        SELECT community_comment_seq, parent_community_comment_seq, maxDepth
+        FROM (SELECT *, (SELECT MAX(depth) FROM tb_community_comment) maxDepth FROM tb_community_comment) as tcc
+        WHERE depth = tcc.maxDepth
+        AND community_seq = #{communitySeq}
+        order by community_comment_seq desc
+    </select>
+
+    <!-- 정렬할때 저장소용 -->
+    <select id="selectCommentSeq" parameterType="FoTbCommunityCommentDTO" resultType="FoTbCommunityCommentDTO">
+        SELECT community_comment_seq
+             , TIMESTAMPDIFF(MINUTE, create_dt, NOW()) dateDiff
+             , community_seq
+             , content
+             , depth
+             , parent_community_comment_seq
+             , replace(m.name, substr(name, 2, 2), '**') name
+             , recommend
+             , del_flag
+             , create_seq
+             , create_dt
+             , update_seq
+             , update_dt
+             , (SELECT COUNT(*) FROM tb_community_comment t WHERE t.parent_community_comment_seq = tcc.community_comment_seq) commentCnt
+        FROM tb_community_comment tcc
+                 INNER JOIN member m on m.id = tcc.create_seq
+        WHERE community_seq = #{communitySeq}
+          AND community_comment_seq = #{communityCommentSeq}
+        ORDER BY community_comment_seq desc
+    </select>
+
+    <select id="selectFindDepth" parameterType="FoTbCommunityCommentDTO" resultType="FoTbCommunityCommentDTO">
+        SELECT community_comment_seq, parent_community_comment_seq, depth
+        FROM tb_community_comment
+        WHERE depth = #{depth}
+    </select>
+
+    <select id="selectRecommend" parameterType="FoTbCommunityDTO" resultType="FoTbCommunityDTO">
+        SELECT community_recommend_seq
+        FROM tb_community_recommend
+        WHERE create_seq = #{memberId}
+        <if test='communitySeq != "0" and communitySeq != null and communitySeq != ""'>
+            AND community_seq = #{communitySeq}
+        </if>
+        <if test='communityCommentSeq != "0" and communityCommentSeq != null and communityCommentSeq != ""'>
+            AND community_comment_seq = #{communityCommentSeq}
+        </if>
+    </select>
+
+    <!-- 커뮤니티 글 쓰기 -->
+    <insert id="insertCommunity" parameterType="FoTbCommunityDTO">
+        insert into tb_community(
+              community_type
+            , dtype
+            , title
+            , content
+            , hit
+            , secret_flag
+            , recommend
+            , file_seq
+            , create_seq
+            , create_dt
+            , update_dt
+            , company_seq
+        ) VALUES (
+              #{communityType}
+            , #{dtype}
+            , #{title}
+            , #{content}
+            , '0'
+            , #{secretFlag}
+            , '0'
+            , #{fileSeq}
+            , #{memberId}
+            , NOW()
+            , NOW()
+            , #{companySeq}
+        )
+        <selectKey order="AFTER" keyProperty="communitySeq" resultType="String">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <insert id="insertCommunityComment" parameterType="FoTbCommunityCommentDTO">
+        insert into tb_community_comment(
+                  community_seq
+                , content
+                , depth
+                , parent_community_comment_seq
+                , recommend
+                , create_seq
+                , create_dt
+                , update_dt
+            ) VALUES (
+                  #{communitySeq}
+                , #{content}
+                , #{depth}
+                , #{parentCommunityCommentSeq}
+                , '0'
+                , #{memberId}
+                , NOW()
+                , NOW()
+            )
+    </insert>
+
+    <insert id="insertCommunityRecommend" parameterType="FoTbCommunityDTO">
+        INSERT INTO tb_community_recommend(
+                  community_seq
+                , community_comment_seq
+                , create_seq
+                , create_dt
+        ) VALUES (
+                  #{communitySeq}
+                , #{communityCommentSeq}
+                , #{memberId}
+                , NOW()
+                )
+    </insert>
+
+    <delete id="deleteCommunityRecommend" parameterType="FoTbCommunityDTO">
+        DELETE
+        FROM tb_community_recommend
+        WHERE community_recommend_seq = #{communityRecommendSeq}
+    </delete>
+
+    <update id="updateRecommend" parameterType="FoTbCommunityDTO">
+        UPDATE tb_community
+        SET recommend = recommend + #{recommend}
+        WHERE community_seq = #{communitySeq}
+    </update>
+
+    <update id="updateRecommendComment" parameterType="FoTbCommunityDTO">
+        UPDATE tb_community_comment
+        SET recommend = recommend + #{recommend}
+        WHERE community_comment_seq = #{communityCommentSeq}
+    </update>
+
+    <update id="updateCommunityHit" parameterType="FoTbCommunityDTO">
+        UPDATE tb_community
+        SET hit = hit + 1
+        WHERE community_seq = #{communitySeq}
+    </update>
+
+    <!-- AP/HH 구분에 따른 카테고리 조회 -->
+    <select id="selectCommunityCategory" parameterType="FoTbCommunityDTO" resultType="FoTbCommunityDTO">
+        /* com.fw.core.mapper.db1.m.MCommunityMapper.selectCommunityCategory, AP/HH 구분에 따른 카테고리 조회, YJW, MCommunityMapper.xml */
+        SELECT cd
+             , cd_nm
+        FROM tb_common_cd
+        WHERE upper_cd = 'COMMUNITY_TYPE' AND cd_replace1 = #{dtype}
+    </select>
+
+    <!-- 해당 포지션 등록 헤드헌터 조회 -->
+    <select id="selectHeadhunterByCompanySeq" parameterType="FoTbCommunityDTO" resultType="FoTbCommunityDTO">
+        /* com.fw.core.mapper.db1.m.MCommunityMapper.selectHeadhunterByCompanySeq, 해당 포지션 등록 헤드헌터 조회, YJW, MCommunityMapper.xml */
+        SELECT DISTINCT
+               hc.companyName
+             , p.member_id
+        FROM position p
+    INNER JOIN hr_company hc ON hc.id = p.hr_company_id
+        WHERE p.hr_company_id = #{companySeq}
+    </select>
+</mapper>

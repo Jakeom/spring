@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/hh/hhFaqLayout">
+<body>
+<div id="container-block">
+    <div layout:fragment="contents" th:remove="tag">
+        <div class="layout-content">
+            <div class="community-content">
+                <form name="inquiryForm" method="POST">
+                    <p class="center-title">1:1 문의하기</p>
+                    <div class="inquiry-content">
+                        <div class="row m-b-10">
+                            <div class="col-md-3">
+                                <select name="kindCd" class="select-design select-lg" style="width: 100%">
+                                    <option value="">선택</option>
+                                    <option value="USER">회원가입/회원정보</option>
+                                    <option value="RESTRICT">이력서 등록</option>
+                                    <option value="POSITION">제안요청/입사지원관리</option>
+                                    <option value="RESUME">헤드헌터/서치펌 검색</option>
+                                    <option value="ETC">기타 이용</option>
+                                </select>
+                            </div>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control form-lg inp-phone" data-role="subject"
+                                       name="subject" placeholder="제목을 입력하세요."/>
+                            </div>
+                        </div>
+                        <div class="row m-b-10">
+                            <div class="col-md-12">
+                                <div class="form-textarea m-0">
+                                    <textarea name="content" id="content" cols="30" rows="10" data-role="content"
+                                              placeholder="내용을 입력하세요"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-upload">
+                                    <input type="file" name="files" id="form-file"/>
+                                    <label for="form-file">
+                                        <span class="file-name"></span>
+                                        <i class="icon-input-add"></i>
+                                    </label>
+                                </div>
+                                <p class="m-t-5">10MB 이하 파일첨부 (jpg, gif, png, pdf)</p>
+                            </div>
+                        </div>
+                        <div class="send-btn">
+                            <a data-role="submit" class="btn btn-primary btn-xl">문의하기</a>
+                        </div>
+                    </div>
+                </form>
+                <div class="my-inquiry-list">
+                    <form name="searchForm">
+                        <input type="hidden" name="page" th:value="${searchInfo.page}"/>
+                    </form>
+                    <h4 class="table-subtitle mb-3">내 문의내역</h4>
+                    <div class="fake-table">
+                        <th:block th:if="${#lists.isEmpty(inquiryList)}">
+                            <div class="fake-table-column">
+                                <div class="fake-table-cell">
+                                    <div class="announcement-wrap text-start">
+                                        <tr>
+                                            <td colspan="10" class="text-center">데이터가 없습니다.</td>
+                                        </tr>
+                                    </div>
+                                </div>
+                            </div>
+                        </th:block>
+                        <th:block th:each="list : ${inquiryList}">
+                            <div class="fake-table-column">
+                                <div class="fake-table-cell">
+                                    <div class="announcement-wrap text-start">
+                                        <a th:href="'/hh/service/inquiry/detail?id='+${list.id}" class="title"
+                                           th:text="${list.subject}" data-role="qnaDetail"
+                                           th:data-seq="${list.id}"></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </th:block>
+
+                    </div>
+                </div>
+                <div class="d-flex justify-content-center mt-5">
+                    <div class="d-flex justify-content-center mt-5">
+                        <th:block
+                                th:include="common/paging :: paging_Fragment(fnc=*{'fn_go_page(this)'}, pageId=*{'pageName1'})"/>
+                        <script>
+                            $(document).ready(function () {
+                                /*<![CDATA[*/
+                                var result = '[[${searchInfo.totalCount}]]';
+                                $("#callCount").text(result);
+                                /*]]>*/
+                            });
+                        </script>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

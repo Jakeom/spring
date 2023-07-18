@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/default}">
+
+<body>
+	<div layout:fragment="contents" th:remove="tag">
+		<main id="content" role="main">
+			<h2 class="title">고객사 관리</h2>
+			<div class="row p-3">
+				<div class="col-12">
+					<form id="searchClient" name="searchClient">
+						<div class="row mt-5">
+			                <div class="col-4">
+				                <div class="d-flex align-items-center">
+				                    <input type="text" id="clientStartDt" name="clientStartDt"
+												class="form-control form-datepicker" placeholder="날짜 선택">
+				                    <div class="mr-2">~</div>
+				                    <input type="text" id="clientEndDt" name="clientEndDt"
+												class="form-control form-datepicker" placeholder="날짜 선택">
+				                </div>
+			                </div>
+			                <div class="col-4">
+			                	<div class="d-flex align-items-center">
+									<button type="button" class="btn btn-dark"
+											name="colorChange" id="all" data-role="all">전체</button>
+										<button type="button" class="btn btn-dark"
+											name="colorChange" id="today" data-role="today">오늘</button>
+										<button type="button" class="btn btn-dark"
+											name="colorChange" id="week" data-role="week">7일</button>
+										<button type="button" class="btn btn-dark"
+											name="colorChange" id="month" data-role="month">1개월</button>
+			                    </div>
+			                </div>
+			                <div class="col-4 text-right">
+			                	<div class="d-flex" style="float: right">
+				                	<select name="searchSelect" id="searchSelect"  class="custom-select w-auto mr-2">
+										<option value="companyName">고객사명</option>
+										<option value="licenseNo">사업자번호</option>
+										<option value="name">PM</option>
+									</select>
+									<input data-role="enter" type="text" id="inputSelect" class="form-control w-auto"/>
+				                    <button type="button" class="btn btn-primary" id="search"
+										data-role="search">검색하기</button>
+								</div>
+			                </div>
+			                <div class="col-12 mt-3">
+								<div class="d-flex">
+									<select name="wefirmSelect" id="wefirmSelect" class="form-control w-auto">
+										<option value="">전체</option>
+									</select>
+								</div>
+							</div>
+			            </div>
+			        </form>
+		
+					<div class="row mt-3">
+	              		<div class="col">
+							<!-- 아래 테이블 -->
+							<table class="table" id="datatable">
+								<thead>
+									<tr>
+										<th>No.</th>
+										<th>사업자번호</th>
+										<th>고객사명</th>
+										<th>PM</th>
+										<th>등록일</th>
+										<th>만료일</th>
+										<th>소속 위펌</th>
+									</tr>
+								</thead>
+							</table>
+							<!-- /아래 테이블 -->
+						</div>
+					</div>
+				</div>
+			</div>
+		</main>
+	</div>
+</body>
+</html>

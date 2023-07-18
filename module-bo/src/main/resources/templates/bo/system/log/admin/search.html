@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/blank}">
+<head>
+</head>
+<body>
+<div layout:fragment="contents" th:remove="tag">
+    <table class="table table-bordered table-center" id="showAdminList">
+        <thead>
+        <tr>
+            <th class="col-6">ID</th>
+            <th class="col-6">NAME</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="list : ${adminList}" th:data-admin-id="${list.adminId}" data-role="loginLog"
+            style="cursor:pointer">
+            <td th:text="${list.adminId}"></td>
+            <td th:text="${list.adminNm}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

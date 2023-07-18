@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html  xmlns:th="http://www.thymeleaf.org"
+       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+       layout:decorate="~{layouts/mainLayoutHh}">
+  <body>
+    <div id="container-block" layout:fragment="contents" th:remove="tag">
+      <div class="main-content">
+        <div class="main-visual"></div>
+
+        <div class="container main-content__join">
+          <div class="headhunter-main-status">
+            <p class="sign-wrap__title p-0">채용 현황</p>
+            <div class="status-list">
+              <div>
+                <p class="name">진행중 공고</p>
+                <p class="cnt">10</p>
+              </div>
+              <div>
+                <p class="name">마감된 공고</p>
+                <p class="cnt">10</p>
+              </div>
+              <div>
+                <p class="name">오늘 신규 지원자</p>
+                <p class="cnt">10</p>
+              </div>
+              <div>
+                <p class="name">미열람 이력서</p>
+                <p class="cnt">10</p>
+              </div>
+            </div>
+          </div>
+          <div class="sign-wrap">
+            <div class="login-group">
+              <div class="login-group__con">
+                <button type="button" class="group__individual">개인회원<br />로그인</button>
+                <button type="button" class="login-group__headhunter">헤드헌터<br />로그인</button>
+              </div>
+              <div class="login-group__sns">
+                <a href=""><i class="icon-b-naver"></i></a>
+                <a href=""><i class="icon-b-kakao"></i></a>
+                <a href=""><i class="icon-b-facebook"></i></a>
+                <a href=""><i class="icon-b-google"></i></a>
+                <a href=""><i class="icon-b-apple"></i></a>
+              </div>
+            </div>
+            <div class="sign-wrap__banner"></div>
+            <div class="sign-btn__group">
+              <button type="button" class="btn btn-outline-primary btn-lg">개인 회원가입</button>
+              <button type="button" class="btn btn-outline-primary btn-lg">헤드헌터 회원가입</button>
+            </div>
+          </div>
+          <div class="sign-wrap__login">
+            <p class="sign-wrap__title">개인회원 로그인</p>
+            <a href="javascript:void(0);" class="close"><i class="icon-g-close"></i></a>
+            <div class="signin-form">
+              <div>
+                <input type="text" class="form-control main-login" />
+                <input type="password" class="form-control main-pw" />
+              </div>
+              <div class="wrap-login__btn">로그인</div>
+            </div>
+            <div class="sign-wrap__form">
+              <div class="use-login">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" value="" id="multipleCheck" />
+                  <label class="form-check-label" for="multipleCheck">로그인 상태 유지</label>
+                </div>
+              </div>
+              <div class="hidden-flex-mobile">
+                <a href="#none" class="pw-reset">ID/PW 찾기</a>
+              </div>
+            </div>
+            <div class="login-sns main">
+              <div class="login-sns__wrap">
+                <a href="javascript:void(0)">
+                  <div class="icon-naver"></div>
+                </a>
+                <a href="javascript:void(0)">
+                  <div class="icon-kakao"></div>
+                </a>
+                <a href="javascript:void(0)">
+                  <div class="icon-facebook"></div>
+                </a>
+                <a href="javascript:void(0)">
+                  <div class="icon-google"></div>
+                </a>
+                <a href="javascript:void(0)">
+                  <div class="icon-apple"></div>
+                </a>
+              </div>
+              <p class="sign-up">아직 회원이 아니세요? <a href="">회원가입</a></p>
+            </div>
+          </div>
+          <div class="sign-wrap__success">
+            <div class="sign-success__con">
+              <div class="profile-img" style="background-image: url('../assets/images/icon-login.svg')"></div>
+              <p class="name">홍길동 님</p>
+              <p class="email">admin@resume9.co.kr</p>
+              <div class="d-flex justify-content-center">
+                <div class="notice-con">
+                  <a href="javascript:void(0)">
+                    <i class="icon-notice"></i>
+                    <p class="content-txt">읽지 않은 알림</p>
+                    <p class="content-cnt">10</p>
+                  </a>
+                </div>
+                <div class="reward-con">
+                  <a href="javascript:void(0)">
+                    <i class="icon-reward"></i>
+                    <p class="content-txt">리워드</p>
+                    <p class="content-cnt">20,000</p>
+                  </a>
+                </div>
+              </div>
+              <button type="button" class="btn btn-outline-primary btn-lg">이력서 작성하기</button>
+            </div>
+          </div>
+        </div>
+        <!-- // main-content__join -->
+
+        <div class="main-content__announcement">
+          <div class="container">
+            <div class="announcement-head">
+              <p class="main-content-title">내 포지션 관리</p>
+              <div class="">
+                <div class="swiper-button-prev"></div>
+                <div class="swiper-button-next"></div>
+              </div>
+            </div>
+            <div class="announcement-wrap">
+              <div class="swiper-container  position">
+                <div class="swiper-wrapper">
+                  <div class="swiper-slide">
+                    <ul class="announcement-wrap__list">
+                      <li class="active">
+                        <a href="">
+                          <div class="">
+                            <p class="announcement-classification">중소기업</p>
+                            <p class="announcement-object">뉴프렉스 베트남 인사팀장 모집</p>
+                          </div>
+                          <div class="date-wrap">
+                            <p class="date text-primary">D-26</p>
+                            <p class="deadline">공고마감일 : 2022.10.12</p>
+                          </div>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="">
+                          <div class="">
+                            <p class="announcement-classification">중소기업</p>
+                            <p class="announcement-object">뉴프렉스 베트남 인사팀장 모집</p>
+                          </div>
+                          <div class="date-wrap">
+                            <p class="date text-primary">D-26</p>
+                            <p class="deadline">공고마감일 : 2022.10.12</p>
+                          </div>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="">
+                          <div class="">
+                            <p class="announcement-classification">중소기업</p>
+                            <p class="announcement-object">뉴프렉스 베트남 인사팀장 모집</p>
+                          </div>
+                          <div class="date-wrap">
+                            <p class="date text-primary">D-26</p>
+                            <p class="deadline">공고마감일 : 2022.10.12</p>
+                          </div>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="">
+                          <div class="">
+                            <p class="announcement-classification">중소기업</p>
+                            <p class="announcement-object">뉴프렉스 베트남 인사팀장 모집</p>
+                          </div>
+                          <div class="date-wrap">
+                            <p class="date text-primary">D-26</p>
+                            <p class="deadline">공고마감일 : 2022.10.12</p>
+                          </div>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="">
+                          <div class="">
+                            <p class="announcement-classification">중소기업</p>
+                            <p class="announcement-object">뉴프렉스 베트남 인사팀장 모집</p>
+                          </div>
+                          <div class="date-wrap">
+                            <p class="date text-primary">D-26</p>
+                            <p class="deadline">공고마감일 : 2022.10.12</p>
+                          </div>
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                  <div class="swiper-slide">2</div>
+                </div>
+              </div>
+              <div class="announcement-more">
+                <button type="button" class="btn btn-primary btn-xl round">채용정보 더보기</button>
+              </div>
+            </div>
+          </div>
+          <div class="container m-t-30">
+            <div class="announcement-head">
+              <p class="main-content-title">내 인재 관리</p>
+              <div class="">
+                <div class="swiper-button-prev"></div>
+                <div class="swiper-button-next"></div>
+              </div>
+            </div>
+            <div class="announcement-wrap">
+              <div class="swiper-container humanResources">
+                <div class="swiper-wrapper">
+                  <div class="swiper-slide">
+                    <ul class="announcement-wrap__list">
+                      <li class="active">
+                        <a href="">
+                          <div class="">
+                            <p class="announcement-classification">중소기업</p>
+                            <p class="announcement-object">뉴프렉스 베트남 인사팀장 모집</p>
+                          </div>
+                          <div class="date-wrap">
+                            <p class="deadline">공고마감일 : 2022.10.12</p>
+                          </div>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="">
+                          <div class="">
+                            <p class="announcement-classification">중소기업</p>
+                            <p class="announcement-object">뉴프렉스 베트남 인사팀장 모집</p>
+                          </div>
+                          <div class="date-wrap">
+                            <p class="deadline">공고마감일 : 2022.10.12</p>
+                          </div>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="">
+                          <div class="">
+                            <p class="announcement-classification">중소기업</p>
+                            <p class="announcement-object">뉴프렉스 베트남 인사팀장 모집</p>
+                          </div>
+                          <div class="date-wrap">
+                            <p class="deadline">공고마감일 : 2022.10.12</p>
+                          </div>
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                  <div class="swiper-slide">2</div>
+                </div>
+              </div>
+              <div class="announcement-more">
+                <button type="button" class="btn btn-primary btn-xl round">채용정보 더보기</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- // main-content__announcement -->
+
+        <!-- // main-content__search -->
+        <div class="main-content__platform">
+          <div class="container">
+            <div class="platform-head">
+              <p class="platform-title">헤드헌터 플랫폼 레쥬메나인</p>
+              <p class="main-content-title">레쥬메나인의 장점을 둘러보세요.</p>
+            </div>
+            <div class="platform-bg-card">
+              <p class="platform-desc-title">Platform RESUME9</p>
+              <p class="platform-desc-txt">RESUME9 이력서 등록 한 번으로 AI가 당신을 원하는 곳으로 당신의 경력을 최고 우대하는 곳으로 안내해줍니다.</p>
+            </div>
+          </div>
+          <div class="swiper-container">
+            <div class="swiper-wrapper">
+              <div class="swiper-slide">
+                <div class="platform-card">
+                  <p class="platform-card-title">
+                    귀찮은 이력서 작성,<br />
+                    로봇에게 맡기세요.
+                  </p>
+                  <p class="platform-card-desc">
+                    RESUME9 이력서 양식으로 등록하면 RPA로 1초만에 뚝딱!<br />
+                    귀찮은 항목들도 자동으로 입력해 줍니다.
+                  </p>
+                  <a href="" class="btn btn-md round">자세히보기</a>
+                </div>
+              </div>
+              <div class="swiper-slide">
+                <div class="platform-card">
+                  <p class="platform-card-title">
+                    귀찮은 이력서 작성,<br />
+                    로봇에게 맡기세요.
+                  </p>
+                  <p class="platform-card-desc">
+                    RESUME9 이력서 양식으로 등록하면 RPA로 1초만에 뚝딱!<br />
+                    귀찮은 항목들도 자동으로 입력해 줍니다.
+                  </p>
+                  <a href="" class="btn btn-md round">자세히보기</a>
+                </div>
+              </div>
+              <div class="swiper-slide">
+                <div class="platform-card">
+                  <p class="platform-card-title">
+                    귀찮은 이력서 작성,<br />
+                    로봇에게 맡기세요.
+                  </p>
+                  <p class="platform-card-desc">
+                    RESUME9 이력서 양식으로 등록하면 RPA로 1초만에 뚝딱!<br />
+                    귀찮은 항목들도 자동으로 입력해 줍니다.
+                  </p>
+                  <a href="" class="btn btn-md round">자세히보기</a>
+                </div>
+              </div>
+            </div>
+            <div class="container platform-controller">
+              <div class="swiper-button-prev"></div>
+              <div class="swiper-pagination"></div>
+              <div class="swiper-button-next"></div>
+            </div>
+          </div>
+        </div>
+        <!-- // main-content__platform -->
+        <div class="main-content__list">
+          <div class="container">
+            <div class="main-content-notice">
+              <div class="list-head">
+                <p class="content-title">공지사항</p>
+                <a href="" class="content-more">더보기 <i class="icon-plus"></i></a>
+              </div>
+              <ul class="list-content">
+                <li><a href="">2022년 추석 연휴 유료서비스 연장적용 및 고객지원 안내 연장적용 및 고객지원 안내</a></li>
+                <li><a href="">[주의] 이메일지원으로 위장된 랜섬웨어 피해 예방 안내</a></li>
+                <li><a href="">[이벤트] 영화 `오 마이 고스트` 예매권 이벤트</a></li>
+                <li><a href="">잡코리아 포스트 `내 멘토가 되어줘!` 이벤트</a></li>
+                <li><a href="">잡코리아 개인정보처리방침 개정 안내</a></li>
+              </ul>
+            </div>
+            <div class="main-content-faq">
+              <div class="list-head">
+                <p class="content-title">FAQ</p>
+                <a href="" class="content-more">더보기 <i class="icon-plus"></i></a>
+              </div>
+              <ul class="list-content">
+                <li><a href="">[회원가입·로그인]로그인 상태 유지란?</a></li>
+                <li><a href="">[보안 서비스]IP 보안이란?</a></li>
+                <li><a href="">[회원가입·로그인]잡코리아를 탈퇴하면 패밀리사이트도 이용할 수 없나요?</a></li>
+                <li><a href="">[회원가입·로그인]자동 로그아웃 현상이 자주 반복됩니다. 어떻게 하나요?</a></li>
+                <li><a href="">[회원가입·로그인]회원탈퇴는 어떻게 하나요?</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <!-- // main-content__list -->
+        <div class="main-content__product">
+          <div class="container">
+            <div class="platform-head">
+              <p class="platform-title dark">경력직 Platform RESUME9</p>
+              <p class="main-content-title dark">개인정보를 상업적으로 판매할 경우, 50%의 Reward를 레쥬메나인이 제공해드립니다.</p>
+            </div>
+            <div class="product-list">
+              <div class="product-content">
+                <img src="/static/images/main-product-01.svg" alt="회원가입 절차" />
+                <p class="product-title">회원가입 절차</p>
+                <p class="product-desc">RESUME9의 헤드헌터 회원은 정식으로 관련 기관에 등록된 헤드헌터만 가입할 수 있습니다.</p>
+                <div class="view-more">
+                  <a href="">
+                    <i class="icon-round-arrow"></i>
+                    <span>자세히보기</span>
+                  </a>
+                </div>
+              </div>
+              <div class="product-content">
+                <img src="/static/images/main-product-02.svg" alt="회원가입 혜택" />
+                <p class="product-title">회원가입 혜택</p>
+                <p class="product-desc">가입 후 이용할 수 있는 다양한 기능과 혜택을 확인하세요.</p>
+                <div class="view-more">
+                  <a href="">
+                    <i class="icon-round-arrow"></i>
+                    <span>자세히보기</span>
+                  </a>
+                </div>
+              </div>
+              <div class="product-content">
+                <img src="/static/images/main-product-03.svg" alt="서치펌 단체가입 안내차" />
+                <p class="product-title">서치펌 단체가입 안내</p>
+                <p class="product-desc">RESUME9은 헤드헌터 전문 플랫폼으로 같은 서치펌 소속의 헤드헌터간 정보 공유와 코웍 기능을 제공하고 있습니다.</p>
+                <div class="view-more">
+                  <a href="">
+                    <i class="icon-round-arrow"></i>
+                    <span class="">자세히보기</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- // main-content__product -->
+        <div class="sm-banner">경력직은 헤드헌터, 헤드헌터 Platform RESUME9</div>
+      </div>
+    </div>
+
+    <script>
+      const mainSwiper = new Swiper('.main-content__join .swiper-container', {
+        // If we need pagination
+        slidesPerView: 1,
+        pagination: {
+          el: '.main-content__join .swiper-pagination',
+        },
+
+        // Navigation arrows
+        navigation: {
+          nextEl: '.main-content__join .swiper-button-next',
+          prevEl: '.main-content__join .swiper-button-prev',
+        },
+      });
+
+      const announcementSwiper = new Swiper('.main-content__announcement .swiper-container.position', {
+        // If we need pagination
+        slidesPerView: 1,
+        // Navigation arrows
+        navigation: {
+          nextEl: '.main-content__announcement .swiper-button-next',
+          prevEl: '.main-content__announcement .swiper-button-prev',
+        },
+      });
+      const announcementSwipers = new Swiper('.main-content__announcement .swiper-container.humanResources', {
+        // If we need pagination
+        slidesPerView: 1,
+        // Navigation arrows
+        navigation: {
+          nextEl: '.main-content__announcement .swiper-button-next',
+          prevEl: '.main-content__announcement .swiper-button-prev',
+        },
+      });
+      const searchSwiper = new Swiper('.main-content__search .swiper-container', {
+        // If we need pagination
+        breakpoints: {
+          996: {
+            slidesPerView: 4,
+            spaceBetween: 24,
+          },
+        },
+        slidesPerView: 1,
+        spaceBetween: 0,
+        // Navigation arrows
+        navigation: {
+          nextEl: '.main-content__search .swiper-button-next',
+          prevEl: '.main-content__search .swiper-button-prev',
+        },
+
+        scrollbar: {
+          el: '.main-content__search .swiper-scrollbar',
+        },
+      });
+      const platformSwiper = new Swiper('.main-content__platform .swiper-container', {
+        // If we need pagination
+        breakpoints: {
+          996: {
+            slidesPerView: 'auto',
+            spaceBetween: 140,
+            centeredSlides: true,
+            loop: true,
+          },
+        },
+        slidesPerView: 1,
+        navigation: {
+          nextEl: '.main-content__platform .swiper-button-next',
+          prevEl: '.main-content__platform .swiper-button-prev',
+        },
+        pagination: {
+          el: '.main-content__platform .swiper-pagination',
+          clickable: true,
+          renderBullet: function (index, className) {
+            return '<span class="' + className + '">' + (index + 1) + '</span>';
+          },
+        },
+      });
+    </script>
+  </body>
+</html>

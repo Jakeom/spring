@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<title>TALK - 메인</title>
+	<script th:src="${mainUrl+'/static/lib/jquery/jquery.min.js'}"></script>
+	<link rel="stylesheet" th:href="${mainUrl+'/static/lib/jquery-ui/jquery-ui.min.css'}" />
+	<script th:src="${mainUrl+'/static/lib/jquery-ui/jquery-ui.min.js'}"></script>
+	<link rel="stylesheet" th:href="${mainUrl+'/static/lib/select2/select2.min.css'}" />
+	<script th:src="${mainUrl+'/static/lib/select2/select2.min.js'}"></script>
+	<link rel="stylesheet" th:href="${mainUrl+'/static/css/bootstrap-grid.css'}" />
+	<link rel="stylesheet" th:href="${mainUrl+'/static/css/style.css'}" />
+	<script th:src="${mainUrl+'/static/lib/bootstrap/bootstrap.bundle.min.js'}"></script>
+	<script th:src="${mainUrl+'/static/js/ui.js'}" async></script>
+	<link rel="stylesheet" th:href="${mainUrl+'/static/lib/swiper/css/swiper-bundle.min.css'}" />
+	<script th:src="${mainUrl+'/static/lib/swiper/js/swiper-bundle.min.js'}"></script>
+
+	<script type="text/javascript" th:src="${mainUrl+'/static/js/common/chat.js'}"></script>
+	<script type="text/javascript" th:src="${mainUrl+'/static/js/common/gitpleLive-v0.0.7.min.js'}"></script>
+	<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.6/dayjs.min.js"></script>
+
+	<script>
+	// --------------------------------------채팅 환경설정하기 [start]-------------------------------------------------------
+	var channelObj = {
+			 channelNm : ""
+			,loginUserId : ""
+			,loginUserNm : ""
+			,loginType : ""
+			,masterUserId : ""
+			,masterUserNm : ""
+			,pairYn : "Y"
+			,positionId : ""
+			,userList : []
+			,chatOpen : 'Y'
+	}
+	
+	function fn_chat_make(channelData){	
+		try{			
+			var channelObj = JSON.parse(channelData);
+			chatObj.channel_create(channelObj);
+		}catch(e){	}
+		return true;
+	}
+    </script>
+	<h1>채팅앱에서 호출하는 숨겨진 페이지</h1>
+  </body>
+
+</html>

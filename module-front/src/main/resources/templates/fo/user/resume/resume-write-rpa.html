@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="layouts/mainLayout">
+<body>
+<div id="container-block" layout:fragment="contents" th:remove="tag">
+    <div class="loading" style="background: rgba(0,0,0,0.7);width: 100%; height:100%;position: fixed;top:0;left:0;z-index: 999999;display: none">
+        <div style="background-image: url('/static/images/loadingbar.gif');background-repeat:no-repeat; background-position: center center;width: 100%; height:100%">
+            <img class="loading-close" src="/static/images/icon-g-close.svg" style="width: 150px;height: 150px; float: right">
+        </div>
+    </div>
+    <input type="hidden" name="wssDomain" th:value="${wssDomain}" />
+    <input type="hidden" name="mId" th:value="${#authentication.principal.id}"/>
+    <form name="certForm" action="/fo/auth/certification" method="POST" target="certForm">
+        <input type="hidden" name="data"/>
+        <input type="hidden" name="name" th:value="${#authentication.principal.name}"/>
+        <input type="hidden" id="resultData" name="resultData"/>
+    </form>
+    <div class="container">
+        <div class="sub-content">
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link" href="/fo/user/resume/resume-write">직접입력</a>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link active" href="/fo/user/resume/resume-write-rpa">이력서 로봇 프로젝트</a>
+                </li>
+            </ul>
+            <div class="tab-content" id="myTabContent">
+                <div class="tab-pane fade active show" id="home" role="tabpanel" aria-labelledby="home-tab">
+                    <div class="auto-project">
+                        <p class="title">
+                            이력서 로봇(RPA)은 현재 개발중인 프로젝트로 기능 향상을 위한 테스트로 제공 중입니다.<br/>
+                            양식 형태와 문구에 따라 판독오류가 발생할 수 있으며, 현재는 docx, doc, pdf 파일만 등록할 수 있습니다.
+                        </p>
+                        <p class="notice">※ 표나 그림이 삽입된 이력서는 판독이 제한됩니다.</p>
+                        <div class="form-upload">
+                            <input type="file" class="resume-file" id="resume-file"/>
+                            <label for="resume-file"><span class="file-name m-r-10"></span><i class="icon-input-add"></i></label>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between m-t-20">
+                            <p>로봇이 읽을 수 있는 이력서는? <a href="/static/file/이력서.docx" class="text-primary text-underline" download="">RESUME9 이력서 양식 다운로드</a></p>
+                            <a href="/fo/service/faq-individual" class="btn btn-outline-dark btn-sm">이력서 로봇FAQ</a>
+                        </div>
+                    </div>
+                    <div class="apply-wrap-body write m-t-30">
+                        <form name="resume" class="content">
+                                <!-- 인적사항 -->
+                                <div th:with="sessionLoginInfo = ${#authentication.principal}">
+                                    <div class="content">
+                                        <h4 class="table-subtitle mb-3">인적사항<span class="text-danger">(필수)</span></h4>
+                                        <div class="desc">
+                                            <div class="apply-wrap-head">
+                                                <div class="img-upload" style="position:relative">
+                                                    <input type="file" id="img-upload"/>
+                                                    <img id="img-upload-file" src=""
+                                                         style="width:165px; height: 200px; display:none; position: absolute; top:0; left:0"/>
+                                                    <label for="img-upload" class="img-upload-label">
+                                                        <i class="icon-img-add"></i>
+                                                        <span>이미지 올리기</span>
+                                                        <em>png, jpg 형식, 2MB 미만, <br/>360*360 사이즈 권장</em>
+                                                    </label>
+                                                </div>
+                                                <div class="resume-info">
+                                                    <div class="row">
+                                                        <div class="col-md-4 col-4 col m-b-10">
+                                                            <input type="hidden" name="totalCareer" value="0"/>
+                                                            <input type="text" class="form-control form-lg inp-name"
+                                                                   name="userName" th:value="${sessionLoginInfo.name}"
+                                                                   readonly/>
+                                                        </div>
+                                                        <div class="col-md-4 col-4 col m-b-10">
+                                                            <input type="text" class="form-control form-lg inp-birth"
+                                                                   name="birth" value="" placeholder="생년월일(8자리)"/>
+                                                        </div>
+                                                        <div class="col-md-4 col-4 col m-b-10">
+                                                            <input type="text" class="form-control form-lg inp-birth"
+                                                                   name="lastSalary" value="" placeholder="최종연봉(만원)"/>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-6 col-12 col m-b-10">
+                                                            <input type="number" class="form-control form-lg inp-phone"
+                                                                   name="phone" th:value="${sessionLoginInfo.phone}" readonly/>
+                                                        </div>
+                                                        <div class="col-md-6 col-12 col m-b-10">
+                                                            <input type="text" class="form-control form-lg inp-email"
+                                                                   placeholder="" th:value="${sessionLoginInfo.email}"
+                                                                   name="email" readonly/>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-12 col">
+                                                            <input type="text" class="form-control form-lg inp-address"
+                                                                   name="address" value="" placeholder="주소"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- end -->
+                                </div>
+                            </form>
+
+                            <!-- 핵심역량 -->
+                            <form name="specForm" class="content">
+                                <div class="content">
+                                    <h4 class="table-subtitle mb-3">핵심역량<span class="text-danger">(필수)</span></h4>
+                                    <div class="desc">
+                                        <div class="row align-items-center m-b-10">
+                                            <div class="col-md-1 col-2 col">
+                                                <p class="num-box text-center">Main</p>
+                                            </div>
+                                            <div class="col-md-11 col-10 col">
+                                                <input type="hidden" name="specType" value="MAIN">
+                                                <input type="text" name="spec" class="form-control form-lg"
+                                                       placeholder="인사, 회계, 기획, 설계, 영업, 관리, 개발, 용접 등"/>
+                                            </div>
+                                        </div>
+                                        <div class="row align-items-center m-b-10">
+                                            <div class="col-md-1 col-2 col">
+                                                <p class="num-box text-center">상세</p>
+                                            </div>
+                                            <div class="col-md-11 col-10 col">
+                                                <input type="hidden" name="specType" value="DETAIL">
+                                                <input type="text" name="spec" class="form-control form-lg"
+                                                       placeholder="인사기획, 평가보상, 내부회계, IT기획, 전략기획, 마케팅기획, 홍보, IR, 투자 등"/>
+                                            </div>
+                                        </div>
+                                        <div class="row align-items-center m-b-10">
+                                            <div class="col-md-1 col-2 col">
+                                                <p class="num-box text-center">기타</p>
+                                            </div>
+                                            <div class="col-md-11 col-10 col">
+                                                <input type="hidden" name="specType" value="ETC">
+                                                <input type="text" name="spec" class="form-control form-lg"
+                                                       placeholder="자격증(의사, 변호사, 회계사 등), 주요실적, 주재원, 어학 등"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- end -->
+                            </form>
+
+                            <form name="academicForm" class="content">
+                                <!-- 학력 -->
+                                <div class="content">
+                                    <h4 class="table-subtitle mb-3">학력<span class="text-danger">(필수)</span></h4>
+                                    <div class="desc">
+                                        <div class="row align-items-center high-school-area">
+                                            <div class="col-md-2 col-6 col m-b-10">
+                                                <input type="text" name="degreeCd" class="form-control form-lg"
+                                                       value="고등학교" readonly/>
+                                            </div>
+                                            <div class="col-md-2 col-6 col m-b-10">
+                                                <div class="search-box search-lg">
+                                                    <input type="text" name="schoolName" class="" placeholder="학교명"/>
+                                                    <input type="hidden" name="schoolCd" value=""/>
+                                                    <button type="button" class="search-btn"><i
+                                                            class="icon-search-dark"></i></button>
+                                                </div>
+                                                <div class="search-result-list high-school">
+                                                    <ul></ul>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2 col-6 col m-b-10">
+                                                <input type="text" name="locationCd" class="form-control form-lg"
+                                                       placeholder="소재지"/>
+                                            </div>
+                                            <div class="col-md-2 col-6 col m-b-10">
+                                                <input type="text" name="graduationYm" class="form-control form-lg"
+                                                       placeholder="졸업년월(6자리)"/>
+                                                <input type="hidden" name="entranceStatusCd" value="ENTRANCE"/>
+                                            </div>
+                                            <div class="col-md-2 col-6 col m-b-10">
+                                                <select class="select-design select-lg" name="graduationStatusCd"
+                                                        style="width: 100%">
+                                                    <option value="GRADUATION">졸업</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-2 col-6 col m-b-10">
+                                                <div class="form-check">
+                                                    <input type="hidden" name="majorClassCd" value=""/>
+                                                    <input type="hidden" name="majorName" value=""/>
+                                                    <input type="hidden" name="majorGrades" value=""/>
+                                                    <input type="hidden" name="minorClassCd" value=""/>
+                                                    <input type="hidden" name="minorName" value=""/>
+                                                    <input type="hidden" name="minorGrades" value=""/>
+                                                    <input type="hidden" name="entranceYm" value=""/>
+                                                    <input type="hidden" name="estType" value=""/>
+                                                    <input type="hidden" name="schoolType" value=""/>
+                                                    <input type="hidden" name="inOverseas" value="0"/>
+                                                    <input class="form-check-input" type="checkbox" value=""
+                                                           id="overseas" name="overseas"/>
+                                                    <label class="form-check-label" for="overseas">해외</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row add-education university-area">
+                                            <div class="col-md-2 col-12 col m-b-10">
+                                                <select class="select-design select-lg" name="degreeCd"
+                                                        style="width: 100%">
+                                                    <option value="COLLEGE">대학교(4년)</option>
+                                                    <option value="JUNIOR_COLLEGE">대학(2/3년)</option>
+                                                    <option value="MASTER">석사</option>
+                                                    <option value="PHD">박사</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-10 col-12 col">
+                                                <div class="row align-items-center">
+                                                    <div class="col-md-3 col-12 col m-b-10">
+                                                        <div class="search-box search-lg">
+                                                            <input type="text" name="universityName" class=""
+                                                                   placeholder="학교명"/>
+                                                            <input type="hidden" name="schoolCd" value=""/>
+                                                            <button type="button" class="search-btn"><i
+                                                                    class="icon-search-dark"></i></button>
+                                                        </div>
+                                                        <div class="search-result-list university">
+                                                            <ul></ul>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3 col-6 col m-b-10">
+                                                        <input type="text" name="locationCd"
+                                                               class="form-control form-lg" placeholder="소재지"/>
+                                                    </div>
+                                                    <div class="col-md-3 col-6 col m-b-10">
+                                                        <div class="form-check">
+                                                            <input type="hidden" name="inOverseas" value="0"/>
+                                                            <input type="hidden" name="estType"/>
+                                                            <input type="hidden" name="schoolType"/>
+                                                            <input class="form-check-input univ-oversea" type="checkbox"
+                                                                   value="" name="univOversea" id="univOversea"/>
+                                                            <label class="form-check-label" for="univOversea">해외</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row align-items-center">
+                                                    <div class="col-md-3 col-6 col m-b-10">
+                                                        <input type="text" class="form-control form-lg"
+                                                               name="entranceYm" value="" placeholder="입학년월(6자리)"/>
+                                                    </div>
+                                                    <div class="col-md-3 col-6 col m-b-10">
+                                                        <select class="select-design select-lg" name="entranceStatusCd"
+                                                                style="width: 100%">
+                                                            <option value="">입학상태</option>
+                                                            <option value="ENTRANCE">입학</option>
+                                                            <option value="TRANSFER">편입</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-3 col-6 col m-b-10">
+                                                        <input type="text" class="form-control form-lg"
+                                                               name="graduationYm" value="" placeholder="졸업년월(6자리)"/>
+                                                    </div>
+                                                    <div class="col-md-3 col-6 col m-b-10">
+                                                        <select class="select-design select-lg"
+                                                                name="graduationStatusCd" style="width: 100%">
+                                                            <option value="">졸업상태</option>
+                                                            <option value="GRADUATION">졸업</option>
+                                                            <option value="EXPECTANT_GRADUATION">졸업예정</option>
+                                                            <option value="DOING">재학중</option>
+                                                            <option value="BREAK">휴학중</option>
+                                                            <option value="SELF_LEAVE">중퇴</option>
+                                                            <option value="COMPLETION">수료</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="row align-items-center">
+                                                    <div class="col-md-3 col-6 col m-b-10">
+                                                        <input type="hidden" name="majorClassCd" value="MAJOR"/>
+                                                        <input type="text" name="majorName" class="form-control form-lg"
+                                                               value="" placeholder="주 전공명"/>
+                                                    </div>
+                                                    <div class="col-md-3 col-6 col m-b-10">
+                                                        <input type="text" name="majorGrades"
+                                                               class="form-control form-lg" value="" placeholder="학점"/>
+                                                    </div>
+                                                    <div class="col-md-3 col-6 col m-b-10">
+                                                        <input type="hidden" name="minorClassCd" value="MINOR"/>
+                                                        <input type="text" name="minorName" class="form-control form-lg"
+                                                               value="" placeholder="부 전공명"/>
+                                                    </div>
+                                                    <div class="col-md-3 col-6 col m-b-10">
+                                                        <input type="text" name="minorGrades"
+                                                               class="form-control form-lg" value="" placeholder="학점"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="btn-group d-flex justify-content-center m-t-20  gap-10">
+                                            <button type="button" class="btn btn-outline-dark btn-lg m-r-10"
+                                                    data-role="addEducation">항목추가 <i class="icon-row-add"></i></button>
+                                            <button type="button" class="btn btn-outline-primary btn-lg"
+                                                    data-role="deleteEducation">항목삭제 <i
+                                                    class="icon-resume-minus  resume"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- end -->
+                            </form>
+
+                            <!-- 경력사항 -->
+                            <div class="content company-area">
+                                <h4 class="table-subtitle mb-3">경력사항<span class="text-danger">(선택)</span></h4>
+                                <div class="desc">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-4 col-6 col m-b-10">
+                                            <div class="search-box search-lg">
+                                                <input type="text" name="companyNames" class=""
+                                                       placeholder="회사 이름을 입력하세요"/>
+                                                <button type="button" class="search-btn"><i
+                                                        class="icon-search-dark"></i></button>
+                                            </div>
+                                            <div class="search-result-list company">
+                                                <ul></ul>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2 col-6 col m-b-10">
+                                            <div class="department">
+                                                <input type="text" name="departmentNames" class="form-control form-lg"
+                                                       placeholder="부서명"/>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2 col-4 col m-b-10">
+                                            <input type="text" name="entranceYms" class="form-control form-lg"
+                                                   placeholder="입사년월"/>
+                                        </div>
+                                        <div class="col-md-2 col-4 col m-b-10">
+                                            <input type="text" name="resignationYms" class="form-control form-lg"
+                                                   placeholder="퇴사년월"/>
+                                        </div>
+                                        <div class="col-md-2 col-4 col m-b-10">
+                                            <div class="form-check">
+                                                <input type="hidden" name="holdOffices" value="0"/>
+                                                <input class="form-check-input" type="checkbox" value=""
+                                                       id="holdOffice"/>
+                                                <label class="form-check-label" for="holdOffice">재직중</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row align-items-center">
+                                        <div class="col-md-2 col-6 col m-b-10">
+                                            <input type="text" name="positionInputs" class="form-control form-lg"
+                                                   placeholder="직급"/>
+                                        </div>
+                                        <div class="col-md-2 col-6 col m-b-10">
+                                            <input type="text" name="dutyInputs" class="form-control form-lg"
+                                                   placeholder="직책"/>
+                                        </div>
+                                        <div class="col-md-3 col-12 col m-b-10">
+                                            <div class="d-flex align-items-center">
+                                                <input type="text" name="salarys" class="form-control form-lg"
+                                                       placeholder="최종연봉"/>
+                                                <p class="w-50px m-l-10">만원</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row align-items-center">
+                                        <div class="col-12 col m-b-10">
+                                            <div class="form-textarea m-0">
+                                                <textarea name="inputTasks" cols="30" rows="10" placeholder="담당업무"
+                                                          class=""></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="btn-group d-flex justify-content-center m-t-10">
+                                        <button type="button" class="btn btn-outline-primary" data-role="careerSave">
+                                            저장
+                                        </button>
+                                    </div>
+                                    <div class="career-area">
+                                        <div class="career" style="display:none;">
+                                            <div class="row align-items-center">
+                                                <div class="col-12 col">
+                                                    <div class="desc result m-t-30">
+                                                        <div class="row row-line">
+                                                            <div class="m-b-10">
+                                                                <input type="hidden" name="mode" value="INSERT"/>
+                                                                <input type="hidden" name="companyName" value=""/>
+                                                                <input type="hidden" name="departmentName" value=""/>
+                                                                <input type="hidden" name="entranceYm" value=""/>
+                                                                <input type="hidden" name="resignationYm" value=""/>
+                                                                <input type="hidden" name="holdOffice" value=""/>
+                                                                <input type="hidden" name="positionInput" value=""/>
+                                                                <input type="hidden" name="dutyInput" value=""/>
+                                                                <input type="hidden" name="salary" value=""/>
+                                                                <input type="hidden" name="inputTask" value=""/>
+                                                                <input type="hidden" name="certFlag" value=""/>
+                                                            </div>
+                                                            <ul class="detail-list mt-0">
+                                                                <li>
+                                                                    <span class="cert-area m-b-10"></span>
+                                                                    <span class="text-primary">경력 <span
+                                                                            class="careerPeriod">0년 0개월</span></span>
+                                                                </li>
+                                                                <li>
+                                                                    <p class="company text-dark font-bold"></p>
+                                                                </li>
+                                                                <li>
+                                                                    <span class="key text-dark font-bold">부서명</span>
+                                                                    <span class="value department-name"></span>
+                                                                </li>
+                                                                <li>
+                                                                    <span class="key text-dark font-bold">직급</span>
+                                                                    <span class="value position-input"></span>
+                                                                </li>
+                                                                <li>
+                                                                    <span class="key text-dark font-bold">직책</span>
+                                                                    <span class="value duty-input"></span>
+                                                                </li>
+                                                                <li>
+                                                                    <span class="key text-dark font-bold">최종연봉</span>
+                                                                    <span class="value salary"></span>
+                                                                </li>
+                                                            </ul>
+                                                            <div class="career-txt">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="btn-group d-flex justify-content-end m-t-10">
+                                                <button type="button" data-role="careerModify"
+                                                        class="btn btn-outline-gray btn-sm m-r-10">수정
+                                                </button>
+                                                <button type="button" data-role="careerDelete"
+                                                        class="btn btn-outline-danger btn-sm">삭제
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mt-3">
+                                    <span class="text-primary">총 경력 <span id="totalCareer">0년 0개월</span></span>
+                                </div>
+                                <div class="btn-group d-flex justify-content-end m-t-10">
+                                    <button type="button" class="btn btn-outline-dark" data-role="certification">경력인증
+                                    </button>
+                                </div>
+                            </div>
+                            <!-- end -->
+
+                            <!-- 희망근무조건 -->
+                            <div class="content">
+                                <h4 class="table-subtitle mb-3">희망근무조건</h4>
+                                <div class="desc">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-2 col-6 col m-b-10">
+                                            <select name="desiredHire" class="select-design select-lg"
+                                                    style="width: 100%">
+                                                <option value="">고용형태</option>
+                                                <option value="FULL_TIME">정규직</option>
+                                                <option value="PART_TIME">계약직</option>
+                                                <option value="INTERN">인턴</option>
+                                                <option value="DISPATCH">파견직</option>
+                                                <option value="FREELANCER">프리랜서</option>
+                                                <option value="MILITARY_SERVICE">병역특례</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-2 col-6 col m-b-10">
+                                            <select name="desiredLocationCd" class="select-design select-lg"
+                                                    style="width: 100%">
+                                                <option value="">희망근무지</option>
+                                                <option value="SEOUL">서울</option>
+                                                <option value="IN">수도권</option>
+                                                <option value="ALL">전국</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-2 col-6 col m-b-10">
+                                            <select class="select-design select-lg" name="joinDateCd"
+                                                    style="width: 100%">
+                                                <option value="">입사가능시기</option>
+                                                <option value="IMMEDIATELY">채용후즉시</option>
+                                                <option value="TWO_WEEKS">2주이내</option>
+                                                <option value="MONTH">한달이내</option>
+                                                <option value="CONSULTATION">협의후결정</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-2 col-6 col m-b-10">
+                                            <input type="text" name="desiredPosition" class="form-control form-lg"
+                                                   value="" placeholder="희망직급"/>
+                                        </div>
+                                        <div class="col-md-4 col-12 col m-b-10">
+                                            <div class="row align-items-center">
+                                                <div class="col-6">
+                                                    <input type="text" name="desiredSalary" class="form-control form-lg"
+                                                           value="" placeholder="희망연봉(천만원)"/>
+                                                </div>
+                                                <div class="col-6">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" value="bylaws"
+                                                               id="bylaws"/>
+                                                        <input type="hidden" name="bylaws" value="0"/>
+                                                        <label class="form-check-label" for="bylaws">내규에 따름</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- end -->
+
+                            <!-- 채용우대자격 -->
+                            <div class="content">
+                                <h4 class="table-subtitle mb-3">채용우대자격</h4>
+                                <div class="desc">
+                                    <div class="row align-items-center">
+                                        <div class="col-4 col">
+                                            <select name="isVeterans" class="select-design select-lg"
+                                                    style="width: 100%">
+                                                <option value="">보훈대상여부</option>
+                                                <option value="1">대상</option>
+                                                <option value="0">비대상</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-4 col">
+                                            <select name="disability" class="select-design select-lg"
+                                                    style="width: 100%">
+                                                <option value="">장애여부</option>
+                                                <option value="1">대상</option>
+                                                <option value="0">비대상</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-4 col">
+                                            <select name="militaryServiceCd" class="select-design select-lg"
+                                                    style="width: 100%">
+                                                <option value="">병역</option>
+                                                <option value="INCOMPLETE">군필</option>
+                                                <option value="NOT">미필</option>
+                                                <option value="SERVICING">복무중</option>
+                                                <option value="EXCEPTION">해당없음</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- end -->
+
+                            <!-- 어학 -->
+                            <div class="content">
+                                <h4 class="table-subtitle mb-3">어학(선택)</h4>
+                                <div class="desc">
+                                    <div class="form-textarea textarea-sm m-0">
+                                        <textarea name="languageInput" cols="30" rows="10" placeholder="공인시험 점수, 회화수준 등"
+                                                  class=""></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- end -->
+
+                            <!-- 자격증 -->
+                            <div class="content">
+                                <h4 class="table-subtitle mb-3">자격증(선택)</h4>
+                                <div class="desc">
+                                    <div class="form-textarea textarea-sm m-0">
+                                        <textarea name="licenseName" cols="30" rows="10"
+                                                  placeholder="자격증명, 취득기관, 취득년월 등" class=""></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- end -->
+
+                            <!-- 수상 -->
+                            <div class="content">
+                                <h4 class="table-subtitle mb-3">수상(선택)</h4>
+                                <div class="desc">
+                                    <div class="form-textarea textarea-sm m-0">
+                                        <textarea name="awardName" cols="30" rows="10" placeholder="수상명, 수여기관, 취득년월 등"
+                                                  class=""></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- end -->
+
+                            <!-- 대외활동 -->
+                            <div class="content">
+                                <h4 class="table-subtitle mb-3">대외활동(선택)</h4>
+                                <div class="desc">
+                                    <div class="form-textarea textarea-sm m-0">
+                                        <textarea name="activityName" cols="30" rows="10" placeholder="대외활동내용"
+                                                  class=""></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- end -->
+
+                            <!-- 포트폴리오 -->
+                            <div class="content">
+                                <h4 class="table-subtitle mb-3">포트폴리오</h4>
+                                <div class="desc">
+                                    <div class="portfolio-area">
+                                        <div class="row align-items-center portfolio-list">
+                                            <div class="col-md-2 col-6 col m-b-10">
+                                                <select class="select-design select-lg attach-type" name="attachType"
+                                                        style="width: 100%">
+                                                    <option value="URL">URL</option>
+                                                    <option value="FILE">파일첨부</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-10 col-12 col m-b-10">
+                                                <input type="text" name="url" class="form-control form-lg portfolio-url"
+                                                       value="" placeholder="http://"/>
+                                                <div class="form-upload portfolio-file" style="display:none">
+                                                    <input type="file" id="portfolioFile" class="portfolio-files"/>
+                                                    <label for="portfolioFile"><span class="file-name m-r-10"></span><i
+                                                            class="icon-input-add"></i></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="btn-group d-flex justify-content-center m-t-20">
+                                        <button type="button" class="btn btn-outline-dark btn-lg m-r-10"
+                                                data-role="addPortfolio">항목추가 <i class="icon-row-add"></i></button>
+                                        <button type="button" class="btn btn-outline-primary btn-lg"
+                                                data-role="deletePortfolio">항목삭제 <i class="icon-resume-minus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- end -->
+
+                            <!-- 영문이력서 -->
+                            <div class="content">
+                                <h4 class="table-subtitle mb-3">영문이력서</h4>
+                                <div class="desc">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-12 col-12 col m-b-10">
+                                            <div class="form-upload">
+                                                <input name="enAttachType" type="file" class="" id="enResumeFile"/>
+                                                <label for="enResumeFile"><span class="file-name m-r-10"></span><i
+                                                        class="icon-input-add"></i></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- end -->
+                            <!-- 자기소개서 -->
+                            <div class="content">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <h4 class="table-subtitle mb-3">자기소개서<span class="text-danger">(필수)</span></h4>
+                                    <div class="d-flex align-items-center m-b-15">
+                                        <button type="button" class="btn btn-outline-dark btn-sm m-r-10"
+                                                data-role="spellCheck">맞춤법 검사
+                                        </button>
+                                        <!--<p class="">총 글자수 <span class="text-danger">123</span>자</p>-->
+                                    </div>
+                                </div>
+                                <div class="desc">
+                                    <div class="row align-items-center">
+                                        <div class="col-12">
+                                            <div class="form-textarea m-0">
+                                                <textarea name="selfIntroduction" id="" cols="30" rows="30"
+                                                          placeholder="내용을 입력하세요" class=""></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="spell-check-wrap" style="display:none">
+                                    <div class="spell-check-head">
+                                        <p>맞춤법에 어긋난 단어가 <span class="text-danger spell-cnt"></span> 있습니다.</p>
+                                        <div>
+                                            <input type="hidden" name="resultSpell"/>
+                                            <button type="button" class="btn btn-outline-dark btn-sm m-r-10"
+                                                    data-role="spellCheck">맞춤법 재검사
+                                            </button>
+                                            <button type="button" class="btn btn-outline-dark btn-sm m-r-10"
+                                                    data-role="spellChange">모두 수정
+                                            </button>
+                                            <button type="button" class="btn btn-dark btn-sm" data-role="spellEnd">맞춤법
+                                                검사 종료
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="spell-document-content">
+
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- end -->
+                        </div>
+                    </div>
+                    <div class="send-btn">
+                        <a href="#" class="btn btn-primary btn-xl" data-role="applyResume">저장하기</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div layout:fragment="modal" th:remove="tag">
+<div class="modal fade" id="modal-rpa-notice" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-comment modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header justify-content-end">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-form text-center">
+                    파일이 등록되었습니다.<br/>
+                    형식에 맞지 않을경우,항목이 누락 될 수 있습니다.<br/>
+                    반드시 확인 후 등록해주시기 바랍니다.<br/>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</body>
+</html>

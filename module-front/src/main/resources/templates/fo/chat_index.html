@@ -1,0 +1,1420 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0 , maximum-scale=1.0, user-scalable=no" />
+	<title>TALK - 메인</title>
+	<script src="/static/lib/jquery/jquery.min.js"></script>
+	<link rel="stylesheet" href="/static/lib/jquery-ui/jquery-ui.min.css" />
+	<script src="/static/lib/jquery-ui/jquery-ui.min.js"></script>
+	<link rel="stylesheet" href="/static/lib/select2/select2.min.css" />
+	<script src="/static/lib/select2/select2.min.js"></script>
+	<link rel="stylesheet" href="/static/css/bootstrap-grid.css" />
+	<link rel="stylesheet" href="/static/css/style.css" />
+	<script src="/static/lib/bootstrap/bootstrap.bundle.min.js"></script>
+	<script src="/static/js/ui.js" async></script>
+	<link rel="stylesheet" href="/static/lib/swiper/css/swiper-bundle.min.css" />
+	<script src="/static/lib/swiper/js/swiper-bundle.min.js"></script>
+
+	<script type="text/javascript" src="/static/js/common/chat.js"></script>
+	<script type="text/javascript" src="/static/js/common/gitpleLive-v0.0.7.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.6/dayjs.min.js"></script>
+
+	<script>
+	// --------------------------------------채팅 환경설정하기 [start]-------------------------------------------------------
+	var _chat_UserID = "gitple_test";				// 채팅 첫 접속 확인용
+	var _chat_UserNm = "gitple_test";
+	var _userType = "FO";
+	var _current_channel = {};
+	var _current_channel_list = [];
+	var _stdImgMap = new Map();
+	var _chatType = "";
+
+	let gitplelive = null;
+    let session_token = "";
+
+    var app_id = chatObj.app_id;
+	var url = chatObj.app_url;
+
+	var channelObj = {
+			 channelNm : ""
+			,loginUserId : ""
+			,loginUserNm : ""
+			,loginType : ""
+			,masterUserId : ""
+			,masterUserNm : ""
+			,pairYn : "Y"
+			,positionId : ""
+			,userList : []
+			,chatOpen : 'Y'
+	}
+
+    // client ip & token 발급
+    function startGitpleLive(userId) {
+        let apiURL = chatObj.app_url+"/v1/users/"+userId+"/token";
+        const data = {
+            expires_at: dayjs().add(7, "day").unix() * 1000
+        };
+        var token = chatObj.api_token();
+        var headers = {"APP_ID": app_id, "APP_API_TOKEN":token};
+        const config = {headers};
+        axios.post(apiURL, data, config)
+                .then((res) => {
+                    session_token = res.data.token;
+
+                    console.log("===========api Token=============="+token);
+
+                    gitpleLiveInit(userId);
+                })
+                .catch((error) => {
+                	console.log("==============startGitpleLive 오류===============")
+                    console.log(error);
+                });
+    }
+
+    function disconnectLive() {
+        gitplelive.disconnectUser();
+    }
+
+    function gitpleLiveInit(user_id) {
+    	const userInfo = {user_id};
+        const config = {app_id, url, session_token};
+
+        try {
+            gitplelive = new GitpleLive.Client(config);
+        } catch (err) {
+            console.log(err);
+        }
+
+        try {
+            gitplelive.connectUser(userInfo);
+        } catch (err) {
+            console.log(err);
+        }
+
+        // 연결됨
+        gitplelive.on("connected", () => {
+            console.log("GitpleLive Connect");
+        });
+
+        // 연결 종료됨
+        gitplelive.on("disconnected", () => {
+            console.log("GitpleLive Disconnect");
+        });
+
+        // 재연결 시작
+        gitplelive.on("reconnectTry", () => {
+            console.log("GitpleLive reconnectTry");
+        });
+
+        // 재연결 성공
+        gitplelive.on("reconnectSucceed", () => {
+            console.log("GitpleLive reconnectSucceed");
+        });
+
+        // 재연결 실패
+        gitplelive.on("reconnectFailed", () => {
+            console.log("GitpleLive reconnectFailed");
+            gitplelive.disconnectUser();
+        });
+
+        gitplelive.on("error", (error) => {
+            console.log("GitpleLive Error:");
+            console.log(error)
+        });
+
+        // 채널 이벤트
+        gitplelive.on("group:channel_create", (channel) => {
+            console.log("=== group:channel_create ===");
+            console.log("Channel Data :", channel);
+        });
+
+        gitplelive.on("group:channel_update", (channel) => {
+            console.log("=== group:channel_update ===");
+            console.log("Channel Data :", channel);
+        });
+
+        gitplelive.on("group:channel_delete", (channel) => {
+            console.log("=== group:channel_delete ===");
+            console.log("Channel Data :", channel);
+        });
+
+        gitplelive.on("group:channel_join", (channel, user) => {
+            console.log("=== group:channel_join ===");
+            console.log("channel:", channel);
+            console.log("user:", user);
+        });
+
+        gitplelive.on("group:channel_leave", (channel, user) => {
+            console.log("=== group:channel_leave ===");
+            console.log("channel:", channel);
+            console.log("user:", user);
+        });
+
+        gitplelive.on("group:channel_manager_create", (channel, user) => {
+            console.log("=== group:channel_manager_create ===");
+            console.log("channel:", channel);
+            console.log("user:", user);
+        });
+
+        gitplelive.on("group:channel_manager_delete", (channel, user) => {
+            console.log("=== group:channel_manager_delete ===");
+            console.log("channel:", channel);
+            console.log("user:", user);
+        });
+
+        gitplelive.on("group:channel_freeze", (channel) => {
+            console.log("=== group:channel_freeze ===");
+            console.log("channel:", channel);
+        });
+
+        gitplelive.on("group:channel_unfreeze", (channel) => {
+            console.log("=== group:channel_unfreeze ===");
+            console.log("channel:", channel);
+        });
+
+        // 메시지 이벤트
+        gitplelive.on("group:message_send", (channel, message) => {
+            console.log("========GitpleLive Message1==="+JSON.stringify(message));
+			console.log("========GitpleLive Message2==="+JSON.stringify(channel));
+			fn_channel_send_receive(message, channel);
+        });
+
+        gitplelive.on("group:message_delete", (channel, message) => {
+            console.log("=== group:message_delete ===");
+            console.log("channel:", channel);
+            console.log("message:", message);
+        });
+
+        // 사용자 이벤트 핸들러
+        gitplelive.on("user_update", (user) => {
+            console.log("=== user_update ===");
+            console.log("user:", user);
+        });
+
+        gitplelive.on("user_delete", (user) => {
+            console.log("=== user_delete ===");
+            console.log("user:", user);
+        });
+
+        // 채널 메시지 읽음 이벤트
+        gitplelive.on("group:channel_message_read_event", (channel) => {
+            console.log("=== group:channel_message_read_event ===");
+            console.log("channel:", channel);
+        });
+
+        // 채널 메시지 배달 이벤트
+        gitplelive.on("group:channel_message_delivered_event", (channel) => {
+            console.log("=== group:channel_message_delivered_Event ===");
+            console.log("channel:", channel);
+            
+            //fn_channel_list_user(_chat_UserID);
+        });
+    }
+
+    // 재접속하기
+    function fn_reconnect(userId){
+		try{
+			disconnectLive();
+		}catch(e){}
+		try{
+			startGitpleLive(userId);
+		}catch(e){}
+	}
+ 	// --------------------------------------채팅 환경설정하기 [end]-----------------------------
+
+	// --------------------------------------채널 [start]------------------------------------
+	$(function(){
+		channelObj.loginUserId = "[[${userId}]]";
+		channelObj.loginUserNm = "[[${userNm}]]";
+		channelObj.loginType = "[[${userType}]]";
+
+		if(c21.is_mobile()){
+			$("#profile").addClass("active show");
+			$('#myTab').css("display", "none");
+		}else{
+			$("#home").addClass("active show");
+			$('#myTab').css("display", "");
+		}
+
+		var loginUserId = channelObj.loginUserId;
+		_chat_UserID = "resume9_"+loginUserId;
+		_userType = channelObj.loginType;
+		_chat_UserNm = channelObj.loginUserNm;
+
+		fn_reconnect(_chat_UserID);
+		fn_channel_list_user(_chat_UserID);
+		fn_pub_event();
+	});
+
+	function fn_pub_event(){
+		// 채팅창 모바일 이벤트
+		//$(".message-list .list li").on("click", function () {
+		//    $(".message-content").addClass("active");
+		//});
+		$(".opponent .back").on("click", function () {
+		    $(".message-content").removeClass("active");
+		});
+	}
+
+	// 사용자 채널 정보 전체 조회하기
+	function fn_channel_list_user(chatUserId){
+		var url = "/group/channels?show_members=true&show_managers=true&show_delivery_receipt=true"
+		+"&show_read_receipt=true&show_unread=true&show_last_message=true&limit=30&include_members="+chatUserId;
+		var params= {};
+		params.method = "GET";
+		var _callback = function(data){
+			_current_channel_list = data.channels;
+			fn_channel_make_list(_current_channel_list);
+		}
+		chatObj.api_chat(url, params, _callback);
+	}
+	
+	// 검색어 입력하기
+	function fn_channel_search_text(){
+		var text = $("#channel_search_text").val();
+		var searchData = [];
+		for(var i=0; i<_current_channel_list.length; i++){
+			var obj = _current_channel_list[i];
+			var objText = JSON.stringify(obj);
+			if(objText.indexOf(text) > -1){
+				searchData.push(obj);
+			}
+		}
+		fn_channel_make_list(searchData);
+	}
+
+	// 채널 전체 목록 가져와서 화면에 뿌리기
+	function fn_channel_make_list(data){
+		$(".message-list").css("display", "none");
+		
+		var lastHtml1 = "";
+		var lastHtml2 = "";
+		
+		/*
+		if(data){
+			data.sort(function(a,b){
+				var no1 = a.last_message == null ? 0 : a.last_message.created_at;
+				var no2 = b.last_message == null ? 0 : b.last_message.created_at;				
+				var no3 = a.created_at;
+				var no4 = b.created_at;
+				if(no1 < no3) no1 = no3;
+				if(no2 < no4) no2 = no4;				
+				return no2-no1;
+			});
+		}else{
+			return false;
+		}
+		*/
+
+		console.log("=============채널 대화 목록 만들기1============="+data.length);
+
+		var idSet = new Set();
+		var positionSet = new Set();
+
+		for(var i=0; i<data.length; i++){
+			console.log("=============채널 대화 목록 만들기2============="+JSON.stringify(data[i]));
+			try{
+				var h = '';
+				var obj = data[i];
+				var channel_id = obj.channel_id;
+				var created_at = obj.created_at;
+				var updated_at = obj.updated_at;
+				var meta = obj.meta;
+
+				var meta_pairYn = meta.pairYn;
+				var meta_firstYn = meta.firstYn;
+				var meta_useYn = meta.useYn;
+				var meta_masterId = meta.master;
+				var meta_masterNm = meta.masterNm;
+
+				var channelName = obj.name;
+				var profile_url = obj.profile_url;
+				var read_receipt = obj.read_receipt;
+				var delivery_receipt = obj.delivery_receipt;
+				var members = obj.members;
+				var unread = obj.unread;
+				var last_message = obj.last_message;
+				var last_fileType = "";
+				var last_userNm = "";
+				var memberLen = members.length;
+
+				// 개인 seq
+				for(var a=0; a<memberLen; a++){
+					var userId =  members[a].user_id;
+					userId = userId.split("ume9_")[1];
+					idSet.add(userId);
+				}
+
+				// position Seq
+				var positionId = channel_id.split("_")[1];
+				if(positionId =="group"){
+					positionId = channel_id.split("_")[2];
+				}
+				positionSet.add(positionId);
+
+				// 1:1 채팅방인 경우 거절한 경우 useYn = "N" 이고 안보여준다.
+				var id = "";
+			    if(meta_pairYn =="Y"){
+			    	if(_userType !="HH" && meta_useYn =="N"){  // 일반 채팅방인 경우
+			    		// continue;
+			    	}
+				}
+
+			    console.log("======fn_channel_make_list====="+JSON.stringify(last_message)+"/"+JSON.stringify(obj));
+
+				// 채팅창 최신 메시지
+				var message_content = "";
+				var message_last_time = 0;
+
+				if(last_message){
+					var message_type = last_message.type;
+					if(message_type =="text"){
+						message_content = last_message.content;
+						message_last_time = last_message.created_at;
+					}else{
+						
+						var type = last_message.type;
+						if(type=="file"){
+							var file = last_message.file;
+							var file_nm = file.name;
+							var fileLen = file_nm.length;
+	                        var lastDot = file_nm.lastIndexOf('.');
+	                        var fileExt = file_nm.substring(lastDot,fileLen).toLowerCase();
+	                        if(fileExt ==".jpg" || fileExt ==".png" || fileExt ==".jpeg" || fileExt ==".gif"){
+	                        	message_content = "사진을 보냄";
+	                        }else{
+	                        	message_content = file_nm+" 파일을 보냄";
+	                        }
+							message_last_time = last_message.created_at;
+						}						
+					}					
+				}
+				
+				// console.log("=============channelName============"+channelName+"/"+message_last_time+"/"+created_at+"/"+(message_last_time-created_at));
+				if(message_last_time!=0 && message_last_time < created_at){
+					// message_last_time = created_at;
+				}	
+
+				var message_title = "";
+				var targetNm = "";
+				var targetId = "";
+				// 1:1 채팅인 경우
+				try{
+					if(meta_pairYn=="Y"){
+						targetNm = members[0].name;
+						targetId = members[0].user_id; 
+						
+						if(targetId == _chat_UserID){
+							targetNm = members[1].name;
+							targetId = members[1].user_id; 
+						}
+						
+						if(_userType =="HH"){
+							message_title = targetNm+"에게 메시지를 보냄";
+						}else{
+							message_title = targetNm+"에게 메시지를 받음";
+						}
+					}else{
+						message_title = "단체방 메시지";
+						targetNm = "";
+						targetId = "";
+					}
+				}catch(e){}
+
+				// 마지막 글쓴 사람이 없으면 메시지 보낸 내용으로 대처
+				if(last_message){
+					last_userNm = last_message.user.name;
+				}else{
+					last_userNm = message_title;
+				}
+				
+				var timeText = "";
+				/*
+					// 시간타임
+					var timeText = c21.time_diff(message_last_time, "minute");
+					if(timeText <  1){
+						timeText ="방금전";
+					}else if(timeText < 61){
+						timeText = timeText+"분전";
+					}else{
+						timeText =  "";
+					}
+				*/
+
+				// 읽기 처리
+				var read_class = "notice";
+				read_class = "";
+				/*
+				var readTime = obj.read_receipt[_chat_UserID];
+				if(message_last_time!=0){
+					if(Number(message_last_time) - Number(readTime) < 0){
+						read_class = "";
+					}
+				}
+				*/
+
+				// 내용 hyperlink 달기
+				message_content = c21.change_hyperlink(message_content);
+
+				try{
+					// 1:1 채널은 상대방 이름으로
+					var name = "";
+					var group = "";
+					if(meta_pairYn =="N"){
+						group = "group";
+					}else{
+						memberLen = "0";
+					}
+
+					if(timeText==""){
+	                   	timeText = c21.number_date(created_at, 'yyyy-MM-dd');
+	                }
+
+					var meta_image = "";
+					if(meta_pairYn =="Y" && meta_useYn =="N"){
+						h += '<li class="disabled">';
+					}else{
+						h += '<li class="">';
+					}
+
+					h += '<div class="d-flex">';
+	                h += '    <span class="profile" targetId="'+targetId+'"><img src="/static/images/icon-login.svg" alt=""></span>';
+
+	                if(meta_pairYn =="Y" && meta_useYn =="N"){
+	                	h += '    <a href="javascript:;">';
+					}else{
+						h += '    <a href="javascript:;"  onclick="fn_channel_enter(this, \''+channel_id+'\')" targetNm="'+targetNm+'" targetId="'+targetId+'">';
+					}
+
+	                h += '      <div class="cont">';
+	                
+	                if(meta_pairYn == "N"){
+	                	h += '        <span class="title">'+channelName+' <b>('+memberLen+'명)</b></span>';
+	 	                h += '        <span class="msg">'+message_content+'</span>';
+	                }else{
+	                	h += '        <span class="title">'+channelName+'</span>';
+	                	if(members.length>1){
+	                		h += '        <span class="name">'+targetNm+' </span>';   
+	                	}	                	   
+	                	if(last_message){
+	                		h += '        <span class="msg">'+message_content+'</span>';
+	                	}else{
+	                		h += '        <span class="msg">'+message_title+'</span>';
+	                	}	 	                
+	                }
+	                
+	                h += '        <span class="'+read_class+'"></span>';
+	                h += '      </div>';
+	                h += '    </a>';
+	                h += '  </div>';
+	                h += '  <div class="list-out">';
+
+	                if(meta_masterId ==_chat_UserID){
+	                	if( meta_useYn =="N"){
+	                		h += '<a href="javascript:;"  style="color:blue;font-size:13px" onclick="fn_channel_remove(\''+channel_id+'\', \''+meta_masterId+'\')">채팅방삭제</a>';
+	                	}	                	
+	                }else{
+	                	h += '<a href="javascript:;"  style="color:blue;font-size:13px" onclick="fn_channel_leave(\''+channel_id+'\')">나가기</a>';
+	                }
+
+	                h += '    <span>'+timeText+'</span>';
+	                h += '  </div>';
+	                h += '  <div class="refuse">';
+	                h += '    <p>거절된 대화입니다.</p>';
+	                h += '  </div>';
+	                h += '</li>';
+
+	                lastHtml1 += h;
+				}catch(e){
+					console.log("=============채널 대화 목록 만들기 오류1============="+e);
+				}
+			}catch(e){
+				console.log("=============채널 대화 목록 만들기 오류2============="+e);
+			}
+		}
+
+		// 사용자 이미지 불러오기
+		var imgList = [];
+		for (const value of idSet) {
+			var obj = {};
+			obj.memberId= value;
+			imgList.push(obj);
+		}
+		
+		$("#profile").find("ul").html(lastHtml1);
+		
+		var params = {};
+		params.method = "POST";
+		params.imgList = JSON.stringify(imgList);
+		var _callback = function(data){
+			if(data.length > 0){
+				for(var a=0; a<data.length; a++){
+					var o = data[a];
+					var key = o.memberId;
+					var value = o.url;
+					_stdImgMap.set("resume9_"+key, value);
+				}
+			}
+		}
+		var url = "/m/chat/chat-image";
+		chatObj.inner_chat(url, params, _callback);
+		
+		$("#chat_list").find(".profile").each(function(){			
+			var id = $(this).attr("targetId");
+			if(id){
+				if(id != _chat_UserID){
+					var url = _stdImgMap.get(id);				
+					if(url){
+						$(this).find("img").attr("src", url);
+					}
+				}				
+			}else{  // 전체이미지
+				$(this).find("img").attr("src", "/static/images/default_position.png");
+			}			
+		})			
+		$(".message-list").css("display", "");
+				
+		/*			
+		// 사용자 단체 불러오기
+		imgList = [];
+		for (const value of positionSet) {
+			var obj = {};
+			obj.positionId= value;
+			imgList.push(obj);
+		}
+
+		var url = "/m/chat/chat-image-position";
+		var params = {};
+		params.method = "POST";
+		params.imgList = JSON.stringify(imgList);
+		var _callback = function(data){
+			console.log(data);
+		}
+		chatObj.inner_chat(url, params, _callback);
+		*/		
+	}
+
+	// 채팅방 들어가기
+	var _enterIdx = "";
+	function fn_channel_enter(th, channelId){
+		$(th).closest("ul").find("li").removeClass("active");
+		$(th).closest("li").addClass("active");
+		_enterIdx = $(th).closest("ul").find("a").index(th);
+
+		_current_channel = "";
+		var success = false;
+		for(var i=0; i<_current_channel_list.length; i++){
+			var obj =  _current_channel_list[i];
+			if(obj.channel_id == channelId){
+				_current_channel = obj;
+				success = true;
+				break;
+			}
+		}
+		if(!success) return false;
+
+		var meta = _current_channel.meta;
+		if(_userType !="HH"){
+			var created_at = _current_channel.created_at;
+			var meta_pairYn = meta.pairYn;
+			var meta_firstYn = meta.firstYn;
+			var meta_useYn = meta.useYn;
+
+			if(meta_firstYn =="Y"){
+				var myModal = new bootstrap.Modal(document.getElementById('modal-chat-first'));
+			    myModal.show();
+				return false;
+			}
+		}
+
+		$(".chat_enter").css("display", "");
+		$("#chat_remove_btn").css("dislay", "none");
+
+	    var targetId = $(th).attr("targetId");
+	    var targetNm = $(th).attr("targetNm");
+	    var channelNm = _current_channel.name;	    
+	    $(".message-header").find(".name").html(channelNm);
+
+	 	// 채팅방 입장하기
+		try{
+			var params = {};
+			var url = "/group/channels/"+channelId+"/join";
+			params.method = "PUT";
+			params.member = _chat_UserID;
+			var _callback = function(data){
+				fn_channel_msg_list();
+				$(".message-content").addClass("active");
+			}
+			chatObj.api_chat(url, params, _callback);
+		}catch(e){}
+
+		// 헤드헌터인 경우만 채팅방 삭제권한
+	    // alert(meta.master+"/"+_chat_UserID);
+	    if( (_userType=="HH") && (meta.master == _chat_UserID)){
+	    	$("#chat_remove_btn").css("display", "");
+	    	$("#chat_remove_btn").attr("onclick", "fn_channel_remove(\'"+channelId+"\')");
+	    }else{
+	    	$("#chat_remove_btn").css("display", "none");
+	    }
+	    
+	    // 이미지 세팅
+	    var targetId = $(th).attr("targetId");
+	    if(targetId){
+	    	if(targetId != _chat_UserID){
+	    		var url = _stdImgMap.get(targetId);
+		    	if(url){
+		    		$(".message-header").find(".profile").html('<img src="'+url+'" alt="">');
+		    	}else{
+		    		$(".message-header").find(".profile").html('<img src="/static/images/icon-login.svg" alt="">');
+		    	}	
+	    	}	    	    	
+	    }else{
+	    	$(".message-header").find(".profile").html('<img src="/static/images/default_position.png" alt="">');
+	    }
+	    
+	}
+
+	// 채팅방 메시지 조회하기 (처음 채팅방 진입한 후)
+	function fn_channel_msg_list(){
+		var params = {};
+		var channel_id = _current_channel.channel_id;
+		var url = "/group/channels/"+channel_id+"/messages?limit=30";
+		params.method = "GET";
+		var _callback = function(data){
+			data = data.messages;
+			fn_channel_send_msg_make("ONE", data);
+			_current_msg_list = data;
+
+			// 채팅방 목록 조회가 끝난 다음에 채팅방 읽음 처리
+			fn_channel_read(channel_id, _chat_UserID);
+		}
+		chatObj.api_chat(url, params, _callback);
+	}
+
+	// 채팅방 읽음처리
+	function fn_channel_read(channelId, userId){
+		var params = {};
+		var url = "/group/channels/"+channelId+"/messages/read";
+		params.method = "PUT";
+		params.member = userId;
+		console.log("============채팅방 메타데이터 읽음처리============="+JSON.stringify(params));
+		var _callback = function(res){}
+		chatObj.api_chat(url, params, _callback);
+	}
+
+	// 채팅방 메시지 그리기
+	function fn_channel_send_msg_make(addType, list){
+		var h = "";
+		var memberCnt = _current_channel.members.length;
+		var delivery_receipt = _current_channel.delivery_receipt;
+		var read_receipt = _current_channel.read_receipt;
+		var meta_type = _current_channel.meta.type;
+		var members = _current_channel.members;
+
+		console.log("===============채팅방 메시지 전체================="+JSON.stringify(list));
+
+		var joined_at = 0;
+		for(var i=0; i<members.length; i++){
+			var mObj = members[i];
+			var id = mObj.user_id;
+			if(id == _chat_UserID){
+				joined_at = mObj.joined_at;
+			}
+		}
+		var read_receipt = _current_channel.read_receipt;
+
+		if(list.length>1){
+			list = list.reverse();
+		}
+
+		for(var i=0; i<list.length; i++){
+			var obj = list[i];
+			var user_id = obj.user.user_id;
+			var user_name = obj.user.name;
+			var user_img = "";
+			var meta = obj.meta;
+			var user_type = "";
+			var meta_image = _stdImgMap.get(user_id);
+
+			if(!meta){
+				meta = {
+						del_yn :  "N",
+						icon_url : "",
+						content : "",
+						bar_msg_yn : "N"
+				}
+			}
+
+			var fileType = obj.type;
+			var err_yn = "N";
+			var icon_url = "";
+			var content = "";
+			var created_at = obj.created_at;
+			var updated_at = obj.updated_at;
+			var insTime = c21.number_date(created_at, "a/p hh:mm");
+			var uptTime = c21.number_date(updated_at, "a/p hh:mm");
+			var message_id = obj.message_id;
+
+			// 읽기 카운트 세기
+			memberCnt = Number(memberCnt)-1;
+			$.each(read_receipt, function(key, value) {
+			    var readTime = value;
+			    if(readTime > updated_at ){
+			    	memberCnt = memberCnt-1;
+			    }
+			});
+			if(memberCnt<1) memberCnt="";
+
+			var del_yn = "N";
+			var bar_msg_yn = "N";
+			if(fileType =="text"){
+				del_yn =  meta.del_yn;
+				icon_url = meta.icon_url;
+				bar_msg_yn = meta.bar_msg_yn;
+			}
+
+			console.log("===========채팅방 메시지 만들기 =============="+meta_image+"/"+user_id+"/"+_chat_UserID+"/"+bar_msg_yn+"/"+user_type);
+
+			/* 이전 대화 안보이게 하기
+			if( created_at < joined_at){
+				continue;
+			}
+			*/
+
+			if(bar_msg_yn == "Y"){
+				content = obj.content;
+				h += '		<div class="date">';
+				h += '			<span style="width:300px">'+content+'</span>';
+				h += '		</div>';
+			}else{
+				if(user_id == _chat_UserID){ // 본인인 경우
+					if(del_yn =="Y"){  // 삭제한 메시지
+							h += '<div class="chatting_me">';
+							h += '	<div class="chatting_bubble_wrap">';
+							h += '		<div class="chatting_bubble del_message">';
+							h += '			삭제된 메시지입니다.';
+							h += '		</div>';
+							h += '	</div>';
+						h += '	</div>';
+					}else if(bar_msg_yn == "Y"){
+
+					}else{
+						if(fileType =="text"){
+							content = obj.content.trim();
+							content = c21.change_hyperlink(content);
+
+							h += '	<div class="item my careat_chat_div text" createAt="'+created_at+'" targetId="'+user_id+'">';
+				            h += '    <p>'+content+'</p>';
+				            h += '    <div class="time">'+insTime+'</div>';
+				            h += '  </div>';
+
+						}else{
+							var created_at = obj.created_at;
+							var nowDt = c21.number_date(created_at, 'yyyyMMdd');
+							var endDt =  c21.date_addDay(7, 'yyyy.MM.dd', nowDt);
+							var today = c21.date_today('yyyyMMdd');
+
+							var file_type = obj.file.type;
+							var file_nm = obj.file.name;
+							var file_url = obj.file.url;
+							var size = obj.file.size;
+
+							var mSize = parseInt((size/1024)*100)/100;
+							if(mSize > 1024){
+								mSize = parseInt((size/1024*1024)*100)/100;
+								mSize = mSize+"MB";
+							}else{
+								mSize = mSize+"KB";
+							}
+
+							var _fileLen = file_nm.length;
+	                        var _lastDot = file_nm.lastIndexOf('.');
+	                        var _fileExt = file_nm.substring(_lastDot,_fileLen).toLowerCase();
+
+							var fileClassType = "";
+							if(_fileExt ==".mp4" || _fileExt ==".mp3" || _fileExt ==".avi" || _fileExt ==".mpeg"){
+								fileClassType = "video";
+							}else if(_fileExt ==".pdf"||_fileExt ==".hwp" || _fileExt ==".xls" || _fileExt ==".xlsx" ||
+									_fileExt ==".doc" || _fileExt ==".docx" || _fileExt ==".txt" || _fileExt ==".ppt"|| _fileExt ==".pptx" || _fileExt ==".csv"){
+								fileClassType = "pdf";
+							}else if(_fileExt ==".jpg" || _fileExt ==".png" || _fileExt ==".jpeg" || _fileExt ==".gif"){
+								fileClassType = "jpg";
+							}else {
+								fileClassType = "zip";
+							}
+							
+							var filename = file_url.replace(/^.*[\\\/]/, '');
+							file_url = file_url.split(filename)[0]+file_nm;	    
+							
+							h += '<div class="item my careat_chat_div" createAt="'+created_at+'" targetId="'+user_id+'">';
+								if(_fileExt ==".jpg" || _fileExt ==".png" || _fileExt ==".jpeg" || _fileExt ==".gif"){
+									h += '	<div class="imgbox image" onclick="fn_fileDownload(\''+file_url+'\');">';
+									h += '		<img src="'+file_url+'" alt="이미지" style="width:100%">';
+									h += '	</div>';
+									h += '	<div class="time">'+insTime+'</div>';
+									h += '</div>';
+
+								}else{
+									h += '	<p>';
+									if(nowDt <= today){
+										if( _fileExt ==".txt"){
+											h += '	<strong class="tit"><a href="javascript:;" class="save" style="color:white" onclick="fn_fileDownload(\''+file_url+'\');">'+file_nm+'</a></strong><br/><br/>';
+										}else{
+											h += '	<strong class="tit"><a href="'+file_url+'" class="save" download="'+file_nm+'" style="color:white">'+file_nm+'</a></strong><br/><br/>';
+										}
+									}else{
+										h += '		<strong class="tit">'+file_nm+'</strong><br/>';
+									}
+									h += '		<span class="period">유효기한: '+endDt+'까지</span><br/>';
+									h += '		<span class="volume">'+mSize+'</span><br/>';
+									h += '	</p>';
+									h += '  <div class="time">'+insTime+'</div>';
+								}
+							h += '</div>';
+						}
+					}
+
+				}else{ // 상대방
+
+					if(del_yn =="Y"){  // 삭제한 메시지
+						h += '<div class="chatting_you">';
+							h += '	<div class="chatting_bubble_wrap">';
+							h += '		<div class="chatting_bubble del_message">';
+							h += '			삭제된 메시지입니다.';
+							h += '		</div>';
+							h += '	</div>';
+						h += '	</div>';
+
+					}else if(bar_msg_yn == "Y"){
+
+					}else{
+						if(fileType =="text"){
+							content = obj.content.trim();
+							content = c21.change_hyperlink(content);
+							h += '	<div class="item you careat_chat_div text" createAt="'+created_at+'" targetId="'+user_id+'">';
+							h += '		<div class="d-flex align-items-center m-b-10">';
+			                h += '  		<span class="profile">';
+			                if(meta_image){
+			                	h += '			<img src="'+meta_image+'" alt=""/>';
+			                }else{
+			                	h += '			<img src="/static/images/no-img.png" alt=""/>';
+			                }
+			                h += '			</span>';
+			                h += '  		<span class="name m-l-10">'+user_name+'</span>';
+			                h += '		</div>';
+				            h += '    <p>'+content+'</p>';
+				            h += '    <div class="time">'+insTime+'</div>';
+				            h += '  </div>';
+				           
+						}else{
+							var created_at = obj.created_at;
+							var nowDt = c21.number_date(created_at, 'yyyyMMdd');
+							var endDt =  c21.date_addDay(7, 'yyyy.MM.dd', nowDt);
+							var today = c21.date_today('yyyyMMdd');
+
+							var file_type = obj.file.type;
+							var file_nm = obj.file.name;
+							var file_url = obj.file.url;
+							var size = obj.file.size;
+
+							var mSize = parseInt((size/1024)*100)/100;
+							if(mSize > 1024){
+								mSize = parseInt((size/1024*1024)*100)/100;
+								mSize = mSize+"MB";
+							}else{
+								mSize = mSize+"KB";
+							}
+
+							var _fileLen = file_nm.length;
+	                        var _lastDot = file_nm.lastIndexOf('.');
+	                        var _fileExt = file_nm.substring(_lastDot,_fileLen).toLowerCase();
+
+							var fileClassType = "";
+							if(_fileExt ==".mp4" || _fileExt ==".mp3" || _fileExt ==".avi" || _fileExt ==".mpeg"){
+								fileClassType = "video";
+							}else if(_fileExt ==".pdf"||_fileExt ==".hwp" || _fileExt ==".xls" || _fileExt ==".xlsx" ||
+									_fileExt ==".doc" || _fileExt ==".docx" || _fileExt ==".txt" || _fileExt ==".ppt"|| _fileExt ==".pptx" || _fileExt ==".csv"){
+								fileClassType = "pdf";
+							}else if(_fileExt ==".jpg" || _fileExt ==".png" || _fileExt ==".jpeg" || _fileExt ==".gif"){
+								fileClassType = "jpg";
+							}else {
+								fileClassType = "zip";
+							}
+							
+							console.log("===============file_url2============"+file_url);
+
+							h += '<div class="item careat_chat_div" createAt="'+created_at+'" targetId="'+user_id+'">';
+								if(_fileExt ==".jpg" || _fileExt ==".png" || _fileExt ==".jpeg" || _fileExt ==".gif"){
+									h += '	<div class="imgbox image" onclick="fn_fileDownload(\''+file_url+'\');">';
+									h += '		<img src="'+file_url+'" alt="이미지" style="width:100%">';
+									h += '	</div>';
+									h += '	<div class="time">'+insTime+'</div>';
+									h += '</div>';
+
+								}else{
+									h += '	<p style="color:black; font-size:16px">';
+									if(nowDt <= today){
+										if( _fileExt ==".txt"){
+											h += '	<strong class="tit"><a href="javascript:;" class="save"  onclick="fn_fileDownload(\''+file_url+'\');">'+file_nm+'</a></strong><br/><br/>';
+										}else{
+											h += '	<strong class="tit"><a href="'+file_url+'" class="save" download="'+file_nm+'" style="color:#202020">'+file_nm+'</a></strong><br/><br/>';
+										}
+									}else{
+										h += '		<strong class="tit">'+file_nm+'</strong><br/>';
+									}
+									h += '		<span class="period">유효기한: '+endDt+'까지</span><br/>';
+									h += '		<span class="volume">'+mSize+'</span><br/>';
+									h += '	</p>';
+									h += '  <div class="time">'+insTime+'</div>';
+								}
+							h += '</div>';
+
+						}
+					}
+				}
+			}
+		}
+
+		if(addType =="ADD"){
+			$("#channel_message_div").append(h);
+		}else{
+			// 채팅방 입장보다 늦은 내용은 안 보여줌
+			$("#channel_message_div").html(h);
+		}
+
+		// 채팅창 맨 밑으로 이동
+		$("#channel_message_div").scrollTop($("#channel_message_div")[0].scrollHeight);
+
+		// 채팅목록 재조회 (모바일은 주석처리)
+		fn_channel_list_user(_chat_UserID);
+
+		// 선택 목록 active
+		$(".message-list").find("li").eq(_enterIdx).addClass("active");
+	}
+
+	// 채팅방 메시지 보내기
+	function fn_channel_send_msg(){
+		var content = $("#channel_text_input").val();
+		$("#channel_text_btn").prop("disabled", true);
+
+		var params = {};
+		var a = content.trim().replace(/ /gi, "");
+		if(a==""){
+			$("#channel_text_btn").prop("disabled", false);
+			return false;
+		}else{
+			// 채팅 메시지 push 보내기
+			fn_send_push(content);
+			params.content = content.replace(/\n/gi, "<br/>");
+		}
+
+		var channel_id = _current_channel.channel_id;
+		var url = "/group/channels/"+channel_id+"/messages";
+		params.method = "POST";
+		params.user_id = _chat_UserID;
+		params.meta = {
+			"del_yn" : "N",
+			"bar_msg_yn" : "N"
+		};
+		params.type = "text";
+		params.file = "";
+
+		console.log("===============채팅방 메시지 전송1 =================="+JSON.stringify(params));
+
+		var _callback = function(res){
+			console.log("===============채팅방 메시지 전송2 =================="+res.channel_id+"/"+JSON.stringify(res));
+
+			if(!res.channel_id){
+				// location.reload();
+				return false;
+			}
+			$("#channel_text_input").val("");
+			$("#channel_text_btn").prop("disabled", false);
+		}
+		chatObj.api_chat(url, params, _callback);
+	}
+
+	// 채팅방 내용 실시간 받기
+	function fn_channel_send_receive(messageObj, channelObj){
+		var list = [];
+		list.push(messageObj);
+		var channelId = channelObj.channel_id;
+		var cId = _current_channel.channel_id;
+		if(channelId == cId){
+			_current_msg_list.push(messageObj);
+			fn_channel_send_msg_make("ADD", list);
+		}
+	}
+
+	// 채팅방 파일 보내기
+	function fn_channel_send_file(th){
+		var channel_id = _current_channel.channel_id;
+		var url = "/group/channels/"+channel_id+"/messages";
+		var formData = new FormData();
+		formData.append("user_id", _chat_UserID);
+		formData.append("type", "file");
+		formData.append("file", $('#channel_file_input')[0].files[0]);
+		
+	 	var fileNm = $('#channel_file_input')[0].files[0].name;
+		fn_send_push(fileNm+" 파일 전송함");
+
+		var _callback = function(res){
+			console.log("===============채팅방 파일 메시지 보내기 ===============");
+		}
+		chatObj.api_chat_file(url, formData, _callback );
+		
+		/*
+		var fileInput = document.getElementsByClassName("ex_file");
+		for( var i=0; i<fileInput.length; i++ ){
+			if( fileInput[i].files.length > 0 ){
+				for( var j = 0; j < fileInput[i].files.length; j++ ){
+					console.log(fileInput[i].files[j].name); // 파일명 출력
+				}
+			}
+		}
+		*/
+	}
+
+	// 채팅방 나가기// 채널 채널 퇴장하기
+	function fn_channel_leave(channel_id){
+		if(!confirm("채팅방을 나가시겠습니까?")){
+			return false;
+		}
+
+		// 채팅방 입장, 퇴장 메시지 보내기
+		var params = {};
+		url = "/group/channels/"+channel_id+"/messages";
+		params.method = "POST";
+		params.type = "text";
+		params.file = "";
+		params.user_id = _chat_UserID;
+		params.content = _chat_UserNm+"님이 나가셨습니다.";
+		params.meta = {
+			"del_yn" : "N",
+			"bar_msg_yn" : "Y"
+		};
+		var _callback = function(res){
+			console.log("=============채팅방 퇴장1 메시지보내기=======");
+		}
+		chatObj.api_chat(url, params, _callback);
+
+		// 채팅방에서 나가기
+		params = {};
+		var url = "/group/channels/"+channel_id+"/leave";
+		params.method = "PUT";
+		params.member = _chat_UserID;
+
+		var _callback = function(res){
+			console.log("===============채팅방 퇴장1 ==================");
+			console.log(res);
+
+			$(".chat_enter").css("display", "none");
+			// fn_channel_list_user(_chat_UserID); 		// 채팅방 목록 재조회
+			history.go(0);
+		}
+		chatObj.api_chat(url, params, _callback);
+	}
+
+	// 채널 삭제하기
+	function fn_channel_remove(channel_id, mId){
+		console.log("===============채팅방 삭제하기 =================="+JSON.stringify(_current_channel));
+		var params = {};
+		var url = "/group/channels/"+channel_id;
+		params.method = "DELETE";
+		params.member = _chat_UserID;
+
+		if(!confirm("채팅방을 삭제하시겠습니까?")){
+			return false;
+		}
+		$(".message-content").removeClass("active");
+		
+		var delCheck = false;
+		try{
+			var meta = _current_channel.meta;
+			var masterId = meta.master;
+			if(masterId == _chat_UserID){
+				delCheck = true;
+			}					
+		}catch(e){}
+		
+		if(mId ==_chat_UserID){
+			delCheck = true;
+		}	
+		
+		if(!delCheck){
+			alert("채팅방 삭제 권한이 없습니다.");
+			return false;
+		}
+				
+		var _callback = function(res){			
+			$(".chat_enter").css("display", "none");
+			fn_channel_list_user(_chat_UserID); 		// 채팅방 목록 재조회	
+			$("#channel_message_div").html("");
+		}
+		chatObj.api_chat(url, params, _callback);
+	}
+	</script>
+</head>
+<body class="body-talk">
+    <div id="container-block">
+      <div class="talk-inbox">
+        <div class="message-wrap">
+          <div class="">
+            <ul class="nav nav-tabs border-bottom-0" id="myTab" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">알림</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false" tabindex="-1">채팅</button>
+              </li>
+            </ul>
+            <div class="tab-content" id="myTabContent">
+              <div class="tab-pane fade" id="home" role="tabpanel" aria-labelledby="home-tab">
+                <div class="notice-list">
+                  <div class="message-search">
+                    <div class="input-group">
+                      <input type="text" class="form-control bg-light" name="searchValue" placeholder="검색어를 입력하세요"/>
+                      <div class="input-group-append">
+                        <button class="btn btn-light" type="submit">
+                          <i class="icon-input-search-dark"><span class="sr-only">검색</span></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <input type="hidden" name="memberId" th:value="${params.memberId}">
+                  <div class="list" id="alarmList">
+                      <ul>
+                          <th:block  th:each="list : ${alarmList}">
+                            <li th:classappend="${list.receiveYn eq 'N' ? 'active' : 'disabled'}" th:value="${list.pushHistSeq}" th:data-type="${list.dispType}" th:data-url="${list.url}" name="alarm">
+                                <div class="d-flex">
+                                    <span class="profile"><img src="/static/images/icon-chat-notice-active.svg" alt="김신"/></span>
+                                    <a href="javascript:;">
+                                        <div class="cont">
+                                            <span class="title" th:text="${list.dispTypeNm}">dispTypeNm - 알림종류</span>
+                                            <span class="name" th:text="${list.title}">title - 알림제목</span>
+                                            <span class="msg" th:text="${list.content}">content - 알림내용</span>
+                                            <span th:classappend="${list.receiveYn eq 'N' ? 'notice' : ''}" name="receiveYn"></span>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="list-out">
+                                    <span th:text="${list.sendTime}">sendTime - 보낸시간</span>
+                                </div>
+                            </li>
+                          </th:block>
+                      </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+                <div class="message-list">
+                  <div class="message-search">
+                    <div class="input-group">
+                      <input type="text" class="form-control bg-light" id="channel_search_text" placeholder="검색어를 입력하세요" onkeyup="fn_channel_search_text()"/>
+                      <div class="input-group-append">
+                        <button class="btn btn-light" type="submit">
+                          <i class="icon-input-search-dark"><span class="sr-only">검색</span></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="list"  id="chat_list">
+                    <ul></ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="message-content">
+            <div class="message-header">
+	              <div class="opponent chat_enter" style="display:none">
+	                <a href="javascript:void(0)" class="back"><i class="icon-b-prev"></i></a>
+	                <span class="profile">
+	                	<img src="/static/images/icon-login.svg" alt="">
+	                </span>
+	                <span class="name"></span>
+	              </div>
+	              <button type="button" class="btn btn-sm btn-outline-danger chat_enter" style="display:none" id="chat_remove_btn">채팅방삭제</button>
+            </div>
+            <div class="message-body" id="channel_message_div"></div> <!-- 메시지 내용 -->
+            <div class="message-footer chat_enter" style="display:none">
+              <div class="input-group">
+                <input type="file" class="clip-file"  id="channel_file_input" onchange="fn_channel_send_file(this);"/>
+                <label for="channel_file_input" class="clip-file-label"><i class="icon-clip"></i></label>
+                <input type="text" class="form-control form-md bg-light" id="channel_text_input" placeholder="메시지를 입력하세요." onkeyup="javascript:if(event.keyCode == 13){ fn_channel_send_msg(); return; } "/>
+                <div class="input-group-append">
+                  <button type="submit" class="btn btn-dark" id="channel_text_btn" onclick="fn_channel_send_msg();" onkeyup="javascript:if(event.keyCode == 13){	fn_channel_send_msg(); return; }">전송</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 채팅 수락 모달창 -->
+    <div class="modal fade" id="modal-chat-first" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-comment modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header justify-content-end">
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="text-title">채팅요청이 왔습니다.<br/>수락하시겠습니까?</div>
+            <div class="modal-footer">
+	            <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal" onclick="fn_chat_first(2)">거절</button>
+	            <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="fn_chat_first(1)">수락</button>
+	          </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      // var myModal = new bootstrap.Modal(document.getElementById('modal-chat-first'));
+      // myModal.show();
+      function fn_chat_first(type){
+    	  	var channel = _current_channel;
+			var meta = channel.meta;
+			var channel_id = channel.channel_id;
+			var url = "/group/channels/"+channel_id+"/meta";
+			var params = {}
+			params.method = "PUT";
+			if(type==1){
+				meta.firstYn = "N";
+				meta.useYn = "Y";
+    		}else{
+    			meta.firstYn = "N";
+				meta.useYn = "N";
+    		}
+			params.meta = meta;
+
+			console.log("============채팅방 메타데이터 수정하기============="+JSON.stringify(params));
+			var _callback = function(res){
+				fn_channel_list_user(_chat_UserID);
+			}
+			chatObj.api_chat(url, params, _callback);
+      }
+
+      function fn_fileDownload(filePath) {
+    	//filePath = "https://file-guest.gitplelive.io/guest/development/gitple/resume9/group/channel_484_4328_4416/1673072029268/%EC%83%98%ED%94%8C.hwp";
+      	//filePath ='https://file-guest.gitplelive.io/guest/development/gitple/resume9/group/channel_484_4328_4416/1673072040237/buddy.jpg';
+      	//filePath ="https://file-guest.gitplelive.io/guest/development/gitple/resume9/group/channel_484_4328_4416/1673078656846/survey_sample.xlsx";
+      	
+      	var file_nm = filePath.replace(/^.*[\\\/]/, '');
+        if(c21.is_mobile()){
+        	$("#down_image").attr("href", filePath);
+        	$("#down_image").attr("download", file_nm);
+        	$("#down_image").click();
+		}else{
+			var url = "/hh/chat/filedown?filePath="+filePath+"&fileName="+file_nm;
+			url = encodeURI(url)
+	        var iFrame = $('#hiddenFrame');
+	        if (iFrame.length == 0) {
+	             $('<iframe name="hiddenFrame" id="hiddenFrame" style="visibility: hidden;position: absolute; left: 0; top: 0; height:0; width:0; border: none;"></iframe>').appendTo('body');
+	             iFrame = $('#hiddenFrame');
+	        }
+	        var iFrameParent = iFrame.parent();
+	        iFrame.remove();
+	        iFrame.attr('src', url);
+	        iFrameParent.append(iFrame);
+		}
+      }
+    </script>
+	<a href="" id="down_image" download="" style="display:none">다운로드</a>
+    <script>
+    // 알림기능
+    $(document).on("click", "li[name=alarm]", function() { // 알림 클릭 시 읽음처리
+    	let url = $(this).data("url");
+        let type = $(this).data("type");
+        if(type != "COMPANY_QUESTION") { // 이 회사가 궁금해요 - 상세이동X
+            if (url != "" && url != null) { // url 존재 시 해당 링크로 이동
+                window.opener.location.href = url;
+            }
+        }
+    	let param = {
+    		pushHistSeq: $(this).val()
+    	}
+    	$.ajax({
+    		url: "/m/chat/update-alarm-receive",
+    		type: "post",
+    		dataType: 'json',
+    		contentType: "application/json",
+    		data: JSON.stringify(param),
+    		success: function(d) {
+    			$.ajax({
+    				url: "/m/chat/alarm-list",
+    				type: "GET",
+    				data: {memberId : $("input[name=memberId]").val()},
+    				success: function (html) {
+    					$("#alarmList").empty();
+    					$("#alarmList").append(html);
+    				},
+    				error: function () {
+    					alert("시스템 오류가 발생했습니다. 관리자에게 문의해주세요.");
+    				}
+    			});
+    		},
+    		error: function() {
+    			alert("시스템 오류가 발생했습니다. 관리자에게 문의해주세요.");
+    		}
+    	});
+    })
+
+    $(document).on("keyup", "input[name=searchValue]", function() { // 알람 keyup 검색
+    	$.ajax({
+    		url: "/m/chat/alarm-list",
+    		type: "GET",
+    		data: {memberId : $("input[name=memberId]").val() , searchValue : $(this).val()},
+    		success: function (html) {
+    			$("#alarmList").empty();
+    			$("#alarmList").append(html);
+    		},
+    		error: function () {
+    			alert("시스템 오류가 발생했습니다. 관리자에게 문의해주세요.");
+    		}
+    	});
+    })
+
+    // 채팅 메시지 보내기
+    function fn_send_push(message){
+    	var channel = _current_channel;
+    	var members = channel.members;    	
+    	var memberId = [];
+    	for(var i=0; i<members.length; i++){
+    		var obj = members[i];
+    		var userId = obj.user_id;
+    		var id = userId.split("_")[1];
+    		memberId.push(id);
+    	}
+    	var channelNm = channel.name;
+    	var channelId = channel.channel_id;
+    	var channelIdArr = channelId.split("_");
+    	var positionId = channelIdArr[1];
+    	if(positionId == "group"){
+    		positionId = channelIdArr[2];
+    	}
+    	    	
+		var params = {}
+		params.userId = _chat_UserID.split("_")[1];
+		params.targetId =  JSON.stringify(memberId);
+		params.title = channelNm;   	// 채팅방 제목
+ 		params.message = message;   	// 대화내용
+		params.positionId = positionId;	// 포지션 id
+		
+		params.method = "POST";
+		var _callback = function(data){
+			console.log("성공");
+		}
+		var url = "/m/chat/chat-push";
+		chatObj.inner_chat(url, params, _callback);
+    }
+    </script>
+
+  </body>
+
+</html>

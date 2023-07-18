@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.api.ApiNoticeMapper">
+
+    <!--공지사항 리스트 조회-->
+    <select id="selectNoticeList" resultType="ApiNoticeDTO" parameterType="ApiNoticeDTO">
+        /* com.fw.core.mapper.db1.api.ApiNoticeMapper.selectNoticeList, selectNoticeList, 22.12.01, YJW, ApiNoticeMapper.xml */
+        SELECT notice_seq
+             , notice_type_cd
+             , fn_get_common_cd(notice_type_cd, 'BOARD_TYPE', 1) AS noticeType
+             , title
+             , content
+             , file_seq
+             , hit
+             , del_flag
+             , create_seq
+             , date_format(create_dt, '%Y.%m.%d') as create_dt
+             , update_seq
+             , date_format(update_dt, '%Y.%m.%d') as update_dt
+             , display_order
+        FROM tb_notice
+        WHERE del_flag = 'N'
+          AND display_order IS NOT NULL
+        <if test='noticeSeq != null and noticeSeq != ""'>
+          AND notice_seq = #{noticeSeq}
+        </if>
+         <if test='endRow > 0'>
+             LIMIT #{startRow}, #{endRow}
+         </if>
+    </select>
+</mapper>

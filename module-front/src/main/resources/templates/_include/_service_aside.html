@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:fragment="common">
+<aside>
+  <ul>
+    <li>
+      <a href="javascript:void(0)"><span class="poppins">고객센터</span></a>
+      <ul>
+        <li th:classappend="${activeMenuURI eq '/fo/service/faq-individual'} ? 'active' : ''">
+          <a href="/fo/service/faq-individual">자주 묻는 질문</a>
+        </li>
+        <li th:classappend="${activeMenuURI eq '/fo/service/inquiry'} ? 'active' : ''">
+          <a href="/fo/service/inquiry">1:1 문의하기</a>
+        </li>
+        <li th:classappend="${activeMenuURI eq '/fo/service/notice'} ? 'active' : ''">
+          <a href="/fo/service/notice">공지사항/이벤트</a>
+        </li>
+      </ul>
+    </li>
+    <li th:classappend="${activeMenuURI eq '/fo/service/withdrawal'} ? 'active' : ''">
+      <a href="/fo/service/withdrawal"><span class="poppins">회원탈퇴</span></a>
+    </li>
+  </ul>
+</aside>
+</div>
+</html>

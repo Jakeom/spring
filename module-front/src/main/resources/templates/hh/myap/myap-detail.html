@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layouts/hh/mainLayout}">
+<body>
+<div id="container-block" layout:fragment="contents" th:remove="tag">
+      <div class="container">
+        <div class="sub-content">
+          <div>
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">고객사</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false" tabindex="-1">포지션 수행이력</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact" type="button" role="tab" aria-controls="contact" aria-selected="false">메모</button>
+              </li>
+            </ul>
+            <div class="tab-content" id="myTabContent">
+              <div class="tab-pane fade active show" id="home" role="tabpanel" aria-labelledby="home-tab">
+                <div class="content">
+                  <h4 class="table-subtitle mb-3 m-t-25">기업정보</h4>
+                  <div class="desc">
+                    <table class="table border-top-1">
+                      <caption>
+                        기업정보
+                      </caption>
+                      <colgroup>
+                        <col width="15%" />
+                        <col width="35%" />
+                        <col width="15%" />
+                        <col width="35%" />
+                      </colgroup>
+                      <tbody>
+                        <tr>
+                          <th class="">기업명</th>
+                          <td class="">
+                            <p>(주)삼성전자</p>
+                          </td>
+                          <th class="">사업자등록번호</th>
+                          <td class="">
+                            <p>81886******</p>
+                          </td>
+                        </tr>
+                        <tr>
+                          <th class="">대표자</th>
+                          <td class="">
+                            <p>이재용</p>
+                          </td>
+                          <th class="">설립일</th>
+                          <td class="">
+                            <p>20170410</p>
+                          </td>
+                        </tr>
+                        <tr>
+                          <th class="">전화번호</th>
+                          <td class="">
+                            <p>031-1234-5678</p>
+                          </td>
+                          <th class="">도로명주소</th>
+                          <td class="">
+                            <p>서울 구로구 디지털로 272, 1007호</p>
+                          </td>
+                        </tr>
+                        <tr>
+                          <th class="">기업규모</th>
+                          <td class="">
+                            <p>대기업</p>
+                          </td>
+                          <th class="">업종명 10차</th>
+                          <td class="">
+                            <p>시스템 소프트웨어 개발 및 공급업</p>
+                          </td>
+                        </tr>
+                        <tr>
+                          <th class="">상장</th>
+                          <td class="">
+                            <p>대상</p>
+                          </td>
+                          <th class="">휴 · 폐업여부</th>
+                          <td class="">
+                            <p>-</p>
+                          </td>
+                        </tr>
+                        <tr>
+                          <th class="">기업상태</th>
+                          <td class="" colspan="3">
+                            <p>정상</p>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <div class="d-flex align-items-center justify-content-end m-t-20">
+                  <a href="#" class="btn btn-primary">수정</a>
+                </div>
+                <div class="content m-t-30">
+                  <div class="d-flex align-items-center justify-content-between">
+                    <h4 class="table-subtitle mb-3 m-t-25">인사담당자 정보</h4>
+                    <button type="button" class="btn btn-dark">추가</button>
+                  </div>
+                  <div class="desc">
+                    <table class="table border-top-1">
+                      <!-- <p class="m-t-25 m-b-25 d-flex align-items-center justify-content-center">인사 담당자 정보가 없습니다.</p> -->
+                      <caption>
+                        기업정보
+                      </caption>
+                      <colgroup>
+                        <col width="10%" />
+                        <col width="23%" />
+                        <col width="10%" />
+                        <col width="23%" />
+                        <col width="10%" />
+                        <col width="23%" />
+                      </colgroup>
+                      <tbody>
+                        <tr>
+                          <th class="">이름</th>
+                          <td class="">
+                            <input type="text" class="form-control form-md" value="" placeholder="ex) 홍길동" />
+                          </td>
+                          <th class="">이메일주소</th>
+                          <td class="">
+                            <input type="text" class="form-control form-md" value="" placeholder="example@test.com" />
+                          </td>
+                          <th class="">유선연락처</th>
+                          <td class="">
+                            <input type="text" class="form-control form-md" value="" placeholder="(-)를 제외하고 입력" />
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+              <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+                <table class="table m-t-15 border-top-1">
+                  <colgroup>
+                    <col width="15%" />
+                    <col width="65%" />
+                    <col width="10%" />
+                    <col width="10%" />
+                  </colgroup>
+                  <thead>
+                    <tr>
+                      <th class="text-center">등록일</th>
+                      <th class="">포지션 명</th>
+                      <th class="text-center">마감/종료일</th>
+                      <th class="text-center">포지션 상태</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td class="text-center">
+                        <p>2022-09-21</p>
+                      </td>
+                      <td class="">
+                        <a href="../position/position-view.html" class="text-primary text-underline">테스트 포지션 등록</a>
+                      </td>
+                      <td class="text-center">
+                        <p>2022-09-30</p>
+                      </td>
+                      <td class="text-center">
+                        <p>진행중</p>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
+                <div class="memo-content">
+                  <p>
+                    고객사에 대한 메모를 작성해 보세요.<br />
+                    메모는 <strong>나만 볼 수 있으며</strong>, 고객사별 특징을 기록해 놓을 수 있습니다.
+                  </p>
+                  <div class="memo-form">
+                    <input type="text" class="form-control form-lg" placeholder="메모를 입력하세요." />
+                    <button type="button" class="btn btn-primary">메모입력</button>
+                  </div>
+                </div>
+                <table class="table m-t-15 border-top-1">
+                  <colgroup>
+                    <col width="20%" />
+                    <col width="80%" />
+                  </colgroup>
+                  <thead>
+                    <tr>
+                      <th class="text-center">등록일시</th>
+                      <th class="">내용</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td class="text-center" colspan="2">
+                        <p class="m-t-20 m-b-20 text-centent">작성한 메모가 없습니다.</p>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="d-flex justify-content-center mt-5">
+            <div class="pagination">
+              <a href=""><i class="icon-pager-prev"></i></a>
+              <a href="" class="active">1</a>
+              <a href="">2</a>
+              <a href="">3</a>
+              <a href="">4</a>
+              <a href="">5</a>
+              <a href="">6</a>
+              <a href="">7</a>
+              <a href="">8</a>
+              <a href="">9</a>
+              <a href="">10</a>
+              <a href=""><i class="icon-pager-next"></i></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

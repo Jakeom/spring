@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.hh.HhInquiryMapper">
+
+    <!-- Inquiry 등록-->
+    <insert id="insertInquiry" parameterType="HhInquiryDTO">
+        /* com.fw.core.mapper.db1.hh.HhInquiryMapper.insertInquiry, Inquiry등록, 22-11-23, Ghazal , HhInquiryMapper.xml */
+        INSERT INTO qna (
+               createdAt
+             , content
+             , kindCd
+             , subject
+             , delFlag
+             , member_id
+             , attach_file_id
+             , answerYn
+        ) VALUES (
+               NOW()
+             , #{content}
+             , #{kindCd}
+             , #{subject}
+             , 'N'
+             , #{frontSession.id}
+             , #{fileSeq}
+             , 'N'
+        )
+
+        <selectKey order="AFTER" keyProperty="id" resultType="String">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <!--Inquiry 상세보기-->
+    <select id="selectInquiryDetail" resultType="HhInquiryDTO">
+        /*com.fw.core.mapper.db1.hh.HhInquiryMapper.selectInquiryDetail, Inquiry 상세보기 , 2022.11 , skayhlj@gmail.com, HhInquiryMapper.xml*/
+        SELECT
+            id
+             , date_format(createdAt, '%Y-%m-%d ') as createdAt
+             , date_format(updatedAt, '%Y-%m-%d ') as updatedAt
+             , answer
+             , answeredAt
+             , answerYn
+             , content
+             , kindCd
+             , subject
+             , attach_file_id AS file_seq
+             , member_id
+             , backoffice_admin_id
+        FROM qna
+        where delFlag = 'N' AND id = #{id}
+    </select>
+
+    <!--  카운트 취득-->
+    <select id="selectInquiryListCntForPaging" resultType="int">
+        /*com.fw.core.mapper.db1.hh.HhInquiryMapper.selectInquiryListCntForPaging,   조회 카운트 취득 , 2022-11-24 , Ghazal HhInquiryMapper.xml*/
+        SELECT COUNT(*) AS cnt
+        FROM qna
+        WHERE member_id = #{frontSession.id}
+    </select>
+
+    <!-- 조회 페이징-->
+    <select id="selectInquiryListPaging" resultType="HhInquiryDTO">
+        /*com.fw.core.mapper.db1.hh.HhInquiryMapper.selectInquiryListPaging,  조회 페이징 , 2022-11-24 , Ghazal HhInquiryMapper.xml*/
+        SELECT @rownum:=@rownum+1 AS rownum
+        , A.*
+        FROM (
+        SELECT
+            id
+           , createdAt
+           , updatedAt
+           , answer
+           , answeredAt
+           , content
+           , kindCd
+           , subject
+           , attach_file_id AS file_seq
+           , member_id
+           , backoffice_admin_id
+        FROM qna
+        where delFlag = 'N'
+        AND member_id = #{frontSession.id}
+        <if test="sortColumn != '' and sortColumn != null">
+            <if test="sortColumn eq 'endDate'">
+                ORDER BY ${sortColumn} DESC LIMIT 18446744073709551615
+            </if>
+            <if test="sortColumn eq 'createdAt'">
+                ORDER BY ${sortColumn} LIMIT 18446744073709551615
+            </if>
+        </if>
+
+        ) AS A
+        , (SELECT @rownum:=0) TMP order by rownum DESC
+        <include refid="common.paging" />
+    </select>
+</mapper>

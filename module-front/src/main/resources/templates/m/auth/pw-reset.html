@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layouts/mLayout">
+<body>
+    <div layout:fragment="contents" th:remove="tag">
+        <form name="certForm" th:action="${certServer}" method="POST" target="certForm">
+            <input type="hidden" name="tr_cert">
+            <input type="hidden" name="tr_url" th:value="${certCallbackUrl} + '?mode=findId'">
+            <input type="hidden" name="tr_add" value="N">
+        </form>
+        <form name="resultForm">
+            <input type="hidden" name="di" id="di"/>
+            <input type="hidden" name="name" id="name"/>
+            <input type="hidden" name="phone" id="phone"/>
+        </form>
+        <div id="container-block">
+            <div class="container">
+                <!-- step1 -->
+                <div class="sub-content" id="findPassword">
+                    <h3 class="center-title">비밀번호 찾기</h3>
+                    <div class="find-txt-box">
+                        <p class="text-center">비밀번호를 모르시나요?</p>
+                        <p class="text-center">본인 인증 후 비밀번호를 다시 설정할 수 있습니다.</p>
+                    </div>
+                    <div class="find-btn-group">
+                        <button type="button" class="btn btn-dark btn-lg" data-role="btnMemberCert">본인인증으로 찾기</button>
+                    </div>
+                    <p class="find-content">
+                        <span>아이디를 찾으시나요?</span>
+                        <a href="/m/auth/find-id">아이디 찾기</a>
+                    </p>
+                </div>
+                <!-- changePassword 회원 아이디 존재O -->
+                <div class="sub-content" id="changePassword" style="display: none">
+                    <h3 class="center-title">비밀번호 재설정</h3>
+                    <div class="find-pw-box">
+                        <input type="password" id="password" name="password" class="form-control form-lg" placeholder="새로운 비밀번호를 입력해주세요."/>
+                        <p class="form-text mt-2 text-danger" data-msg-target="password"></p>
+                        <input type="password" id="passwordChk" name="passwordChk" class="form-control form-lg m-t-10" placeholder="새로운 비밀번호를 한번 더 입력해주세요."/>
+                        <p class="form-text mt-2 text-danger" data-msg-target="passwordChk"></p>
+                    </div>
+                    <div class="find-btn-group">
+                        <button type="button" class="btn btn-dark btn-lg" data-role="changePw">비밀번호 변경</button>
+                    </div>
+                </div>
+                <!-- noLoginId 회원 아이디 존재X -->
+                <div class="sub-content" id="noLoginId" style="display: none">
+                    <h3 class="center-title">비밀번호 재설정</h3>
+                    <div class="find-txt-box">
+                        <p class="text-center">회원님의 아이디가 존재하지 않습니다.</p>
+                        <p class="text-center">회원가입하여 RESUME9을 시작하세요!</p>
+                    </div>
+                    <div class="find-btn-group">
+                        <button type="button" class="btn btn-dark btn-lg" data-role="signup">회원가입으로 이동</button>
+                    </div>
+                </div>
+                <!-- changePasswordSuccess 재설정완료 -->
+                <div class="sub-content" id="changePasswordSuccess" style="display: none">
+                    <h3 class="center-title">비밀번호 재설정</h3>
+                    <div class="find-txt-box">
+                        <p class="text-center"><span id="successMsg">absd@naver.com(홍길동)</span>님의</p>
+                        <p class="text-center">비밀번호가 성공적으로 변경되었습니다.</p>
+                    </div>
+                    <div class="find-btn-group">
+                        <button type="button" class="btn btn-dark btn-lg" data-role="login">로그인으로 이동</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

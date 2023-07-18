@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.bo.BoLogAdminMapper">
+
+    <!-- 관리자 로그 GROUP BY COUNT -->
+    <select id="selectAdminLog" parameterType="BoAdminLogDTO" resultType="BoAdminLogDTO">
+        SELECT url
+             , COUNT(*) as count
+        FROM tb_admin_log
+        GROUP BY url
+        ORDER BY count DESC
+    </select>
+
+    <!-- 관리자 아이디 조회 -->
+    <select id="selectAdminId" parameterType="BoAdminDTO" resultType="BoAdminDTO">
+        SELECT admin_id
+             , admin_nm
+        FROM tb_admin
+        WHERE admin_id LIKE CONCAT ('%', #{adminId}, '%')
+    </select>
+
+    <!-- 관리자 로그인 로그 조회 -->
+    <select id="selectAdminLoginLog" parameterType="BoAdminLoginLogDTO" resultType="BoAdminLoginLogDTO">
+        SELECT admin_id
+             , result_flag
+             , access_ip
+             , create_dt
+        FROM tb_admin_login_log
+        WHERE admin_id = #{adminId}
+        ORDER BY admin_login_log_seq DESC
+    </select>
+
+</mapper>

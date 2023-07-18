@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/default}">
+<body>
+	<div layout:fragment="contents" th:remove="tag">
+		<main id="content" role="main">
+			<h2 class="title">We펌 조회 및 관리</h2>
+			<div class="row p-3">
+				<div class="col-12">
+					<form id="searchWefirm" name="searchWefirm">
+						<div class="row mt-5">
+							<div class="col-4">
+								<div class="d-flex align-items-center">
+									<input type="text" id="wefirmStartDt" name="wefirmStartDt"
+													class="form-control form-datepicker m-1" placeholder="날짜 선택">
+									<div class="mr-2">~</div>
+									<input type="text" id="wefirmEndDt" name="wefirmEndDt"
+													class="form-control form-datepicker m-1" placeholder="날짜 선택">
+								</div>
+							</div>
+							<div class="col-2">
+								<div class="d-flex align-items-center">
+									<button type="button" class="btn btn-dark" data-role="all">전체</button>
+									<button type="button" class="btn btn-dark" data-role="today">오늘</button>
+									<button type="button" class="btn btn-dark" data-role="week">7일</button>
+									<button type="button" class="btn btn-dark" data-role="month">1개월</button>
+								</div>
+							</div>
+							<div class="col-6">
+								<div class="d-flex" style="float: right">
+									<select id="personalInfo" class="form-control w-auto"
+										data-role="select-dropdown" data-profile="minimal">
+										<option value="name">이름</option>
+										<option value="phone">휴대번호</option>
+										<option value="email">이메일주소</option>
+									</select>
+									<input type="text" class="form-control w-auto"
+									data-role="writer" />
+									<button type="button" class="btn btn-primary"
+										data-role="search">검색하기</button>
+								</div>
+							</div>
+							<div class="col-12 mt-3">
+								<select id="selectType" name="selectType" data-role="select"
+									class="form-control w-auto">
+									<option value="">전체</option>
+									<option value="0">정상</option>
+									<option value="1">폐쇄</option>
+								</select>
+							</div>
+						</div>
+					</form>
+					<!-- /Search -->
+					<div class="row mt-3">
+						<div class="col-12">
+							<table id="datatable" class="table">
+								<thead>
+									<tr>
+										<th>NO</th>
+										<th>개설 승인일</th>
+										<th>We펌 명</th>
+										<th>개설자</th>
+										<th>소속HH수</th>
+										<th>진행중 공고 수</th>
+										<th>상태</th>
+										<th>조회 및 관리</th>
+									</tr>
+								</thead>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</main>
+	</div>
+	<div layout:fragment="modal" th:remove="tag"></div>
+</body>
+</html>

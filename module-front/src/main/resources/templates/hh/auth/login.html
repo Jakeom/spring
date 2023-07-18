@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layouts/loginLayout">
+<body>
+    <div layout:fragment="contents" th:remove="tag">
+        <div id="container-block">
+            <div id="container">
+                <div class="container">
+                    <div class="content-bg">
+                        <h2 class="center-title">로그인</h2>
+                        <ul class="nav nav-tabs" id="myTab" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <a href="/fo/auth/login" class="nav-link">개인회원</a>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <a href="/hh/auth/login" class="nav-link active">헤드헌터회원</a>
+                            </li>
+                        </ul>
+                        <div class="tab-content" id="myTabContent">
+                            <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+                                <form action="" name="login">
+                                    <fieldset>
+                                        <input type="hidden" name="dType" value="HH" />
+                                        <legend>로그인</legend>
+                                        <div class="form-group">
+                                            <label for="loginId">아이디</label>
+                                            <input type="text" class="form-control form-control-xl bg-light" name="loginId" id="loginId" placeholder="resume9"/>
+                                        </div>
+                                        <div class="form-group m-t-25">
+                                            <label for="password">비밀번호</label>
+                                            <input type="password" class="form-control form-control-xl bg-light" name="password" id="password" placeholder="비밀번호 입력" autocomplete="off"/>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="row justify-content-between align-items-center">
+                                                <div class="col-auto">
+                                                    <div class="form-check">
+                                                        <input type="hidden" name="autoLogin" value="">
+                                                        <input class="form-check-input" type="checkbox" data-role="autoLoginCheck" value="Y" id="autoLogin" />
+                                                        <label class="form-check-label" for="autoLogin">로그인 상태 유지</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-auto hidden-flex-mobile">
+                                                    <a href="/fo/auth/find-id" class="pw-reset">아이디찾기</a>
+                                                    <a href="/fo/auth/pw-reset" class="pw-reset">비밀번호 재설정</a>
+                                                    <a href="/hh/auth/signup" class="pw-reset">회원가입</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="btn btn-xl btn-primary w-100 login-btn" data-role="login">로그인
+                                        </button>
+                                        <div class="col-auto hidden-flex-desktop justify-content-center m-t-30">
+                                            <a href="/fo/auth/find-id" class="pw-reset">아이디찾기</a>
+                                            <a href="/fo/auth/pw-reset" class="pw-reset">비밀번호 재설정</a>
+                                            <a href="/hh/auth/signup" class="pw-reset">회원가입</a>
+                                        </div>
+                                    </fieldset>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div layout:fragment="modal" th:remove="tag">
+        <!-- 서치펌 변경신청 모달 -->
+        <div class="modal fade" id="modal-change-sf" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-write modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel3">서치펌 변경신청</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form name="sfChangeForm">
+                            <table class="table">
+                                <colgroup>
+                                    <col style="width:25%"/>
+                                </colgroup>
+                                <tbody>
+                                <tr>
+                                    <th class="">회사명</th>
+                                    <td class="">
+                                        <input type="text" name="sfName" class="form-control form-md" value="" maxlength="20"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="">대표자명</th>
+                                    <td class="">
+                                        <input type="text" name="sfCeoName" class="form-control form-md" value="" maxlength="10"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="">사업자등록번호</th>
+                                    <td class="">
+                                        <input type="text" name="sfRegNumber" class="form-control form-md" value="" maxlength="10"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="">회사전화번호</th>
+                                    <td class="">
+                                        <input type="text" name="sfPhone" class="form-control form-md" value="" maxlength="11"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="">종사자명부</th>
+                                    <td class="">
+                                        <div class="form-upload mt-0">
+                                            <input type="file" class="" id="form-file" name="sfWorkerFile" />
+                                            <label for="form-file"><span class="file-name m-r-10"></span><i class="icon-input-add"></i></label>
+                                        </div>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </form>
+                        <p class="text-danger m-t-30 m-b-10">신청 후 관리자 승인까지 2~3일정도 소요됩니다.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">취소</button>
+                        <button type="button" class="btn btn-primary" data-role="request">신청</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/hh/hhCommunityLayout">
+    <body>
+        <div id="container-block">
+            <div layout:fragment="contents" th:remove="tag">
+                <div class="layout-content">
+                    <div class="sub-content-head">
+                        <input type="hidden" name="communityType" th:value="${searchInfo.communityType}" />
+                        <h3 class="subtitle" th:text="${searchInfo.communityTypeNm}"></h3>
+                        <button id="writeCommunityModal" type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modal-write-hh">글쓰기</button>
+                    </div>
+                    <div class="community-content">
+                        <h4 class="table-subtitle mb-3">최신 글</h4>
+                        <div class="feed-list">
+                            <ul>
+                                <th:block th:each="list : ${communityList}">
+                                    <li>
+                                        <div class="row row-40 align-items-center">
+                                            <div class="col feed-body">
+                                                <div class="title"><a
+                                                        th:href="'/hh/community/board/detail?communityType=' + ${list.communityType} + '&communitySeq='+ ${list.communitySeq}"
+                                                        th:text="${list.title}"></a></div>
+                                                <p class="desc" th:text="${list.content}"></p>
+                                                <p class="name" th:text="${list.name}">홍**</p>
+                                            </div>
+                                            <div class="post-cell">
+                                                <p class="date" th:text="${list.difDate}"></p>
+                                                <div class="post-cell__list">
+                                                    <span class="view" th:text="'조회수 ' + ${list.hit}">조회수 123</span>
+                                                    <span class="like" th:text="'좋아요 ' + ${list.recommend}">좋아요 1</span>
+                                                    <span class="comment" th:text="'댓글 ' + ${list.commentCnt}">댓글 13</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </th:block>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div layout:fragment="modal" th:remove="tag">
+                <!-- 커뮤니티 글쓰기 - headhunter -->
+                <div class="modal fade" id="modal-write-hh" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-write modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">게시글 쓰기</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <form name="hhCommunityForm">
+                                <input type="hidden" name="secretFlag" value="N">
+                                <div class="modal-body">
+                                    <div class="select-form">
+                                        <select name="communityType" data-role="communitySelect" class="select-design" style="width: 100%">
+                                            <option value="FREE_BOARD">자유게시판</option>
+                                            <option value="HH_TALK">헤드헌터 수다</option>
+                                            <option value="HH_STUDY">헤드헌터 실무공부</option>
+                                            <option value="REPORT">신고합니다</option>
+                                            <option value="HH_RECRUIT">헤드헌터 모집공고</option>
+                                            <option value="R9_IMPROVE">RESUME9 관련 개선사항 요청</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <input type="text" class="form-control form-md" name="title" id="communityTitleHh" placeholder="제목을 입력하세요" maxlength="30"/>
+                                    </div>
+                                    <div class="form-textarea">
+                                        <textarea name="content" id="communityContentHh" cols="30" rows="10" placeholder="내용을 입력하세요" maxlength="300"></textarea>
+                                    </div>
+                                    <div class="form-upload">
+                                        <input type="file" data-role="upFile" data-seq="1" class="" name="files" id="hhCommunityFormFile1"/>
+                                        <label for="hhCommunityFormFile1"><i class="icon-input-add"></i></label>
+                                    </div>
+                                    <div class="preview-image-wrap">
+                                    </div>
+                                </div>
+                            </form>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">닫기</button>
+                                <button type="button" data-role="save" class="btn btn-primary">등록</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

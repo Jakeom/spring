@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.fo.FoHeadhunterMapper">
+
+    <!-- 추천코드 확인 -->
+    <select id="selectHeadhunterByRefferalCd" parameterType="FoHeadhunterDTO" resultType="boolean">
+        /* com.fw.core.mapper.db1.fo.FoHeadhunterMapper.selectHeadhunterByRefferalCd, 추천코드 확인, sjpaik, FoHeadhunterMapper.xml */
+        SELECT EXISTS (
+                SELECT 1
+                  FROM headhunter
+                 WHERE referralCode = #{referralCode}
+        ) AS CNT
+    </select>
+
+    <!-- 추천코드 조회 -->
+    <select id="selectHeadhunterByMemberId" parameterType="FoHeadhunterDTO" resultType="String">
+        /* com.fw.core.mapper.db1.fo.FoHeadhunterMapper.selectHeadhunterByMemberId, 추천코드 확인, sjpaik, FoHeadhunterMapper.xml */
+        SELECT referralCode
+          FROM headhunter
+         WHERE member_id = #{memberId}
+    </select>
+
+    <!-- 헤드헌터 등록 -->
+    <insert id="insertHeadhunter" parameterType="FoHeadhunterDTO">
+        /* com.fw.core.mapper.db1.fo.FoHeadhunterMapper.insertHeadhunter, 헤드헌터 등록, sjpaik, FoHeadhunterMapper.xml */
+        INSERT INTO headhunter (
+               approved
+             , sfCeoName
+             , sfName
+             , sfPhone
+             , sfRegNumber
+             , sfWorkerListFileId
+             , member_id
+             , referralCode
+             , delFlag
+             , createSeq
+             , createdAt
+             , updateSeq
+             , updatedAt
+             , showFlag
+        ) VALUES (
+               0
+             , #{sfCeoName}
+             , #{sfName}
+             , #{sfPhone}
+             , #{sfRegNumber}
+             , #{sfWorkerListFileId}
+             , #{memberId}
+             , #{referralCode}
+             , 'N'
+             , #{memberId}
+             , NOW()
+             , #{memberId}
+             , NOW()
+             , 1
+        )
+    </insert>
+    <!-- 승인 요청 -->
+    <insert id="insertHeadhunterRequest" parameterType="FoHeadhunterDTO">
+    	/* com.fw.core.mapper.db1.fo.FoHeadhunterMapper.insertHeadhunterRequest, 승인 요청, wsh, FoHeadhunterMapper.xml */
+    	INSERT INTO hh_approval_request (
+			   id
+			 , createdAt
+			 , denyReason
+			 , status
+			 , backoffice_admin_id
+			 , hh_member_id
+    	) VALUES (
+			 #{id}
+    		 , NOW()
+    		 , #{denyReason}
+    		 , #{status}
+    		 , 1
+    		 , #{memberId}
+		)    
+    </insert>
+
+
+</mapper>

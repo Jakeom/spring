@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html  xmlns:th="http://www.thymeleaf.org"
+       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+       layout:decorate="~{layouts/resumeLayout}">
+<body>
+<div id="container-block">
+  <div layout:fragment="contents" th:remove="tag">
+          <div class="layout-content">
+            <div class="community-content">
+              <div class="sub-content-head">
+                <h3 class="subtitle">이력서 공개설정</h3>
+              </div>
+              <div class="example-form">
+                <ul>
+                  <li>인재정보에 등록된 이력서는 직접 비공개하기 전까지 헤드헌터 열람이 가능합니다.</li>
+                  <li>이력서를 비공개 한 후 포지션 지원을 하여도 인사담당자가 이력서를 열람할 수 있습니다.</li>
+                </ul>
+              </div>
+              <div class="feed-list">
+                <ul>
+                  <li>
+                    <div class="row row-40 align-items-center">
+                      <div class="resume-list-wrap">
+                        <div class="resume-list-object">
+                          <div class="title m-r-20 mt-0">이력서 열람 설정</div>
+                          <div class="total-career">헤드헌터가 내 이력서를 열람하는 것을 설정합니다.</div>
+                        </div>
+                        <div class="toggle-btn">
+                          <input type="checkbox" class="sr-only" onclick="resumeRestricted(this)" id="restrictedCb" th:checked="${resumeSettingInfo.resumeRestricted eq '0'}" />
+                          <label for="restrictedCb">
+                            <div class="button">
+                              <p>공개중</p>
+                              <div class="inside"></div>
+                            </div>
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="row row-40 align-items-center">
+                      <div class="resume-list-wrap">
+                        <div class="resume-list-object">
+                          <div class="title m-r-20 mt-0">포지션 제안받기</div>
+                          <div class="total-career">포지션 제안받기로 설정하시면 나에게 맞는 포지션을 먼저 제안받을 수 있습니다.</div>
+                        </div>
+                        <div class="toggle-btn">
+                          <input type="checkbox" class="sr-only"  onclick="findingJob(this)" th:checked="${resumeSettingInfo.findingJob eq '1'}" id="findingJobCb" />
+                          <label for="findingJobCb">
+                            <div class="button">
+                              <p>제안 받기중</p>
+                              <div class="inside"></div>
+                            </div>
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+      </div>
+    </div>
+  </body>
+</html>

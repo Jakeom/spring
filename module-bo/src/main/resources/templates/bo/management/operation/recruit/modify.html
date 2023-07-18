@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/default}">
+
+<body>
+	<div layout:fragment="contents" th:remove="tag">
+		<div id="container-block">
+			<main id="content" role="main">
+				<h2 class="title">사용자 수정</h2>
+				<div class="p-3 m-3">
+					<input type="hidden" name="noticeSeq" th:value="${modify.noticeSeq}" />
+					<form id="updateNoticeForm" name="updateNotice"	th:object="${modify}">
+						<input type="hidden" id="noticeSeq" name="noticeSeq"	th:value="${modify.noticeSeq}" />
+						<div class="form-group">
+							<select id="selectType" name="selectType" class="form-control w-auto"
+                                data-url="/bo/cd/BOARD_TYPE"
+                                data-default-option="선택"
+                       		></select>
+						</div>
+						<div class="form-group">
+							<label>제목</label> <input type="text" class="form-control" id="title" name="title" th:field="*{title}" placeholder="제목 입력하세요" >
+						</div>
+						<div class="form-group">
+							<label>내용</label> <textarea class="form-control" id="noticeContent" name="content"	th:field="*{content}" placeholder="내용을 입력하세요" rows="12" cols="50" form="updateNoticeForm"></textarea>
+						</div>
+						<button type="button" class="btn btn-primary float-right" data-role="update">수정</button>
+						<button type="button" class="btn btn-danger float-right" data-role="detail">취소</button>
+					</form>
+				</div>
+			</main>
+		</div>
+		<div layout:fragment="modal" th:remove="tag"></div>
+	</div>
+	 <script>
+ 	    window.onload = function() {
+        CKEDITOR.replace('noticeContent');
+  		  };
+	</script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/default}">
+<body>
+<div layout:fragment="contents" th:remove="tag">
+    <div id="container-block">
+        <main id="content" role="main" style="padding: 0 20px;">
+            <h2 class="title">관리자별 권한 관리</h2>
+            <div class="row">
+                <div class="col-12">
+                     <span class="wid-5 mg_r1">
+                          <select class="form-control" name="selectAdmin">
+                             <th:block th:each="admin :${admin}">
+                                <option th:value="${admin.adminSeq}"
+                                        th:text="${admin.adminNm} + '(' + ${admin.adminId} + ')'"></option>
+                             </th:block>
+                          </select>
+                    </span>
+                    <div class="d-flex justify-content-end">
+                        <button type="button" class="btn btn-block" data-role="apply" style="background-color: #AAC4FF">
+                            적용
+                        </button>
+                    </div>
+                    <table class="table">
+                        <colgroup>
+                            <col style="width:70%">
+                            <col style="width:30%">
+                        </colgroup>
+                        <thead>
+                        <tr>
+                            <th class="text-center border-right" style="background-color:#D2DAFF">메뉴명</th>
+                            <th class="text-center" style="background-color:#D2DAFF">
+                                <label for="checkAll">
+                                    <input type="checkbox" id="checkAll" name="checkAll"/>권한
+                                </label>
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="menuProgram : ${menuProgram}">
+                            <td class="text-center border-right" th:text="${menuProgram.programNm}">
+                                <span></span>
+                            </td>
+                            <td class="text-center">
+                                <input type="checkbox" name="checkAdminAuth" th:value="${menuProgram.programCd}"
+                                       th:data-menu-cd="${menuProgram.menuCd}">
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+</body>
+</html>

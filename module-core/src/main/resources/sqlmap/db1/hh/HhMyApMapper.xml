@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.hh.HhMyApMapper">
+
+    <!-- 내 인재관리 -  그룹 리스트 -->
+    <select id="selectHhMyapHistoryGroupList" resultType="HhMyapHistoryGroupDTO">
+        /* com.fw.core.mapper.db1.hh.HhMyApMapper.selectHhMyapHistoryGroupList, 내 인재관리 -  그룹 리스트, yhEom, HhMyApMapper.xml */
+        SELECT *
+          FROM hh_resume_reading_history_group
+         WHERE member_id = #{frontSession.id}
+         <if test="id != null and id != ''">
+            AND id = #{id}
+          </if>
+    </select>
+
+    <!-- 내 인재관리 -  그룹등록/수정/삭제 -->
+    <insert id="insertMyapgroup">
+        /* com.fw.core.mapper.db1.hh.HhMyApMapper.insertMyapgroup, 내 인재관리 -  그룹등록/수정/삭제, yhEom, HhMyApMapper.xml */
+        INSERT INTO hh_resume_reading_history_group
+        (id, createdAt,updatedAt,isDefault,NAME, member_id,delFlag) 
+        VALUES
+        (#{id},NOW(),NOW(),0,#{name},#{frontSession.id},'N')
+        ON DUPLICATE KEY UPDATE
+               updatedAt = NOW()
+             , name = #{name}
+             , delFlag = #{delFlag}
+    </insert>
+    
+    <!-- 내 인재관리 -  이력서 공개/비공개  업데이트 -->
+    <update id="updateHhMyapListResumeOpend">
+      /* com.fw.core.mapper.db1.hh.HhMyApMapper.updateHhMyapListGorup, 내 인재관리 -  이력서 공개/비공개 업데이트, yhEom, HhMyApMapper.xml */
+      UPDATE resume A 
+      INNER JOIN hh_resume_reading_history B ON A.id = B.resume_id
+      SET
+        A.opened = #{opened}
+        <if test="opened == 1">
+          ,A.firstOpenChanged = 1
+        </if>
+      WHERE  B.resume_id = #{resumeId} and B.member_id = #{frontSession.id}
+    </update>
+
+    <!-- 내 인재관리 -  내 인재관리 리스트의 그룹 변경에따른 기본값으로 업데이트 -->
+    <update id="updateHhMyapListGorup">
+      /* com.fw.core.mapper.db1.hh.HhMyApMapper.updateHhMyapListGorup, 내 인재관리 -  내 인재관리 리스트의 그룹 변경에따른 기본값으로 업데이트, yhEom, HhMyApMapper.xml */
+      UPDATE hh_resume_reading_history A 
+      INNER JOIN (
+        <foreach item="item" index="index" collection="checkFieldArr"
+              open="" separator="union" close="">
+                SELECT #{item} AS resume_id
+          </foreach>
+      ) B ON A.resume_id = B.resume_id
+      SET
+      A.group_id = #{groupId} 
+      , A.updatedAt = NOW()
+      WHERE  A.member_id = #{frontSession.id}
+    </update>
+
+    <!-- 내 인재관리 -  +인재등록 / 공개 비공개 하기 -->
+    <update id="updateHhMyapListRegisterPathCd">
+      /* com.fw.core.mapper.db1.hh.HhMyApMapper.updateHhMyapListGorup, 내 인재관리 -  +인재등록 / 공개 비공개 하기, yhEom, HhMyApMapper.xml */
+      UPDATE hh_resume_reading_history A 
+      INNER JOIN (
+        <foreach item="item" index="index" collection="checkFieldArr"
+              open="" separator="union" close="">
+                SELECT #{item} AS resume_id
+          </foreach>
+      ) B ON A.resume_id = B.resume_id
+      SET
+      A.registerPathCd = #{registerPathCd} 
+      <if test="registerPathCd != null and registerPathCd == 'REGISTER'">
+        ,A.expireAt = DATE_ADD(NOW(), INTERVAL 3 MONTH)
+      </if>
+      , A.updatedAt = NOW()
+      WHERE  A.member_id = #{frontSession.id} AND A.registerPathCd != #{registerPathCd} 
+    </update>
+    
+    <!-- 내 인재관리 -  내 인재관리 개수 -->
+    <select id="selectHhMyapListCount" resultType="int">
+        /* com.fw.core.mapper.db1.hh.HhMyApMapper.selectHhMyapListCount, 내 인재관리 -  내 인재관리 개수, yhEom, HhMyApMapper.xml */
+        SELECT count(1) FROM (
+          SELECT 
+            hrrh.id
+            , hrrh.resume_id
+            , hrrh.member_id
+            , hrrhg.name AS group_nm
+            , m.name
+            , fm.url
+            , r.coreAbility
+            , r.totalCareer
+            , r.birth AS birth
+            , t2.cd_nm as gender 
+            , t1.cd_nm as registerPathNm 
+            , hrrh.registerPathCd
+          ,(SELECT companyName FROM resume_career WHERE delFlag='N' AND resume_id = hrrh.resume_id ORDER BY holdOffice DESC, resignationYm DESC LIMIT 1) AS finalCompany
+          ,(SELECT name FROM resume_academic_background WHERE resume_id = hrrh.resume_id  and resume_academic_background.delFlag = 'N' ORDER BY entranceYm DESC LIMIT 1) AS finalSchool
+          FROM hh_resume_reading_history hrrh
+          LEFT JOIN hh_resume_reading_history_group hrrhg ON hrrhg.id = hrrh.group_id
+          LEFT JOIN resume r ON hrrh.resume_id = r.id AND r.delFlag = 'N'		
+          LEFT JOIN member m ON r.member_id = m.id		
+          LEFT JOIN tb_common_cd t1 ON t1.group_cd = 'HH_REGISTERPATHCD' AND hrrh.registerPathCd = t1.cd AND t1.del_flag = 'N'
+          LEFT JOIN tb_common_cd t2 ON t2.group_cd = 'GENDER' AND r.genderCd = t2.cd AND t2.del_flag = 'N'
+          LEFT JOIN file_mgr fm ON fm.id = m.profilePictureFileId AND fm.delFlag = 'N'		  
+          WHERE 1=1 AND hrrh.delFlag = 'N' AND hrrh.member_id = #{frontSession.id}
+        <if test="keyword != null and keyword != ''">
+            AND (SELECT GROUP_CONCAT(spec SEPARATOR '|') FROM resume_spec WHERE resume_id = r.id AND delFlag = 'N' group by resume_id) LIKE CONCAT('%',#{keyword},'%')
+        </if>
+        ) DD WHERE 1=1
+        <if test="registerPathCd eq 'POINT'">
+            AND DD.registerPathCd IN ('POINT', 'TICKET')
+        </if>
+        <if test="registerPathCd eq 'REGISTER'">
+            AND DD.registerPathCd IN ('REGISTER', 'TEMP')
+        </if>
+          <if test="careerSt != null and careerSt != ''">
+            AND DD.totalCareer >= (#{careerSt} * 12)
+          </if>
+          <if test="careerEn != null and careerEn != ''">
+              AND (#{careerEn} * 12) >= DD.totalCareer
+          </if>
+          <if test="ageSt != null and ageSt != ''">
+            AND LEFT(DATE_FORMAT(NOW(), '%Y%m%d') - DD.birth, 2) >= #{ageSt}
+          </if>
+          <if test="ageEn != null and ageEn != ''">
+            AND #{ageEn} >= LEFT(DATE_FORMAT(NOW(), '%Y%m%d') - DD.birth, 2)
+          </if>
+          <if test="name != null and name != ''">
+            AND DD.name  LIKE CONCAT('%',#{name},'%')
+          </if>
+          <if test="coreAbility != null and coreAbility != ''">
+            AND DD.coreAbility  LIKE CONCAT('%',#{coreAbility},'%')
+          </if>
+          <if test="finalCompany != null and finalCompany != ''">
+            AND DD.finalCompany  LIKE CONCAT('%',#{finalCompany},'%')
+          </if>
+    </select>
+
+    <!--  내 인재관리 -  내 인재관리 리스트 -->
+    <select id="selectHhMyapList" resultType="HhMyapListDTO">
+        /* com.fw.core.mapper.db1.hh.HhMyApMapper.selectHhMyapList, 내 인재관리 -  내 인재관리 리스트, yhEom, HhMyApMapper.xml */
+        SELECT * FROM (
+          SELECT 
+            hrrh.id
+            ,hrrh.resume_id
+            ,r.member_id
+            ,hrrh.member_id AS mm_id
+            ,CASE WHEN hrrh.expireAt &lt; NOW() THEN 'EXPIRED'
+                  WHEN a.resumeRestricted = 0 AND opened = 0 THEN 'HH_NOOPEN'
+                  WHEN a.resumeRestricted = 1 AND opened = 0 THEN 'AP_NOOPEN'
+                  WHEN a.resumeRestricted = 1 AND opened = 1 THEN 'AP_NOOPEN'
+             ELSE 'CLEAN' END AS isExpired
+            , TIMESTAMPDIFF(DAY, DATE_FORMAT(NOW(),'%Y-%m-%d'), DATE_FORMAT(hrrh.expireAt,'%Y-%m-%d')) AS dDay -- D-DAY
+            ,DATE_FORMAT(hrrh.expireAt,'%Y-%m-%d') AS expireAt
+            ,DATE_FORMAT(hrrh.expireAt,'%Y-%m-%d') AS updatedAt
+            , hrrh.createdAt
+            ,hrrhg.name AS group_nm
+            , m.name
+            , r.picture_file_id AS profilePictureFileId
+            , fm.url
+            , r.birth
+            , r.opened
+            , r.firstOpenChanged
+            , CONCAT(SUBSTRING(r.birth,1,4),' (',(SELECT (YEAR(NOW()) - YEAR(r.birth)) - (DATE_FORMAT(r.birth, '%m%d') > DATE_FORMAT(NOW(), '%m%d'))),'), ',SUBSTRING(t2.cd_nm,1,1)) AS birth_nm
+            , YEAR(r.birth) AS birthYear
+            , LEFT(DATE_FORMAT(NOW(), '%Y%m%d') - r.birth, 2)  AS age
+            , CONCAT ((r.totalCareer DIV 12),'년',MOD(r.totalCareer,12),'개월') AS totalCareerNm
+            , (SELECT GROUP_CONCAT(spec SEPARATOR '|') FROM resume_spec WHERE resume_id = r.id AND delFlag = 'N' group by resume_id) AS coreAbility
+            , r.totalCareer
+            , a.resumeRestricted
+            , t2.cd_nm as gender 
+            , (CASE WHEN hrrh.registerPathCd = 'POINT' THEN '연락처보기'
+                    WHEN hrrh.registerPathCd = 'REGISTER' THEN '인재등록'
+                    WHEN hrrh.registerPathCd = 'TEMP' THEN '인재등록'
+                    WHEN hrrh.registerPathCd = 'TICKET' THEN '연락처보기' END) registerPathNm
+            , hrrh.registerPathCd
+            , (SELECT IF(COUNT(1) = 0, 0, COUNT(1) - 1) from resume_career WHERE resume_id = r.id and delFlag = 'N') AS turnover_cnt
+          ,(SELECT companyName FROM resume_career WHERE delFlag='N' AND resume_id = hrrh.resume_id ORDER BY holdOffice DESC,  resignationYm DESC LIMIT 1) AS finalCompany
+          ,(SELECT companyName FROM resume_career WHERE delFlag='N' AND resume_id = hrrh.resume_id ORDER BY (IFNULL(resignationYm,DATE_FORMAT(NOW(),'%Y%m')) - entranceYm) DESC LIMIT 1) AS longestCompany
+           <![CDATA[
+          ,(SELECT CONCAT('<p>',name,'</p><p>(',locationCd,')</p>') FROM resume_academic_background WHERE resume_id = hrrh.resume_id and resume_academic_background.delFlag = 'N' ORDER BY entranceYm DESC LIMIT 1) AS finalSchool
+            ]]>
+          ,(SELECT name FROM resume_academic_background WHERE resume_id = hrrh.resume_id  and resume_academic_background.delFlag = 'N' ORDER BY entranceYm DESC LIMIT 1) AS mainFinalSchool
+          ,(SELECT locationCd FROM resume_academic_background WHERE resume_id = hrrh.resume_id   and resume_academic_background.delFlag = 'N' ORDER BY entranceYm DESC LIMIT 1) AS mainLocation
+          FROM hh_resume_reading_history hrrh
+          LEFT JOIN hh_resume_reading_history_group hrrhg ON hrrhg.id = hrrh.group_id
+          LEFT JOIN resume r ON hrrh.resume_id = r.id AND r.delFlag = 'N'		
+          LEFT JOIN member m ON r.member_id = m.id
+          LEFT JOIN applicant a ON m.id = a.member_id
+          LEFT JOIN tb_common_cd t2 ON t2.group_cd = 'GENDER' AND r.genderCd = t2.cd AND t2.del_flag = 'N'
+          LEFT JOIN file_mgr fm ON fm.id = m.profilePictureFileId AND fm.delFlag = 'N'		  
+          WHERE 1=1 AND hrrh.delFlag = 'N' AND hrrh.member_id = #{frontSession.id}
+
+        <if test="keyword != null and keyword != ''">
+            AND (SELECT GROUP_CONCAT(spec SEPARATOR '|') FROM resume_spec WHERE resume_id = r.id AND delFlag = 'N' group by resume_id) LIKE CONCAT('%',#{keyword},'%')
+        </if>
+        ) DD WHERE 1=1
+        <if test="registerPathCd eq 'POINT'">
+            AND DD.registerPathCd IN ('POINT', 'TICKET')
+        </if>
+        <if test="registerPathCd eq 'REGISTER'">
+            AND DD.registerPathCd IN ('REGISTER', 'TEMP')
+        </if>
+          <if test="resumeId != null and resumeId != ''">
+            AND DD.resume_id  >= #{resumeId}
+          </if>
+          <if test="careerSt != null and careerSt != ''">
+            AND DD.totalCareer >= (#{careerSt} * 12)
+          </if>
+          <if test="careerEn != null and careerEn != ''">
+              AND (#{careerEn} * 12) >= DD.totalCareer
+          </if>
+          <if test="ageSt != null and ageSt != ''">
+            AND LEFT(DATE_FORMAT(NOW(), '%Y%m%d') - DD.birth, 2) >= #{ageSt}
+          </if>
+          <if test="ageEn != null and ageEn != ''">
+            AND #{ageEn} >= LEFT(DATE_FORMAT(NOW(), '%Y%m%d') - DD.birth, 2)
+          </if>
+          <if test="name != null and name != ''">
+            AND DD.name  LIKE CONCAT('%',#{name},'%')
+          </if>
+          <if test="coreAbility != null and coreAbility != ''">
+            AND DD.coreAbility  LIKE CONCAT('%',#{coreAbility},'%')
+          </if>
+          <if test="finalCompany != null and finalCompany != ''">
+            AND DD.finalCompany  LIKE CONCAT('%',#{finalCompany},'%')
+          </if>
+        ORDER BY DD.createdAt DESC
+          <include refid="common.paging" />
+    </select>
+
+    <!-- 내 인재관리 (배치용) -  기간만료된 이력서일련번호, 헤드헌터 일련번호 취득 -->
+    <select id="selectHhMyapExpiredList" resultType="HhMyapListDTO">
+      /* com.fw.core.mapper.db1.hh.HhMyApMapper.selectHhMyapExpiredList, 내 인재관리 (배치용) -  기간만료된 이력서일련번호, 헤드헌터 일련번호 취득, yhEom, HhMyApMapper.xml */
+      SELECT A.member_id,A.resume_id FROM hh_resume_reading_history A 
+		  INNER JOIN resume B ON A.resume_id = B.id
+		  WHERE A.expireAt > NOW() AND B.firstOpenChanged = '0'
+      LIMIT 1
+    </select>
+
+    <select id="selectReward" resultType="HhRewardDTO">
+        SELECT * FROM reward 
+        WHERE applicant_id = #{frontSession.id}
+        LIMIT 1
+    </select>
+
+    <insert id="insertReward">
+        INSERT INTO reward (applicant_id,balance,updatedAt,createdAt)
+        VALUES (#{applicantId},#{balance},NOW(),NOW())
+
+        <selectKey order="AFTER" keyProperty="id" resultType="String">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <update id="updateReward">
+        UPDATE reward SET 
+        balance = balance + #{balance}
+        WHERE applicant_id = #{applicantId}
+    </update>
+
+    <insert id="insertRewardHistory">
+        INSERT INTO reward_history (createdAt, updatedAt, balance, goodsCd, increase, reasonCd, trId, applicant_id, headhunter_id, reward_id, adminReason, backoffice_admin_id, delFlag, reward_goods_id) 
+				VALUES ( NOW(), NOW(), (SELECT balance FROM reward WHERE applicant_id=#{applicantId}), #{goodsCd}, #{increase}, #{reasonCd}, #{trId}, #{applicantId}, #{headhunterId}, #{rewardId}, NULL, NULL, 'N', #{rewardGoodsId});
+    </insert>
+    <!-- 내 인재관리 -  헤드헌터 포인트 존재 확인 -->
+    <select id="selectPoint" resultType="HhPointDTO">
+        /* com.fw.core.mapper.db1.hh.HhMyApMapper.selectPoint, 내 인재관리 -  헤드헌터 포인트 존재 확인, yhEom, HhMyApMapper.xml */
+        SELECT * FROM point 
+        WHERE member_id = #{frontSession.id}
+        LIMIT 1
+    </select>
+    <!-- 내 인재관리 -  포인트 데이터 생성 -->
+    <insert id="insertPoint">
+        /* com.fw.core.mapper.db1.hh.HhMyApMapper.insertPoint, 내 인재관리 -  포인트 데이터 생성, yhEom, HhMyApMapper.xml */
+        INSERT INTO point (createdAt, updatedAt, balance, freePoint, member_id) 
+        VALUES (NOW(), NOW(), #{balance}, #{freePoint}, #{memberId});
+
+        <selectKey order="AFTER" keyProperty="id" resultType="String">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <!-- 내 인재관리 -  포인트 업데이트 -->
+    <update id="updatePoint">
+        /* com.fw.core.mapper.db1.hh.HhMyApMapper.updatePoint, 내 인재관리 -  포인트 업데이트, yhEom, HhMyApMapper.xml */
+        UPDATE point SET 
+        updatedAt = NOW()
+        ,balance = balance + #{balance}
+        ,freePoint = freePoint + #{freePoint}
+        ,paidPoint = paidPoint + #{paidPoint}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 내 인재관리 -  포인트 이력등록 -->
+    <insert id="insertPointUseHistory">
+        /* com.fw.core.mapper.db1.hh.HhMyApMapper.insertPointUseHistory, 내 인재관리 -  포인트 이력등록, yhEom, HhMyApMapper.xml */
+        INSERT INTO point_use_history 
+        (createdAt, updatedAt, reasonCd, member_id, point_id, freeBalance, freeIncrease, paidBalance, paidIncrease) 
+        VALUES 
+        (NOW(), NOW(), #{reasonCd}, #{memberId}, #{pointId}
+        , (SELECT balance FROM point WHERE id = #{pointId})
+        , #{freeIncrease}
+        , (SELECT paidPoint FROM point WHERE id = #{pointId})
+        , #{paidIncrease})
+    </insert>
+</mapper>

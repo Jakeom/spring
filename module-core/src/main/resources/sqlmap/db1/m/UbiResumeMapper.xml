@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.m.UbiResumeMapper">
+
+    <!-- 이력서 취득-->
+    <select id="selectResumeInfo" resultType="UbiDataDTO">
+        /*com.fw.core.mapper.db1.m.UbiResumeMapper.selectResumeInfo, 이력서 취득 , 2023.01 , wsh, UbiResumeMapper.xml*/
+        SELECT id
+             , createdAt
+             , updatedAt
+             , address
+             , birth
+             , YEAR(birth) AS year
+             , LEFT(DATE_FORMAT(NOW(), '%Y%m%d') - birth, 2)  AS age
+             , bylaws
+             , careerDescription
+             , coreAbility
+             , deleted
+             , deletedAt
+             , desiredPosition
+             , desiredSalary
+             , desiredHire
+             , fn_get_common_cd(desiredHire,'DESIRED_HIRE',1) AS howcome
+             , disability
+             , disabilityRatingCd
+             , disabilityRatingReason
+             , employmentStatusCd
+             , existTemp
+             , finalPosition
+             , genderCd
+             , isVeterans
+             , joinDateCd
+             , fn_get_common_cd(joinDateCd,'JOIN_DATE',1) AS joinDateCd
+             , militaryServiceCd
+             , fn_get_common_cd(militaryServiceCd,'MILITARY_SERVICE',1) AS militaryServiceNm
+             , opened
+             , last_salary
+             , representation
+             , selfIntroduction
+             , totalCareer
+             , concat(ROUND((totalCareer/12),0),'년',ROUND((totalCareer%12),0),'개월') totalCareerNm
+             , veteransReason
+             , create_member_id
+             , member_id
+             , parent_resume_id
+             , picture_file_id
+             , createPath
+             , firstOpenChanged
+             , delFlag
+             , (SELECT name FROM member WHERE id = member_id) name
+             , (SELECT email FROM member WHERE id = member_id) email
+             , (SELECT phone FROM member WHERE id = member_id) phone
+             , (SELECT location_cd FROM resume_location WHERE delFlag = 'N' AND resume_id = #{resumeId}) AS location
+             , (SELECT name FROM resume_academic_background WHERE resume_id = #{resumeId} ORDER BY entranceYm DESC LIMIT 1) AS schoolName
+             , (SELECT degreeCd FROM resume_academic_background WHERE resume_id = #{resumeId} ORDER BY entranceYm DESC LIMIT 1) AS degreeCd
+             , (SELECT locationCd FROM resume_academic_background WHERE resume_id = #{resumeId} ORDER BY entranceYm DESC LIMIT 1) AS locationCd
+          FROM resume
+         WHERE delFlag = 'N'
+           AND id = #{id}
+    </select>
+
+    <!-- 학력,전공 정보 취득-->
+    <select id="selectAcademicInfo" parameterType="UbiDataDTO" resultType="UbiDataDTO">
+        /*com.fw.core.mapper.db1.m.UbiResumeMapper.selectAcademicInfo, 학력,전공 정보 취득 , 2023.01 , wsh, UbiResumeMapper.xml*/
+        SELECT RAB.id
+             , RAB.degreeCd
+             , concat(substr(RAB.entranceYm,1,4),'.',substr(RAB.entranceYm,5,6)) entranceYm
+             , RAB.entranceStatusCd
+             , RAB.grades
+             , RAB.graduationStatusCd
+             , fn_get_common_cd(RAB.graduationStatusCd,'GRADUATION_STATUS',1) AS graduationStatusNm
+             , concat(substr(RAB.graduationYm,1,4),'.',substr(RAB.graduationYm,5,6)) graduationYm
+             , RAB.inOverseas
+             , RAB.locationCd
+             , RAB.name AS schoolName
+             , RAB.schoolCd
+             , RABM.majorClassCd
+             , RABM.majorName
+             , (SELECT majorClassCd FROM resume_academic_background_major WHERE academic_background_id = RAB.id AND majorClassCd = 'MINOR' AND delFlag = 'N') AS majorClassCd
+             , (SELECT majorName FROM resume_academic_background_major WHERE academic_background_id = RAB.id AND majorClassCd = 'MINOR' AND delFlag = 'N') AS majorName
+             , RAB.resume_id
+             , RAB.delFlag
+          FROM resume_academic_background RAB
+    LEFT OUTER JOIN resume_academic_background_major RABM ON RAB.id = RABM.academic_background_id AND RABM.majorClassCd <![CDATA[ <> ]]> 'MINOR' AND RABM.delFlag = 'N'
+         WHERE RAB.delFlag = 'N'
+           AND resume_id = #{resumeId}
+    </select>
+
+    <!-- 경력 정보 취득-->
+    <select id="selectCareerInfo" parameterType="UbiDataDTO" resultType="UbiDataDTO">
+        /*com.fw.core.mapper.db1.m.UbiResumeMapper.selectCareerInfo, 경력 정보 취득 , 2023.01 , wsh, UbiResumeMapper.xml*/
+        SELECT id
+             , annualSalary
+             , category
+             , companyName
+             , departmentName
+             , dutyCd
+             , dutyInput
+             , concat(substr(entranceYm,1,4),'.',substr(entranceYm,5,6)) careerEntranceYm
+             , entranceYm
+             , holdOffice
+             , fn_get_common_cd(holdOffice,'HOLD_OFFICE',1) AS holdOfficeNm
+             , positionCd
+             , positionInput
+             , concat(substr(resignationYm,1,4),'.',substr(resignationYm,5,6)) resignationYmCareer
+             , resignationYm
+             , task
+             , resume_id
+             , salary
+             , certFlag
+             , delFlag
+             , concat(ROUND((PERIOD_DIFF(resignationYm,entranceYm)/12),0),'년',ROUND((PERIOD_DIFF(resignationYm,entranceYm)%12),0),'개월') AS finalCareer
+             , concat(ROUND((PERIOD_DIFF(DATE_FORMAT(NOW(),'%Y%m'),entranceYm)/12),0),'년',ROUND((PERIOD_DIFF(DATE_FORMAT(NOW(),'%Y%m'),entranceYm)%12),0),'개월') AS currentCareer
+          FROM resume_career
+         WHERE delFlag = 'N'
+           AND resume_id = #{resumeId}
+    </select>
+
+    <!-- 최종경력 정보 취득 -->
+    <select id="selectFinalCareerInfo" parameterType="UbiDataDTO" resultType="UbiDataDTO">
+        SELECT id
+             , annualSalary AS carAnnualSalary
+             , category
+             , companyName
+             , departmentName
+             , dutyCd
+             , dutyInput
+             , concat(substr(entranceYm,1,4),'.',substr(entranceYm,5,6)) entranceYmCareer
+             , entranceYm
+             , holdOffice
+             , fn_get_common_cd(holdOffice,'HOLD_OFFICE',1) AS holdOfficeNm
+             , positionCd
+             , positionInput
+             , concat(substr(resignationYm,1,4),'.',substr(resignationYm,5,6)) resignationYmCareer
+             , resignationYm
+             , task
+             , resume_id
+             , salary
+             , certFlag
+             , delFlag
+             , concat(ROUND((PERIOD_DIFF(resignationYm,entranceYm)/12),0),'년',ROUND((PERIOD_DIFF(resignationYm,entranceYm)%12),0),'개월') AS finalCareer
+             , concat(ROUND((PERIOD_DIFF(DATE_FORMAT(NOW(),'%Y%m'),entranceYm)/12),0),'년',ROUND((PERIOD_DIFF(DATE_FORMAT(NOW(),'%Y%m'),entranceYm)%12),0),'개월') AS CurrentCareer
+        FROM resume_career
+        WHERE delFlag = 'N' AND resume_id = #{resumeId}
+        ORDER BY entranceYm DESC
+        LIMIT 1
+    </select>
+
+    <!-- 핵심역량 정보 취득-->
+    <select id="selectSpecInfo" parameterType="UbiDataDTO" resultType="UbiDataDTO">
+        /*com.fw.core.mapper.db1.m.UbiResumeMapper.selectSpecInfo, 핵심역량 정보 취득 , 2023.01 , wsh, UbiResumeMapper.xml*/
+        SELECT id
+             , resume_id
+             , spec_type
+             , fn_get_common_cd(spec_type,'SPEC',1) AS specNm
+             , spec
+             , delFlag
+          FROM resume_spec
+         WHERE delFlag = 'N'
+           AND resume_id = #{resumeId}
+      ORDER BY FIELD(spec_type, 'Main', '상세', '기타') DESC
+    </select>
+
+    <!-- 희망근무지 정보 취득-->
+    <select id="selectDesiredLocationInfo" parameterType="UbiDataDTO" resultType="UbiDataDTO">
+        /*com.fw.core.mapper.db1.fo.FoResumeMapper.selectDesiredInfo,  희망근무지 정보 취득 , 2023.01 , wsh, UbiResumeMapper.xml*/
+        SELECT id
+             , resume_id
+             , location_cd AS desiredLocationCd
+             , fn_get_common_cd(location_cd,'LOC',1) AS location
+             , delFlag
+          FROM resume_location
+         WHERE delFlag = 'N'
+           AND resume_id = #{resumeId}
+    </select>
+
+    <!-- 어학 정보 취득-->
+    <select id="selectLanguageInfo" parameterType="FoResumeDTO" resultType="UbiDataDTO">
+        /*com.fw.core.mapper.db1.m.UbiResumeMapper.selectLanguageInfo,  어학 정보 취득 , 2023.01 , wsh, UbiResumeMapper.xml*/
+        SELECT id
+             , conversationCd
+             , languageCd
+             , languageCertificationCd
+             , languageInput
+             , obtainYm
+             , testInput
+             , testScore
+             , testTypeCd
+             , resume_id
+             , delFlag
+          FROM resume_language
+         WHERE delFlag = 'N'
+           AND resume_id = #{resumeId}
+      ORDER BY languageCertificationCd
+    </select>
+
+    <!-- 자격증 정보 취득-->
+    <select id="selectLicenseInfo" parameterType="UbiDataDTO" resultType="UbiDataDTO">
+        /*com.fw.core.mapper.db1.m.UbiResumeMapper.selectLicenseInfo,  자격증 정보 취득 , 2023.01 , wsh, UbiResumeMapper.xml*/
+        SELECT id
+             , agency
+             , name AS licenseName
+             , obtainYm AS licenseObtainYm
+             , resume_id
+             , delFlag
+          FROM resume_license
+         WHERE delFlag = 'N'
+           AND resume_id = #{resumeId}
+    </select>
+
+    <!-- 수상 정보 취득-->
+    <select id="selectAwardInfo" parameterType="UbiDataDTO" resultType="UbiDataDTO">
+        /*com.fw.core.mapper.db1.m.UbiResumeMapper.selectAwardInfo,  수상 정보 취득 , 2022.11 , 2023.01 , wsh, UbiResumeMapper.xml*/
+        SELECT id
+             , agency AS awardAgency
+             , awardYm
+             , name AS awardNm
+             , resume_id
+             , delFlag
+          FROM resume_award
+         WHERE delFlag = 'N'
+           AND resume_id = #{resumeId}
+    </select>
+
+    <!-- 대외활동 정보 취득-->
+    <select id="selectActivityInfo" parameterType="UbiDataDTO" resultType="UbiDataDTO">
+        /*com.fw.core.mapper.db1.m.UbiResumeMapper.selectActivityInfo,  대외활동 정보 취득 , 2023.01 , wsh, UbiResumeMapper.xml*/
+        SELECT id
+             , content
+             , resume_id
+             , delFlag
+          FROM resume_external_activity
+         WHERE delFlag = 'N'
+           AND resume_id = #{resumeId}
+    </select>
+
+    <!-- 포트폴리오 정보 취득-->
+    <select id="selectPortfolioInfo" parameterType="UbiDataDTO" resultType="UbiDataDTO">
+        /*com.fw.core.mapper.db1.m.UbiResumeMapper.selectPortfolioInfo,  포트폴리오 정보 취득 , 2023.01 , wsh, UbiResumeMapper.xml*/
+        SELECT id
+             , attachType
+             , url
+             , attach_file_id
+             , resume_id
+             , delFlag
+          FROM resume_portfolio
+         WHERE delFlag = 'N'
+           AND resume_id = #{resumeId}
+    </select>
+
+    <!-- 영문이력서 정보 취득-->
+    <select id="selectEnglishResumeInfo" parameterType="UbiDataDTO" resultType="UbiDataDTO">
+        /*com.fw.core.mapper.db1.m.UbiResumeMapper.selectEnglishResumeInfo,  영문이력서 정보 취득 , 2023.01 , wsh, UbiResumeMapper.xml*/
+        SELECT id
+             , attachType AS enAttachType
+             , url AS enUrl
+             , attach_file_id AS enAttachFileId
+             , resume_id
+             , delFlag
+          FROM resume_english
+         WHERE delFlag = 'N'
+           AND resume_id = #{resumeId}
+    </select>
+
+    <!-- 취업활동증명서-->
+    <select id="selectEmploymentCertificate" parameterType="UbiDataDTO" resultType="UbiDataDTO">
+        /*com.fw.core.mapper.db1.m.UbiResumeMapper.selectEmploymentCertificate,  취업활동증명서 , 2023.01 , yj, UbiResumeMapper.xml*/
+        SELECT PA.id
+             , PA.processStatus
+             , PA.proposalStatus
+             , PA.progressStep
+             , fn_get_common_cd(PA.processStatus,'POSITION_PROCESSSTATUS',1) AS processStatusNm
+             , DATE_FORMAT(PA.createdAt,'%Y/%m/%d') createdAt
+             , PA.ap_member_id
+             , PA.hh_member_id
+             , POS.id AS postingId
+             , POS.title
+             , POS.hr_company_id
+             , HC.companyScale
+             , HC.companyName
+             , HC.address
+             , HC.phone
+             , POS.isPrivate
+             , PA.regPath
+             , PA.resume_modify_flag
+             , M.name
+             , M.phone AS apPhone
+             , PA.passedStatus
+             , R.address as apAddress
+        FROM position_applicant PA
+  INNER JOIN position POS ON POS.id = PA.position_id
+  INNER JOIN hr_company HC ON POS.hr_company_id = HC.id
+    LEFT JOIN applicant A ON PA.ap_member_id = A.member_id
+    LEFT JOIN member M ON A.member_id = M.id
+    LEFT JOIN resume R ON PA.resume_id = R.id
+        WHERE PA.delFlag = 'N'
+          AND PA.id IN (
+            <foreach item="item" index="index" collection="idList" open="" separator="," close="">
+                #{item.id}
+            </foreach>
+            )
+    </select>
+
+</mapper>
+

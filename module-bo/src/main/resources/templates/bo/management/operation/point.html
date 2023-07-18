@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/default}">
+
+<body>
+	<div layout:fragment="contents" th:remove="tag">
+		<main id="content" role="main">
+			<h2 class="title">포인트 관리</h2>
+			<div class="row p-3">
+				<div class="col-12">
+					<!-- Search -->
+					<div class="">
+						<form id="searchPoint" name="searchPoint">
+							<div class="row mt-5">
+								<div class="col-4">
+									<div class="d-flex align-items-center">
+										<input type="text" id="PointStartDt" name="PointStartDt" class="form-control form-datepicker" placeholder="날짜 선택">
+										<div class="mr-2">~</div>
+										<input type="text" id="PointEndDt" name="PointEndDt" class="form-control form-datepicker" placeholder="날짜 선택">
+									</div>
+								</div>
+								<div class="col-4">
+									<div class="d-flex align-items-center">
+										<button type="button" class="btn btn-dark" id="all" name="colorChange" data-role="all">전체</button>
+										<button type="button" class="btn btn-dark" id="today" name="colorChange" data-role="today">오늘</button>
+										<button type="button" class="btn btn-dark" id="week" name="colorChange" data-role="week">7일</button>
+										<button type="button" class="btn btn-dark" id="month" name="colorChange" data-role="month">1개월</button>
+									</div>
+								</div>
+								<div class="col-4 text-right">
+									<div class="d-flex" style="float: right">
+										<select id="personalInfo" name="personalInfo" class="custom-select w-auto mr-2">
+											<option value="name">이름</option>
+											<option value="phone">휴대번호</option>
+											<option value="email">이메일주소</option>
+										</select> <input type="text" class="form-control d-inline-block w-auto" data-role="member" />
+										<button type="button" class="btn btn-primary" data-role="search">검색하기</button>
+									</div>
+								</div>
+								<div class="col-12 mt-3">
+									<div>
+										<div class="form-inline m-b-20">
+											<div class="m-0">
+												<select id="selectType" name="selectType" class="form-control w-auto" data-url="/bo/cd/POINT_USE" data-default-option="전체"></select>
+											</div>
+											<div class="m-1 ">
+												<select id="freePayType" name="selectType" class="form-control">
+													<option value="">전체</option>
+													<option value="increase">무상지급 포인트 증가</option>
+													<option value="decrease">무상지급 포인트 감소</option>
+												</select>
+											</div>
+											<div class="m-1">
+												<select id="paidPayType" name="selectType" class="form-control">
+													<option value="">전체</option>
+													<option value="increase">결제 포인트 증가</option>
+													<option value="decrease">결제 포인트 감소</option>
+												</select>
+											</div>
+											<div class="m-0">
+												<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">포인트 지급/차감</button>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</form>
+						<div class="row mt-3">
+							<div class="col">
+								<table id="datatable" class="table">
+									<thead>
+										<tr>
+											<th>회원 ID</th>
+											<th>구분</th>
+											<th>이름</th>
+											<th>활동</th>
+											<th>총포인트(무상포인트/결제포인트)</th>
+											<th>무상지급 포인트 증감</th>
+											<th>결제 포인트 증감</th>
+											<th>일시</th>
+										</tr>
+									</thead>
+								</table>
+							</div>
+						</div>
+					</div>
+					<!--modal-->
+					<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-hidden="true">
+						<div class="modal-dialog modal-dialog-centered" role="document">
+							<div class="modal-content">
+								<div class="modal-header"></div>
+								<div class="modal-body">
+									<table class="table table-bordered">
+										<tr>
+											<th>지급/차감 회원 ID</th>
+											<td colspan="5"> <input class="form-control" type="text" name="insertId"> </td>
+										</tr>
+										<tr>
+											<th>포인트관리</th>
+											<td colspan="5">
+												<label class="form-check-label" >지급</label>
+												<input value="1" class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1" checked>
+												<br>
+												<label class="form-check-label" >차감</label>
+												<input value="0" class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2">
+											</td>
+										</tr>
+										<tr>
+											<th>무상/유상</th>
+											<td colspan="5">
+												<label class="form-check-label" >무상포인트</label>
+												<input value="1" class="form-check-input" type="radio" name="pointTypeRadio" checked>
+												<br>
+												<label class="form-check-label" >유상포인트</label>
+												<input value="0" class="form-check-input" type="radio" name="pointTypeRadio">
+											</td>
+										</tr>
+										<tr>
+											<th>포인트입력</th>
+											<td colspan="5"> <input class="form-control" type="text" name="insertPoint"> </td>
+										</tr>
+	
+									</table>
+								</div>
+								<div class="modal-footer">
+									<button type="button" class="btn btn-secondary" data-role="save" data-dismiss="modal">등록</button>
+									<button type="button" class="btn btn-secondary" data-dismiss="modal">취소</button>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!--/modal-->
+				</div>
+			</div>
+		</main>
+	</div>
+</body>
+</html>

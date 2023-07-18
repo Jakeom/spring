@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/default}">
+
+<body>
+	<div layout:fragment="contents" th:remove="tag">
+		<main id="content" role="main">
+			<h2 class="title">서치펌/고객사 배너 등록</h2>
+			<div class="row p-3">
+	            <div class="col-12">
+					<!-- form -->
+					<form id="insertNotice" name="insertNotice">
+						<table class="table table-bordered">
+							<colgroup>
+								<col style="width:120px" />
+								<col />
+							</colgroup>
+							<tr>
+								<th class="text-center">URL</th>
+									<td><input class="form-control" type="text" id="url"></td>
+								</tr>
+								<tr>
+									<th class="text-center">회사명</th>
+									<td><input class="form-control" type="text" id="companyName"></td>
+								</tr>
+								<tr>
+									<th class="text-center">순서</th>
+									<td><input class="form-control" type="text" id="sort"></td>
+								</tr>
+								<tr>
+									<th class="text-center">노출종류</th>
+									<td><select id="displayType" name="displayType"
+										class="form-control w-auto">
+											<option value="CUSTOMER">고객사</option>
+											<option value="SEARCH">서치펌</option>
+									</select></td>
+								</tr>
+								<tr>
+									<th class="text-center">사용여부</th>
+									<td><label><input type="radio" name="useFlag" value="Y"> 활성</label>
+										<label><input type="radio" name="useFlag" value="N"> 비활성</label></td>
+								</tr>
+								<tr>
+									<th class="text-center">첨부 파일</th>
+									<td><input class="form-control" type="file" id="u_file"
+										name="u_file" accept="image/*">
+			
+										<div id="imgViewArea" style="margin-top: 10px; display: none;">
+											<img id="imgArea" style="width: 200px; height: 100px;"
+												data-role="imgView" />
+										</div></td>
+								</tr>
+						</table>
+						<div class="m-t-10 text-right">
+							<button type="button" class="btn btn-primary" data-role="save">등록</button>
+							<button type="button" class="btn btn-danger" data-role="cancel">목록으로</button>
+						</div>
+					</form>
+					<!-- form -->
+				</div>
+			</div>
+		</main>
+	</div>
+</body>
+</html>

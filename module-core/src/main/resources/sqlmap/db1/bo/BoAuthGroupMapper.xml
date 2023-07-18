@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.bo.BoAuthGroupMapper">
+
+    <!-- 메뉴프로그램 리스트 -->
+    <select id="selectMenuProgram" parameterType="BoAdminMenuProgramDTO" resultType="BoAdminMenuProgramDTO">
+        /* com.fw.core.mapper.db1.bo.BoAuthGroupMapper.selectMenuProgram, 메뉴 프로그램 리스트 조회,22.09.27, yjw , AuthGroupMapper.xml */
+        SELECT program_nm
+             , menu_cd
+             , program_cd
+        FROM tb_admin_menu_program
+    </select>
+
+    <!-- 그룹 리스트 -->
+    <select id="selectGroupList" parameterType="BoGroupDTO" resultType="BoGroupDTO">
+        /* com.fw.core.mapper.db1.bo.BoAuthGroupMapper.selectGroupList, 그룹 리스트 ,22.09.27, yjw , AuthGroupMapper.xml */
+        SELECT group_id
+             , group_nm
+        FROM tb_group
+        WHERE del_flag = 'N'
+          AND use_flag = 'Y'
+    </select>
+
+    <!-- 그룹별 권한 정보 -->
+    <select id="selectGroupAuth" parameterType="BoAuthGroupDTO" resultType="BoAuthGroupDTO">
+        /* com.fw.core.mapper.db1.bo.BoAuthGroupMapper.selectGroupAuth, 그룹별 권한 정보 ,22.09.23, yjw , AuthGroupMapper.xml */
+        SELECT menu_cd
+             , program_cd
+             , create_seq
+             , create_dt
+        FROM tb_admin_group_auth
+        WHERE group_id = #{groupId}
+    </select>
+
+    <!-- 그룹별 권한 적용 -->
+    <insert id="insertGroupAuth" parameterType="BoAuthGroupDTO">
+        /* com.fw.core.mapper.db1.bo.BoAuthGroupMapper.insertGroupAuth, 그룹별 권한 적용,22.09.27, yjw , AuthGroupMapper.xml */
+        INSERT INTO tb_admin_group_auth (
+                group_id
+              , program_cd
+              , menu_cd
+              , create_seq
+              , create_dt
+        ) VALUES
+        <foreach collection="groupAuthList" item="item" separator=",">
+             (
+                #{groupId}
+              , #{item.programCd}
+              , #{item.menuCd}
+              , #{adminSession.adminSeq}
+              , NOW()
+        )
+        </foreach>
+    </insert>
+
+    <!-- 그룹별 권한 초기화 -->
+    <delete id="deleteGroupAuth" parameterType="BoAuthGroupDTO">
+        /* com.fw.core.mapper.db1.bo.BoAuthGroupMapper.deleteGroupAuth, 그룹별 권한 초기화,22.09.27, yjw , AuthGroupMapper.xml */
+        DELETE
+        FROM tb_admin_group_auth
+        WHERE group_id = #{groupId}
+    </delete>
+</mapper>

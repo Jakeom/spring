@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.api.ApiHeadHunterMapper">
+
+    <!-- 내 인재 리스트 카운트 -->
+    <select id="selectApListCnt" parameterType="ApiMemberDTO" resultType="int">
+        /* com.fw.core.mapper.db1.api.ApiHeadHunterMapper.selectApListCnt, 내 인재 리스트 카운트, 23.01.25, YJW, ApiHeadHunterMapper.xml */
+        SELECT COUNT(1)
+        FROM hh_resume_reading_history hrrh
+    LEFT JOIN hh_resume_reading_history_group hrrhg ON hrrhg.id = hrrh.group_id
+    LEFT JOIN resume r ON hrrh.resume_id = r.id AND r.delFlag = 'N'
+    INNER JOIN member m ON r.member_id = m.id
+    LEFT JOIN applicant a ON m.id = a.member_id
+        WHERE hrrh.delFlag = 'N'
+          AND hrrh.member_id = #{memberId}
+          AND CHAR_LENGTH(r.birth) = 8
+    </select>
+
+    <!-- 내 인재 리스트 조회 -->
+    <select id="selectApList" parameterType="ApiMemberDTO" resultType="ApiMemberDTO">
+        /* com.fw.core.mapper.db1.api.ApiHeadHunterMapper.selectApList, 내 인재 리스트 조회, 23.01.25, YJW, ApiHeadHunterMapper.xml */
+        SELECT DATE_FORMAT(hrrh.expireAt,'%Y-%m-%d %H:%i:%s') AS expireAt
+             , m.name
+             , r.picture_file_id
+             , r.birth
+             , r.totalCareer
+             , m.id AS userSeq
+             , fn_get_common_cd(r.genderCd, 'GENDER', 1) as gender
+             , r.genderCd AS genderCd
+             , r.opened
+             , r.firstOpenChanged
+             , (SELECT name FROM resume_academic_background WHERE resume_id = hrrh.resume_id and resume_academic_background.delFlag = 'N' ORDER BY entranceYm DESC LIMIT 1) AS finalSchool
+             , (SELECT locationCd FROM resume_academic_background WHERE resume_id = hrrh.resume_id ORDER BY entranceYm DESC LIMIT 1) AS schoolLocation
+             , (SELECT companyName FROM resume_career WHERE delFlag='N' AND resume_id = hrrh.resume_id ORDER BY holdOffice DESC , resignationYm DESC LIMIT 1) AS finalCompany
+             , a.resumeRestricted
+             , hrrh.resume_id
+             , m.DTYPE AS dtype
+             , (CASE WHEN hrrh.expireAt &lt; NOW() THEN 'EXPIRED'
+                     WHEN a.resumeRestricted = 0 AND opened = 0 THEN 'HH_NOOPEN'
+                     WHEN a.resumeRestricted = 1 AND opened = 0 THEN 'AP_NOOPEN'
+                     WHEN a.resumeRestricted = 1 AND opened = 1 THEN 'AP_NOOPEN'
+               ELSE 'CLEAN' END) AS expireFlag
+             , (CASE WHEN hrrh.registerPathCd = 'POINT' THEN 'PHONE' -- PHONE : 연락처보기 / REGISTER : 인재등록
+                     WHEN hrrh.registerPathCd = 'TICKET' THEN 'PHONE'
+                     WHEN hrrh.registerPathCd = 'REGISTER' THEN 'REGISTER'
+                     WHEN hrrh.registerPathCd = 'TEMP' THEN 'REGISTER'
+                END) registerPath
+        FROM hh_resume_reading_history hrrh
+    LEFT JOIN hh_resume_reading_history_group hrrhg ON hrrhg.id = hrrh.group_id
+    LEFT JOIN resume r ON hrrh.resume_id = r.id AND r.delFlag = 'N'
+    INNER JOIN member m ON r.member_id = m.id -- 이름 null인경우 error발생
+    LEFT JOIN applicant a ON m.id = a.member_id
+        WHERE hrrh.delFlag = 'N'
+          AND hrrh.member_id = #{memberId}
+          AND CHAR_LENGTH(r.birth) = 8
+        <if test='endRow > 0'>
+            LIMIT #{startRow}, #{endRow}
+        </if>
+    </select>
+</mapper>

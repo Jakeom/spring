@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/mLayout">
+<body>
+<div id="container-block" layout:fragment="contents" th:remove="tag">
+    <div class="container">
+        <div class="sub-content">
+            <div class="row row-40 align-items-center">
+                <h3 class="subtitle">채용공고 상세</h3>
+                <div class="title-line mt-4 mb-4"></div>
+                <div class="poting-detail-wrap">
+                    <div class="d-flex justify-content-between">
+                        <div class="announcement-wrap">
+                            <input type="hidden" name="id"
+                                   th:value="${positionDetail} eq null ? '':${positionDetail.id} ">
+                            <p class="scale"><span th:text="${positionDetail.companyScale}"></span><span class="company"
+                                                                                                         th:text="${positionDetail.publicCd} == 0? ${positionDetail.companyName}:''">삼성전자</span>
+                            </p>
+                            <div class="title" th:text="${positionDetail.title}">MIS/인사시스템관리,IT운영-CC파트 콜센터운영/전사/기획 서버 및
+                                DB관리
+                            </div>
+                            <p class="date">
+                                <span>공고마감일</span>
+                                <span th:text="${positionDetail.endDate}">2022.10.21 (금)</span>
+                                <span class="tag tag-lg tag-outline-primary m-0">
+                      <em th:text="${#strings.contains(positionDetail.dDay, '-') ? '공고마감' : 'D-' + positionDetail.dDay}">D-16</em>
+                    </span>
+                            </p>
+                            <span th:text="${positionDetail.industry}"></span>
+                        </div>
+                        <div></div>
+                    </div>
+                    <div class="desc"
+                         th:utext="${positionDetail.jobDescription eq null? '':positionDetail.jobDescription.replaceAll('\n','<br/>')}">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

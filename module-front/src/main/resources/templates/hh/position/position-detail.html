@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security" layout:decorate="~{layouts/hh/mainLayout}">
+<body>
+    <div id="container-block" layout:fragment="contents" th:remove="tag">
+        <div class="container">
+            <div class="sub-content">
+                <div class="position-title-wrap">
+                    <div class="position-title-content">
+                        <th:block th:if="${detail.hhPositionType ne 'PM' and detail.hhPositionType ne 'CO'}">
+                            <span class="tag tag-sm tag-danger m-0">단독</span>
+                        </th:block>
+                        <th:block th:if="${detail.hhPositionType eq 'PM'}">
+                            <span class="tag tag-sm tag-orange m-0">PM</span>
+                        </th:block>
+                        <th:block th:if="${detail.hhPositionType eq 'CO'}">
+                            <span class="tag tag-sm tag-primary m-0">CO</span>
+                        </th:block>
+                        <a th:href="'/hh/company/headhunter-view?positionId=' + ${detail.id}" class="object" th:text="${detail.title}">테스트 포지션등록 (지원하지마세요)</a>
+                        <th:block th:if="${detail.hhPositionType eq 'PM'}">
+                            <span class="tag tag-sm none-border tag-gray" data-bs-toggle="modal" data-bs-target="#modal-cowork-list">CO 현황</span>
+                        </th:block>
+                    </div>
+                    <div class="position-title-state">
+                        <div class="d-flex align-items-center">
+                            <th:block th:if="${detail.hhPositionType ne 'CO'}">
+                                <p class="m-r-10">이 포지션</p>
+                                <select class="select-design select2-hidden-accessible" name="status" data-select2-id="select2-data-1-tov2" tabindex="-1" aria-hidden="true">
+                                    <option value="">상태변경</option>
+                                    <option value="CLOSED">종료</option>
+                                </select>
+                            </th:block>
+                            <th:block th:if="${detail.hhPositionType eq 'CO'}">
+                                <p class="m-r-10">이 포지션</p>
+                                <select class="select-design select2-hidden-accessible" name="coStatus" data-select2-id="select2-data-1-tov2" tabindex="-1" aria-hidden="true">
+                                    <option value="">상태변경</option>
+                                    <option value="CLOSED">코웍종료</option>
+                                </select>
+                            </th:block>
+                        </div>
+                    </div>
+                </div>
+                <ul class="nav nav-tabs m-t-30" id="myTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" th:classappend="${#strings.isEmpty(searchInfo.viewMode) or #strings.equals('CONTACT', searchInfo.viewMode) ? 'active' : ''}" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">컨택리스트</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" th:classappend="${#strings.equals('REGISTER', searchInfo.viewMode) ? 'active' : ''}" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false" tabindex="-1">접수</button>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane fade" th:classappend="${#strings.isEmpty(searchInfo.viewMode) or #strings.equals('CONTACT', searchInfo.viewMode) ? 'active show' : ''}" id="home" role="tabpanel" aria-labelledby="home-tab">
+                        <form name="contactForm" action="/hh/position/position-detail">
+                            <div class="btn-group m-t-30 d-flex align-items-center justify-content-between">
+                                <div>
+                                    <a href="/hh/myap/myap-list" class="btn btn-outline-dark btn-md">인재검색</a>
+                                    <a href="javascript:void(0)" class="btn btn-dark btn-md" data-bs-toggle="modal" data-bs-target="#modal-position-list">목록추가(수동)</a>
+                                    <button type="button" class="btn btn-outline-danger btn-md" data-role="deleteContactList">삭제</button>
+                                </div>
+                                <div>
+                                <input type="hidden" name="id" th:value="${detail.id}" />
+                                <input type="hidden" name="viewMode" value="CONTACT" />
+                                <select name="searchType" class="select-design" style="width: 150px">
+                                    <option value="">상태</option>
+                                    <option value="NOTHING" th:selected="${'NOTHING' eq searchInfo.searchType}">제안전</option>
+                                    <option value="PROPOSAL" th:selected="${'PROPOSAL' eq searchInfo.searchType}">제안중</option>
+                                    <option value="REJECT" th:selected="${'REJECT' eq searchInfo.searchType}">제안거부</option>
+                                    <option value="ACCEPT" th:selected="${'ACCEPT' eq searchInfo.searchType}">제안승인</option>
+                                    <option value="OK" th:selected="${'OK' eq searchInfo.searchType}">적합</option>
+                                    <option value="NO" th:selected="${'NO' eq searchInfo.searchType}">부적합</option>
+                                </select>
+                                <button type="button" class="btn btn-outline-dark btn-md" data-bs-toggle="modal" data-bs-target="#modal-suggest-email" data-id="#mail-tab">이메일 제안</button>
+                                <button type="button" class="btn btn-outline-primary btn-md" data-bs-toggle="modal" data-bs-target="#modal-suggest-sms" data-id="#sms-tab">문자 안내</button>
+                                </div>
+                            </div>
+                        </form>
+                        <table class="table m-t-30">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">
+                                        <div class="form-check p-0">
+                                            <input class="form-check-input" type="checkbox" name="contactListCheckAll" value="" />
+                                        </div>
+                                    </th>
+                                    <th class="text-center">등록일<br/>제안일</th>
+                                    <th class="text-center">등록경로</th>
+                                    <th class="text-center">이름<br/>생년월일</th>
+                                    <th class="text-center">연락처<br/>이메일</th>
+                                    <th class="text-center">이력서</th>
+                                    <th class="text-center">상태</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <th:block th:if="${#lists.isEmpty(contactList)}">
+                                    <tr>
+                                        <td colspan="8" class="text-center">컨택리스트가 없습니다.</td>
+                                    </tr>
+                                </th:block>
+                                <th:block th:each="list : ${contactList}">
+                                    <tr>
+                                        <td class="text-center">
+                                            <div class="form-check p-0">
+                                                <th:block th:if="${list.regPath eq '2'}">
+                                                    <span th:if="${#strings.isEmpty(list.processStatus)}">
+                                                        <input class="form-check-input" type="checkbox" name="applicantIds"
+                                                           th:value="${list.id}"
+                                                           th:data-name="${list.name}"
+                                                           th:data-reg-path="${list.regPath}"
+                                                           data-email-flag="N"
+                                                        />
+                                                    </span>
+                                                    <span th:if="${not #strings.isEmpty(list.processStatus) and not #strings.equals('FAIL', list.processStatus)}">
+                                                        <input class="form-check-input" type="checkbox" name="applicantIds"
+                                                           th:value="${list.id}"
+                                                           th:data-name="${list.name}"
+                                                           th:data-reg-path="${list.regPath}"
+                                                           data-email-flag="N"
+                                                        />
+                                                    </span>
+                                                    <span th:if="${#strings.equals('FAIL', list.processStatus)}">
+                                                        <input class="form-check-input" type="checkbox" name="applicantIds"
+                                                           th:value="${list.id}"
+                                                           th:data-name="${list.name}"
+                                                           th:data-reg-path="${list.regPath}"
+                                                           data-email-flag="N"
+                                                        />
+                                                    </span>
+                                                </th:block>
+                                                <th:block th:if="${list.regPath ne '2'}">
+                                                    <th:block th:if="${#strings.isEmpty(list.proposalStatusNm)}">
+                                                        <input class="form-check-input" type="checkbox" name="applicantIds"
+                                                           th:value="${list.id}"
+                                                           th:data-name="${list.name}"
+                                                           th:data-reg-path="${list.regPath}"
+                                                           data-email-flag="Y"
+                                                        />
+                                                    </th:block>
+                                                    <th:block th:if="${#strings.equals('PROPOSAL', list.proposalStatus) or #strings.equals('UNDER_REVIEW', list.proposalStatus)}">
+                                                        <input class="form-check-input" type="checkbox" name="applicantIds"
+                                                           th:value="${list.id}"
+                                                           th:data-name="${list.name}"
+                                                           th:data-reg-path="${list.regPath}"
+                                                           data-email-flag="Y"
+                                                        />
+                                                    </th:block>
+                                                    <th:block th:if="${#strings.equals('ACCEPT', list.proposalStatus) or #strings.equals('REJECT', list.proposalStatus)}">
+                                                        <input class="form-check-input" type="checkbox" name="applicantIds"
+                                                           th:value="${list.id}"
+                                                           th:data-name="${list.name}"
+                                                           th:data-reg-path="${list.regPath}"
+                                                           data-email-flag="N"
+                                                        />
+                                                    </th:block>
+                                                </th:block>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                            <p th:text="${list.createdAt}">2022-10-30</p>
+                                            <p th:text="${#strings.isEmpty(list.proposalAt) ? '-' : list.proposalAt}">2022-10-31</p>
+                                        </td>
+                                        <td class="text-center">
+                                            <p th:text="${list.regPathNm}">내인재</p>
+                                        </td>
+                                        <td class="text-center">
+                                            <p th:text="${list.name}">곽정석</p>
+                                            <p th:text="${#strings.isEmpty(list.year) ? '-' : list.year + '(' + list.age + ')'}">1975(48)</p>
+                                        </td>
+                                        <td class="text-center">
+                                            <p>
+                                                <th:block th:if="${detail.hhPositionType ne 'CO'}">
+                                                    <span th:text="${#strings.equals('0', list.phoneOpened) and #strings.equals('CO', list.receiptPath) ? '비공개' : list.phone}">010-1111-2222</span>
+                                                </th:block>
+                                                <th:block th:if="${detail.hhPositionType eq 'CO'}">
+                                                    <span th:text="${list.phone}">010-1111-2222</span>
+                                                </th:block>
+                                                <th:block th:if="${list.regPath ne '3' and !#strings.equals('true', list.isTemp)}">
+                                                    <button type="button" class="tag tag-sm none-border" data-role="chat"
+                                                            th:data-position-id="${detail.id}"
+                                                            th:data-headhunter-id="${#authentication.principal.id}"
+                                                            th:data-headhunter-name="${#authentication.principal.name}"
+                                                            th:data-member-id="${list.memberId}"
+                                                            th:data-member-name="${list.name}"
+                                                            th:data-title="${detail.title}">채팅하기</button>
+                                                </th:block>
+                                            </p>
+                                            <th:block th:if="${detail.hhPositionType ne 'CO'}">
+                                                <p th:text="${#strings.equals('0', list.phoneOpened) and #strings.equals('CO', list.receiptPath) ? '비공개' : list.email}">soft@gmail.com</p>
+                                            </th:block>
+                                            <th:block th:if="${detail.hhPositionType eq 'CO'}">
+                                                <p th:text="${list.email}">010-1111-2222</p>
+                                            </th:block>
+                                        </td>
+                                        <td class="text-center">
+                                            <th:block th:if="${detail.hhPositionType ne 'CO'}">
+                                                <th:block th:if="${not #strings.isEmpty(list.resumeId)}">
+                                                    <a th:if="${(#strings.equals('1', list.phoneOpened)) or (not #strings.equals('CO접수', list.receiptPathNm))}" th:data-id="${list.id}" th:href="'/m/resume/resume-detail-ap?mode=view&f=' + ${list.resumeModifyFlag} + '&resumeId=' + ${list.resumeId} + '&applicantId=' + ${list.id}" target="_blank" data-role="show">보기</a>
+                                                </th:block>
+                                            </th:block>
+                                            <th:block th:if="${detail.hhPositionType eq 'CO'}">
+                                                <a th:if="${not #strings.isEmpty(list.resumeId)}" th:data-id="${list.id}" th:href="'/m/resume/resume-detail-ap?mode=view&f=' + ${list.resumeModifyFlag} + '&resumeId=' + ${list.resumeId} + '&applicantId=' + ${list.id}" target="_blank" data-role="show">보기</a>
+                                            </th:block>
+                                        </td>
+                                        <td class="text-center">
+                                            <th:block th:if="${list.regPath eq '2'}">
+                                                <th:block th:if="${#strings.isEmpty(list.processStatus)}">
+                                                    <a href="javascript:void(0)" class="text-underline" data-bs-toggle="modal" data-bs-target="#modal-progress-state"
+                                                       th:data-phone="${list.phone}"
+                                                       th:data-id="${list.id}">적합/부적합</a>
+                                                </th:block>
+                                                <span th:if="${not #strings.isEmpty(list.processStatus) and not #strings.equals('FAIL', list.processStatus)}">적합</span>
+                                                <span th:if="${#strings.equals('FAIL', list.processStatus)}">부적합</span>
+                                            </th:block>
+                                            <th:block th:if="${list.regPath ne '2'}">
+                                                <p th:if="${#strings.isEmpty(list.proposalStatusNm)}">제안전</p>
+                                                <p th:if="${#strings.equals('UNDER_REVIEW', list.proposalStatus)}">제안전</p>
+                                                <p th:if="${#strings.equals('PROPOSAL', list.proposalStatus)}">제안중</p>
+                                                <p th:if="${#strings.equals('ACCEPT', list.proposalStatus)}">제안승인</p>
+                                                <p th:if="${#strings.equals('REJECT', list.proposalStatus)}">제안거부</p>
+                                            </th:block>
+                                        </td>
+                                    </tr>
+                                </th:block>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="tab-pane fade" th:classappend="${#strings.equals('REGISTER', searchInfo.viewMode) ? 'active show' : ''}" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+                        <form name="contactForm" action="/hh/position/position-detail">
+                            <input type="hidden" name="viewMode" value="REGISTER" />
+                            <input type="hidden" name="id" th:value="${detail.id}" />
+                            <div class="btn-group m-t-30 d-flex align-items-center justify-content-between">
+                                <div>
+                                    <button type="button" class="btn btn-outline-danger btn-md" data-bs-toggle="modal" data-bs-target="#modal-fail-sms">탈락</button>
+                                    <select class="select-design" name="searchType2" style="width: 150px">
+                                        <option value="">전형결과</option>
+                                        <option value="NOTHING" th:selected="${'NOTHING' eq searchInfo.searchType2}">전형전</option>
+                                        <option value="ING" th:selected="${'ING' eq searchInfo.searchType2}">전형중</option>
+                                        <option value="DOCUMENT_FAIL" th:selected="${'DOCUMENT_FAIL' eq searchInfo.searchType2}">서류탈락</option>
+                                        <option value="FAIL" th:selected="${'FAIL' eq searchInfo.searchType2}">최종탈락</option>
+                                        <option value="DOCUMENT_PASS" th:selected="${'DOCUMENT_PASS' eq searchInfo.searchType2}">서류통과</option>
+                                        <option value="PASS" th:selected="${'PASS' eq searchInfo.searchType2}">최종합격</option>
+                                    </select>
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <th:block th:if="${detail.hhPositionType ne 'CO'}">
+                                        <p class="m-r-15">채용사 추천을 위해 이력서 보기 화면에서 추천용 PDF 파일을 등록해주세요.</p>
+                                        <button type="button" class="btn btn-primary btn-md" data-bs-toggle="modal" data-bs-target="#modal-recommend-email">채용사에 추천</button>
+                                    </th:block>
+                                    <th:block th:if="${detail.hhPositionType eq 'CO'}">
+                                        <button type="button" class="btn btn-primary btn-md" data-role="submitPm">PM 제출</button>
+                                    </th:block>
+                                </div>
+                            </div>
+                        </form>
+                        <table class="table m-t-30">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="processListCheckAll" value="" />
+                                        </div>
+                                    </th>
+                                    <th class="text-center">접수일</th>
+                                    <th class="text-center">접수경로</th>
+                                    <th class="text-center">이름<br/>생년월일</th>
+                                    <th class="text-center">연락처<br/>이메일</th>
+                                    <th class="text-center">동의서/이력서</th>
+                                    <th class="text-center">이력서</th>
+                                    <th class="text-center">상태</th>
+                                    <th class="text-center">전형결과</th>
+                                    <th class="text-center">인재등록</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            <th:block th:if="${#lists.isEmpty(processList)}">
+                                <tr>
+                                    <td colspan="10" class="text-center">접수리스트가 없습니다.</td>
+                                </tr>
+                            </th:block>
+                            <th:block th:each="list : ${processList}">
+                                <tr>
+                                    <td class="text-center">
+                                        <div class="form-check p-0">
+                                            <input class="form-check-input" type="checkbox" name="registerApplicantIds"
+                                                   th:value="${list.id}"
+                                                   th:data-submit-resume-file-id="${list.submitResumeFileId}"
+                                                   th:data-name="${list.name}"
+                                            />
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <p th:text="${list.changeAt}">2022-10-30</p>
+                                    </td>
+                                    <td class="text-center">
+                                        <p th:text="${list.receiptPathNm}">내인재</p>
+                                    </td>
+                                    <td class="text-center">
+                                        <p th:text="${list.name}">곽정석</p>
+                                        <p th:text="${#strings.isEmpty(list.year) ? '-' : list.year + '(' + list.age + ')'}">1975(48)</p>
+                                    </td>
+                                    <td class="text-center">
+                                        <p>
+                                            <th:block th:if="${detail.hhPositionType ne 'CO'}">
+                                                <th:block th:if="${not #strings.isEmpty(list.resumeId)}">
+                                                    <span th:text="${list.resumeId}"></span>
+                                                    <a th:if="${(#strings.equals('1', list.phoneOpened)) or (not #strings.equals('CO접수', list.receiptPathNm))}" th:data-id="${list.id}" th:href="'/m/resume/resume-detail-ap?mode=view&f=' + ${list.resumeModifyFlag} + '&resumeId=' + ${list.resumeId} + '&applicantId=' + ${list.id}" target="_blank" data-role="show">보기</a>
+                                                </th:block>
+                                            </th:block>
+                                            <th:block th:if="${detail.hhPositionType eq 'CO'}">
+                                                <span th:text="${list.phone}">010-1111-2222</span>
+                                            </th:block>
+                                        </p>
+                                        <th:block th:if="${detail.hhPositionType ne 'CO'}">
+                                            <p th:text="${#strings.equals('0', list.phoneOpened) and #strings.equals('CO', list.receiptPath) ? '비공개' : list.email}">010-1111-2222</p>
+                                        </th:block>
+                                        <th:block th:if="${detail.hhPositionType eq 'CO'}">
+                                            <p th:text="${list.email}">010-1111-2222</p>
+                                        </th:block>
+                                        <th:block th:if="${detail.hhPositionType eq 'CO' and list.phoneOpened eq '0'}">
+                                            <p>
+                                                <button type="button" class="tag tag-sm none-border" data-bs-toggle="modal" data-bs-target="#modal-open-info" th:data-id="${list.id}">연락처 공개하기</button>
+                                            </p>
+                                        </th:block>
+                                    </td>
+                                    <td class="text-center">
+                                        <a th:if="${not #lists.isEmpty(list.agreeFileList)}" th:href="${list.agreeFileList[0].url}">(동의서)</a><br />
+                                        <a th:if="${not #lists.isEmpty(list.resumeFileList)}" th:href="${list.resumeFileList[0].url}">(이력서)</a>
+                                    </td>
+                                    <td class="text-center">
+                                        <th:block th:if="${detail.hhPositionType ne 'CO'}">
+                                            <th:block th:if="${(not #strings.isEmpty(list.resumeId) and #strings.equals('1', list.phoneOpened)) or (not #strings.equals('CO접수', list.receiptPathNm))}">
+                                                <a th:data-id="${list.id}" th:href="'/m/resume/resume-detail-ap?mode=recommend&submitResumeFileId=' + ${list.submitResumeFileId} + '&f=' + ${list.resumeModifyFlag} + '&resumeId=' + ${list.resumeId} + '&applicantId=' + ${list.id}" target="_blank" data-role="show">보기</a>
+                                                <br /><span th:if="${!#strings.isEmpty(list.submitResumeFileId)}">(첨부)</span>
+                                            </th:block>
+                                        </th:block>
+                                        <th:block th:if="${detail.hhPositionType eq 'CO'}">
+                                            <a th:if="${not #strings.isEmpty(list.resumeId)}" th:data-id="${list.id}" th:href="'/m/resume/resume-detail-ap?mode=recommend&submitResumeFileId=' + ${list.submitResumeFileId} + '&f=' + ${list.resumeModifyFlag} + '&resumeId=' + ${list.resumeId} + '&applicantId=' + ${list.id}" target="_blank" data-role="show">보기</a>
+                                            <br /><span th:if="${!#strings.isEmpty(list.submitResumeFileId)}">(첨부)</span>
+                                        </th:block>
+                                    </td>
+                                    <td class="text-center">
+                                        <th:block th:if="${list.regPath eq '2'}">
+                                            <span>적합</span>
+                                        </th:block>
+                                        <th:block th:if="${list.regPath ne '2'}">
+                                            <p th:if="${#strings.isEmpty(list.proposalStatusNm)}">제안전</p>
+                                            <p th:if="${#strings.equals('UNDER_REVIEW', list.proposalStatus)}">제안전</p>
+                                            <p th:if="${#strings.equals('PROPOSAL', list.proposalStatus)}">제안중</p>
+                                            <p th:if="${#strings.equals('ACCEPT', list.proposalStatus)}">제안승인</p>
+                                            <p th:if="${#strings.equals('REJECT', list.proposalStatus)}">제안거부</p>
+                                        </th:block>
+                                    </td>
+                                    <td class="text-center">
+                                        <p th:if="${#strings.isEmpty(list.processStatusNm) and !#strings.equals('PROCESS', list.progressStep)}">전형전</p>
+                                        <p th:if="${#strings.isEmpty(list.processStatusNm) and #strings.equals('PROCESS', list.progressStep)}">전형중</p>
+                                        <p th:if="${#strings.equals('서류합격', list.processStatusNm)}">
+                                            서류합격<br />
+                                            <button type="button" class="tag tag-sm none-border" data-role="finalPass" th:data-id="${list.id}">최종합격</button>
+                                        </p>
+                                        <p th:if="${#strings.equals('DOCUMENT_REVIEW', list.processStatus)}">
+                                            전형중
+                                        </p>
+                                        <p th:if="${!#strings.isEmpty(list.processStatusNm) and !#strings.equals('서류합격', list.processStatusNm) and !#strings.equals('DOCUMENT_REVIEW', list.processStatus)}" th:text="${list.processStatusNm}"></p>
+                                    </td>
+                                    <td class="text-center">
+                                        <button th:if="${#strings.isEmpty(list.resumeId)}" type="button" class="tag tag-sm none-border" data-role="registerResume" th:data-id="${list.id}" th:data-memberId="${list.memberId}">인재등록</button>
+                                    </td>
+                                </tr>
+                            </th:block>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center justify-content-between"></div>
+            </div>
+        </div>
+
+        <div layout:fragment="modal" th:remove="tag">
+            <div class="modal fade" id="modal-cowork-list" tabindex="-1" aria-labelledby="coworkListModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-comment modal-dialog-centered" style="max-width: 900px">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">CO현황 <small>현재 포지션에 참여중인 코워커(CO) 현황</small></h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <table class="table border-top-1 m-t-30">
+                                <colgroup>
+                                    <col style="width:25%" />
+                                    <col style="width:25%" />
+                                    <col style="width:25%" />
+                                    <col style="width:25%" />
+                                </colgroup>
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">CO</th>
+                                        <th class="text-center">ID</th>
+                                        <th class="text-center">참여일</th>
+                                        <th class="text-center">접수이력서</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <th:block th:each="list : ${coworkerList}">
+                                        <tr>
+                                            <td class="text-center" th:text="${list.name}"></td>
+                                            <td class="text-center" th:text="${list.loginId}"></td>
+                                            <td class="text-center" th:text="${list.createdAt}"></td>
+                                            <td class="text-center" th:text="${list.resumeCnt}"></td>
+                                        </tr>
+                                    </th:block>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">확인</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 이메일 포지션 제안 메일 -->
+            <div class="modal fade" id="modal-suggest-email" tabindex="-1" aria-labelledby="suggestEmailModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-comment modal-dialog-centered" style="max-width: 900px">
+                    <div class="modal-content">
+                        <div class="modal-header justify-content-end">
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row email-wrap m-0">
+                                <div class="col-12 m-t-20">
+                                    <div class="d-flex justify-content-between">
+                                        <div class="d-flex gap-10">
+                                            <select class="select-design" style="width: 250px"
+                                                    data-url="/fo/common/template/list/EMAIL"
+                                                    data-show-name="name"
+                                                    data-value-name="id"
+                                                    data-default-option="불러올 템플릿 선택"
+                                                    name="emailTemplate"
+                                            >
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <table class="table border-top-1 m-t-30">
+                                <colgroup>
+                                    <col style="width:15%" />
+                                </colgroup>
+                                <tbody>
+                                <tr>
+                                    <th class="">관련 포지션</th>
+                                    <td class="position" th:text="${detail.title}"></td>
+                                </tr>
+                                <tr>
+                                    <th class="">받는 사람</th>
+                                    <td class="">
+                                        <div class="d-flex align-items-center justify-content-between">
+                                            <div class="coworker-wrap m-r-15 bg-white">
+                                                <div class="coworker-list">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="">제목</th>
+                                    <td class="">
+                                        <input type="text" class="form-control form-lg" name="emailSubject" value="" placeholder="제목을 입력해주세요." />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="">내용</th>
+                                    <td class="">
+                                        <textarea class="form-control form-lg" id="emailContent" name="emailContent" value="" placeholder="내용을 입력해주세요." rows="15" th:utext="${profile.signatureProposal}"></textarea>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">취소</button>
+                                <button type="button" class="btn btn-primary" data-role="sendEmail">확인</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 인사담당자 추천 메일 -->
+            <div class="modal fade" id="modal-recommend-email" tabindex="-1" aria-labelledby="recommendEmailModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-comment modal-dialog-centered" style="max-width: 900px">
+                    <div class="modal-content">
+                        <div class="modal-header justify-content-end">
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <table class="table border-top-1 m-t-30">
+                                <colgroup>
+                                    <col style="width:15%" />
+                                </colgroup>
+                                <tbody>
+                                <tr>
+                                    <th class="">수신기업</th>
+                                    <td class="position" th:text="${detail.companyName}"></td>
+                                </tr>
+                                <tr>
+                                    <th class="">제목
+                                        <div class="coworker-list recommend-list"></div></th>
+                                    <td class="">
+                                        <input type="text" class="form-control form-lg" name="recommendSubject" value="" placeholder="제목을 입력해주세요." />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="">내용</th>
+                                    <td class="">
+                                        <textarea class="form-control form-lg" id="recommendContent" name="recommendContent" value="" placeholder="내용을 입력해주세요." rows="15"></textarea>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="">열람비밀번호 설정</th>
+                                    <td class="">
+                                        <input type="password" class="form-control form-lg" name="password" value="" />
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">취소</button>
+                                <button type="button" class="btn btn-primary" data-role="sendRecommendEmail">확인</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SMS 안내 문자 -->
+            <div class="modal fade" id="modal-suggest-sms" tabindex="-1" aria-labelledby="suggestSmsModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-comment modal-dialog-centered" style="max-width: 900px">
+                    <div class="modal-content">
+                        <div class="modal-header justify-content-end">
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row email-wrap m-0">
+                                <div class="col-12 m-t-20">
+                                    <div class="d-flex justify-content-between">
+                                        <div class="d-flex gap-10">
+                                            <select class="select-design" style="width: 250px"
+                                                    name="smsTemplate"
+                                                    data-url="/fo/common/template/list/SMS"
+                                                    data-show-name="name"
+                                                    data-value-name="id"
+                                                    data-default-option="불러올 템플릿 선택"
+                                            >
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <table class="table border-top-1 m-t-30">
+                                <colgroup>
+                                    <col style="width:15%" />
+                                </colgroup>
+                                <tbody>
+                                <tr>
+                                    <th class="">관련 포지션</th>
+                                    <td class="position" th:text="${detail.title}"></td>
+                                </tr>
+                                <tr>
+                                    <th class="">받는 사람</th>
+                                    <td class="">
+                                        <div class="d-flex align-items-center justify-content-between">
+                                            <div class="coworker-wrap m-r-15 bg-white">
+                                                <div class="coworker-list">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="">제목</th>
+                                    <td class="">
+                                        <input type="text" class="form-control form-lg" name="smsSubject" value="" placeholder="제목을 입력해주세요." />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="">내용</th>
+                                    <td class="">
+                                        <textarea class="form-control form-lg" name="smsContent" value="" placeholder="내용을 입력해주세요." rows="15"></textarea>
+                                        <div class="msg-type m-t-10" style="text-align: right">0 byte / SMS</div>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">취소</button>
+                                <button type="button" class="btn btn-primary" data-role="sendSms">확인</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SMS 탈락 문자 -->
+            <div class="modal fade" id="modal-fail-sms" tabindex="-1" aria-labelledby="failSmsModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-comment modal-dialog-centered" style="max-width: 900px">
+                    <div class="modal-content">
+                        <div class="modal-header justify-content-end">
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <table class="table border-top-1 m-t-30">
+                                <colgroup>
+                                    <col style="width:15%" />
+                                </colgroup>
+                                <tbody>
+                                <tr>
+                                    <th class="">받는 사람</th>
+                                    <td class="">
+                                        <div class="d-flex align-items-center justify-content-between">
+                                            <div class="coworker-wrap m-r-15 bg-white">
+                                                <div class="coworker-list">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="">제목</th>
+                                    <td class="">
+                                        <input type="text" class="form-control form-lg" name="failSmsSubject" value="" placeholder="제목을 입력해주세요." />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="">내용</th>
+                                    <td class="">
+                                        <textarea class="form-control form-lg" name="failSmsContent" value="" placeholder="내용을 입력해주세요." rows="15"></textarea>
+                                        <div class="msg-type m-t-10" style="text-align: right">0 byte / SMS</div>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">취소</button>
+                                <button type="button" class="btn btn-primary" data-role="sendFailSms">확인</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 목록추가(수동) -->
+            <div class="modal fade" id="modal-position-list" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-write modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">목록추가(수동)</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p class="m-b-25">기본정보를 알고있는 후보자의 경우 컨택리스트에 추가 후, 포지션 제안을 할 수 있습니다.</p>
+                            <table class="table border-top-1 m-t-30">
+                                <colgroup>
+                                    <col style="width:25%" />
+                                </colgroup>
+                                <tbody>
+                                <tr>
+                                    <th class="">이름</th>
+                                    <td class="">
+                                        <input type="hidden" name="positionId" th:value="${detail.id}" />
+                                        <input type="text" class="form-control form-lg" name="name" value="" placeholder="이름" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="">휴대폰번호</th>
+                                    <td class="">
+                                        <input type="text" class="form-control form-lg" name="phone" value="" placeholder="(-)를 제외하고 입력" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="">이메일주소</th>
+                                    <td class="">
+                                        <input type="text" class="form-control form-lg" name="email" value="" placeholder="email@example.com" />
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">취소</button>
+                            <button type="button" class="btn btn-primary" data-role="contactManualRegister">확인</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 포지션 종료 -->
+            <div class="modal fade" id="modal-position-end" tabindex="-1" aria-labelledby="positionEndModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-write modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="positionEndModalLabel">포지션 종료</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p class="m-b-25">포지션 종료 사유를 선택하세요</p>
+                            <table class="table border-top-1 m-t-30">
+                                <colgroup>
+                                </colgroup>
+                                <tbody>
+                                <tr>
+                                    <th class="">
+                                        <input type="hidden" name="positionId" th:value="${detail.id}" />
+                                        <input type="radio" name="stopReason" id="stopReasonDONE" value="DONE" />
+                                        <label for="stopReasonDONE">채용완료</label>
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th class="">
+                                        <input type="radio" name="stopReason" id="stopReasonCHANGE" value="CHANGE" />
+                                        <label for="stopReasonCHANGE">채용사의 계획 변경</label>
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th class="">
+                                        <input type="radio" name="stopReason" id="stopReasonETC" value="ETC" />
+                                        <label for="stopReasonETC">기타</label>
+                                    </th>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <p class="m-t-25">포지션 종료 후에는 재개할 수 없습니다.<br />종료하시겠습니까?</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">취소</button>
+                            <button type="button" class="btn btn-primary" data-role="positionEnd">확인</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 코웍 종료 -->
+            <div class="modal fade" id="modal-coworker-end" tabindex="-1" aria-labelledby="coworkerEndModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-write modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="coworkerEndModalLabel">포지션 코웤 종료</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <input type="hidden" name="positionId" th:value="${detail.id}" />
+                            <p class="m-b-25">코웤 종료 이후 다시 참여하기 위해서는 해당 공고에서 다시 코웤 참여를 해야합니다.</p>
+                            <p class="m-t-25">현재 진행중인 코웤을 종료하시겠습니까?</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">취소</button>
+                            <button type="button" class="btn btn-primary" data-role="coworkerEnd">확인</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 연락처 공개 -->
+            <div class="modal fade" id="modal-open-info" tabindex="-1" aria-labelledby="openInfoModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-write modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="openInfoModalLabel">연락처 공개</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <input type="hidden" name="id" />
+                            <p class="m-b-25">PM에게 연락처를 공개하시겠습니까?</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">취소</button>
+                            <button type="button" class="btn btn-primary" data-role="openInfoConfirm">확인</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 컨택리스트 삭제 -->
+            <div class="modal fade" id="modal-delete-contact-list" tabindex="-1" aria-labelledby="contactListDeleteModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-write modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="contactListDeleteModalLabel">컨택리스트 삭제</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p class="m-t-25">컨택리스트를 삭제하시겠습니까?</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">취소</button>
+                            <button type="button" class="btn btn-primary" data-role="deleteContactListConfirm">확인</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 포지션 상세 - 컨택리스트 상태 적합/부적합 선택 -->
+            <div class="modal fade" id="modal-progress-state" tabindex="-1" aria-labelledby="progressStateModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-comment modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header justify-content-end">
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="text-form text-center">
+                                직접지원한 인재의 경우 이력서를 확인 후<br />
+                                적합, 부적합 여부를 선택해주세요.
+                            </div>
+                            <div class="d-flex justify-content-center m-b-25">
+                                <input type="hidden" name="id" />
+                                <input type="hidden" name="phone" />
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="progress" value="PASS" id="passProgress" checked />
+                                    <label class="form-check-label" for="passProgress"> 적합 </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="progress" value="FAIL" id="failProgress" />
+                                    <label class="form-check-label" for="failProgress"> 부적합 </label>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">취소</button>
+                                <button type="button" class="btn btn-primary" data-role="nextProgress">확인</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </th:block>
+    </div>
+</body>
+</html>

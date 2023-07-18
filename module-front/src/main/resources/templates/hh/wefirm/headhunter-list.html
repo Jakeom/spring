@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layouts/hh/hhWefirmLayout">
+<body>
+	<div id="container-block">
+		<div layout:fragment="contents" th:remove="tag">
+			<div class="layout-content">
+				<div class="d-flex">
+					<h3 class="subtitle">헤드헌터 리스트</h3>
+					<span class="font-size-14 m-l-20 text-gray">※ 퇴사 후 즉시 WE펌에서 탈퇴 처리 해주셔야 합니다. 미 처리 시 WE펌 사용에 제한을 받을 수 있습니다.<br /> (직업안정법
+						상 서치펌 변경 후 30일 이내 신고하지 않으면 법률위반 입니다)
+					</span>
+				</div>
+				<div class="title-line mt-4 mb-5"></div>
+				<form name="searchForm" action="/hh/wefirm/headhunter-list">
+					<input type="hidden" name="page" th:value="${searchInfo.page}" />
+					<div class="tbl-head justify-content-end">
+						<div class="d-flex gap-10">
+							<input type="text" class="form-control white form-md" name="searchValue" th:value="${searchInfo.searchValue}" style="width: 250px"
+								placeholder="검색어를 입력하세요." />
+							<button type="button" class="btn btn-outline-gray btn-md" data-role="search">검색</button>
+						</div>
+					</div>
+				</form>
+				<table class="table border-top-1 m-t-15">
+					<thead>
+						<tr>
+							<th class="text-center">
+								<div class="form-check p-0">
+									<input class="form-check-input" type="checkbox" value="" name="checkAll" />
+								</div>
+							</th>
+							<th class="text-center">No.</th>
+							<th class="text-center">사진</th>
+							<th class="text-center">이름</th>
+							<th class="text-center">연락처</th>
+							<th class="text-center">이메일</th>
+							<th class="text-center">가입일</th>
+							<th class="text-center">진행중공고</th>
+						</tr>
+					</thead>
+					<tbody>
+						<th:block th:if="${#lists.isEmpty(wefirmHeadhunterList)}">
+                            <tr>
+                              <td colspan="8" class="text-center">헤드헌터 리스트가 없습니다.</td>
+                           </tr>
+                         </th:block>
+						<tr th:each="list : ${wefirmHeadhunterList}">
+							<td class="text-center">
+                                <th:block th:if="${!#strings.equals('대표', list.adminRole) and !#strings.equals('운영자', list.adminRole)}">
+                                    <input type="checkbox" class="form-check-input" th:value="${list.id}" name="checkHeadhunter" />
+                                </th:block>
+                            </td>
+							<th:bolck>
+							<td class="text-center">
+								<p th:text="${list.adminRole}">1</p>
+							</td>
+							</th:block>
+							<td class="text-center">
+								<div class="img-box"
+									th:style="${!#lists.isEmpty(list.commonFileList)? 'background-image: url('+ list.commonFileList[0].url+');background-size:100% 100%': 'background-image: url(/static/images/no-img.png);background-size:100% 100%'}">
+								</div>
+							</td>
+							<td class="text-center">
+								<p th:text="${list.name}">홍길동</p>
+							</td>
+							<td class="text-center">
+								<p th:text="${list.phone}">010-1234-5678</p>
+							</td>
+							<td class="text-center">
+								<p th:text="${list.email}">asdb@naver.com</p>
+							</td>
+							<td class="text-center">
+								<p th:text="${list.createdAt}">2020.12.01</p>
+							</td>
+							<td class="text-center">
+								<p>
+								   <a th:href="'/hh/wefirm/position-list?memberId='+${list.memberId}" class="text-danger" th:text="${list.postingCnt}">1</a>건
+								</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				<div class="d-flex justify-content-end m-t-15">
+					<button type="button" class="btn btn-outline-danger btn-md" data-role="delete">강제탈퇴</button>
+				</div>
+				<div class="d-flex justify-content-center mt-5">
+					<th:block th:include="common/paging :: paging_Fragment(fnc=*{'fn_go_page(this)'}, pageId=*{'pageName1'})" />
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

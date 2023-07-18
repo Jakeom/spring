@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html
+    lang="ko"
+    xmlns:th="http://www.thymeleaf.org"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<head>
+    <th:block th:include="_include/_head :: commonMetaAndTitle" />
+    <th:block th:include="_include/_head :: commonStyle" />
+    <th:block layout:fragment="head" th:remove="tag" />
+</head>
+
+
+<body >
+    <div th:include="_include/_headhunter_main_header :: common" th:remove="tag"></div>
+    <div id="container-block">
+        <div class="container">
+            <div class="layout">
+                <div class="layout-left">
+                <th:block th:include="_include/_address_aside :: common" th:remove="tag"/>
+                </div>
+                <!-- Content Wrapper. Contains page content -->
+                <th:block layout:fragment="contents" />
+
+                <!-- 알림 버튼 -->
+                <th:block th:if="${alarmCnt != null}">
+                    <a href="javascript:void(0)" class="chat-notice" th:classappend="${alarmCnt > 0 ? 'active' : ''}">
+                        <i class="icon-chat-notice"></i>
+                    </a>
+                </th:block>
+                <a href="#" class="top-btn">
+                    <i class="icon-top-btn"></i>
+                </a>
+                <!--// 알림 버튼 -->
+
+            </div>
+        </div>
+    </div>
+    <th:block layout:fragment="modal" />
+    <!--/* 각 페이지에서 추가되는 모달 영역 */-->
+    <div th:include="_include/_modal :: common" th:remove="tag"></div>
+
+    <div th:include="common/javascript :: common" th:remove="tag"></div>
+</body>
+
+<footer>
+    <th:block th:include="_include/_footer :: commonMetaAndTitle" />
+    <th:block layout:fragment="footer" th:remove="tag" />
+</footer>
+</html>

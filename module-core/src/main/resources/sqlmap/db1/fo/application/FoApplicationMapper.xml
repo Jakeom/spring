@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.fo.application.FoApplicationMapper">
+
+    <!-- 입사지원 조회 카운트 취득-->
+    <select id="selectApplicationListCntForPaging" resultType="int">
+        /*com.fw.core.mapper.db1.fo.application.FoApplicationMapper.selectApplicationListCntForPaging,  입사지원 조회 카운트 취득 , 2022.11 , skayhlj@gmail.com, FoJopMapper.xml*/
+        SELECT COUNT(1) AS CNT
+          FROM position_applicant PA
+    INNER JOIN position POS ON POS.id = PA.position_id
+    INNER JOIN hr_company HC ON POS.hr_company_id = HC.id
+         WHERE PA.delFlag = 'N'
+           AND ap_member_id = #{apMemberId}
+        <choose>
+            <when test="mode eq 'PAST_SUPPORT'"><!-- 과거 지원 결과 -->
+                <choose>
+                    <when test="selectCondition eq 'PASS'"><!-- 최종합격 -->
+                        AND progressStep IN ('PASS')
+                    </when>
+                    <when test="selectCondition eq 'FAIL'"><!-- 불합격 -->
+                        AND processStatus IN ('DOCUMENT_FAIL', 'FAIL')
+                    </when>
+                    <otherwise><!-- 전체 -->
+                        AND (processStatus IN ('DOCUMENT_FAIL', 'FAIL') OR progressStep IN ('PASS'))
+                    </otherwise>
+                </choose>
+            </when>
+            <when test="mode eq 'EMPLOYMENT_CERTIFICATE'"><!-- 취업활동증명서 발급 -->
+                AND (ProgressStep IN ('PROCESS', 'PASS', 'FAIL'))
+            </when>
+            <when test="mode eq 'JOB_POSITION'"><!-- 받은 포지션 제안 -->
+                AND (regPath = '2' OR (regPath ='1' AND (proposalStatus IN ('ACCEPT', 'PROPOSAL', 'REJECT'))) OR (regPath ='3' AND proposalStatus IN ('ACCEPT', 'PROPOSAL', 'REJECT')))
+                AND proposalStatus IN ('PROPOSAL', 'ACCEPT', 'REJECT')
+            </when>
+            <when test="mode eq 'APPLICATION_STATUS'"><!-- 입사지원 현황 -->
+                AND (regPath = '2' OR (regPath ='1' AND (proposalStatus IN ('ACCEPT'))) OR (regPath ='3' AND proposalStatus IN ('ACCEPT')))
+            </when>
+        </choose>
+        <if test="selectPeriod != '' and selectPeriod != null">
+            <if test="selectPeriod eq '1month'">
+                AND PA.createdAt BETWEEN DATE_SUB(NOW(), INTERVAL 1 MONTH) AND NOW()
+            </if>
+            <if test="selectPeriod eq '3month'">
+                AND PA.createdAt BETWEEN DATE_SUB(NOW(), INTERVAL 3 MONTH) AND NOW()
+            </if>
+            <if test="selectPeriod eq '6month'">
+                AND PA.createdAt BETWEEN DATE_SUB(NOW(), INTERVAL 6 MONTH) AND NOW()
+            </if>
+            <if test="selectPeriod eq '12month'">
+                AND PA.createdAt BETWEEN DATE_SUB(NOW(), INTERVAL 1 YEAR) AND NOW()
+            </if>
+        </if>
+    </select>
+
+    <!-- 입사지원 조회 페이징-->
+    <select id="selectApplicationListPaging" resultType="FoPositionApplicantDTO">
+        /*com.fw.core.mapper.db1.fo.application.FoApplicationMapper.selectApplicationListPaging, 입사지원 조회 페이징 , 2022.11 , skayhlj@gmail.com, FoJopMapper.xml*/
+        SELECT @rownum:=@rownum+1 AS rownum
+             , A.*
+        FROM (
+        SELECT PA.id
+             , PA.processStatus
+             , PA.proposalStatus
+             , PA.progressStep
+             , fn_get_common_cd(PA.processStatus,'POSITION_PROCESSSTATUS',1) AS processStatusNm
+             , DATE_FORMAT(PA.createdAt,'%Y.%m.%d') createdAt
+             , PA.ap_member_id
+             , PA.hh_member_id
+             , POS.id AS postingId
+             , POS.title
+             , POS.hr_company_id
+             , HC.companyScale
+             , HC.companyName
+             , HC.address
+             , HC.phone
+             , POS.public_cd
+             , PA.regPath
+             , PA.resume_modify_flag
+             , (SELECT name FROM member WHERE id = PA.hh_member_id) name
+             , (SELECT sfName FROM headhunter WHERE member_id= PA.hh_member_id) sfName
+             , PA.passedStatus
+             , fn_get_common_cd(PA.receiptPath,'RECEIPT_PATH',1) AS receiptPath
+             , (SELECT id FROM position_reading_history WHERE position_id = POS.id AND applicant_id = #{frontSession.id} AND delFlag = 'N' LIMIT 1) scrapId
+          FROM position_applicant PA
+    INNER JOIN position POS ON POS.id = PA.position_id
+    INNER JOIN hr_company HC ON POS.hr_company_id = HC.id
+         WHERE PA.delFlag = 'N'
+           AND PA.ap_member_id = #{apMemberId}
+        <choose>
+            <when test="mode eq 'PAST_SUPPORT'"><!-- 과거 지원 결과 -->
+                <choose>
+                    <when test="selectCondition eq 'PASS'"><!-- 최종합격 -->
+                        AND progressStep IN ('PASS')
+                    </when>
+                    <when test="selectCondition eq 'FAIL'"><!-- 불합격 -->
+                        AND processStatus IN ('DOCUMENT_FAIL', 'FAIL')
+                    </when>
+                    <otherwise><!-- 전체 -->
+                        AND (processStatus IN ('DOCUMENT_FAIL', 'FAIL') OR progressStep IN ('PASS'))
+                    </otherwise>
+                </choose>
+            </when>
+            <when test="mode eq 'EMPLOYMENT_CERTIFICATE'"><!-- 취업활동증명서 발급 -->
+                AND (ProgressStep IN ('PROCESS', 'PASS', 'FAIL'))
+            </when>
+            <when test="mode eq 'JOB_POSITION'"><!-- 받은 포지션 제안 -->
+                AND (regPath = '2' OR (regPath ='1' AND (proposalStatus IN ('ACCEPT', 'PROPOSAL', 'REJECT'))) OR (regPath ='3' AND proposalStatus IN ('ACCEPT', 'PROPOSAL', 'REJECT')))
+                AND proposalStatus IN ('PROPOSAL', 'ACCEPT', 'REJECT')
+            </when>
+            <when test="mode eq 'APPLICATION_STATUS'"><!-- 입사지원 현황 -->
+                AND (regPath = '2' OR (regPath ='1' AND (proposalStatus IN ('ACCEPT'))) OR (regPath ='3' AND proposalStatus IN ('ACCEPT')))
+            </when>
+        </choose>
+        <if test="selectPeriod != '' and selectPeriod != null">
+            <if test="selectPeriod eq '1month'">
+                AND PA.createdAt BETWEEN DATE_SUB(NOW(), INTERVAL 1 MONTH) AND NOW()
+            </if>
+            <if test="selectPeriod eq '3month'">
+                AND PA.createdAt BETWEEN DATE_SUB(NOW(), INTERVAL 3 MONTH) AND NOW()
+            </if>
+            <if test="selectPeriod eq '6month'">
+                AND PA.createdAt BETWEEN DATE_SUB(NOW(), INTERVAL 6 MONTH) AND NOW()
+            </if>
+            <if test="selectPeriod eq '12month'">
+                AND PA.createdAt BETWEEN DATE_SUB(NOW(), INTERVAL 1 YEAR) AND NOW()
+            </if>
+        </if>
+        ORDER BY PA.id
+          ) AS A
+             , (SELECT @rownum:=0) TMP order by rownum DESC
+        <include refid="common.paging" />
+    </select>
+
+    <!-- 내 이력서 열람내역 카운트 취득-->
+    <select id="selectResumeReadingHistoryCntForPaging" resultType="int">
+        /*com.fw.core.mapper.db1.fo.application.FoApplicationMapper.selectResumeReadingHistoryCntForPaging,  입사지원 조회 카운트 취득 , 2022.11 , skayhlj@gmail.com, FoJopMapper.xml*/
+        SELECT COUNT(1) AS CNT
+        FROM hh_resume_reading_history HRH
+        INNER JOIN resume ON HRH.resume_id = resume.id AND resume.member_id = #{apMemberId}
+        WHERE HRH.delFlag = 'N'
+    </select>
+
+    <!--  내 이력서 열람내역 페이징-->
+    <select id="selectResumeReadingHistoryPaging" resultType="FoPositionApplicantDTO">
+        /*com.fw.core.mapper.db1.fo.application.FoApplicationMapper.selectResumeReadingHistoryPaging, 내 이력서 열람내역 페이징 , 2022.11 , skayhlj@gmail.com, FoJopMapper.xml*/
+        SELECT @rownum:=@rownum+1 AS rownum
+             , A.*
+        FROM (
+       SELECT  HRH.id
+             , date_format(HRH.createdAt, '%Y-%m-%d %H:%i') as createdAt
+             , HRH.updatedAt
+             , HRH.expireAt
+             , HRH.registerPathCd
+             , HRH.member_id
+             , HRH.resume_id
+             , HRH.memo
+             , HRH.group_id
+             , HRH.delFlag
+             , (SELECT name FROM member WHERE id = HRH.member_id ) name
+             , (SELECT sfName FROM headhunter WHERE member_id= HRH.member_id) sfName
+             , (SELECT COUNT(1) FROM position WHERE member_id = HRH.member_id AND deleted = 0 AND endDate > NOW() AND status = 'DOING') AS postingCnt
+             , (SELECT COUNT(1) FROM blacklist_hh WHERE headhunter_id = HRH.member_id AND delFlag = 'N' AND applicant_id = #{frontSession.id} ) AS blackCnt
+             , (SELECT id FROM blacklist_hh WHERE headhunter_id = HRH.member_id AND delFlag = 'N' AND applicant_id = #{frontSession.id} ) AS blackId
+          FROM hh_resume_reading_history HRH
+         INNER JOIN resume ON HRH.resume_id = resume.id AND resume.member_id = #{apMemberId}
+         WHERE HRH.delFlag = 'N'
+        ) AS A
+        , (SELECT @rownum:=0) TMP order by rownum DESC
+        <include refid="common.paging" />
+    </select>
+
+    <!-- 포지션 제안 수락여부에 따른 수정 -->
+    <update id="updateProposalAcceptance" parameterType="FoPositionApplicantDTO">
+        /*com.fw.core.mapper.db1.fo.application.FoApplicationMapper.updateProposalAcceptance, 포지션 제안 수락여부에 따른 수정 , 2023.01 , YJW, FoApplicationMapper.xml*/
+        UPDATE position_applicant
+           SET updatedAt = NOW()
+            <if test="progressStep != null and progressStep != ''">
+             , progressStep = #{progressStep}
+            </if>
+            <if test="receiptPath != null and receiptPath != ''">
+             , receiptPath = #{receiptPath}
+            </if>
+            <if test="resumeId != null and resumeId != ''">
+             , resume_id = #{resumeId}
+            </if>
+            <if test="proposalStatus != null and proposalStatus != ''">
+             , proposalStatus = #{proposalStatus}
+            </if>
+        WHERE id = #{applicantId}
+    </update>
+    
+    <!-- 포지션 지원 상세 -->
+    <select id="selectPositionApplicantInfo" parameterType="FoPositionApplicantDTO" resultType="FoPositionApplicantDTO">
+        /*com.fw.core.mapper.db1.fo.application.FoApplicationMapper.selectPositionApplicantInfo, 포지션 지원 상세 , 2023.01 , YJW, FoApplicationMapper.xml*/
+        SELECT id
+             , createdAt
+             , passedStatus
+             , phoneOpened
+             , pmSubmitted
+             , processStatus
+             , progressStep
+             , proposalAt
+             , proposalStatus
+             , proposedEamil
+             , proposedSms
+             , receiptPath
+             , receiptStatus
+             , regPath
+             , resultNoticed
+             , updateRequest
+             , ap_member_id
+             , hh_member_id
+             , position_id
+             , resume_id
+             , submit_resume_file_id
+             , delFlag
+             , resume_modify_flag
+        FROM position_applicant
+        WHERE id = #{applicantId}
+          AND delFlag = 'N'
+    </select>
+
+</mapper>

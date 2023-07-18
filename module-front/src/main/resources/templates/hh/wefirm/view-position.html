@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layouts/hh/hhWefirmLayout">
+<body>
+	<div id="container-block">
+		<div layout:fragment="contents" th:remove="tag">
+			<div class="layout-content">
+				<h3 class="subtitle">포지션 공고보기</h3>
+				<div class="title-line mt-4 mb-5"></div>
+				<form name="searchForm" action="/hh/wefirm/view-position">
+					<input type="hidden" name="page" th:value="${searchInfo.page}" />
+					<div class="d-flex justify-content-end m-b-15 p-0">
+						<div class="">
+							<select class="select-design" style="width: 150px" name="orderType">
+								<option value="createdAt" th:selected="${searchInfo.orderType} == 'createdAt'">최신순</option>
+								<option value="participantCnt" th:selected="${searchInfo.orderType} == 'participantCnt'">참여자수순</option>
+								<option value="endDate" th:selected="${searchInfo.orderType} == 'endDate'">마감임박순</option>
+							</select>
+						</div>
+					</div>
+					<div class="sub-content-head">
+						<div class="search-area">
+							<div class="input-group">
+								<select class="select-design" style="width: 150px" name="searchType">
+									<option value="name" th:selected="${'name' eq searchInfo.searchType}">담당자</option>
+									<option value="title" th:selected="${'title' eq searchInfo.searchType}">제목+본문</option>
+								</select> <input type="text" class="form-control p-l-20" name="searchValue" th:value="${searchInfo.searchValue}" placeholder="" />
+								<div class="input-group-append">
+									<button type="button" class="btn btn-primary btn-input-search" data-role="search">검색</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</form>
+				<table class="table border-top-1">
+					<colgroup>
+						<col width="20%" />
+						<col width="50%" />
+						<col width="15%" />
+						<col width="15%" />
+					</colgroup>
+					<thead>
+						<tr>
+							<th class="text-center">일정</th>
+							<th class="">포지션 내용</th>
+							<th class="text-center">담당자</th>
+							<th class="text-center">참여자 수</th>
+						</tr>
+					</thead>
+					<tbody>
+						<th:block th:if="${#lists.isEmpty(viewPositionList)}">
+                            <tr>
+                              <td colspan="8" class="text-center">조건에 맞는 포지션이 없습니다.</td>
+                           </tr>
+                         </th:block>
+						<tr th:each="list : ${viewPositionList}">
+							<td class="text-center">
+								<p th:text="${list.createdAt}">2022.12.08</p>
+								<p>
+									~ <span th:text="${list.endDate}">2022.12.23</span>
+								</p>
+							</td>
+							<td class="">
+								<p class="text-gray" th:text="${list.companyName}">제이티비씨미디어텍(주)</p>
+								<a th:href="'/hh/company/headhunter-view?positionId='+${list.id}" class="text-primary text-underline" th:text="${list.title}">[방송제작사]</a>
+							</td>
+							<td class="text-center">
+								<p th:text="${list.name}">홍길동</p>
+							</td>
+							<td class="text-center">
+								<p>
+									<span class="text-danger" th:text="${list.participantCnt}">0</span> 명
+								</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				<div class="d-flex justify-content-center mt-5">
+                	<th:block th:include="common/paging :: paging_Fragment(fnc=*{'fn_go_page(this)'}, pageId=*{'pageName1'})"/>
+            	</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/default}">
+
+<body>
+	<div layout:fragment="contents" th:remove="tag">
+		<main id="content" role="main">
+			<h2 class="title">1:1문의 관리</h2>
+			<!-- Search -->
+			<div class="row p-3">
+				<div class="col-12">
+					<form id="searchQna" name="searchQna">
+						<div class="row mt-5">
+							<div class="col-4">
+								<div class="d-flex align-items-center">
+									<input type="text" id="qnaStartDt" name="qnaStartDt"
+										class="form-control form-datepicker" placeholder="날짜 선택">
+									<div class="mr-2">~</div>
+									<input type="text" id="qnaEndDt" name="qnaEndDt"
+										class="form-control form-datepicker" placeholder="날짜 선택">
+								</div>
+							</div>
+							<div class="col-2">
+								<div class="d-flex align-items-center">
+									<button type="button" class="btn btn-dark" data-role="all">전체</button>
+									<button type="button" class="btn btn-dark" data-role="today">오늘</button>
+									<button type="button" class="btn btn-dark" data-role="week">7일</button>
+									<button type="button" class="btn btn-dark" data-role="month">1개월</button>
+								</div>
+							</div>
+							<div class="col-6">
+								<div class="d-flex" style="float: right">
+									<select id="personalInfo" class="form-control w-auto"
+										data-role="select-dropdown" data-profile="minimal">
+										<option value="name">이름</option>
+									</select> <input type="text"
+										class="form-control d-inline-block w-auto mr-2"
+										data-role="writer" placeholder="문의자" /> <input type="text"
+										class="form-control d-inline-block w-auto" name="admin"
+										placeholder="답변자" />
+									<button type="button" class="btn btn-primary"
+										data-role="search">검색</button>
+								</div>
+							</div>
+							<div class="col-12 mt-3">
+								<div class="d-flex">
+									<select id="subSelectType" name="selectType"
+										class="form-control w-auto" data-url="/bo/cd/MEMBER_TYPE"
+										data-default-option="선택"></select> <select id="selectType"
+										class="form-control w-auto">
+										<option selected="selected" value="">전체</option>
+										<option value="N">접수</option>
+										<option value="Y">답변완료</option>
+									</select>
+								</div>
+							</div>
+						</div>
+					</form>
+					<div class="row mt-3">
+						<div class="col">
+							<table id="datatable" class="table">
+								<thead>
+									<tr>
+										<th>ID</th>
+										<th>문의자</th>
+										<th>문의일시</th>
+										<th>제목</th>
+										<th>카테고리</th>
+										<th>분류</th>
+										<th>처리상태</th>
+										<th>답변자</th>
+										<th>답변일시</th>
+									</tr>
+								</thead>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</main>
+	</div>
+</body>
+</html>
+

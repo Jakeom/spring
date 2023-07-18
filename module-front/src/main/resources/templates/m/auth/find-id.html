@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layouts/mLayout">
+<body>
+    <div layout:fragment="contents" th:remove="tag">
+        <form name="certForm" th:action="${certServer}" method="POST" target="certForm">
+            <input type="hidden" name="tr_cert">
+            <input type="hidden" name="tr_url" th:value="${certCallbackUrl} + '?mode=findId'">
+            <input type="hidden" name="tr_add" value="N">
+        </form>
+        <form name="resultForm">
+            <input type="hidden" name="di" id="di" />
+            <input type="hidden" name="name" id="name" />
+            <input type="hidden" name="phone" id="phone" />
+        </form>
+        <div id="container-block">
+            <div class="container">
+                <!-- findId 아이디 찾기 -->
+                <div class="sub-content" id="findId">
+                    <h3 class="center-title">아이디 찾기</h3>
+                    <div class="find-txt-box">
+                        <p class="text-center" >아이디를 모르시나요?</p>
+                        <p class="text-center">
+                            개인정보보호를 위해<br/>본인 인증을 해야 아이디를 찾을 수 있습니다.
+                        </p>
+                    </div>
+                    <div class="find-btn-group">
+                        <button type="button" class="btn btn-dark btn-lg" data-role="btnMemberCert">본인인증으로 찾기</button>
+                    </div>
+                </div>
+                <!-- findSuccess 해당 회원 아이디 존재O -->
+                <div class="sub-content" id="findIdSuccess" style="display: none">
+                    <h3 class="center-title">아이디 찾기</h3>
+                    <div class="find-txt-box">
+                        <p class="text-center">
+                            <span id="resultName">홍길동</span>님의 아이디는<br/>
+                            <span id="resultLoginId">abcd1234@naver.com</span> 입니다.
+                        </p>
+                    </div>
+                    <div class="find-btn-group">
+                        <button type="button" class="btn btn-dark btn-lg" data-role="login">로그인으로 이동</button>
+                    </div>
+                </div>
+                <!-- findIdFail 해당 회원 아이디 존재 X -->
+                <div class="sub-content" id="findIdFail" style="display: none">
+                    <h3 class="center-title">아이디 찾기</h3>
+                    <div class="find-txt-box">
+                        <p class="text-center">회원님의 아이디가 존재하지 않습니다.</p>
+                        <p class="text-center">회원가입하여 RESUME9을 시작하세요!</p>
+                    </div>
+                    <div class="find-btn-group">
+                        <button type="button" class="btn btn-dark btn-lg" data-role="signup">회원가입으로 이동</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

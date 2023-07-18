@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.bo.BoPaymentMapper">
+
+    <!--리스트 조회-->
+    <select id="selectPaymentList" resultType="BoPaymentDTO">
+        /* com.fw.core.mapper.db1.bo.BoPaymentMapper.selectPaymentList, p. selectPaymentList, p. 2022.10.24, p. Ghazal, p. BoPaymentMapper.xml */
+        SELECT
+                p.id
+                , p.cancelledPrice
+                , date_format(p.createdAt, '%Y-%m-%d %H:%i') as createdAt
+                , fn_get_common_cd(p.status,'PAYMENT_TYPE',1) AS statusCd
+                , p.status
+                , p.method
+                , p.methodName
+                , p.orderId
+                , p.paymentData
+                , p.pg
+                , p.pgName
+                , p.price
+                , p.productName
+                , date_format(p.purchasedAt, '%Y-%m-%d %H:%i') as purchasedAt
+                , p.remainPrice
+                , p.receiptId
+                , p.status
+                , p.unit
+                , p.member_id
+                , p.point_product_id
+                , p.requestedAt
+                , p.bankCode
+                , p.bankName
+                , p.virtualAccount
+                , p.depositor
+                , p.expireDate
+                , date_format(p.revokedAt, '%Y-%m-%d %H:%i') as revokedAt
+                , p.delFlag
+                , m.name
+                , puh.id pointUseHistoryId
+        FROM payment p JOIN member m ON p.member_id = m.id
+                       JOIN point_use_history puh on p.id = puh.payment_id
+        WHERE p.delFlag = 'N'
+    </select>
+
+    <!--검색-->
+    <select id="searchPaymentList" resultType="BoPaymentDTO">
+        /* com.fw.core.mapper.db1.bo.BoPaymentMapper.searchPaymentList, p. searchPaymentList, p. 2022.10.24, p. Ghazal, p.
+        BoPaymentMapper.xml */
+        SELECT
+        p.id
+        , p.cancelledPrice
+        , fn_get_common_cd(p.status,'PAYMENT_TYPE',1) AS statusCd
+        , p.status
+        , date_format(p.createdAt, '%Y-%m-%d %H:%i') as createdAt
+        , p.method
+        , p.methodName
+        , p.orderId
+        , p.paymentData
+        , p.pg
+        , p.pgName
+        , p.price
+        , p.productName
+        , date_format(p.purchasedAt, '%Y-%m-%d %H:%i') as purchasedAt
+        , p.remainPrice
+        , p.receiptId
+        , p.status
+        , p.unit
+        , p.member_id
+        , p.point_product_id
+        , p.requestedAt
+        , p.bankCode
+        , p.bankName
+        , p.virtualAccount
+        , p.depositor
+        , p.expireDate
+        , date_format(p.revokedAt, '%Y-%m-%d %H:%i') as revokedAt
+        , p.delFlag
+        , m.name
+        , m.phone
+        , m.email
+        , puh.id pointUseHistoryId
+        FROM payment p JOIN member m ON p.member_id = m.id
+                       JOIN point_use_history puh on p.id = puh.payment_id
+        <where>
+            WHERE p.delFlag = 'N'
+        <if test="searchStart != '' and searchStart!=null and searchEnd !='' and searchEnd!=null">
+            AND date_format(p.createdAt, '%Y-%m-%d') BETWEEN #{searchStart} AND #{searchEnd}
+        </if>
+        <if test="email != null and email!=''">
+            AND m.email LIKE CONCAT('%', #{email}, '%')
+        </if>
+        <if test="name != null and name !='' ">
+            AND m.name LIKE CONCAT('%', #{name}, '%')
+        </if>
+        <if test=" phone!='' and phone!=null ">
+            AND m.phone LIKE CONCAT('%', #{phone}, '%')
+        </if>
+        <if test=" status!='' and status!=null ">
+            AND status = #{status}
+        </if>
+        </where>
+    </select>
+
+    <!--결제취소 구매내역 업데이트 -->
+    <update id="updatePayment" parameterType="BoPaymentDTO" >
+        /* com.fw.core.mapper.db1.bo.BoPaymentMapper.updatePayment, 결제취소 구매내역 업데이트 , ldb, BoPaymentMapper.xml */
+        UPDATE payment SET
+            cancelledPrice = #{cancelledPrice}
+                         , remainPrice = #{remainPrice}
+                         , revokedAt = NOW()
+                         , status = #{status}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 포인트 update  -->
+    <update id="updatePoint" parameterType="BoPaymentDTO">
+        /*com.fw.core.mapper.db1.bo.BoPaymentMapper.updatePoint, 포인트 update, 2023.1 , ldb, BoPaymentMapper.xml*/
+        UPDATE point
+        SET balance = freePoint + #{freeIncrease} + paidPoint + #{paidIncrease}
+          , freePoint = freePoint + #{freeIncrease}
+          , paidPoint = paidPoint + #{paidIncrease}
+          , updatedAt = NOW()
+        WHERE member_id = #{memberId}
+    </update>
+
+    <!-- 포인트 변경 내역-->
+    <insert id="insertPointUseHistory" parameterType="BoPaymentDTO">
+        /*com.fw.core.mapper.db1.bo.BoPaymentMapper.insertPointUseHistory, 포인트 변경 내역,  2023.1 , ldb, BoPaymentMapper.xml*/
+        INSERT INTO point_use_history (
+                                        createdAt
+                                      , updatedAt
+                                      , reasonCd
+                                      , member_id
+                                      , point_id
+                                      , freeBalance
+                                      , freeIncrease
+                                      , paidBalance
+                                      , paidIncrease
+                                      , payment_id
+        )
+        SELECT NOW()
+             , NOW()
+             , #{type}
+             , member_id
+             , id
+             , freePoint
+             , #{freeIncrease}
+             , paidPoint
+             , #{paidIncrease}
+             , #{paymentId}
+        FROM point
+        WHERE member_id = #{memberId}
+    </insert>
+
+    <!-- 결제취소 가능 포인트 상세조회 -->
+    <select id="selectPurchasePointInfo" parameterType="BoPaymentDTO" resultType="BoPaymentDTO">
+        /* com.fw.core.mapper.db1.bo.BoPaymentMapper.selectPurchasePointInfo, 결제취소 가능 포인트 상세조회, ldb, BoPaymentMapper.xml */
+        SELECT PUH.id
+             , DATE_FORMAT(PUH.createdAt,'%Y.%m.%d. %T') AS createdAt
+             , PUH.updatedAt
+             , PUH.reasonCd
+             , fn_get_common_cd(PUH.reasonCd,'POINT_USE',1) AS reasonNm
+             , PUH.member_id
+             , PUH.payment_id
+             , P.method
+             , P.orderId
+             , P.price
+             , P.remainPrice
+             , P.cancelledPrice
+             , P.receiptId
+             , P.status
+             , P.member_id
+             , P.point_product_id
+             , P.bankCode
+             , P.bankName
+             , P.virtualAccount
+             , P.depositor
+             , P.expireDate
+             , PUH.point_id
+             , PUH.freeBalance
+             , PUH.freeIncrease
+             , PUH.paidBalance
+             , PUH.paidIncrease
+             , PUH.adminReason
+             , PUH.backoffice_admin_id
+             , PUH.delFlag
+        FROM point_use_history PUH
+                 INNER JOIN payment P ON PUH.payment_id = P.id
+        WHERE PUH.id = #{pointUseHistoryId}
+    </select>
+
+</mapper>

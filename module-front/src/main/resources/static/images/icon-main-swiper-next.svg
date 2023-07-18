@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="18.414" height="13.414" viewBox="0 0 18.414 13.414">
+  <defs>
+    <clipPath id="clip-path">
+      <rect width="18.414" height="13.414" fill="none"/>
+    </clipPath>
+  </defs>
+  <g id="반복_그리드_10" data-name="반복 그리드 10" clip-path="url(#clip-path)">
+    <g transform="translate(-1198 0.707)">
+      <g id="_copy" data-name="&lt; copy" transform="translate(1217 13) rotate(180)">
+        <g id="_" data-name="&lt;">
+          <path id="Shape_1635" data-name="Shape 1635" d="M8,13,2,7,8,1" fill="none" stroke="#000" stroke-width="2"/>
+          <rect id="Rectangle_1636" data-name="Rectangle 1636" width="16" height="2" transform="translate(3 6)" fill="#0a0b0c"/>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

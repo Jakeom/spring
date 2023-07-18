@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/hh/hhWefirmLayout">
+<body>
+<div id="container-block">
+    <div layout:fragment="contents" th:remove="tag">
+        <div class="layout-content">
+            <h3 class="subtitle">고객사 관리</h3>
+            <div class="title-line mt-4 mb-5"></div>
+            <form name="searchForm">
+                <input type="hidden" name="page" th:value="${searchInfo.page}"/>
+                <div class="d-flex justify-content-end m-b-15 p-0">
+                    <select class="select-design" style="width: 150px" name="orderType">
+                        <option value="">전체</option>
+                        <option value="pmName" th:selected="${searchInfo.orderType} eq 'pmName'">헤드헌터순</option>
+                        <option value="companyName" th:selected="${searchInfo.orderType} eq 'companyName'">기업순</option>
+                        <option value="apprFlag" th:selected="${searchInfo.orderType} eq 'apprFlag'">처리중</option>
+                    </select>
+                </div>
+                <div class="sub-content-head p-0">
+                    <div class="search-area">
+                        <div class="input-group">
+                            <select class="select-design" style="width: 150px" name="searchType">
+                                <option value="COMPANY" th:selected="${searchInfo.searchType} eq 'COMPANY'">고객사명</option>
+                                <option value="PM" th:selected="${searchInfo.searchType} eq 'PM'">PM</option>
+                                <option value="LICENSE" th:selected="${searchInfo.searchType} eq 'LICENSE'">사업자번호</option>
+                            </select>
+                            <input type="text" class="form-control p-l-20" placeholder="검색어를 입력해주세요." name="searchValue" th:value="${searchInfo.searchValue}"/>
+                            <div class="input-group-append">
+                                <button class="btn btn-primary btn-input-search" type="button" data-role="search">검색
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <div class="tbl-head mt-0 m-b-10">
+                <div class="d-flex align-items-center gap-10">
+                    <th:block th:if="${selectWefirmAuth.wefirmAuth} eq 'MANAGER'">
+                        <button type="button" class="btn btn-outline-gray" data-role="delete">삭제</button>
+                    </th:block>
+                </div>
+                <div>
+                    <th:block th:if="${selectWefirmAuth.wefirmAuth} eq 'MANAGER'">
+                        <button type="button" class="btn btn-primary" id="register-customer" data-bs-toggle="modal" data-bs-target="#modal-customer-registration">+ 신규등록</button>
+                    </th:block>
+                </div>
+            </div>
+            <table class="table border-top-1">
+                <thead>
+                <tr>
+                    <th:block th:if="${selectWefirmAuth.wefirmAuth} eq 'MANAGER'">
+                        <th class="text-center" style="width: 1%">
+                            <div class="form-check p-0">
+                                <input class="form-check-input" type="checkbox" value="" name="checkAll"/>
+                            </div>
+                        </th>
+                    </th:block>
+                    <th class="text-center" style="width: 7%">인증</th>
+                    <th class="text-center" style="width: 7%">사업자 번호</th>
+                    <th class="text-center" style="width: 25%">고객사명</th>
+                    <th class="text-center" style="width: 10%">PM</th>
+                    <th class="text-center" style="width: 5%">등록일</th>
+                    <th class="text-center" style="width: 5%">만료일</th>
+                    <th class="text-center" style="width: 20%">관리</th>
+                    <th:block th:if="${selectWefirmAuth.wefirmAuth} eq 'MANAGER'">
+                        <th class="text-center" style="width: 25%">관리자</th>
+                    </th:block>
+                </tr>
+                </thead>
+                <tbody>
+                <th:block th:if="${#lists.isEmpty(customerList)}">
+                    <tr>
+                        <td colspan="9" class="text-center">존재하는 데이터가 없습니다.</td>
+                    </tr>
+                </th:block>
+                <th:block th:if="${!#lists.isEmpty(customerList)}">
+                    <tr th:each="list : ${customerList}">
+                        <th:block th:if="${selectWefirmAuth.wefirmAuth} eq 'MANAGER'">
+                            <td class="text-center">
+                                <div class="form-check p-0">
+                                    <input class="form-check-input" type="checkbox" th:value="${list.pmId}" name="checkCustomer"/>
+                                </div>
+                            </td>
+                        </th:block>
+                        <td class="text-center">
+                            <p th:text="${#strings.equals(list.cerifiedFlag,'Y')? '●' : ''}">●</p>
+                        </td>
+                        <td class="text-center">
+                            <p th:text="${list.licenseNo}">1549876546</p>
+                        </td>
+                        <td class="text-center">
+                            <p th:text="${list.companyName}">제이티비씨미디어텍(주)</p>
+                        </td>
+                        <td class="text-center">
+                            <th:block th:if="${selectWefirmAuth.wefirmAuth} eq 'MANAGER'">
+                                <p th:text="${list.pmName}" name="modifyCustomer" th:data-seq="${list.pmId}" data-bs-toggle="modal" data-bs-target="#modal-customer-modify" class="text-primary text-underline">홍길동</p>
+                            </th:block>
+                            <th:block th:unless="${selectWefirmAuth.wefirmAuth} eq 'MANAGER'">
+                                <p th:text="${list.pmName}">홍길동</p>
+                            </th:block>
+                        </td>
+                        <td class="text-center">
+                            <p th:text="${list.registerAt}">2022.09.30</p>
+                        </td>
+                        <td class="text-center">
+                            <p th:text="${list.formatExpiredAt}">2023.03.30 21:45</p>
+                        </td>
+                        <td class="text-center">
+                            <!-- 본인이 PM인 경우만 합격자등록/수정 권한 -->
+                            <th:block th:if="${list.pmMemberId} eq ${searchInfo.memberId}">
+                                <th:block th:if="${list.apprFlag eq 'E' || #strings.isEmpty(list.apprFlag)}">
+                                    <p class="text-primary text-underline" name="registerPasser" th:data-seq="${list.pmId}"
+                                       data-bs-toggle="modal" data-bs-target="#modal-register-passer">합격자등록</p>
+                                </th:block>
+                                <th:block th:unless="${list.apprFlag eq 'E' || #strings.isEmpty(list.apprFlag)}">
+                                    <p class="text-primary text-underline" name="modifyPasser" th:text="${list.passName+list.statusMsg}"
+                                       th:data-seq="${list.clientPassId}" data-bs-toggle="modal" data-bs-target="#modal-modify-passer">합격자수정</p>
+                                </th:block>
+                            </th:block>
+                            <th:block th:unless="${list.pmMemberId} eq ${searchInfo.memberId}">
+                                <p class="text-primary">-</p>
+                            </th:block>
+                        </td>
+                        <th:block th:if="${selectWefirmAuth.wefirmAuth} eq 'MANAGER'">
+                        <td class="text-center">
+                            <th:block th:if="${!#strings.isEmpty(list.apprFlag)}">
+                                <th:block th:if="${list.apprFlag eq 'N'}">
+                                    <p th:text="${list.passName+list.statusMsg}" class="text-primary text-underline"
+                                       th:data-name="${list.passName}" th:data-seq="${list.clientPassId}" th:data-id="${list.pmId}"
+                                       name="approvePasser" data-bs-toggle="modal" data-bs-target="#modal-approve-passer"></p>
+                                </th:block>
+                                <th:block th:unless="${list.apprFlag eq 'N'}">
+                                    <p th:text="${list.apprFlag eq 'E' ? '포지션제안중' : list.passName+list.statusMsg}"></p>
+                                </th:block>
+                            </th:block>
+                        </td>
+                        </th:block>
+                    </tr>
+                </th:block>
+                </tbody>
+            </table>
+            <div class="d-flex justify-content-center mt-5">
+                <th:block th:include="common/paging :: paging_Fragment(fnc=*{'fn_go_page(this)'}, pageId=*{'pageName1'})"/>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 고객사 등록 modal -->
+<div layout:fragment="modal" th:remove="tag">
+    <div class="modal fade" id="modal-customer-registration" tabindex="-1" aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-write modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">고객사 등록</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="tbl-head-cnt text-danger">내 고객사 리스트는 외부에 절대 공개되지 않습니다.</p>
+                    <table class="table">
+                        <colgroup>
+                            <col style="width:25%"/>
+                        </colgroup>
+                        <tbody>
+                        <tr>
+                            <th class="">회사명</th>
+                            <td class="company-area">
+                                <div class="search-box">
+                                    <input type="text" class="form-control form-lg" value="" name="companyNames" placeholder="기업명으로 검색가능합니다."/>
+                                    <button type="button" class="search-btn" data-role="searchCompany"><i class="icon-search-dark"></i></button>
+                                </div>
+                                <div class="search-result-list company">
+                                    <ul></ul>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="">사업자등록번호</th>
+                            <td class="">
+                                <input type="text" class="form-control form-lg" value="" name="licenseNumber" placeholder="" maxlength="10" readonly/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="">PM</th>
+                            <td class="">
+                                <select class="select-design" name="pmMemberId" style="width: 100%">
+                                    <option value="">PM을 선택하세요</option>
+                                    <th:block th:each="list : ${headhunterList}">
+                                        <option th:value="${list.memberId}" th:text="${list.name}" name="pmOption"></option>
+                                    </th:block>
+                                </select>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-primary" data-role="register">등록</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 고객사 수정 modal -->
+    <div class="modal fade" id="modal-customer-modify" tabindex="-1" aria-labelledby="exampleModalLabel2"
+         aria-hidden="true">
+        <div class="modal-dialog modal-write modal-dialog-centered">
+          <input type="hidden" value="" name="modifyPmId"/>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel2">고객사 수정<span class="tbl-head-cnt text-danger">(PM만 수정이 가능합니다.)</span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <table class="table">
+                        <colgroup>
+                            <col style="width:25%"/>
+                        </colgroup>
+                        <tbody>
+                        <tr>
+                            <th class="">회사명</th>
+                            <td class="company-area">
+                                <div class="search-box">
+                                    <input type="text" class="form-control form-lg" value="" name="modifyCompanyNames" placeholder="" readonly/>
+                                </div>
+                                <div class="search-result-list company">
+                                    <ul></ul>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="">사업자등록번호</th>
+                            <td class="">
+                                <input type="text" class="form-control form-lg" value="" name="modifyLicenseNo" placeholder="" maxlength="10" readonly/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="">PM</th>
+                            <td class="">
+                                <select class="select-design" name="modifyPmMemberId" style="width: 100%">
+                                    <option value="">PM을 선택하세요</option>
+                                    <th:block th:each="list : ${headhunterList}">
+                                        <option th:value="${list.memberId}" th:text="${list.name}" name="modifyPmOption"></option>
+                                    </th:block>
+                                </select>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-primary" data-role="modify">수정</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 합격자 등록 -->
+    <div class="modal fade" id="modal-register-passer" tabindex="-1" aria-labelledby="exampleModalLabel3" aria-hidden="true">
+        <div class="modal-dialog modal-write modal-dialog-centered">
+            <div class="modal-content">
+              <input type="hidden" name="passerPmId" value=""/>
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel3">합격자 등록</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <table class="table">
+                        <colgroup>
+                            <col style="width:25%"/>
+                        </colgroup>
+                        <tbody>
+                        <tr>
+                            <th class="">합격자명</th>
+                            <td class="">
+                                <input type="text" name="passName" class="form-control form-md" value="" maxlength="7"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="">세금계산서</th>
+                            <td class="">
+                                <div class="form-upload mt-0">
+                                    <input type="file" class="" id="form-file" name="taxFiles" />
+                                    <label for="form-file"><span class="file-name m-r-10"></span><i class="icon-input-add"></i></label>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="">발행일자</th>
+                            <td class="">
+                                <div class="form-date-wrap">
+                                    <input type="text" name="registerAt" id="registerAt" class="form-date" readonly/>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <p class="text-danger m-t-30 m-b-10">검토 후 등록 반영까지 영업일 기준 2~3일정도 소요됩니다.</p>
+                    <p class="text-danger m-b-10">정보가 잘못될 경우 반려처리되며, 별도 안내되지 않으니 개별 확인하시어 재등록 해주시면 됩니다.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-primary" data-role="register-passer">등록</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 합격자 수정 -->
+    <div class="modal fade" id="modal-modify-passer" tabindex="-1" aria-labelledby="exampleModalLabel4" aria-hidden="true">
+        <div class="modal-dialog modal-write modal-dialog-centered">
+            <div class="modal-content">
+              <input type="hidden" name="fileChangeFlag" value="N" />
+              <input type="hidden" name="modifyClientPassId" value="" />
+              <input type="hidden" name="modifyApprFlag" value="" />
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel4">합격자 수정</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <table class="table">
+                        <colgroup>
+                            <col style="width:25%"/>
+                        </colgroup>
+                        <tbody>
+                        <tr>
+                            <th class="">합격자명</th>
+                            <td class="">
+                                <input type="text" name="modifyPassName" class="form-control form-md" value="" maxlength="7"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="">세금계산서</th>
+                            <td class="">
+                                <div class="form-upload mt-0">
+                                    <input type="file" class="" id="form-file-modify" name="modifyTaxFiles" />
+                                    <label for="form-file-modify"><span class="file-name m-r-10" name="currentFileName"></span><i class="icon-input-add"></i></label>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="">발행일자</th>
+                            <td class="">
+                                <div class="form-date-wrap">
+                                    <input type="text" name="modifyRegisterAt" id="modifyRegisterAt" class="form-date" readonly/>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <p class="text-danger m-t-30 m-b-10 modify-message-1">검토 후 등록 반영까지 영업일 기준 2~3일정도 소요됩니다.</p>
+                    <p class="text-danger m-b-10 modify-message-2">정보가 잘못될 경우 반려처리되며, 별도 안내되지 않으니 개별 확인하시어 재등록 해주시면 됩니다.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-primary" data-role="modify-passer">수정</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 합격자 승인 modal -->
+    <div class="modal fade" id="modal-approve-passer" tabindex="-1" aria-labelledby="exampleModalLabel5" aria-hidden="true">
+        <div class="modal-dialog modal-write modal-dialog-centered">
+            <div class="modal-content">
+                <input type="hidden" name="clientPassId" value=""/>
+                <input type="hidden" name="approvePmId" value=""/>
+                <input type="hidden" name="setStatus" value=""/>
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel5">합격자 승인</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <table class="table border-top-1 m-t-30">
+                        <colgroup>
+                            <col style="width:25%"/>
+                        </colgroup>
+                        <tbody>
+                        <tr>
+                            <th class="">합격자명</th>
+                            <td class="">
+                                <input type="text" name="approvePassName" class="form-control form-md" value="" maxlength="7" readonly/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="">세금계산서</th>
+                            <td class="tax-file">
+                                <a href="" class="text-primary text-underline" download>다운로드</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="">승인여부</th>
+                            <td class="">
+                                <div class="check-badge-wrap">
+                                    <div>
+                                        <input type="radio" class="check-badge" value="Y" id="approve" name="approveStatus"/>
+                                        <label for="approve" class="check-badge-label">승인</label>
+                                    </div>
+                                    <div>
+                                        <input type="radio" class="check-badge" value="R" id="reject" name="approveStatus"/>
+                                        <label for="reject" class="check-badge-label">반려</label>
+                                    </div>
+                            </td>
+                        </tr>
+                        <tr id="rejectMemoArea" style="display: none">
+                            <th class="">반려사유</th>
+                            <td class="">
+                                <div class="form-textarea">
+                                    <textarea name="rejectMemo" id="rejectMemo" cols="20" rows="5" placeholder="내용을 입력하세요" class=""></textarea>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-primary" data-role="save-approve">저장</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

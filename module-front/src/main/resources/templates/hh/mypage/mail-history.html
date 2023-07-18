@@ -1,0 +1,55 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layouts/hh/hhMypageLayout">
+<head>
+<style>
+.sms-hover p.off {
+	width: 412px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.sms-hover:hover .on {
+	display: block;
+}
+
+.sms-hover:hover .off {
+	display: none;
+}
+
+.sms-hover .on {
+	display: none;
+}
+</style>
+</head>
+<body>
+	<div id="container-block">
+		<div layout:fragment="contents" th:remove="tag">
+			<input type="hidden" name="mode" th:value="${#strings.isEmpty(searchInfo.mode) ? 'home' : searchInfo.mode}" />
+			<div class="layout">
+				<div class="layout-content">
+					<h3 class="subtitle poppins">발송한 메일/SMS내역</h3>
+					<div class="title-line mt-4 mb-5"></div>
+					<ul class="nav nav-tabs" id="myTab" role="tablist">
+						<li class="nav-item" role="presentation">
+							<button class="nav-link" id="home-tab" data-bs-toggle="tab" data-url="/hh/mypage/history/mail" data-bs-target="#home" type="button" role="tab"
+								aria-controls="home" aria-selected="true">발송한 메일내역</button>
+						</li>
+						<li class="nav-item" role="presentation">
+							<button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-url="/hh/mypage/history/sms" data-bs-target="#profile" type="button"
+								role="tab" aria-controls="profile" aria-selected="false" tabindex="-1">발송한 문자내역</button>
+						</li>
+					</ul>
+					<!-- 발송한 메일 내역 -->
+					<div class="tab-content" id="myTabContent">
+						<div class="tab-pane fade" id="home" role="tabpanel" aria-labelledby="home-tab"></div>
+						<div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- 메일 상세 모달 -->
+</body>
+</html>

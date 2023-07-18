@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/hh/hhMypageLayout">
+<body>
+<div id="container-block">
+	<div layout:fragment="contents" th:remove="tag">
+          <div class="layout-content">
+            <div class="row row-40 align-items-center">
+              <h3 class="subtitle">이용내역</h3>
+              <div class="title-line mt-4 mb-5"></div>
+            </div>
+			<form name="searchForm">
+            <div class="tbl-head m-0">
+            <input type="hidden" name="page" th:value="${searchInfo.page}"/>
+              <div class="btn-group date-list" role="group">
+                <p class="m-r-20 hidden-mobile">조회기간</p>
+                <input type="hidden" name="selectPeriod" th:value="${searchInfo.selectPeriod}"/>
+                <button type="button" class="btn btn-outline-primary" th:classappend="${searchInfo.selectPeriod} =='today'? 'active':'' " data-role="selectPeriod" value="today" data-period="today">오늘</button>
+                <button type="button" class="btn btn-outline-primary" th:classappend="${searchInfo.selectPeriod} =='1month'? 'active':'' " data-role="selectPeriod" value="1month" data-period="1month">1개월</button>
+                <button type="button" class="btn btn-outline-primary" th:classappend="${searchInfo.selectPeriod} =='3month'? 'active':'' " data-role="selectPeriod" value="3month" data-period="3month">3개월</button>
+              </div>
+              <div class="d-flex align-items-center gap-10">
+                <select class="select-design" name="sortColumn" style="width: 135px">
+                  <option value="">전체</option>
+                  <option value="LOGIN" th:selected="${searchInfo.sortColumn} == 'LOGIN'">로그인</option>
+                  <option value="POSITION_REGISTER" th:selected="${searchInfo.sortColumn} == 'POSITION_REGISTER'">포지션등록</option>
+                  <option value="RESUME_REGISTER" th:selected="${searchInfo.sortColumn} == 'RESUME_REGISTER'">이력서등록</option>
+                </select>
+              </div>
+            </div>
+            </form>
+            <table class="table border-top-1">
+              <colgroup>
+                <col width="15%" />
+                <col width="15%" />
+                <col width="55%" />
+                <col width="15%" />
+              </colgroup>
+              <thead>
+                <tr>
+                  <th class="text-center">일시</th>
+                  <th class="text-center">IP</th>
+                  <th class="text-center">기기</th>
+                  <th class="text-center">내역</th>
+                </tr>
+              </thead>
+              <tbody>
+              	<th:block th:if="${#lists.isEmpty(logList)}">
+                    <tr>
+                        <td colspan="8" class="text-center">이용내역이 없습니다.</td>
+                    </tr>
+                </th:block>
+                <tr th:each="list : ${logList}">
+                  <td class="text-center">
+                    <p th:text="${list.createDt}">2022-10-04 17:40:57</p>
+                  </td>
+                  <td class="text-center">
+                    <p th:text="${list.accessIp}">61.73.75.162</p>
+                  </td>
+                  <td class="text-center">
+                    <p th:text="${list.userAgent}">-</p>
+                  </td>
+                  <td class="text-center">
+                    <p th:text="${list.useTypeNm}">-</p>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="d-flex justify-content-center mt-5">
+              <th:block
+                   th:include="common/paging :: paging_Fragment(fnc=*{'fn_go_page(this)'}, pageId=*{'pageName1'})"/>
+            </div>
+          </div>
+        </div>
+      </div>
+  </body>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html  xmlns:th="http://www.thymeleaf.org"
+       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+       layout:decorate="layouts/mypageLayout">
+<body>
+<div id="container-block">
+  <div layout:fragment="contents" th:remove="tag">
+          <div class="layout-content">
+            <h3 class="subtitle poppins">스크랩/최근열람 공고</h3>
+            <form name="searchForm">
+              <input type="hidden" name="page" th:value="${searchInfo.page}"/>
+            </form>
+            <div class="title-line mt-4 mb-5"></div>
+            <div class="row row-0">
+              <ol class="step mt-n3">
+                <li>
+                  <a href="/fo/mypage/resume-scrap"><span>스크랩 공고</span></a>
+                </li>
+                <li class="active">
+                  <a href="javascript:void(0)" data-role="goReadingForm"><span>최근 열람 공고</span></a>
+                </li>
+                <form name="resumeReadingForm" action="/fo/mypage/resume-reading-notice" method="GET" style="display: none;">
+                  <input type="hidden" name="positionIdList">
+                </form>
+              </ol>
+            </div>
+            <div class="resume-form position">
+              <th:block th:if="${#lists.isEmpty(positionList)}">
+                <div class="text-center">최근열람 공고가 없습니다.</div>
+              </th:block>
+              <th:block th:each=" list : ${positionList}">
+                <div class="resume-form-list resume-main-form w-100">
+                  <div class="announcement-wrap">
+                    <input type="hidden" name="id" th:value="${list.id}">
+                    <p class="scale">
+                      <span th:text="${list.companyScale}"></span>
+                      <span class="company" th:text="${list.publicCd} == 0 ? ${list.companyName} : '***'">삼성전자</span>
+                    </p>
+                    <a th:if="${!#strings.contains(list.dDay, '-')}" th:href="'/fo/user/jop/posting/detail?id='+${list.id}" class="title" th:text="${list.title}" th:data-seq="${list.id}"></a>
+                    <span th:if="${#strings.contains(list.dDay, '-')}" class="title" th:text="${list.title}" th:data-seq="${list.id}"></span>
+                    <p class="date">
+                      <span>공고마감일</span>
+                      <span th:text="${list.endDate}">2022.10.21 (금)</span>
+                      <span class="text-danger" th:text="${#strings.contains(list.dDay, '-') ? '공고마감' : '(D-' + list.dDay + ')'}">(D-15)</span>
+                    </p>
+                  </div>
+                  <div class="btn-group">
+                    <button href="javascript:void(0)" th:data-id="${list.id}" data-role=checkApplicant th:text="${list.applicantYn eq '1'? '지원완료':'즉시지원'}"
+                            th:if="${!#strings.contains(list.dDay, '-')}" th:disabled="${list.applicantYn eq '1'}" class="btn btn-outline-danger btn-md">즉시지원</button>
+                    <button href="javascript:void(0)" th:data-id="${list.id}"
+                            th:if="${#strings.contains(list.dDay, '-')}" disabled="disabled" class="btn btn-outline-danger btn-md">지원마감</button>
+                  </div>
+                </div>
+              </th:block>
+            </div>
+            <div class="d-flex justify-content-center mt-5">
+              <th:block th:include="common/paging :: paging_Fragment(fnc=*{'fn_go_page(this)'}, pageId=*{'pageName1'})"/>
+            </div>
+          </div>
+      </div>
+    </div>
+  </body>
+</html>

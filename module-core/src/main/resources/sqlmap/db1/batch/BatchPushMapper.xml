@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.batch.BatchPushMapper">
+
+    <!-- 푸쉬 대상 데이타 취득-->
+    <select id="selectTargetPushHistList" resultType="PushHistBean">
+        /* com.fw.core.mapper.db1.batch.BatchPushMapper.updatePushHist, 푸쉬 대상 데이타 취득 - 푸쉬 대상 데이타 취득 , yhEom, HhAddressMapper.xml */
+        SELECT 
+            A.*
+        FROM tb_push_hist A
+        WHERE 1=1 
+        AND A.send_yn = 'N' AND send_time IS NULL
+        <if test='phoneType != null and phoneType != ""'>
+            AND A.phoneType = ${phoneType} 
+        </if>
+    </select>
+
+    <!-- 푸쉬 결과 업데이트 -->
+    <update id="updatePushHist" parameterType="PushHistBean">
+        /* com.fw.core.mapper.db1.batch.BatchPushMapper.updatePushHist, 푸시 결과 업데이트 - 푸시 결과 업데이트 , yhEom, HhAddressMapper.xml */
+        UPDATE tb_push_hist SET
+        
+         send_time = NOW()
+         ,send_yn = #{sendYn}
+         ,update_id = #{updateId}
+         ,update_time = NOW()
+
+        WHERE push_hist_seq = #{pushHistSeq}
+    </update>
+
+    <!-- 푸쉬 결과 실패처리 -->
+    <update id="updatePushHistPhoneTokenANDPhoneTypeIsNull">
+        /* com.fw.core.mapper.db1.batch.BatchPushMapper.updatePushHistPhoneTokenANDPhoneTypeIsNull, 푸쉬 결과 실패처리, sjapk, HhAddressMapper.xml */
+        UPDATE tb_push_hist
+           SET send_time = NOW()
+             , send_yn = 'F'
+             , update_id = 'BATCH'
+             , update_time = NOW()
+         WHERE phone_token IS NULL OR phone_type IS NULL
+    </update>
+
+    <!-- 푸쉬 등록 -->
+    <insert id="insertPushHist">
+        /* com.fw.core.mapper.db1.batch.BatchPushMapper.insertPushHist, 푸시등록 - 푸시등록 , yhEom, HhAddressMapper.xml */
+        INSERT INTO tb_push_hist (
+               disp_type
+             , member_id
+             , title
+             , content
+             , img_nm
+             , img_path
+             , img_size
+             , url
+             , phone_type
+             , phone_token
+             , set_time
+             , create_id
+             , create_time
+             , update_id
+             , update_time
+        ) VALUES (
+               #{dispType}
+             , #{memberId}
+             , #{title}
+             , #{content}
+             , #{imgNm}
+             , #{imgPath}
+             , #{imgSize}
+             , #{url}
+             , #{phoneType}
+             , #{phoneToken}
+             , NOW()
+             , #{createId}
+             , NOW()
+             , #{createId}
+             , NOW()
+        )
+    </insert>
+
+    <!-- 맞춤채용공고 알람 푸시등록 -->
+    <insert id="insertApPositionAlert" parameterType="PushHistDTO">
+        /* com.fw.core.mapper.db1.batch.BatchPushMapper.insertApPositionAlert, 푸시등록 -  맞춤채용공고 알람 푸시등록 , yhEom, HhAddressMapper.xml */
+        INSERT INTO tb_push_hist (member_id,disp_type,title,content,url,phone_type,phone_token,set_time,create_id,create_time,update_id,update_time)
+        SELECT m.id AS member_id,'CUSTOM_POSITION','맞춤채용공고알림',CONCAT('직무 ( ',tpa.industry,' )\n','알림신청한 기업의 채용공고가 등록되었습니다.\n\n','클릭하면 채용공고 상세페이지로 이동') ,CONCAT(#{webDomain},'/m/position/detail?id=',p.id) AS position_id,m.phoneType, m.pushToken, NOW(),'batch' , NOW(),'batch',NOW()
+        FROM position p 
+        INNER JOIN member m ON m.ap_posi_flag = 'Y' AND m.pushToken IS NOT NULL AND m.pushToken != ''
+        INNER JOIN (SELECT * FROM tb_position_alert where del_flag = 'N' GROUP BY member_id, industry) tpa ON m.id = tpa.member_id
+        WHERE p.delFlag = 'N' AND p.industry LIKE CONCAT ('%',tpa.industry,'%')
+        and p.createdAt > DATE_FORMAT( DATE_SUB(NOW(), INTERVAL 1 hour),'%Y-%m-%d %H:00:00')
+        -- and (SELECT COUNT(1) FROM tb_push_hist WHERE disp_type = 'CUSTOM_POSITION' AND member_id = m.id) = 0
+    </insert>
+    
+</mapper>

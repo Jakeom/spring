@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/default}">
+<body>
+	<div layout:fragment="contents" th:remove="tag">
+		<main id="content" role="main">
+			<h2 class="title">서치펌/고객사 배너 관리</h2>
+			<div class="row p-3">
+	            <div class="col-12">
+            		<form id="searchFaq" name="searchFaq">
+						<div class="row mt-5">
+			                <div class="col-4">
+				                <div class="d-flex align-items-center">
+				                    <input type="text" id="memberStartDt" name="memberStartDt"
+													class="form-control form-datepicker" placeholder="날짜 선택">
+				                    <div class="mr-2">~</div>
+				                    <input type="text" id="memberEndDt" name="memberEndDt"
+													class="form-control form-datepicker" placeholder="날짜 선택">
+				                </div>
+			                </div>
+			                <div class="col-4">
+			                	<div class="d-flex align-items-center">
+				                	<button type="button" class="btn btn-dark"
+												name="colorChange" id="all" data-role="all">전체</button>
+											<button type="button" class="btn btn-dark"
+												name="colorChange" id="today" data-role="today">오늘</button>
+											<button type="button" class="btn btn-dark"
+												name="colorChange" id="week" data-role="week">7일</button>
+											<button type="button" class="btn btn-dark"
+												name="colorChange" id="month" data-role="month">1개월</button>
+			                    </div>
+			                </div>
+			                <div class="col-4 text-right">
+			                	<button type="button" class="btn btn-primary" data-role="search">검색하기</button>
+			                	<button type="button" class="btn btn-dark" data-role="moveForm">등록</button>
+			                </div>
+			                <div class="col-12 mt-3">
+								<div class="d-flex">
+									<select id="displayType" class="form-control w-auto">
+										<option value="">전체</option>
+										<option value="CUSTOMER">고객사</option>
+										<option value="SEARCH">서치펌</option>
+									</select>
+								</div>
+							</div>
+			            </div>
+			        </form>
+			        <div class="row mt-3">
+	               		<div class="col">
+							<table class="table" id="datatable">
+								<thead>
+									<tr>
+										<th>No.</th>
+										<th>구분</th>
+										<th>이미지</th>
+										<th>활성여부</th>
+										<th>회사명</th>
+										<th>등록/수정일시</th>
+										<th>작성/수정자</th>
+									</tr>
+								</thead>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</main>
+	</div>
+</body>
+</html>

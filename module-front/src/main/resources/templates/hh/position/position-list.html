@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layouts/hh/mainLayout}">
+<body>
+    <div id="container-block" layout:fragment="contents" th:remove="tag">
+        <div class="container">
+            <div class="sub-content">
+                <div>
+                    <h4 class="m-b-10">※ 만료일이 지나면 포지션이 자동 종료처리 됩니다.</h4>
+                    <form name="searchForm" action="/hh/position/position-list">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <ul class="nav nav-tabs border-bottom-0" id="myTab" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">진행중</button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false" tabindex="-1">종료</button>
+                                </li>
+                            </ul>
+                            <div class="d-flex gap-10">
+                                <select class="select-design" name="searchType" style="width: 150px">
+                                    <option value="TITLE" th:selected="${searchInfo.searchType eq 'TITLE'}">제목</option>
+                                    <option value="REGID" th:selected="${searchInfo.searchType eq 'REGID'}">등록자</option>
+                                    <option value="COWORK" th:selected="${searchInfo.searchType eq 'COWORK'}">코웍참가자</option>
+                                </select>
+                                <input type="text" class="form-control white form-md" name="searchValue" th:value="${searchInfo.searchValue}" style="width: 250px"/>
+                                <button type="button" class="btn btn-primary btn-md" data-role="search">검색</button>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="tab-content" id="myTabContent">
+                        <div class="tab-pane fade active show" id="home" role="tabpanel" aria-labelledby="home-tab">
+                            <div class="position-wrap">
+                                <div class="position-list">
+                                    <a href="/hh/position/position-register" class="position-card add">
+                                        <i class="icon-bg-plus"></i>
+                                        <p class="m-t-20">버튼을 눌러 새 포지션을 등록하세요.</p>
+                                    </a>
+                                    <th:block th:each="list : ${doingList}">
+                                        <a th:href="'/hh/position/position-detail?id=' + ${list.id}" class="position-card">
+                                            <div class="position-card-head">
+                                                <div class="d-flex align-items-center gap-10">
+                                                    <th:block th:if="${list.hhPositionType ne 'PM' and list.hhPositionType ne 'CO'}">
+                                                        <span class="tag tag-sm tag-danger m-0">단독</span>
+                                                    </th:block>
+                                                    <th:block th:if="${list.hhPositionType eq 'PM'}">
+                                                        <span class="tag tag-sm tag-orange m-0">PM</span>
+                                                    </th:block>
+                                                    <th:block th:if="${list.hhPositionType eq 'CO'}">
+                                                        <span class="tag tag-sm tag-primary m-0">CO</span>
+                                                    </th:block>
+                                                    <span class="tag tag-sm tag-outline-primary m-0">진행중</span>
+                                                </div>
+                                                <th:block th:if="${list.hhPositionType ne 'CO'}">
+                                                    <th:block th:if="${list.days < 30 and list.days > 0}">
+                                                        <div class="d-flex align-items-center gap-10">
+                                                            <span class="count" th:classappend="${list.days < 7 ? 'extend' : ''}" th:text="${'D-' + list.dDay}">D-1</span>
+                                                            <th:block th:if="${list.endAddCnt ne '3'}">
+                                                                <button type="button" data-role="deadline" class="tag tag-sm tag-outline-danger m-0" data-bs-target="#modal-deadline" data-bs-toggle="modal" th:data-position-id="${list.id}">
+                                                                    <i class="icon-r-time"></i> 연장
+                                                                </button>
+                                                            </th:block>
+                                                        </div>
+                                                    </th:block>
+                                                </th:block>
+                                            </div>
+                                            <div class="position-card-content">
+                                                <p class="title" th:text="${list.title}" style="overflow: hidden;text-overflow: ellipsis;white-space: nowrap;">대기업유통 텍스트 분석</p>
+                                                <p class="desc registration-date" th:text="${'등록일 ' + list.createdAt}">등록일 2022.09.31
+                                                    <th:block th:if="${list.days < 30 and list.days > 0}">
+                                                        <span class="plus-date">+ 30 days</span>
+                                                    </th:block>
+                                                </p>
+                                                <p class="desc expiration-date" th:text="${'만료일 ' + list.endDate}">만료일 2022.10.31</p>
+                                                <p class="desc manager" th:text="${'담당자 ' + list.manager}">담당자 이덕진</p>
+                                                <th:block th:if="${list.coCount > 0}">
+                                                    <p class="participation">
+                                                        <th:block th:if="${list.publicCd ne '0'}">
+                                                            <i class="icon-lock"></i>
+                                                        </th:block>
+                                                        참여CO: <span th:text="${list.coCount}">1</span>명</p>
+                                                </th:block>
+                                            </div>
+                                            <div class="position-card-footer">
+                                                <div class="position-cnt-list" data-role="positionDetail"
+                                                     th:data-url="'/hh/position/position-detail?id=' + ${list.id} + '&mode=position'">
+                                                    <div class="number" th:text="${list.contactCnt}">3</div>
+                                                    <p class="name">포지션 제안</p>
+                                                </div>
+                                                <div class="position-cnt-list" data-role="positionDetail"
+                                                     th:data-url="'/hh/position/position-detail?id=' + ${list.id} + '&mode=resume'">
+                                                    <div class="number" th:text="${list.resumeCnt}">0</div>
+                                                    <p class="name">이력서 접수</p>
+                                                </div>
+                                                <div class="position-cnt-list" data-role="positionDetail"
+                                                    th:data-url="'/hh/position/position-detail?id=' + ${list.id} + '&mode=resume'">
+                                                    <div class="number" th:text="${list.directCnt}">0</div>
+                                                    <p class="name">직접지원</p>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </th:block>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+                            <div class="position-wrap">
+                                <div class="position-list">
+                                    <th:block th:each="list : ${endList}">
+                                        <a href="javascript:void(0)" class="position-card">
+                                            <div class="position-card-head">
+                                                <div class="d-flex align-items-center gap-10">
+                                                    <th:block th:if="${list.hhPositionType ne 'PM' and list.hhPositionType ne 'CO'}">
+                                                        <span class="tag tag-sm tag-danger m-0">단독</span>
+                                                    </th:block>
+                                                    <th:block th:if="${list.hhPositionType eq 'PM'}">
+                                                        <span class="tag tag-sm tag-orange m-0">PM</span>
+                                                    </th:block>
+                                                    <th:block th:if="${list.hhPositionType eq 'CO'}">
+                                                        <span class="tag tag-sm tag-primary m-0">CO</span>
+                                                    </th:block>
+                                                    <span class="tag tag-sm tag-outline-gray m-0">공고마감</span>
+                                                </div>
+                                                <!--<th:block th:if="${list.days < 30 and list.days > 0}">
+                                                    <div class="d-flex align-items-center gap-10">
+                                                        <span class="count extend" th:text="${'D-' + list.dDay}">D-1</span>
+                                                        <button type="button" class="tag tag-sm tag-outline-danger m-0" data-bs-target="#modal-deadline" data-bs-toggle="modal">
+                                                            <i class="icon-r-time"></i> 연장
+                                                        </button>
+                                                    </div>
+                                                </th:block>-->
+                                            </div>
+                                            <div class="position-card-content">
+                                                <p class="title" th:text="${list.title}" style="overflow: hidden;text-overflow: ellipsis;white-space: nowrap;">대기업유통 텍스트 분석</p>
+                                                <p class="desc registration-date" th:text="${'등록일 ' + list.createdAt}">등록일 2022.09.31
+                                                    <th:block th:if="${list.days < 30 and list.days > 0}">
+                                                        <span class="plus-date">+ 30 days</span>
+                                                    </th:block>
+                                                </p>
+                                                <p class="desc expiration-date" th:text="${'만료일 ' + list.endDate}">만료일 2022.10.31</p>
+                                                <p class="desc manager" th:text="${'담당자 ' + list.manager}">담당자 이덕진</p>
+                                                <th:block th:if="${list.coCount > 0}">
+                                                    <p class="participation">
+                                                        <th:block th:if="${list.publicCd ne '0'}">
+                                                            <i class="icon-lock"></i>
+                                                        </th:block>
+                                                        참여CO: <span th:text="${list.coCount}">1</span>명</p>
+                                                </th:block>
+                                            </div>
+                                            <div class="position-card-footer">
+                                                <div class="position-cnt-list">
+                                                    <div class="number" th:text="${list.contactCnt}">3</div>
+                                                    <p class="name">포지션 제안</p>
+                                                </div>
+                                                <div class="position-cnt-list">
+                                                    <div class="number" th:text="${list.resumeCnt}">0</div>
+                                                    <p class="name">이력서 접수</p>
+                                                </div>
+                                                <div class="position-cnt-list">
+                                                    <div class="number" th:text="${list.directCnt}">0</div>
+                                                    <p class="name">직접지원</p>
+                                                </div>
+                                            </div>
+                                            <div class="delete-box">
+                                                <th:block th:if="${list.hhPositionType ne 'CO'}">
+                                                    <th:block th:if="${list.remainCnt eq '0'}">
+                                                        <button type="button" class="btn-delete" data-bs-target="#modal-delete-position" data-bs-toggle="modal" th:data-id="${list.id}">
+                                                            <i class="icon-w-trash"></i>
+                                                        </button>
+                                                    </th:block>
+                                                    <th:block th:unless="${list.remainCnt eq '0'}">
+                                                        <button type="button" class="btn btn-danger" data-role="fail" th:data-id="${list.id}">남은인원 탈락처리</button>
+                                                    </th:block>
+                                                </th:block>
+                                            </div>
+                                        </a>
+                                    </th:block>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div layout:fragment="modal" th:remove="tag">
+            <!-- 마감일 지정 -->
+            <div class="modal fade" id="modal-deadline" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-comment modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header justify-content-end">
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="text-title">마감일을 지정해주세요.</div>
+                            <div class="form-group m-b-30">
+                                <input type="text" name="endDate" id="end-datepicker" class="form-control form-lg form-date" />
+                                <input type="hidden" name="positionId" class="form-control form-date" />
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary m-r-10" data-bs-dismiss="modal" data-role="saveDeadline">저장</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 포지션 삭제 -->
+            <div class="modal fade" id="modal-delete-position" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-comment modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">포지션 삭제</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p class="m-b-20 m-t-20 text-center">
+                                <input name="delPositionId" type="hidden" />
+                                공고를 삭제하시면 더이상 내용 확인이 불가능합니다.<br />
+                                공고를 삭제하시겠습니까?
+                            </p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">취소</button>
+                            <button type="button" class="btn btn-primary" data-role="delPosition">확인</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html  xmlns:th="http://www.thymeleaf.org"
+       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+       layout:decorate="layouts/mainLayout">
+<body>
+<div id="container-block" layout:fragment="contents" th:remove="tag">
+  <div class="container">
+    <div class="sub-content">
+      <p class="center-title">채용공고 검색</p>
+      <form name="searchForm" >
+        <input type="hidden" name="page" th:value="${searchInfo.page}" />
+        <div class="tbl-head">
+          <p class="tbl-head-cnt">총 <span th:text="${searchInfo.totalCount}"></span>건의 채용공고가 있습니다.</p>
+          <a data-role="goBack" class="btn btn-primary btn-xl">목록</a>
+         <!-- <div class="">
+            <select class="select-design" style="width: 100%" name="sortColumn" onchange="changeSort()">
+              <option value="createdAt" th:selected="${searchInfo.sortColumn} == 'createdAt'">등록일순</option>
+              <option value="endDate" th:selected="${searchInfo.sortColumn} == 'endDate'">마감임박순</option>
+            </select>
+          </div>-->
+        </div>
+      </form>
+      <div class="fake-table posting m-t-10">
+        <div class="fake-table-head">
+          <div class="fake-table-cell">공고내용</div>
+          <div class="fake-table-cell">헤드헌터</div>
+          <div class="fake-table-cell">지원</div>
+        </div>
+        <th:block th:if="${#lists.isEmpty(positionList)}">
+          <tr >
+            <td colspan="10" class="text-center">데이터가 없습니다.</td>
+          </tr>
+        </th:block>
+        <th:block th:each="list : ${positionList}">
+          <div class="fake-table-column">
+            <div class="fake-table-cell text-start">
+              <div class="announcement-wrap">
+                <input type="hidden" name="id" th:value="${list.id}">
+                <p class="scale" >
+                  <span th:text="${list.companyScale}"></span>
+                  <span class="company" th:text="${list.publicCd} == 0? ${list.companyName}:'***'">삼성전자</span>
+                  <button type="button" class="favorites" data-role="clickScrap" th:data-positionId="${list.id}" th:classappend="${list.scrapId eq null? '':'active'}"><i class="icon-favorites-off"></i></button>
+                </p>
+                <a th:href="'/fo/user/jop/posting/detail?id='+${list.id}" class="title" th:text="${list.title}" data-role="postingDetail" th:data-seq="${list.id}"></a>
+                <p class="date"><span>공고마감일</span><span th:text="${list.endDate}">2022.10.21 (금)</span><span class="text-danger" th:text="'(D-'+${list.dDay}+')'">(D-15)</span></p>
+              </div>
+            </div>
+            <div class="fake-table-cell text-start">
+              <div class="headhunter-wrap">
+                <a href="javascript:void(0)" class="name" th:data-member-id="${list.memberId}" data-role="hhInfo" data-bs-toggle="modal" data-bs-target="#modal-headhunter" th:text="${list.name}">박준성</a>
+                <p class="company" th:text="${list.sfName}">맨쉬컨설팅(주)</p>
+              </div>
+            </div>
+            <div class="fake-table-cell">
+              <button  href="javascript:void(0)" th:data-id="${list.id}" data-role="checkApplicant" th:text="${list.applicantYn eq '1'? '지원완료':'즉시지원'}" th:disabled="${list.applicantYn eq '1'}" class="btn btn-outline-primary btn-md">즉시지원</button>
+            </div>
+          </div>
+        </th:block>
+      </div>
+      <div class="d-flex justify-content-center mt-5">
+        <th:block
+                th:include="common/paging :: paging_Fragment(fnc=*{'fn_go_page(this)'}, pageId=*{'pageName1'})"/>
+        <script>
+          $(document).ready(function () {
+            /*<![CDATA[*/
+            var result = '[[${searchInfo.totalCount}]]';
+            $("#callCount").text(result);
+            /*]]>*/
+          });
+        </script>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

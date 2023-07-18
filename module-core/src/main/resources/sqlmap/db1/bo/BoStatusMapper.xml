@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.bo.BoStatusMapper">
+
+    <select id="selectMemberCnt" resultType="BoStatusDTO" parameterType="BoStatusDTO">
+        SELECT (SELECT COUNT(1) FROM member) memberCnt
+             , (SELECT COUNT(1) FROM member WHERE deleted = 1) quitMemberCnt
+             , (SELECT COUNT(1) FROM member WHERE deleted = 0) joinMemberCnt
+             , (SELECT COUNT(1) FROM member WHERE DTYPE = 'AP') apMemberCnt
+             , (SELECT COUNT(1) FROM member WHERE DTYPE = 'AP' AND deleted = 1) quitApMemberCnt
+             , (SELECT COUNT(1) FROM member WHERE DTYPE = 'AP' AND deleted = 0) joinApMemberCnt
+             , (SELECT COUNT(1) FROM member WHERE DTYPE = 'HH') hhMemberCnt
+             , (SELECT COUNT(1) FROM member WHERE DTYPE = 'HH' AND deleted = 1) quitHhMemberCnt
+             , (SELECT COUNT(1) FROM member WHERE DTYPE = 'HH' AND deleted = 0) joinHhMemberCnt
+    </select>
+    
+    <select id="selectTodayMemberCnt" resultType="BoStatusDTO" parameterType="BoStatusDTO">
+        SELECT (SELECT COUNT(1) FROM member WHERE DATE_FORMAT(createdAt, '%Y-%m-%d') >= DATE_FORMAT(NOW(), '%Y-%m-%d')) todayMemberCnt
+             , (SELECT COUNT(1) FROM member WHERE deleted = 1 AND DATE_FORMAT(deletedAt, '%Y-%m-%d') >= DATE_FORMAT(NOW(), '%Y-%m-%d')) todayQuitMemberCnt
+             , (SELECT COUNT(1) FROM member WHERE deleted = 0 AND DATE_FORMAT(createdAt, '%Y-%m-%d') >= DATE_FORMAT(NOW(), '%Y-%m-%d')) todayJoinMemberCnt
+             , (SELECT COUNT(1) FROM member WHERE DTYPE = 'AP' AND DATE_FORMAT(createdAt, '%Y-%m-%d') >= DATE_FORMAT(NOW(), '%Y-%m-%d')) todayApMemberCnt
+             , (SELECT COUNT(1) FROM member WHERE DTYPE = 'AP' AND deleted = 1 AND DATE_FORMAT(deletedAt, '%Y-%m-%d') >= DATE_FORMAT(NOW(), '%Y-%m-%d')) todayApQuitMemberCnt
+             , (SELECT COUNT(1) FROM member WHERE DTYPE = 'AP' AND deleted = 0 AND DATE_FORMAT(createdAt, '%Y-%m-%d') >= DATE_FORMAT(NOW(), '%Y-%m-%d')) todayApJoinMemberCnt
+             , (SELECT COUNT(1) FROM member WHERE DTYPE = 'HH' AND DATE_FORMAT(createdAt, '%Y-%m-%d') >= DATE_FORMAT(NOW(), '%Y-%m-%d')) todayHhMemberCnt
+             , (SELECT COUNT(1) FROM member WHERE DTYPE = 'HH' AND deleted = 1 AND DATE_FORMAT(deletedAt, '%Y-%m-%d') >= DATE_FORMAT(NOW(), '%Y-%m-%d')) todayHhQuitMemberCnt
+             , (SELECT COUNT(1) FROM member WHERE DTYPE = 'HH' AND deleted = 0 AND DATE_FORMAT(createdAt, '%Y-%m-%d') >= DATE_FORMAT(NOW(), '%Y-%m-%d')) todayHhJoinMemberCnt
+    </select>
+
+    <select id="selectMonthMemberCnt" resultType="BoStatusDTO" parameterType="BoStatusDTO">
+        SELECT (SELECT COUNT(1) FROM member WHERE DATE_FORMAT(createdAt, '%Y-%m') >= DATE_FORMAT(NOW(), '%Y-%m')) monthMemberCnt
+             , (SELECT COUNT(1) FROM member WHERE deleted = 1 AND DATE_FORMAT(deletedAt, '%Y-%m') >= DATE_FORMAT(NOW(), '%Y-%m')) monthQuitMemberCnt
+             , (SELECT COUNT(1) FROM member WHERE deleted = 0 AND DATE_FORMAT(createdAt, '%Y-%m') >= DATE_FORMAT(NOW(), '%Y-%m')) monthJoinMemberCnt
+             , (SELECT COUNT(1) FROM member WHERE DTYPE = 'AP' AND DATE_FORMAT(createdAt, '%Y-%m') >= DATE_FORMAT(NOW(), '%Y-%m')) monthApMemberCnt
+             , (SELECT COUNT(1) FROM member WHERE DTYPE = 'AP' AND deleted = 1 AND DATE_FORMAT(deletedAt, '%Y-%m') >= DATE_FORMAT(NOW(), '%Y-%m')) monthApQuitMemberCnt
+             , (SELECT COUNT(1) FROM member WHERE DTYPE = 'AP' AND deleted = 0 AND DATE_FORMAT(createdAt, '%Y-%m') >= DATE_FORMAT(NOW(), '%Y-%m')) monthApJoinMemberCnt
+             , (SELECT COUNT(1) FROM member WHERE DTYPE = 'HH' AND DATE_FORMAT(createdAt, '%Y-%m') >= DATE_FORMAT(NOW(), '%Y-%m')) monthHhMemberCnt
+             , (SELECT COUNT(1) FROM member WHERE DTYPE = 'HH' AND deleted = 1 AND DATE_FORMAT(deletedAt, '%Y-%m') >= DATE_FORMAT(NOW(), '%Y-%m')) monthHhQuitMemberCnt
+             , (SELECT COUNT(1) FROM member WHERE DTYPE = 'HH' AND deleted = 0 AND DATE_FORMAT(createdAt, '%Y-%m') >= DATE_FORMAT(NOW(), '%Y-%m')) monthHhJoinMemberCnt
+    </select>
+
+    <select id="selectResumeCnt" resultType="BoStatusDTO" parameterType="BoStatusDTO">
+        SELECT (SELECT COUNT(1) FROM resume WHERE delFlag = 'N') resumeCnt
+             , (SELECT COUNT(1) FROM resume WHERE delFlag = 'N' AND opened = 1) openResumeCnt
+             , (SELECT COUNT(1) FROM resume WHERE delFlag = 'N' AND opened = 0) closeResumeCnt
+    </select>
+
+    <select id="selectTodayResumeCnt" resultType="BoStatusDTO" parameterType="BoStatusDTO">
+        SELECT (SELECT COUNT(1) FROM resume WHERE delFlag = 'N' AND DATE_FORMAT(createdAt, '%Y-%m-%d') >= DATE_FORMAT(NOW(), '%Y-%m-%d')) todayResumeCnt
+             , (SELECT COUNT(1) FROM resume WHERE delFlag = 'N' AND opened = 1 AND DATE_FORMAT(createdAt, '%Y-%m-%d') >= DATE_FORMAT(NOW(), '%Y-%m-%d')) todayOpenResumeCnt
+             , (SELECT COUNT(1) FROM resume WHERE delFlag = 'N' AND opened = 0 AND DATE_FORMAT(createdAt, '%Y-%m-%d') >= DATE_FORMAT(NOW(), '%Y-%m-%d')) todayCloseResumeCnt
+    </select>
+
+    <select id="selectMonthResumeCnt" resultType="BoStatusDTO" parameterType="BoStatusDTO">
+        SELECT (SELECT COUNT(1) FROM resume WHERE delFlag = 'N' AND DATE_FORMAT(createdAt, '%Y-%m') >= DATE_FORMAT(NOW(), '%Y-%m')) monthResumeCnt
+             , (SELECT COUNT(1) FROM resume WHERE delFlag = 'N' AND opened = 1 AND DATE_FORMAT(createdAt, '%Y-%m') >= DATE_FORMAT(NOW(), '%Y-%m')) monthOpenResumeCnt
+             , (SELECT COUNT(1) FROM resume WHERE delFlag = 'N' AND opened = 0 AND DATE_FORMAT(createdAt, '%Y-%m') >= DATE_FORMAT(NOW(), '%Y-%m')) monthCloseResumeCnt
+    </select>
+
+    <select id="selectDayStatus" resultType="BoStatusDTO" parameterType="BoStatusDTO">
+        SELECT (SELECT COUNT(1) FROM member WHERE DTYPE = 'AP' AND DATE_FORMAT(createdAt, '%Y-%m-%d') = #{date}) apMemberCnt
+             , (SELECT COUNT(1) FROM member WHERE DTYPE = 'AP' AND deleted = 1 AND DATE_FORMAT(deletedAt, '%Y-%m-%d') = #{date}) quitApMemberCnt
+             , (SELECT COUNT(1) FROM resume WHERE delFlag = 'N' AND DATE_FORMAT(createdAt, '%Y-%m-%d') = #{date}) resumeCnt
+             , (SELECT COUNT(1) FROM resume WHERE delFlag = 'N' AND DATE_FORMAT(createdAt, '%Y-%m-%d') = #{date} AND opened = 1) openResumeCnt
+             , (SELECT COUNT(1) FROM resume WHERE delFlag = 'N' AND DATE_FORMAT(createdAt, '%Y-%m-%d') = #{date} AND opened = 0) closeResumeCnt
+             , (SELECT COUNT(1) FROM member WHERE DTYPE = 'HH' AND DATE_FORMAT(createdAt, '%Y-%m-%d') = #{date}) hhMemberCnt
+             , (SELECT COUNT(1) FROM member WHERE DTYPE = 'HH' AND deleted = 1 AND DATE_FORMAT(deletedAt, '%Y-%m-%d') = #{date}) quitHhMemberCnt
+             , (SELECT #{date}) as `date`
+    </select>
+
+    <select id="selectMonthStatus" resultType="BoStatusDTO" parameterType="BoStatusDTO">
+        SELECT (SELECT COUNT(1) FROM member WHERE DTYPE = 'AP' AND DATE_FORMAT(createdAt, '%Y-%m') = #{date}) apMemberCnt
+             , (SELECT COUNT(1) FROM member WHERE DTYPE = 'AP' AND deleted = 1 AND DATE_FORMAT(deletedAt, '%Y-%m') = #{date}) quitApMemberCnt
+             , (SELECT COUNT(1) FROM resume WHERE delFlag = 'N' AND DATE_FORMAT(createdAt, '%Y-%m') = #{date}) resumeCnt
+             , (SELECT COUNT(1) FROM resume WHERE delFlag = 'N' AND DATE_FORMAT(createdAt, '%Y-%m') = #{date} AND opened = 1) openResumeCnt
+             , (SELECT COUNT(1) FROM resume WHERE delFlag = 'N' AND DATE_FORMAT(createdAt, '%Y-%m') = #{date} AND opened = 0) closeResumeCnt
+             , (SELECT COUNT(1) FROM member WHERE DTYPE = 'HH' AND DATE_FORMAT(createdAt, '%Y-%m') = #{date}) hhMemberCnt
+             , (SELECT COUNT(1) FROM member WHERE DTYPE = 'HH' AND deleted = 1 AND DATE_FORMAT(deletedAt, '%Y-%m') = #{date}) quitHhMemberCnt
+             , (SELECT #{date}) as `date`
+    </select>
+
+</mapper>

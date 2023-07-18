@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layouts/hh/hhMypageLayout">
+<body>
+<div id="container-block">
+	<div layout:fragment="contents" th:remove="tag">
+        <div class="layout-content">
+          <form name="profileInfo">
+            <input type="hidden" name="photoChangeFlag" value="N" /> <!-- 사진변경여부 -->
+            <div class="row row-40 align-items-center">
+              <input type="hidden" name="memberId" th:value="${info.frontSession.id}">
+              <h3 class="subtitle">프로필 설정 <span class="font-size-14 m-  l-10">※ 표시된 부분은 후보자 화면에서 약식프로필로 노출됩니다.</span></h3>
+              <div class="title-line mt-4 mb-5"></div>
+              <table class="table m-t-15 border-top-1">
+                <colgroup>
+                  <col style="width:15%" />
+                  <col style="width:35%" />
+                  <col style="width:15%" />
+                  <col style="width:35%" />
+                </colgroup>
+                <tbody>
+                  <tr>
+                    <th class="text-center">
+                      <p>프로필 사진 ※</p>
+                    </th>
+                    <td colspan="3">
+                      <div class="file-flex">
+                        <div class="form-upload">
+                          <input type="file" name="files" id="form-file"/>
+                          <label for="form-file">
+                            <span class="file-name" th:text="${!#lists.isEmpty(profileInfo.commonFileList)? profileInfo.commonFileList[0].originName :''}"></span>
+                            <i class="icon-input-add"></i>
+                          </label>
+                        </div>
+                        <p class="m-l-10">(파일형식: .jpg, .png, .gif)</p>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th class="text-center">
+                      <p>직급</p>
+                    </th>
+                    <td>
+                      <input type="text" name="position" class="form-control form-lg" th:value="${profileInfo.position}" placeholder="직급을 입력하세요" maxlength="10"/>
+                    </td>
+                    <th class="text-center">
+                      <p>최종학교/전공</p>
+                    </th>
+                    <td>
+                      <div class="d-flex">
+                        <input type="text" class="form-control form-lg m-r-10" name="school" th:value="${profileInfo.school}" placeholder="학교를 입력하세요" maxlength="10"/>
+                        <input type="text" class="form-control form-lg" name="major" th:value="${profileInfo.major}" placeholder="전공을 입력하세요" maxlength="10"/>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th class="text-center">
+                      <p>인사말 ※</p>
+                    </th>
+                    <td colspan="3">
+                      <div class="form-textarea textarea-sm m-0">
+                        <label for="greeting"></label>
+                        <textarea name="greeting" id="greeting" th:text="${profileInfo.greeting}" cols="30" rows="10" placeholder="인사말을 입력하세요." class="" maxlength="300"></textarea>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th class="text-center">
+                      <p>주요이력</p>
+                    </th>
+                    <td colspan="3">
+                      <div class="form-textarea textarea-sm m-0">
+                        <textarea name="careerDesc" id="careerDesc" th:text="${profileInfo.careerDesc}" cols="30" rows="10" placeholder="주요이력을 입력하세요." class="" maxlength="300"></textarea>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th class="text-center">
+                      <p>전문분야 선택 ※</p>
+                      <p>(최대 5개)</p>
+                    </th>
+                    <td colspan="3">
+                      <div class="check-badge-wrap">
+                        <div>
+                          <input type="checkbox" class="check-badge" name="positionField" id="service" value="SERVICE" />
+                          <label for="service" class="check-badge-label">서비스</label>
+                        </div>
+                        <div>
+                          <input type="checkbox" class="check-badge" name="positionField" id="education" value="EDUCATION" />
+                          <label for="education" class="check-badge-label">교육</label>
+                        </div>
+                        <div>
+                          <input type="checkbox" class="check-badge" name="positionField" id="finance" value="FINANCE" />
+                          <label for="finance" class="check-badge-label">금융·은행</label>
+                        </div>
+                        <div>
+                          <input type="checkbox" class="check-badge" name="positionField" id="association" value="ASSOCIATION" />
+                          <label for="association" class="check-badge-label">기관·협회</label>
+                        </div>
+                        <div>
+                          <input type="checkbox" class="check-badge" name="positionField" id="media" value="MEDIA" />
+                          <label for="media" class="check-badge-label">미디어·광고·출판</label>
+                        </div>
+                        <div>
+                          <input type="checkbox" class="check-badge" name="positionField" id="construction" value="CONSTRUCTION" />
+                          <label for="construction" class="check-badge-label">건설·건축</label>
+                        </div>
+                        <div>
+                          <input type="checkbox" class="check-badge" name="positionField" id="it" value="IT" />
+                          <label for="it" class="check-badge-label">IT·인터넷</label>
+                        </div>
+                        <div>
+                          <input type="checkbox" class="check-badge" name="positionField" id="electronic" value="ELECTRONIC" />
+                          <label for="electronic" class="check-badge-label">전자·통신·반도체</label>
+                        </div>
+                        <div>
+                          <input type="checkbox" class="check-badge" name="positionField" id="medical" value="MEDICAL" />
+                          <label for="medical" class="check-badge-label">의료·제약</label>
+                        </div>
+                        <div>
+                          <input type="checkbox" class="check-badge" name="positionField" id="sale" value="SALE" />
+                          <label for="sale" class="check-badge-label">유통·판매</label>
+                        </div>
+                        <div>
+                          <input type="checkbox" class="check-badge" name="positionField" id="art" value="ART" />
+                          <label for="art" class="check-badge-label">문화·예술·디자인</label>
+                        </div>
+                        <div>
+                          <input type="checkbox" class="check-badge" name="positionField" id="chemistry" value="CHEMISTRY" />
+                          <label for="chemistry" class="check-badge-label">제조·생산·화학</label>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th class="text-center">
+                      <p>소속 서치펌명 ※</p>
+                    </th>
+                    <td>
+                      <p th:text="${profileInfo.sfName}">맨쉬컨설팅(주)</p>
+                    </td>
+                    <th class="text-center">
+                      <p>
+                        이메일 ※
+                      </p>
+                    </th>
+                    <td>
+                      <p th:text="${profileInfo.email}">rasdasd@naver.com</p>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th class="text-center" rowspan="5">
+                      <p>프로필 표시정보</p>
+                    </th>
+                    <th class="text-center border-left-1">
+                      <p>인증여부</p>
+                    </th>
+                    <td colspan="3">
+                      <th:block th:if="${profileInfo.approved} ne '1'">
+                        <button type="button" class="btn btn-danger btn-sm" id="replacement-btn">미인증회원</button>
+                      </th:block>
+                      <th:block th:if="${profileInfo.approved} eq '1'">
+                        <button type="button" class="btn btn-primary btn-sm" id="replacement-btn2">R9 인증회원</button>
+                      </th:block>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th class="text-center border-left-1">
+                      <p>R9 활동기간</p>
+                    </th>
+                    <td colspan="3">
+                      <p><span class="text-danger" th:text="${profileInfo.activityPeriod}"></span>일&nbsp;<span th:text="${'('+profileInfo.joinDate+' 가입)'}"></span></p>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th class="text-center border-left-1">
+                      <p>휴대폰번호</p>
+                    </th>
+                    <td colspan="3">
+                      <p th:text="${profileInfo.phone}" name="phone"></p>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th class="text-center border-left-1">
+                      <p>최종 로그인 일시</p>
+                    </th>
+                    <td colspan="3">
+                      <p th:text="${profileInfo.recentLoginTime}">2020.12.01 17:40:57</p>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="send-btn">
+              <button type="button" class="btn btn-outline-dark btn-xl" data-bs-toggle="modal" data-bs-target="#modal-profile-headhunter">미리보기</button>
+              <button type="button" class="btn btn-dark btn-xl" data-role="save">입력완료</button>
+            </div>
+          </form>
+          </div>
+        </div>
+  </div>
+  <!-- 헤드헌터 상세모달 -->
+  <div layout:fragment="modal" th:remove="tag">
+    <div class="modal fade" id="modal-profile-headhunter" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-headhunter modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body pt-0">
+            <div class="headhunter-profile-content">
+              <div class="headhunter-profile">
+                <div class="headhunter-left">
+                  <div class="headhunter-profile-img" th:style="${!#lists.isEmpty(profileInfo.commonFileList)? 'background-image: url('+ profileInfo.commonFileList[0].url+')':'background-image: url(/static/images/no-img.png)'}"></div>
+                </div>
+                <div class="headhunter-profile-info">
+                  <div>
+                    <p class="company">맨쉬컨설팅(주)</p>
+                    <p class="name">
+                      <span name="hhName" th:text="${profileInfo.name}">이름</span>
+                      <span class="rank" name="hhPosition" th:text="${profileInfo.position}">직급</span>
+                      <span class="txt" name="hhSchool" th:text="${profileInfo.school+' '+profileInfo.major}">학교/전공</span>
+                    </p>
+                  </div>
+                  <div>
+                    <div class="phone">
+                      <p>
+                        <span>연락처</span>
+                        <span class="phone-number" th:text="${profileInfo.phone}">***-****-****</span>
+                        <input type="hidden" name="modalPhone" th:value="${profileInfo.phone}"/>
+                      </p>
+                    </div>
+                  </div>
+                  <ul class="info-list">
+                    <li>
+                      <p>이메일</p>
+                      <p th:text="${profileInfo.email}">이메일</p>
+                    </li>
+                    <li>
+                      <p>최근로그인</p>
+                      <p th:text="${profileInfo.recentLoginDate}">2022-10-11</p>
+                    </li>
+                    <li>
+                      <p>진행중공고</p>
+                      <p><span class="text-danger" th:text="${profileInfo.progressCnt}">0</span>건</p>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="apply-wrap">
+              <div class="apply-wrap-body">
+                <div class="content">
+                  <h4 class="table-subtitle mb-3">인사말</h4>
+                  <div class="desc">
+                    <p class="introduce-text" name="hhGreeting" th:text="${profileInfo.greeting}">인사말</p>
+                  </div>
+                </div>
+                <div class="content">
+                  <h4 class="table-subtitle mb-3">주요이력</h4>
+                  <div class="desc" name="careerDesc">
+                    <ul class="history">
+                      <!--<li>2007 ~ 2013 Flowserve KSM Project OEM Team 팀장/이사</li>
+                      <li>2005 ~ 2007 농원금속(주) 해외영업팀장</li>
+                      <li>2003 ~ 2005 피죤(주) 해외영업팀장</li>-->
+                    </ul>
+                  </div>
+                <div class="content">
+                  <h4 class="table-subtitle mb-3">전문분야</h4>
+                  <div class="desc">
+                    <div class="badge-box fieldList" name="fieldList">
+                        <!--<span class="tag tag-lg tag-outline-primary none-border m-0 field" name="field">
+                          <em>전문분야</em>
+                        </span>-->
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,13 @@
+//  Created - 22.08.22 / sjpaik
+//  Modified -
+bootJar {
+    enabled(false)
+}
+
+jar {
+    enabled(true)
+}
+
+dependencies {
+
+}

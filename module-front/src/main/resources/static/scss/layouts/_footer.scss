@@ -1,0 +1,45 @@
+.footer{
+    padding: 65px 0; background-color: #202020;
+    >.container{ display: flex;}
+    .footer-desc{
+        width: 50%;
+        &.left{padding-right: 40px;}
+        &.right{padding-left: 40px;}
+    }
+    .footer-logo{ width: 138px; height: 36px; background: url('../images/w-logo.svg')50% 50% no-repeat;}
+    .email{font-size: 15px; color: #1686f2; font-weight: 500; margin-top: 8px; margin-bottom: 32px;}
+    .copyright{font-size: 14px; line-height: 1.43; color: #555;}
+}
+.company-info{
+    display: flex; flex-flow: wrap; margin-top: 24px;
+    li{
+        color: #fff; padding-right: 20px; position: relative; line-height: 1.47;
+        &::after{ content: ""; position: absolute; width: 1px; height: 70%; background-color: #555; right: 8px; top: 50%; transform: translateY(-50%); }
+        &.hide-bar{
+            &::after{content:none;}
+         }
+    }
+}
+.wrap-info{
+    display: flex; align-items: center; gap: 42px; margin-top: 10px;
+    a{ color: #fff; font-size: 15px; font-weight: 500;}
+}
+.precautions{
+    font-size: 14px; color: #777; margin-top: 30px;
+}
+.app-download{
+    display: flex; gap: 11px; margin-top: 78px;
+    a{ display: inline-block; width: 50%; text-align: center; border: 1px solid #777; padding: 13px 0; border-radius: 4px;}
+}
+@media screen and (max-width: $BREAKPOINT_LARGE) {
+    .footer{
+        padding: 40px 15px; background-color: #202020;
+        >.container{ display: block;}
+        .footer-desc{
+            width: 100%;
+            &.left{padding-right: 0;}
+            &.right{padding-left: 0;}
+        }
+        .wrap-info{flex-flow: wrap; gap: 30px}
+    }
+}

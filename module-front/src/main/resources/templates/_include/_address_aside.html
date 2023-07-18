@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:fragment="common">
+    <aside>
+        <ul>
+            <li>
+                <a href="#" class="headhunter-side-title" data-bs-toggle="modal"
+                data-bs-target="#modal-group-add"><i
+                        class="icon-file-active m-r-5"></i> 그룹 추가하기</a>
+                <ul id="addressGroupBody">
+                  <th:block th:if="${!#lists.isEmpty(groupList)}" th:each="data : ${groupList}">
+                    <li th:style="${data.id eq searchInfo.groupId ? 'background:#A9F5F2;': ''}">
+                        <a class="addressGroupRow" th:data-id="${data.id}" href="#"><i class="icon-file-default m-l-5 m-r-5"></i> <span th:text="${data.name}" th:remove="tag"></span></a>
+                        <div class="feed-list-detail">
+                            <div class="more-dot">
+                                <button type="button">
+                                    <i class="icon-more-dot"></i>
+                                </button>
+                                <div class="more-page">
+                                    <ul class="p-0">
+                                        <li><a href="#" data-bs-toggle="modal" class="editGroup"
+                                            data-bs-target="#modal-group-edit" th:data-id="${data.id}" th:data-name="${data.name}" >그룹명 수정</a></li>
+                                        <li><a href="#" data-bs-toggle="modal"
+                                            data-bs-target="#modal-gorup-delete"  class="editGroup" th:data-id="${data.id}" th:data-name="${data.name}">삭제</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                  </th:block>
+                </ul>
+            </li>
+            <li>
+                <ul>
+                    <li class="">
+                        <a href="/hh/mypage/mail-history"><i class="icon-email m-r-5"></i> 발송한 메일내역 바로가기</a>
+                    </li>
+                    <li>
+                        <a href="/hh/mypage/frequently-used-message"><i class="icon-email m-r-5"></i> 자주쓰는메일/SMS 바로가기</a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </aside>
+</div>
+</html>

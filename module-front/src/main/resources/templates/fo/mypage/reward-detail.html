@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/mypageLayout">
+<body>
+<div id="container-block">
+    <div layout:fragment="contents" th:remove="tag">
+        <div class="layout-content">
+            <div class="community-content">
+                <div class="sub-content-head">
+                    <h3 class="subtitle">상품 상세</h3>
+                </div>
+                <div class="reword-detail">
+                    <div class="reword-product-img">
+                        <img th:src="${!#lists.isEmpty(rewardInfo.commonFileList)?  rewardInfo.commonFileList[0].url : '/static/images/about-01.png' }"
+                             alt="스타벅스 아이스아메리카노"/>
+                    </div>
+                    <div class="reword-explanation">
+                        <div class="reword-product">
+                            <p class="company" th:text="${rewardInfo.goodComp}">스타벅스</p>
+                            <p class="product-name" th:text="${rewardInfo.goodNm}">아이스 카페 아메리카노</p>
+                            <p class="need-point"><span th:text="${rewardInfo.point}">4,100</span>P</p>
+                            <input type="hidden" name="myPoint"
+                                   th:value="${#authentication.principal.balance == null? '0':#authentication.principal.balance}">
+                            <input type="hidden" name="goodsPoint" th:value="${rewardInfo.point}">
+                            <input type="hidden" name="rewardGoodsId" th:value="${rewardInfo.id}">
+                        </div>
+                        <ul class="product-content">
+                            <li>
+                                <span class="key">교환처</span>
+                                <span class="value" th:text="${rewardInfo.goodComp}">스타벅스</span>
+                            </li>
+                            <!--<li>
+                              <span class="key">유효기간</span>
+                              <span class="value">전송 후 30일</span>
+                            </li>-->
+                        </ul>
+                        <div class="example-form">
+                            <ul>
+                                <li>이 상품은 RESUME9 회원의 리워드 포인트로만 교환할 수 있습니다.</li>
+                                <li>실물 상품이 아닌 매장에서 이용할 수 있는 모바일 교환권이며, 본인의 휴대폰번호로 전송됩니다.</li>
+                                <li>상품은 전송 후, 교환/취소/환불이 되지 않습니다.</li>
+                            </ul>
+                        </div>
+                        <button type="button" data-role="purchase" class="btn btn-lg btn-outline-dark">포인트로 구매하기
+                        </button>
+                    </div>
+                </div>
+                <div class="col" th:utext="${rewardInfo.goodDetail}"></div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/hh/addressLayout">
+<body>
+<div id="container-block">
+    <div layout:fragment="contents" th:remove="tag">
+        <div class="layout-content">
+            <h3 class="subtitle poppins">내 주소록</h3>
+            <div class="title-line mt-4 mb-5"></div>
+            <div class="tbl-head address-tool">
+                <div class="d-flex align-items-center gap-10">
+                    <button type="button" class="btn btn-primary btn-md" data-bs-toggle="modal"
+                            data-bs-target="#modal-add-address">+ 연락처 추가
+                    </button>
+                    <button type="button" class="btn btn-outline-gray btn-md" onclick="openContactDel()"><i class="icon-trash m-r-5"></i> 삭제
+                    </button>
+                    <select class="select-design" style="width: 220px" name="groupIdPop" id="groupIdPop" onchange="openContactMove(this)">
+                        <option value="">그룹이동</option>
+                        <th:block th:if="${!#lists.isEmpty(groupList)}" th:each="data : ${groupList}">
+                            <option th:text="${data.name}" th:value="${data.id}"></option>
+                        </th:block>
+                    </select>
+                    <button type="button" class="btn btn-outline-gray btn-md" data-type="btn" data-bs-toggle="modal"
+                    data-bs-target="#modal-suggest-email">단체 이메일/SMS 전송</button>
+                </div>
+                <form name="searchForm">
+                <div class="d-flex gap-10">
+                    <input type="hidden" name="groupId" id="groupId" th:value="${searchInfo.groupId}">
+                    <input type="hidden" name="page" id="page" value="1">
+                    <select class="select-design" name="searchType" id="searchType" style="width: 130px">
+                        <option value="NAME" th:selected="${searchInfo.searchType eq 'NAME'}">이름</option>
+                        <option value="PHONE" th:selected="${searchInfo.searchType eq 'PHONE'}">휴대폰번호</option>
+                        <option value="EMAIL" th:selected="${searchInfo.searchType eq 'EMAIL'}">이메일</option>
+                    </select>
+                    <input type="text" class="form-control white form-md" style="width: 150px" th:value="${searchInfo.keyword}" name="keyword" id="keyword"/>
+                    <button type="button" class="btn btn-outline-gray btn-md" data-role="search">검색</button>
+                </div>
+                </form>
+            </div>
+            <table class="table m-t-15 border-top-1">
+                <colgroup>
+                    <col style="width:10%"/>
+                    <col style="width:15%"/>
+                    <col style="width:15%"/>
+                    <col style="width:24%"/>
+                    <col style="width:15%"/>
+                    <col style="width:20%"/>
+                </colgroup>
+                <thead>
+                <tr>
+                    <th class="text-center">
+                        <div class="form-check p-0">
+                            <input class="form-check-input" type="checkbox" value="" id="multipleCheckAll" onchange="allCheck()"/>
+                        </div>
+                    </th>
+                    <th class="text-center">
+                        이름<br/>
+                        (등록일)
+                    </th>
+                    <th class="text-center">휴대폰번호</th>
+                    <th class="text-center">이메일</th>
+                    <th class="text-center">최종메일</th>
+                    <th class="text-center">메모</th>
+                </tr>
+                </thead>
+                <tbody>
+                <th:block th:if="${#lists.isEmpty(detailList)}">
+                    <tr>
+                        <td colspan="8" class="text-center">해당되는 데이터가 존재하지 않습니다.</td>
+                    </tr>
+                </th:block>
+                <th:block th:if="${!#lists.isEmpty(detailList)}">
+                    <th:block th:each="data : ${detailList}">
+                        <tr>
+                            <td class="text-center">
+                                <div class="form-check p-0">
+                                    <input class="form-check-input _talbeCheckbox" type="checkbox" value="" id="multipleCheck" name="multipleCheck"  th:value="${data.id}"/>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <p th:text="${data.name}"></p>
+                                <p th:text="${'('+data.createdAt+')'}">(2022-11-04)</p>
+                            </td>
+                            <td class="text-center">
+                                <a href="" class="text-primary text-underline _phone" th:id="|_c${data.Id}|" th:attr="data-id=${data.Id},data-email=${data.email},data-name=${data.name},data-phone=${data.phone}" th:text="${data.phone}" style="display: none;" data-bs-toggle="modal"
+                                data-bs-target="#modal-suggest-sms"></a>
+                            </td>
+                            <td class="text-center">
+                                <a href="" class="text-primary text-underline " th:attr="data-id=${data.Id},data-name=${data.name},data-email=${data.email}" th:text="${data.email}" data-bs-toggle="modal"
+                                data-bs-target="#modal-suggest-email"></a>
+                            </td>
+                            <td class="text-center">
+                                <p th:text="${#strings.isEmpty(data.lastSendAt) ? '-' : data.lastSendAt}" class="_time" style="display: none;"></p>
+                            </td>
+                            <td class="text-center">
+                                <p th:text="${#strings.isEmpty(data.memo) ? '-' : data.memo}"></p>
+                            </td>
+                        </tr>
+                    </th:block>
+                </th:block>
+                </tbody>
+            </table>
+            <div class="d-flex justify-content-center mt-5">
+                <th:block th:include="common/paging :: paging_Fragment(fnc=*{'fn_go_page(this)'}, pageId=*{'pageName1'})"/>
+            </div>
+        </div>
+        <!-- 새 연락처 추가 -->
+        <div class="modal fade" id="modal-add-address" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-write modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">새 연락처 추가</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <form name="addressContactForm">
+                    <div class="modal-body">
+                        <input type="hidden" name="delFlag" id="delFlag"/>
+                        <input type="hidden" name="checkedFields" id="checkedFields"/>
+                        <input type="hidden" name="groupIdMove" id="contactForm-groupId" />
+                        <input type="hidden" name="groupNm" />
+                        <select class="select-design" style="width: 100%" name="groupId" id="groupId">
+                            <th:block th:if="${!#lists.isEmpty(groupList)}" th:each="data : ${groupList}">
+                            <option th:text="${data.name}" th:value="${data.id}"></option>
+                        </th:block>
+                        </select>
+                        <table class="table border-top-1 m-t-30">
+                            <colgroup>
+                                <col width="25%" />
+                            </colgroup>
+                            <tbody>
+                            <tr>
+                                <th class="">이름</th>
+                                <td class="">
+                                    <input type="text" name="name" id="name" maxlength="20" class="form-control form-lg" value="" placeholder="이름" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="">휴대폰번호</th>
+                                <td class="">
+                                    <input type="text"  name="phone" id="phone" maxlength="11" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" class="form-control form-lg" value="" placeholder="(-)를 제외하고 입력" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="">이메일주소</th>
+                                <td class="">
+                                    <input type="text"  name="email" id="email" maxlength="50" class="form-control form-lg" value="" placeholder="email@example.com" />
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <div class="memo-content">
+                            <p class="text-start">메모<span class="font-size-14 text-gray">(100자 이내)</span></p>
+                            <div class="memo-form m-t-10">
+                                <textarea name="memo" id="memo" cols="30" rows="10" maxlength="100"></textarea>
+                            </div>
+                        </div>
+                        <p>내 주소록에서 후보자에게 제안 이후에 연락처를 수정하게 되면 시스템의 정보의 불일치가 발생하여 수정을 금지하고 있습니다.</p>
+                        <p class="text-danger m-t-5">불가피하게 제안 전 수정이 필요한 경우 삭제후 다시 연락처를 추가해 주시기 바랍니다.</p>
+                    </div>
+                    </form>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">취소</button>
+                        <button type="button" class="btn btn-primary" onclick="addContact()">확인</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        
+
+        <form name="addressGroupForm">
+            <input type="hidden" name="delFlag" id="delFlag">
+            <input type="hidden" name="id" id="id">
+            <input type="hidden" name="name" id="name"/>
+        </form>
+
+        <!-- 그룹 추가하기 -->
+        <div class="modal fade" id="modal-group-add" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-write modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">새 그룹 추가</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="text" class="form-control form-md" placeholder="새 그룹명" name="name" id="name"/> 
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">취소</button>
+                        <button type="button" class="btn btn-primary" onclick="groupAdd()">확인</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- 그룹 수정 -->
+        <div class="modal fade" id="modal-group-edit" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-write modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">그룹명 수정</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">                        
+                        <input type="text" class="form-control form-md" placeholder="그룹명" name="name" id="name"/> 
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">취소</button>
+                        <button type="button" class="btn btn-primary" onclick="groupEdit()">확인</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- 이동하시겠습니까? -->
+        <div class="modal fade" id="modal-gorup-move" tabindex="-1" aria-labelledby="exampleModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-comment modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">그룹 이동</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="text-title">[<span id="name"></span>]로 그룹이동 하시겠습니까?</div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">취소</button>
+                            <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="moveContact()">이동</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- 그룹 삭제하시겠습니까? -->
+        <div class="modal fade" id="modal-gorup-delete" tabindex="-1" aria-labelledby="exampleModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-comment modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">그룹 삭제</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="text-title">그룹 [<span id="name"></span>]을 삭제하시겠습니까?</div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">취소</button>
+                            <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="groupDel()">확인</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- 연락처삭제하시겠습니까? -->
+        <div class="modal fade" id="modal-contact-delete" tabindex="-1" aria-labelledby="exampleModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-comment modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">연락처 삭제</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="text-title">선택하신 연락처를 삭제하세겠습니까?</div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">취소</button>
+                            <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="editContact('Y')">확인</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- 알림 -->
+        <div class="modal fade" id="modal-addContact-alert" tabindex="-1" aria-labelledby="exampleModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-comment modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">알림</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="text-title">
+                            이미 등록된 연락처입니다
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" data-bs-dismiss="modal" >확인</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        
+
+        <!-- 이메일 -->
+        <div class="modal fade" id="modal-suggest-email" tabindex="-1" aria-labelledby="suggestEmailModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-comment modal-dialog-centered" style="max-width: 900px">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel"></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row email-wrap m-0">
+                            <ul class="nav nav-tabs" id="_email-Tab" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                  <button class="nav-link _s" onclick="smsTab();" id="sms-tab" data-bs-toggle="tab" data-bs-target="#sms" type="button" role="tab" aria-controls="sms" aria-selected="false" tabindex="-1">SMS/MMS</button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                  <button class="nav-link _e active"  data-bs-toggle="tab" data-bs-target="#email" type="button" role="tab" aria-controls="email" aria-selected="true">이메일</button>
+                                </li>
+                              </ul>
+                        </div>
+                        <div class="row email-wrap m-0">
+                            <div class="col-12 m-t-20">
+                                <div class="d-flex justify-content-between">
+                                    <div class="d-flex gap-10">
+                                        <select class="select-design" style="width: 250px"
+                                                data-url="/fo/common/template/list/EMAIL"
+                                                data-show-name="name"
+                                                data-value-name="id"
+                                                data-default-option="불러올 템플릿 선택"
+                                                name="emailTemplate"
+                                        >
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <table class="table border-top-1 m-t-30">
+                            <colgroup>
+                                <col style="width:15%" />
+                            </colgroup>
+                            <tbody>
+                            <tr>
+                                <th class="">받는 사람</th>
+                                <td class="">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <div class="coworker-wrap m-r-15 bg-white">
+                                            <div class="coworker-list">
+                                            </div>
+                                        </div>
+                                        <button type="button" class="btn btn-sm btn-primary round" onclick="openAddCC();">+ 직접추가</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="">제목</th>
+                                <td class="">
+                                    <input type="text" class="form-control form-lg" name="emailSubject" value="" placeholder="제목을 입력해주세요." />
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="">내용</th>
+                                <td class="">
+                                    <div class="d-flex align-items-center justify-content-end m-b-5 position-relative">
+                                        <button type="button" class="btn btn-primary btn-sm" data-role="replacement-btn">치환태그 삽입</button>
+                                        <div class="replacement-tag-notice">
+                                            <div class="replacement-tag">
+                                                <p class="title">치환태그 방식</p>
+                                                <a href="javascript:void(0)" class="close"><i class="icon-g-close"></i></a>
+                                            </div>
+                                            <table class="table">
+                                                <thead>
+                                                <tr>
+                                                    <th class="text-center">필드명</th>
+                                                    <th class="text-center">태그명</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                <tr>
+                                                    <td class="text-center">수신자이름</td>
+                                                    <td class="text-center text-primary">{$수신자이름$}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="text-center">포지션제목</td>
+                                                    <td class="text-center text-primary">{$포지션제목$}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="text-center">채용사이름</td>
+                                                    <td class="text-center text-primary">{$채용사이름$}</td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <textarea class="form-control form-lg" id="emailContent" name="emailContent" placeholder="내용을 입력해주세요." rows="15" th:utext="${profile.signatureBasic}"></textarea>
+                                </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                        <div class="modal-footer">
+                            <!-- <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">취소</button>
+                            <button type="button" class="btn btn-primary" data-role="sendEmail">확인</button> -->
+                        </div>
+                        <div class="modal-footer">
+                            <div class="d-flex gap-10">
+                            <button type="button" class="btn btn-gray" data-bs-dismiss="modal">취소</button>
+                            <button type="button" class="btn btn-primary" data-role="sendEmail">메일발송</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SMS 안내 문자 -->
+        <div class="modal fade" id="modal-suggest-sms" tabindex="-1" aria-labelledby="suggestSmsModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-comment modal-dialog-centered" style="max-width: 900px">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel"></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row email-wrap m-0">
+                            <ul class="nav nav-tabs" id="_sms-myTab" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                  <button class="nav-link _s" data-bs-toggle="tab" data-bs-target="#sms" type="button" role="tab" aria-controls="sms" aria-selected="false" tabindex="-1">SMS/MMS</button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                  <button class="nav-link _e active" onclick="emailTab();" id="email-tab" data-bs-toggle="tab" data-bs-target="#email" type="button" role="tab" aria-controls="email" aria-selected="true">이메일</button>
+                                </li>
+                              </ul>
+                        </div>
+                        <div class="row email-wrap m-0">
+                            <div class="col-12 m-t-20">
+                                <div class="d-flex justify-content-between">
+                                    <div class="d-flex gap-10">
+                                        <select class="select-design" style="width: 250px"
+                                                name="smsTemplate"
+                                                data-url="/fo/common/template/list/SMS"
+                                                data-show-name="name"
+                                                data-value-name="id"
+                                                data-default-option="불러올 템플릿 선택"
+                                        >
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <table class="table border-top-1 m-t-30">
+                            <colgroup>
+                                <col style="width:15%" />
+                            </colgroup>
+                            <tbody>
+                            <tr>
+                                <th class="">받는 사람</th>
+                                <td class="">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <div class="coworker-wrap m-r-15 bg-white">
+                                            <div class="coworker-list">
+                                            </div>
+                                        </div>
+                                        <button type="button" class="btn btn-sm btn-primary round" onclick="openAddCC();" >+ 직접추가</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="">제목</th>
+                                <td class="">
+                                    <input type="text" class="form-control form-lg" name="smsSubject" value="" placeholder="제목 입력 후 발송시 LMS로 발송됩니다." />
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="">내용</th>
+                                <td class="">
+                                    <div class="d-flex align-items-center justify-content-end m-b-5 position-relative">
+                                        <button type="button" class="btn btn-primary btn-sm" data-role="replacement-btn">치환태그 삽입</button>
+                                        <div class="replacement-tag-notice">
+                                            <div class="replacement-tag">
+                                                <p class="title">치환태그 방식</p>
+                                                <a href="javascript:void(0)" class="close"><i class="icon-g-close"></i></a>
+                                            </div>
+                                            <table class="table">
+                                                <thead>
+                                                <tr>
+                                                    <th class="text-center">필드명</th>
+                                                    <th class="text-center">태그명</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                <tr>
+                                                    <td class="text-center">수신자이름</td>
+                                                    <td class="text-center text-primary">{$수신자이름$}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="text-center">포지션제목</td>
+                                                    <td class="text-center text-primary">{$포지션제목$}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="text-center">채용사이름</td>
+                                                    <td class="text-center text-primary">{$채용사이름$}</td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <textarea class="form-control form-lg" name="smsContent" value="" placeholder="내용을 입력해주세요." rows="15"></textarea>
+                                    <div class="msg-type m-t-10" style="text-align: right">0 byte / SMS</div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">취소</button>
+                            <button type="button" class="btn btn-primary" data-role="sendSms">확인</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 받는사람 직접추가 -->
+        <div class="modal fade" id="modal-email-add" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-write modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">받는사람 직접추가</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <table class="table border-top-1 m-t-30">
+                            <colgroup>
+                                <col width="25%" />
+                            </colgroup>
+                            <tbody>
+                            <tr>
+                                <th class="">이름</th>
+                                <td class="">
+                                    <input type="text" class="form-control form-lg" value="" placeholder="이름" id="addName" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="">이메일주소</th>
+                                <td class="">
+                                    <input type="text" class="form-control form-lg" value="" placeholder="email@example.com" id="addEmail"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="">휴대폰번호</th>
+                                <td class="">
+                                    <input type="text" class="form-control form-lg" value="" placeholder="(-)를 제외하고 입력" id="addphone" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"/>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <div class="form-check m-t-20">
+                            <input class="form-check-input" type="checkbox" value="" id="addContactChk" />
+                            <label class="form-check-label" for="multipleCheck"> 이정보를 [기본그룹] 주소록에 추가합니다. </label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">취소</button>
+                        <button type="button" class="btn btn-primary" onclick="modalAddCC();">추가</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>    
+</div>
+</body>
+</html>

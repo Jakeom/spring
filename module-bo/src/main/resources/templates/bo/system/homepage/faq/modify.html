@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/default}">
+
+<body>
+	<div layout:fragment="contents" th:remove="tag">
+		<input type="hidden" id="faqModifySeq" th:value="${modify.faqSeq}"/>
+		<input type="hidden" id="faqModifyType" th:value="${modify.memberTypeCd}"/>
+		<input type="hidden" id="faqModifyNm" th:value="${modify.categoryNm}"/>
+		<input type="hidden" id="faqCategorySeq" th:value="${modify.faqCategorySeq}"/>
+		<main id="content" role="main">
+			<h2 class="title">FAQ 수정</h2>
+			<div class="row p-3">
+	            <div class="col-12">
+					<form name="modifyForm" th:object="${modify}">
+						<table class="table table-bordered">
+							<colgroup>
+								<col style="width:120px" />
+								<col />
+							</colgroup>
+							<tr>
+								<th class="text-center">FAQ 종류</th>
+								<td>
+									<div class="d-flex align-items-center" th:text="${' ' + modify.memberTypeCd + ' ' + modify.categoryNm}">
+										<!--<button class="btn" id="AP" data-role="AP">AP</button><button class="btn mr-2" id="HH" data-role="HH">HH</button>
+										<select class="select form-control w-auto" id="selectBox" name="selectBox" required>-->
+										</select>
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<th class="text-center">FAQ 제목</th>
+								<td>
+									<input name="title" type="text" class="form-control" autocomplete="off" th:value="${modify.title}" th:placeholder="${modify.title}">
+								</td>
+							</tr>
+							<tr>
+								<td colspan="2">
+									<textarea class="form-control ckeditor" name="contentFaq" autocomplete="off" th:placeholder="${modify.content}" rows="20" cols="50">[[${modify.content}]]</textarea>
+								</td>
+							</tr>
+						</table>
+						<div class="m-t-10 text-right">
+							<button type="button" class="btn btn-dark" data-role="save">수정하기</button>
+							<button type="button" class="btn btn-dark" data-role="delete">삭제하기</button>
+							<button type="button" class="btn btn-dark" data-role="cancel">취소</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</main>
+	</div>
+</body>
+</html>

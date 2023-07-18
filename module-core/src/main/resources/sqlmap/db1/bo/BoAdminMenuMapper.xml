@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.bo.BoAdminMenuMapper">
+
+    <!-- 메뉴 리스트 취득 -->
+    <select id="selectMenuList" resultType="BoAdminMenuDTO">
+        /* com.fw.core.mapper.db1.bo.BoAdminMenuMapper.selectFirstNodeList, 메뉴 리스트 취득, 22.09.15, skayhlj@gmail.com, BoAdminMenuMapper.xml */
+        SELECT menu_cd
+             , upper_menu_cd
+             , menu_nm
+             , menu_icon_cd
+             , menu_url
+             , menu_open_type_cd
+             , menu_order
+             , menu_level
+             , use_flag
+             , access_able_start_dt
+             , access_able_end_dt
+             , block_start_dt
+             , block_end_dt
+             , create_seq
+             , create_dt
+             , update_seq
+             , update_dt
+          FROM tb_admin_menu
+      ORDER BY menu_cd
+    </select>
+
+    <!--메뉴 추가,삭제-->
+    <insert id="insertUpdateMenu" parameterType="BoAdminMenuDTO">
+        /* com.fw.core.mapper.db1.bo.BoAdminMenuMapper.selectThirdNodeList, insertMenu, 22.09.15, skayhlj@gmail.com, BoAdminMenuMapper.xml */
+        <selectKey resultType="String" keyProperty="menuCd" order="BEFORE">
+            SELECT DISTINCT
+            <choose>
+                <when test="menuCd !=null and menuCd !=''">
+                    #{menuCd}
+                </when>
+                <otherwise>
+                    <![CDATA[
+                  CASE WHEN SUBSTR(#{upperMenuCd},10,11)<>0
+                       THEN CONCAT('MENU00',SUBSTR(SUB.max_menu_cd,5)+1)
+                       WHEN SUBSTR(#{upperMenuCd},7,8)<>0
+                       THEN CONCAT('MENU00',SUBSTR(SUB.max_menu_cd,5)+1000)
+                       ELSE CONCAT('MENU00',SUBSTR(SUB.max_menu_cd,5)+1000000) END AS menuCd ]]>
+                       FROM tb_admin_menu menu,
+                    (SELECT
+                  CASE WHEN menu_cd IS NULL THEN #{upperMenuCd}
+                   ELSE MAX (menu_cd) END max_menu_cd FROM tb_admin_menu WHERE upper_menu_cd = #{upperMenuCd} ) SUB
+                </otherwise>
+            </choose>
+        </selectKey>
+        INSERT INTO tb_admin_menu (
+                 menu_cd
+               , upper_menu_cd
+               , menu_nm
+               , menu_icon_cd
+               , menu_url
+               , menu_open_type_cd
+               , menu_order
+               , menu_level
+               , use_flag
+               , access_able_start_dt
+               , access_able_end_dt
+               , block_start_dt
+               , block_end_dt
+               , create_seq
+               , create_dt
+        ) VALUES (
+                 #{menuCd}
+               , #{upperMenuCd}
+               , #{menuNm}
+               , #{menuIconCd}
+               , #{menuUrl}
+               , #{menuOpenTypeCd}
+               , #{menuOrder}
+               , #{menuLevel}
+               , #{useFlag}
+               , #{accessAbleStartDt}
+               , #{accessAbleEndDt}
+               , #{blockStartDt}
+               , #{blockEndDt}
+               , #{createSeq}
+               , now()
+        )
+        ON DUPLICATE KEY UPDATE
+                 menu_nm = #{menuNm}
+               , menu_icon_cd = #{menuIconCd}
+               , menu_url = #{menuUrl}
+               , menu_open_type_cd = #{menuOpenTypeCd}
+               , use_flag = #{useFlag}
+               , access_able_start_dt = #{accessAbleStartDt}
+               , access_able_end_dt = #{accessAbleEndDt}
+               , block_start_dt = #{blockStartDt}
+               , block_end_dt = #{blockEndDt}
+               , update_seq = #{updateSeq}
+               , update_dt = now()
+    </insert>
+
+    <!--메뉴삭제-->
+    <delete id="deleteMenu" parameterType="BoAdminMenuDTO">
+        /* com.fw.core.mapper.db1.bo.BoAdminMenuMapper.deleteMenu, deleteMenu, 22.09.20, skayhlj@gmail.com, BoAdminMenuMapper.xml */
+        DELETE FROM tb_admin_menu
+         WHERE menu_cd = #{menuCd}
+            OR upper_menu_cd = #{menuCd}
+    </delete>
+
+    <!--권한별(개인) 사이드메뉴 리스트 취득-->
+    <select id="selectMenuListForUser" resultType="BoAdminMenuDTO">
+        /* com.fw.core.mapper.db1.bo.BoAdminMenuMapper.selectMenuListForUser, selectMenuListForUser, 22.09.22, skayhlj@gmail.com, BoAdminMenuMapper.xml */
+        SELECT   TAM.menu_cd
+               , TAM.upper_menu_cd
+               , TAM.menu_nm
+               , TAM.menu_icon_cd
+               , TAM.menu_url
+               , TAM.menu_open_type_cd
+               , TAM.menu_order
+               , TAM.menu_level
+               , TAM.use_flag
+               , TAM.access_able_start_dt
+               , TAM.access_able_end_dt
+               , TAM.block_start_dt
+               , TAM.block_end_dt
+               , TAM.create_seq
+               , TAM.create_dt
+               , TAM.update_seq
+               , TAM.update_dt
+            FROM tb_admin_menu TAM
+      INNER JOIN (SELECT DISTINCT MENU_CD FROM tb_admin_person_auth WHERE  admin_seq = #{adminSeq}) TAPA
+              ON TAM.MENU_CD = TAPA.MENU_CD
+           WHERE TAM.use_flag = 'Y'
+           UNION
+          SELECT TAM.menu_cd
+               , TAM.upper_menu_cd
+               , TAM.menu_nm
+               , TAM.menu_icon_cd
+               , TAM.menu_url
+               , TAM.menu_open_type_cd
+               , TAM.menu_order
+               , TAM.menu_level
+               , TAM.use_flag
+               , TAM.access_able_start_dt
+               , TAM.access_able_end_dt
+               , TAM.block_start_dt
+               , TAM.block_end_dt
+               , TAM.create_seq
+               , TAM.create_dt
+               , TAM.update_seq
+               , TAM.update_dt
+            FROM tb_admin_menu TAM
+           WHERE menu_cd IN ( SELECT DISTINCT TAM.upper_menu_cd
+                           FROM tb_admin_menu TAM
+                     INNER JOIN ( SELECT DISTINCT MENU_CD FROM tb_admin_person_auth WHERE admin_seq = #{adminSeq} ) TAPA
+                             ON TAM.MENU_CD = TAPA.MENU_CD
+                          WHERE TAM.use_flag = 'Y' )
+    </select>
+
+    <!--권한별(그룹) 사이드메뉴 리스트 취득-->
+    <select id="selectMenuListForDept" resultType="BoAdminMenuDTO">
+        /* com.fw.core.mapper.db1.bo.BoAdminMenuMapper.selectMenuListForDept, selectMenuListForDept, 22.09.23, skayhlj@gmail.com, BoAdminMenuMapper.xml */
+        /*SELECT
+            MM.*
+        FROM tb_admin_menu MM
+                 INNER JOIN
+             (SELECT DISTINCT MENU_CD FROM tb_admin_dept_auth WHERE group_id = 'G1'
+             ) MD
+             ON MM.MENU_CD = MD.MENU_CD
+                  WHERE MM.use_flag = 'Y'
+                -- AND   MOC.ORG_ID = 'HUB'
+             -- AND   MM.access_able_end_dt > now()
+        -- ORDER BY MM.menu_level, MM.MENU_ORDER
+        union
+        select * from tb_admin_menu where menu_cd in (SELECT distinct
+                                                          MM.upper_menu_cd
+                                                      FROM tb_admin_menu MM
+                                                               INNER JOIN
+                                                           (SELECT DISTINCT MENU_CD FROM tb_admin_dept_auth WHERE group_id = 'G1'
+                                                           ) MD
+                                                           ON MM.MENU_CD = MD.MENU_CD
+                                                      WHERE MM.use_flag = 'Y')*/
+    </select>
+
+    <!-- 권한별(조직) 사이드메뉴 리스트 취득 -->
+    <select id="selectMenuListForOrg" parameterType="BoAdminMenuDTO" resultType="BoAdminMenuDTO">
+        /* com.fw.core.mapper.db1.bo.BoAdminMenuMapper.selectMenuListForOrg, 권한별(조직) 사이드메뉴 리스트 취득, 22.09.23, skayhlj@gmail.com, BoAdminMenuMapper.xml */
+        SELECT SUB.*
+          FROM (
+        SELECT   TAM.menu_cd
+               , TAM.upper_menu_cd
+               , TAM.menu_nm
+               , TAM.menu_icon_cd
+               , TAM.menu_url
+               , TAM.menu_open_type_cd
+               , TAM.menu_order
+               , TAM.menu_level
+               , TAM.use_flag
+               , TAM.access_able_start_dt
+               , TAM.access_able_end_dt
+               , TAM.block_start_dt
+               , TAM.block_end_dt
+               , TAM.create_seq
+               , TAM.create_dt
+               , TAM.update_seq
+               , TAM.update_dt
+            FROM tb_admin_menu TAM
+           WHERE menu_cd IN ( SELECT TAM.upper_menu_cd
+                                FROM tb_admin_menu TAM
+                               WHERE menu_cd IN ( SELECT DISTINCT TAM.upper_menu_cd
+                                                    FROM tb_admin_menu TAM
+                                              INNER JOIN ( SELECT DISTINCT MENU_CD FROM tb_admin_org_auth WHERE org_id = #{orgId} ) TAPA
+                                                                  ON TAM.MENU_CD = TAPA.MENU_CD
+                                                   WHERE TAM.use_flag = 'Y' ))
+         UNION
+        SELECT   TAM.menu_cd
+               , TAM.upper_menu_cd
+               , TAM.menu_nm
+               , TAM.menu_icon_cd
+               , TAM.menu_url
+               , TAM.menu_open_type_cd
+               , TAM.menu_order
+               , TAM.menu_level
+               , TAM.use_flag
+               , TAM.access_able_start_dt
+               , TAM.access_able_end_dt
+               , TAM.block_start_dt
+               , TAM.block_end_dt
+               , TAM.create_seq
+               , TAM.create_dt
+               , TAM.update_seq
+               , TAM.update_dt
+            FROM tb_admin_menu TAM
+           WHERE menu_cd IN ( SELECT DISTINCT TAM.upper_menu_cd
+                          FROM tb_admin_menu TAM
+                          INNER JOIN ( SELECT DISTINCT MENU_CD FROM tb_admin_org_auth WHERE org_id = #{orgId}) TAPA
+                                              ON TAM.MENU_CD = TAPA.MENU_CD
+                          WHERE TAM.use_flag = 'Y' )
+         UNION
+        SELECT   TAM.menu_cd
+               , TAM.upper_menu_cd
+               , TAM.menu_nm
+               , TAM.menu_icon_cd
+               , TAM.menu_url
+               , TAM.menu_open_type_cd
+               , TAM.menu_order
+               , TAM.menu_level
+               , TAM.use_flag
+               , TAM.access_able_start_dt
+               , TAM.access_able_end_dt
+               , TAM.block_start_dt
+               , TAM.block_end_dt
+               , TAM.create_seq
+               , TAM.create_dt
+               , TAM.update_seq
+               , TAM.update_dt
+            FROM tb_admin_menu TAM
+      INNER JOIN tb_admin_org_auth TAOA ON TAM.MENU_CD = TAOA.MENU_CD
+           WHERE TAM.use_flag = 'Y'
+             AND TAOA.ORG_ID = #{orgId} ) SUB
+        ORDER BY SUB.menu_level, SUB.menu_order
+    </select>
+
+</mapper>

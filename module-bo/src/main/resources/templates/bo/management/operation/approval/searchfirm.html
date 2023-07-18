@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/default}">
+
+<body>
+	<div layout:fragment="contents" th:remove="tag">
+		<main id="content" role="main">
+			<h2 class="title">승인 관리</h2>
+			<div class="row p-3">
+				<div class="col-12">
+					<ul class="nav nav-pills">
+						<li class="active"><a class="btn btn-outline-dark" style="min-width: 160px" href="headhunter">HH 가입</a></li>
+						<li><a class="btn btn-outline-dark active" style="min-width: 160px" href="searchfirm">SF 변경</a></li>
+						<li><a class="btn btn-outline-dark" style="min-width: 160px" href="wefirm">We펌</a></li>
+					</ul>
+					<!-- Search -->
+					<div>
+						<form id="searchRecruit" name="searchRecruit">
+							<div class="row mt-5">
+								<div class="col-4">
+									<div class="d-flex align-items-center">
+										<input type="text" id="SFStartDt" name="SFStartDt" class="form-control form-datepicker" placeholder="날짜 선택">
+										<div class="mr-2">~</div>
+										<input type="text" id="SFEndDt" name="SFEndDt" class="form-control form-datepicker" placeholder="날짜 선택">
+									</div>
+								</div>
+								<div class="col-2">
+									<div class="d-flex align-items-center">
+										<button type="button" class="btn btn-dark" name="colorChange" id="all" data-role="all">전체</button>
+										<button type="button" class="btn btn-dark" name="colorChange" id="today" data-role="today">오늘</button>
+										<button type="button" class="btn btn-dark" name="colorChange" id="week" data-role="week">7일</button>
+										<button type="button" class="btn btn-dark" name="colorChange" id="month" data-role="month">1개월</button>
+									</div>
+								</div>
+								<div class="col-6 text-right">
+									<div class="d-flex" style="float: right">
+										<select name="personalInfo" id="personalInfo" class="custom-select w-auto mr-2">
+											<option value="name">이름</option>
+											<option value="phone">휴대번호</option>
+											<option value="email">이메일주소</option>
+										</select> <input data-role="member" type="text" id="inputSelect" class="form-control d-inline-block w-auto mr-2" />
+										<input type="text" class="form-control d-inline-block w-auto" data-role="admin" name="admin" placeholder="처리자"/>
+										<button type="button" class="btn btn-primary" id="search" data-role="search">검색하기</button>
+									</div>
+								</div>
+								<!--<div class="col-4 text-right">
+									<div class="d-flex" style="float: right">
+										<input type="text" data-role="admin" class="form-control w-auto" />
+									</div>
+								</div>-->
+								<div class="col-12 mt-3">
+									<div>
+										<select id="selectType" name="selectType" data-role="select" class="form-control w-auto">
+											<option value="">전체</option>
+											<option value="RECEIPT">접수</option>
+											<option value="APPROVAL">승인</option>
+											<option value="DENY">거절</option>
+										</select>
+									</div>
+								</div>
+							</div>
+						</form>
+						<!-- Search -->
+						<div class="row mt-3">
+							<div class="col">
+								<table id="datatable" class="table">
+									<thead>
+										<tr>
+											<th>회원ID</th>
+											<th>접수자</th>
+											<th>접수일시</th>
+											<th>접수내용</th>
+											<th>처리자</th>
+											<th>처리일시</th>
+											<th>접수내역</th>
+											<th>처리</th>
+										</tr>
+									</thead>
+								</table>
+							</div>
+						</div>
+					</div>
+					<!-- 접수 Modal -->
+					<div class="modal fade" tabindex="-1" id="myModal" role="dialog">
+						<div class="modal-dialog modal-dialog-centered">
+							<!-- Modal content-->
+							<div class="modal-content">
+								<div class="modal-header">
+									<h4 class="modal-title">접수 내역</h4>
+									<i class="fas fa-window-close float-right" data-dismiss="modal"></i>
+								</div>
+								<div class="modal-body">
+									<table class="table" id="modalTable">
+		
+									</table>
+								</div>
+								<div class="modal-footer d-flex justify-content-center">
+									<button type="button" class="btn btn-default btn-outline-dark" data-dismiss="modal" data-role="save">확인</button>
+								</div>
+							</div>
+		
+						</div>
+					</div>
+					<!--/접수 modal-->
+					<!-- 거절 modal -->
+					<div class="modal fade" id="refuseModal" tabindex="-1" role="dialog" aria-hidden="true">
+						<div class="modal-dialog modal-dialog-centered" role="document">
+							<div class="modal-content">
+								<input type="hidden" name="id">
+								<div class="modal-header">
+									<p>등록불가 사유 입력</p>
+								</div>
+								<div class="modal-body">
+									<div class="container">
+										<div class="row m-3">
+											<div class="col-12">
+												<textarea class="form-control" id="refuseContent" placeholder="내용을 입력해주세요."></textarea>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="modal-footer">
+									<div class="container">
+										<div class="row">
+											<div class="col text-center">
+												<button type="button" class="btn btn-outline-secondary" data-dismiss="modal">취소</button>
+												<button class="btn btn-primary" id="modalSave" data-role="modalSave" data-dismiss="modal">확인</button>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- /거절 modal -->
+				</div>
+			</div>
+		</main>
+	</div>
+</body>
+</html>

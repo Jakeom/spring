@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layouts/mypageLayout">
+<body>
+    <div layout:fragment="contents" th:remove="tag">
+        <form name="certForm" th:action="${certServer}" method="POST" target="certForm">
+            <input type="hidden" name="tr_cert">
+            <input type="hidden" name="tr_url" th:value="${certCallbackUrl + '?mode=findId'}">
+            <input type="hidden" name="tr_add" value="N">
+        </form>
+        <div id="container-block">
+            <div class="layout-content">
+                <form name="infoForm">
+                    <input type="hidden" name="photoChangeFlag" value="N" />
+                    <input type="hidden" name="preDi" id="preDi" th:value="${profileInfo.di}" />
+                    <input type="hidden" name="di" id="di" th:value="${profileInfo.di}" />
+                    <input type="hidden" name="phone" id="phone" th:value="${profileInfo.phone}" />
+                    <input type="hidden" name="memberId" id="memberId" th:value="${profileInfo.id}" />
+                    <div class="row row-40 align-items-center">
+                        <h3 class="subtitle">회원정보 수정</h3>
+                        <div class="apply-wrap">
+                            <div class="fake-table profile">
+                                <div class="fake-table-column">
+                                    <div class="fake-table-cell">프로필</div>
+                                    <div class="fake-table-cell">
+                                        <div class="img-upload">
+                                            <div class="upload-img">
+                                                <th:block th:each="list : ${profileInfo.commonFileList}">
+                                                    <img th:src="${list.url eq null ? '/static/images/about-01.png' : list.url}" alt="프로필 사진"/>
+                                                </th:block>
+                                                <th:block th:if="${#lists.isEmpty(profileInfo.commonFileList)}">
+                                                    <img src="/static/images/about-01.png" alt="프로필 사진"/>
+                                                </th:block>
+                                                <input type="file" name="files" id="form-file" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="fake-table-column">
+                                    <div class="fake-table-cell">아이디</div>
+                                    <div class="fake-table-cell">
+                                        [[${profileInfo.loginId}]]
+                                    </div>
+                                </div>
+                                <div class="fake-table-column">
+                                    <div class="fake-table-cell">이름</div>
+                                    <div class="fake-table-cell">
+                                        <input type="text" class="form-control form-md" name="name" id="name" th:value="${profileInfo.name}" readonly />
+                                    </div>
+                                </div>
+                                <div class="fake-table-column">
+                                    <div class="fake-table-cell">휴대폰번호</div>
+                                    <div class="fake-table-cell">
+                                        <div class="d-flex">
+                                            <input type="text" class="form-control form-md" id="formatPhone" name="formatPhone" th:value="${profileInfo.phone}" readonly />
+                                            <button type="button" class="btn btn-primary" data-role="cert">변경하기</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="fake-table-column">
+                                    <div class="fake-table-cell">생년월일</div>
+                                    <div class="fake-table-cell">
+                                        <input type="text" name="birth" id="birth" class="form-control form-md" th:value="${profileInfo.birth}" placeholder="숫자8자리로 입력" />
+                                    </div>
+                                </div>
+                                <div class="fake-table-column">
+                                    <div class="fake-table-cell">성별</div>
+                                    <div class="fake-table-cell">
+                                        <div class="d-flex">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" value="MALE" id="MALE"
+                                                       name="genderCd" th:checked="${profileInfo.genderCd eq 'MALE'}"/>
+                                                <label class="form-check-label" for="MALE"> 남 </label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" value="FEMALE" id="FEMALE"
+                                                       name="genderCd" th:checked="${profileInfo.genderCd eq 'FEMALE'}"/>
+                                                <label class="form-check-label" for="FEMALE"> 여 </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="fake-table-column">
+                                    <div class="fake-table-cell">연락 가능 시간</div>
+                                    <div class="fake-table-cell">
+                                        <div class="d-flex">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" value="ALWAYS"
+                                                       id="contactableTimeOp1"
+                                                       name="contactableTime"
+                                                       th:checked="${profileInfo.contactableTime eq 'ALWAYS'}"/>
+                                                <label class="form-check-label" for="contactableTimeOp1"> 상시 </label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" value="EVENING"
+                                                       id="contactableTimeOp2"
+                                                       name="contactableTime"
+                                                       th:checked="${profileInfo.contactableTime eq 'EVENING'}"/>
+                                                <label class="form-check-label" for="contactableTimeOp2"> 18시~22시 </label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" value="1"
+                                                       id="contactExceptHoliday"
+                                                       th:checked="${profileInfo.contactExceptHoliday eq '1'}"/>
+                                                <label class="form-check-label" for="contactExceptHoliday"> 주말/휴일 제외 </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="fake-table-column">
+                                    <div class="fake-table-cell text-start">개인정보유효기간</div>
+                                    <div class="fake-table-cell">
+                                        <div class="d-flex">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" value="1" id="privacyExpireOp1"
+                                                       name="privacyExpire"
+                                                       th:checked="${profileInfo.privacyExpire eq '1'}"/>
+                                                <label class="form-check-label" for="privacyExpireOp1"> 1년 </label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" value="3" id="privacyExpireOp2"
+                                                       name="privacyExpire"
+                                                       th:checked="${profileInfo.privacyExpire eq '3'}"/>
+                                                <label class="form-check-label" for="privacyExpireOp2"> 3년 </label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" value="-1" id="privacyExpireOp3"
+                                                       name="privacyExpire"
+                                                       th:checked="${profileInfo.privacyExpire eq '-1'}"/>
+                                                <label class="form-check-label" for="privacyExpireOp3"> 탈퇴시까지 </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="send-btn">
+                            <button type="button" class="btn btn-dark btn-xl" data-role="modify">수정완료</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

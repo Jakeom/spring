@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.bo.BoCommonCdMapper">
+
+    <!-- 공통코드 리스트 조회 -->
+    <select id="selectCommonCodeList" parameterType="BoCommonCdDTO" resultType="BoCommonCdDTO">
+        /* com.fw.core.mapper.db1.bo.BoCommonCdMapper.selectCommonCodeList, 공통코드 리스트 조회, 22.09.27, wsh , BoCommonCdMapper.xml */
+        SELECT group_cd
+             , cd
+             , group_nm
+             , upper_cd
+             , cd_nm
+             , cd_order
+             , cd_desc
+             , cd_level
+             , use_flag
+             , del_flag
+             , create_seq
+             , create_dt
+             , update_seq
+             , update_dt
+         FROM tb_common_cd
+        <where>
+            <choose>
+                <when test="cdLevel eq '1'.toString()">
+                    AND del_flag = 'N'
+                    AND cd_level = '1'
+                </when>
+                <otherwise>
+                    AND del_flag = 'N'
+                    AND cd_level = '2'
+                    AND group_cd = #{groupCd}
+                </otherwise>
+            </choose>
+        </where>
+     ORDER BY cd_order ASC
+    </select>
+
+    <!-- 공통코드 리스트 상세 조회 -->
+    <select id="selectCommonCodeInfo" parameterType="BoCommonCdDTO" resultType="BoCommonCdDTO">
+        /* com.fw.core.mapper.db1.bo.BoCommonCdMapper.selectCommonCodeInfo, 공통코드 상세조회, 22.09.29, wsh , BoCommonCdMapper.xml */
+        SELECT group_cd
+             , cd
+             , group_nm
+             , upper_cd
+             , cd_nm
+             , cd_order
+             , cd_desc
+             , cd_level
+             , use_flag
+             , del_flag
+             , create_seq
+             , create_dt
+             , update_seq
+             , update_dt
+         FROM tb_common_cd
+        WHERE group_cd = #{groupCd}
+    <!-- And cd-level = 1-->
+    </select>
+
+    <!-- 공통코드상세 리스트 상세 조회 -->
+    <select id="selectCommonCodeDetailInfo" parameterType="BoCommonCdDTO" resultType="BoCommonCdDTO">
+        /* com.fw.core.mapper.db1.bo.BoCommonCdMapper.selectCommonCodeDetailInfo, 공통코드상세 상세 조회, 22.09.29, wsh , BoCommonCdMapper.xml */
+        SELECT group_cd
+             , cd
+             , group_nm
+             , upper_cd
+             , cd_nm
+             , cd_order
+             , cd_desc
+             , cd_level
+             , use_flag
+             , del_flag
+             , create_seq
+             , create_dt
+             , update_seq
+             , update_dt
+             , cd_replace1
+             , cd_replace2
+         FROM tb_common_cd
+        WHERE cd = #{cd}
+        	AND cd_level = 2
+    </select>
+
+    <!-- 그룹코드 중복체크  -->
+	<select id="selectGroupCdCheck" resultType="int">
+		/* com.fw.core.mapper.db1.bo.BoCommonCdMapper.selectGroupCdcheck, 그룹 코드 중복체크, 22.09.29, shwoo, BoCommonCdMapper.xml */
+		SELECT COUNT(*)
+		  FROM tb_common_cd
+		  WHERE group_cd = #{groupCd}
+	</select>
+
+	<!-- 코드 중복체크  -->
+	<select id="selectCdCheck" resultType="int">
+		/* com.fw.core.mapper.db1.bo.BoCommonCdMapper.selectCdCheck, 코드 중복체크, 22.09.30, shwoo, BoCommonCdMapper.xml */
+		SELECT COUNT(*)
+		  FROM tb_common_cd
+		  WHERE cd = #{cd}
+	</select>
+
+	<!-- 공통코드(cd_level=1) 등록 -->
+	<insert id="insertCommonCd" parameterType="BoCommonCdDTO">
+        /* com.fw.core.mapper.db1.bo.BoCommonCdMapper.insertCommonCd, 공통코드(cd_level=1) 등록, 22.09.27, wsh, BoCommonCdMapper.xml */
+        INSERT INTO tb_common_cd (
+               group_cd
+             , group_nm
+             , cd_nm
+             , cd_order
+             , cd_level
+             , use_flag
+             , create_seq
+             , create_dt
+        ) VALUES (
+               #{groupCd}
+             , #{groupNm}
+             , #{cdNm}
+             , #{cdOrder}
+             , #{cdLevel}
+             , #{useFlag}
+             , #{adminSession.adminSeq}
+             , NOW()
+        )
+	</insert>
+
+	<!-- 공통코드(cd_level=2) 등록 -->
+	<insert id="insertDetailCommonCd" parameterType="BoCommonCdDTO">
+        /* com.fw.core.mapper.db1.bo.BoCommonCdMapper.insertDetailCommonCd, 공통코드(cd_level=2) 등록, 22.09.27, wsh, BoCommonCdMapper.xml */
+        INSERT INTO tb_common_cd (
+			   group_cd
+			 , group_nm
+			 , cd
+             , cd_nm
+             , cd_order
+             , cd_level
+             , use_flag
+             , create_seq
+             , create_dt
+             , cd_replace1
+             , cd_replace2
+        ) VALUES (
+        	   #{groupCd}
+        	 , #{groupNm}
+             , #{cd}
+             , #{cdNm}
+             , #{cdOrder}
+             , #{cdLevel}
+             , #{useFlag}
+             , #{adminSession.adminSeq}
+             , NOW()
+             , #{cdReplace1}
+             , #{cdReplace2}
+        )
+	</insert>
+
+	<!-- 공통코드(cd_level=1) 수정 -->
+	<update id="updateCommonCd" parameterType="BoCommonCdDTO">
+		/* com.fw.core.mapper.db1.bo.BoCommonCdMapper.updateCommonCd, 그룹 정보 수정, 22.09.29, shwoo, BoCommonCdMapper.xml */
+		UPDATE tb_common_cd SET
+			   update_seq = #{adminSession.adminSeq}
+			 , update_dt = NOW()
+		<if test='groupNm != null and groupNm !=""'>
+		     , group_nm = #{groupNm}
+		</if>
+		<if test='cdOrder != null and cdOrder !=""'>
+		     , cd_order = #{cdOrder}
+		</if>
+		<if test='useFlag != null and useFlag !=""'>
+		     , use_flag = #{useFlag}
+		</if>
+		WHERE group_cd = #{groupCd}
+	</update>
+
+	<!-- 공통코드(cd_level=2) 수정 -->
+	<update id="updateDetailCommonCd" parameterType="BoCommonCdDTO">
+		/* com.fw.core.mapper.db1.bo.BoCommonCdMapper.updateDetailCommonCd, 그룹 정보 수정, 22.09.29, shwoo, BoCommonCdMapper.xml */
+		UPDATE tb_common_cd SET
+			   update_seq = #{adminSession.adminSeq}
+			 , update_dt = NOW()
+		<if test='cd != null and cd !=""'>
+		     , cd = #{cd}
+		</if>
+		<if test='cdNm != null and cdNm !=""'>
+		     , cd_nm = #{cdNm}
+		</if>
+		<if test='cdOrder != null and cdOrder !=""'>
+		     , cd_order = #{cdOrder}
+		</if>
+		<if test='useFlag != null and useFlag !=""'>
+		     , use_flag = #{useFlag}
+		</if>
+		WHERE cd = #{cd}
+	</update>
+
+	<!-- 공통코드(cd_level=1) 삭제 -->
+	<update id="deleteCommonCd" parameterType="BoCommonCdDTO">
+		/* com.fw.core.mapper.db1.bo.BoCommonCdMapper.deleteCommonCd, 공통 코드 정보 삭제, 22.09.29, shwoo, BoCommonCdMapper.xml */
+		UPDATE tb_common_cd
+		   SET del_flag = 'Y'
+		 WHERE group_cd = #{groupCd}
+	</update>
+	<!-- 공통코드(cd_level=2) 삭제 -->
+	<update id="deleteDetailCommonCd" parameterType="BoCommonCdDTO">
+		/* com.fw.core.mapper.db1.bo.BoCommonCdMapper.deleteDetailCommonCd, 코드 정보 삭제, 22.09.29, shwoo, BoCommonCdMapper.xml */
+		UPDATE tb_common_cd
+		   SET del_flag = 'Y'
+		 WHERE cd = #{cd}
+	</update>
+</mapper>

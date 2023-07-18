@@ -1,0 +1,514 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.hh.HhMyWefirmMapper">
+
+    <!-- 위펌 일련번호 조회 -->
+    <select id="selectWefirmId" parameterType="HhWefirmDTO" resultType="String">
+        /* com.fw.core.mapper.db1.hh.HhMyWefirmMapper.selectWefirmId, 위펌 일련번호 조회, YJW, HhMyWefirmMapper.xml */
+        SELECT wefirm_id
+        FROM headhunter
+        WHERE member_id = #{memberId}
+    </select>
+
+	<!-- Wefrim 포지션 공고 리스트 -->
+	<select id="selectViewPositionList" parameterType="HhWefirmPositionDTO" resultType="HhWefirmPositionDTO">
+    	/* com.fw.core.mapper.db1.hh.HhMyWefirmMapper.selectViewPositionList, Wefrim 포지션 공고 리스트, wsh, HhMyWefirmMapper.xml */
+    	SELECT p.id
+    		 , DATE_FORMAT(p.createdAt, '%Y-%m-%d') AS createdAt
+    		 , DATE_FORMAT(p.endDate, '%Y-%m-%d') AS endDate
+    		 , p.title
+    		 , hr.companyName
+    		 , m.name
+    		 , (SELECT COUNT(1) FROM position_participant pp WHERE pp.position_id = p.id) AS participantCnt
+    		 , p.jopDescription
+    	FROM position p
+    INNER JOIN hr_company hr ON hr.id = p.hr_company_id
+    INNER JOIN member m ON m.id = p.member_id
+    	WHERE p.member_id IN (
+        SELECT member_id FROM headhunter WHERE wefirm_id = (SELECT wefirm_id FROM headhunter WHERE member_id = #{frontSession.id})
+        ) AND p.isCowork = '1' AND p.isPrivate = '0' AND p.endDate >= NOW() 
+        	   	<if test="searchValue != null and searchValue != '' and searchType =='name'">
+            		AND m.name LIKE CONCAT('%',#{searchValue},'%')
+        	   	</if>
+        	   	<if test="searchValue != null and searchValue != '' and searchType =='title'">
+            		AND p.title LIKE CONCAT('%',#{searchValue},'%')
+        	   	</if>
+        	   	<choose>
+                <when test="orderType eq 'createdAt'">
+                    ORDER BY createdAt DESC
+                </when>
+                <when test="orderType eq 'participantCnt'">
+                    ORDER BY participantCnt DESC
+                </when>
+                <when test="orderType eq 'endDate'">
+                    ORDER BY endDate ASC
+                </when>
+                <otherwise>
+                    ORDER BY createdAt DESC
+                </otherwise>
+            	</choose>
+        <include refid="common.paging" />
+    </select>
+    
+    <!-- 헤드헌터 리스트 -->
+    <select id="selectHeadhunterList" parameterType="HhWefirmHeadhunterDTO" resultType="HhWefirmHeadhunterDTO">
+        /* com.fw.core.mapper.db1.hh.HhMyWefirmMapper.selectHeadhunterList, 헤드헌터 조회, wsh, HhMyWefirmMapper.xml */
+        SELECT @rownum:=@rownum+1 AS rownum
+             , A.*
+          FROM (
+                SELECT h.approved
+                     , h.career
+                     , h.careerDesc
+                     , h.greeting
+                     , h.major
+                     , h.position
+                     , h.school
+                     , h.sfCeoName
+                     , h.sfHomepageUrl
+                     , h.sfName
+                     , h.sfPhone
+                     , h.sfRegNumber
+                     , h.sfWorkerListFileId
+                     , h.signatureBasic
+                     , h.signatureCd
+                     , h.signatureProposal
+                     , h.member_id
+                     , h.wefirm_id
+                     , h.referralCode
+                     , h.delFlag
+                     , h.createSeq
+                     , h.updateSeq
+                     , h.updatedAt
+                     , h.showFlag
+                     , m.profilePictureFileId
+                     , (
+                         CASE WHEN w.ceo_member_id = h.member_id THEN '대표'
+                             WHEN (SELECT COUNT(1) FROM wefirm_admin wa WHERE wa.member_id = h.member_id) > 0 THEN '운영자'
+                          END
+                       ) AS adminRole
+                     , CASE LENGTH(m.phone)
+       						WHEN 11 THEN CONCAT(LEFT(m.phone, 3), '-', MID(m.phone, 4, 4), '-', RIGHT(m.phone, 4))
+      						WHEN 10 THEN CONCAT(LEFT(m.phone, 3), '-', MID(m.phone, 4, 3), '-', RIGHT(m.phone, 4)) END phone
+                     , m.email
+                     , m.name
+                     , DATE_FORMAT(m.createdAt, '%Y.%m.%d') AS createdAt
+                     , (SELECT COUNT(1) FROM position p WHERE p.member_id = h.member_id AND p.deleted = 0 AND p.status IN ('DOING') AND p.isCowork = '1') AS postingCnt
+                  FROM headhunter h
+            INNER JOIN member m ON h.member_id = m.id
+            INNER JOIN wefirm w on h.wefirm_id = w.id
+                 WHERE h.wefirm_id IN (SELECT wefirm_id FROM headhunter WHERE member_id = #{memberId})
+                   AND h.delFlag = 'N'
+                <if test="searchValue != null and searchValue != ''">
+                   AND m.name LIKE CONCAT('%', #{searchValue}, '%')
+                </if>
+            ) AS A, (SELECT @rownum:=0) TMP
+            <choose>
+                <when test="orderType eq 'name'">
+                    ORDER BY name ASC
+                </when>
+                <when test="orderType eq 'postingCnt'">
+                    ORDER BY postingCnt DESC
+                </when>
+                <otherwise>
+                    ORDER BY name ASC
+                </otherwise>
+            </choose>
+            <include refid="common.paging" />
+    </select>
+    
+    <!-- 헤드헌터 상세 조회 -->
+    <select id="selectHhInfo" resultType="HhWefirmHeadhunterDTO">
+    	/* com.fw.core.mapper.db1.hh.HhMyWefirmMapper.selectHhInfo, 헤드헌터 상세 조회, wsh, HhMyWefirmMapper.xml */
+        SELECT HH.member_id
+             , MEM.name
+             , HH.position
+             , HH.school
+             , HH.major
+             , HH.sfName
+             , MEM.phone
+             , MEM.email
+             , HH.greeting
+             , HH.careerDesc
+             , MEM.profilePictureFileId
+             , (SELECT COUNT(1) FROM position WHERE member_id = HH.member_id AND deleted = 0 AND endDate > NOW()) AS postingCnt
+             , (SELECT COUNT(1) FROM hh_reading_history WHERE hh_member_id = HH.member_id AND ap_member_id = #{frontSession.id}) AS readCnt
+             , (SELECT COUNT(1) FROM blacklist_hh WHERE headhunter_id = HH.member_id AND delFlag = 'N' AND applicant_id = #{frontSession.id}) AS blackCnt
+             , (SELECT GROUP_CONCAT(TCD.cd_nm SEPARATOR ',') FROM tb_common_cd TCD, hh_position_field HPF WHERE HPF.member_id = HH.member_id AND TCD.cd = HPF.fieldCd AND delFlag = 'N') fieldCdNm
+             , DATE_FORMAT(MEM.updatedAt, '%Y-%m-%d') AS updatedAt
+          FROM headhunter HH
+    INNER JOIN member MEM ON HH.member_id = MEM.id
+         WHERE HH.member_id = #{memberId}
+    </select>
+    
+    <select id="selectHhFieldInfo" resultType="HhWefirmHeadhunterDTO">
+        SELECT fieldCd
+             , (SELECT cd_nm FROM tb_common_cd WHERE cd = fieldCd) AS fieldCdNm
+          FROM hh_position_field
+         WHERE member_id = #{memberId}
+           AND delFlag = 'N'
+           AND type = 'SPECIAL'
+    </select>
+    
+    <!-- 위펌 헤드헌터 리스트 개수 조회 -->
+    <select id="selectHeadhunterListCnt" parameterType="HhWefirmHeadhunterDTO" resultType="int">
+        /* com.fw.core.mapper.db1.hh.HhMyWefirmMapper.selectHeadhunterListCnt, 위펌 헤드헌터 리스트 개수 조회, wsh, HhMyWefirmMapper.xml */
+        SELECT COUNT(1)
+          FROM headhunter h
+    INNER JOIN member m ON h.member_id = m.id
+         WHERE h.wefirm_id IN (SELECT wefirm_id FROM headhunter WHERE member_id = #{memberId})
+           AND h.delFlag = 'N'
+        <if test="searchValue != null and searchValue != ''">
+            AND m.name LIKE CONCAT('%', #{searchValue}, '%')
+        </if>
+    </select>
+    
+    <!-- 위펌 포지션 리스트 개수 조회 -->
+    <select id="selectViewPositionListCnt" parameterType="HhWefirmPositionDTO" resultType="int">
+        /* com.fw.core.mapper.db1.hh.HhMyWefirmMapper.selectViewPositionListCnt, 위펌 포지션 리스트 개수 조회, wsh, HhMyWefirmMapper.xml */
+        SELECT COUNT(1)
+          FROM position p
+         WHERE p.member_id IN (
+        SELECT member_id FROM headhunter WHERE wefirm_id = (SELECT wefirm_id FROM headhunter WHERE member_id = #{frontSession.id})
+        ) AND p.isCowork = '1' AND p.isPrivate = '0' AND p.endDate >= NOW()
+    </select>
+
+    <!-- 위펌 소속 헤드헌터 리스트 조회 (페이징X) -->
+    <select id="selectWefirmHeadhunterList" parameterType="HhWefirmHeadhunterDTO" resultType="HhWefirmHeadhunterDTO">
+        /* com.fw.core.mapper.db1.hh.HhMyWefirmMapper.selectWefirmHeadhunterList, 위펌 소속 헤드헌터 리스트 조회 (페이징X), YJW, HhMyWefirmMapper.xml */
+        SELECT h.approved
+             , h.career
+             , h.careerDesc
+             , h.greeting
+             , h.major
+             , h.position
+             , h.school
+             , h.sfCeoName
+             , h.sfHomepageUrl
+             , h.sfName
+             , h.sfPhone
+             , h.sfRegNumber
+             , h.sfWorkerListFileId
+             , h.member_id
+             , h.wefirm_id
+             , h.referralCode
+             , h.delFlag
+             , h.createSeq
+             , h.updateSeq
+             , h.updatedAt
+             , h.showFlag
+             , m.profilePictureFileId
+             , (
+                 CASE
+                     WHEN w.ceo_member_id = h.member_id THEN '대표'
+                     WHEN (SELECT COUNT(1) FROM wefirm_admin wa WHERE wa.member_id = h.member_id) > 0 THEN '운영자'
+                 END
+                ) AS adminRole
+             , m.phone
+             , m.email
+             , m.name
+             , DATE_FORMAT(m.createdAt, '%Y.%m.%d') AS createdAt
+             , (SELECT COUNT(1) FROM position WHERE member_id = h.member_id AND deleted = 0 AND endDate > NOW()) AS postingCnt
+        FROM headhunter h
+    INNER JOIN member m ON h.member_id = m.id
+    INNER JOIN wefirm w on h.wefirm_id = w.id
+        WHERE h.wefirm_id IN (SELECT wefirm_id FROM headhunter WHERE member_id = #{memberId})
+          AND h.delFlag = 'N'
+        ORDER BY m.name ASC
+    </select>
+
+    <!-- 위펌 고객사 관리 조회 -->
+    <select id="selectWefirmCustomerList" parameterType="HhWefirmCustomerDTO" resultType="HhWefirmCustomerDTO">
+        /* com.fw.core.mapper.db1.hh.HhMyWefirmMapper.selectWefirmCustomerList, 위펌 고객사 관리 조회, YJW, HhMyWefirmMapper.xml */
+        SELECT @rownum:=@rownum+1 AS rownum
+             , A.*
+        FROM (
+             SELECT cp.id AS pmId
+                  , cp.memberId AS pmMemberId
+                  , cp.licenseNo
+                  , cp.companyName
+                  , cp.createdAt
+                  , DATE_FORMAT(cp.expiredAt,'%Y.%m.%d') AS formatExpiredAt
+                  , cp.expiredAt
+                  , cp.updatedAt
+                  , cp.certifiedAt
+                  , DATE_FORMAT(cp.registerAt,'%Y.%m.%d') AS registerAt
+                  , cp.delFlag
+                  , cp.wefirm_id
+                  , m.name AS pmName
+                  , (SELECT pa.apprFlag FROM client_pass pa WHERE pa.pmId = cp.id ORDER BY pa.updatedAt DESC LIMIT 1) AS apprFlag
+                  , (SELECT pa.passName FROM client_pass pa WHERE pa.pmId = cp.id ORDER BY pa.updatedAt DESC LIMIT 1) AS passName
+                  , (SELECT pa.id FROM client_pass pa WHERE pa.pmId = cp.id ORDER BY pa.updatedAt DESC LIMIT 1) AS clientPassId
+            FROM client_pm cp
+        INNER JOIN member m ON cp.memberId = m.id
+            WHERE cp.wefirm_id IN (SELECT wefirm_id FROM headhunter WHERE member_id = #{memberId})
+            AND cp.delFlag = 'N'
+         <if test="searchValue != '' and searchValue != null">
+             <if test="searchType eq 'COMPANY'">
+                 AND cp.companyName LIKE CONCAT('%', #{searchValue}, '%')
+             </if>
+             <if test="searchType eq 'PM'">
+                 AND m.name LIKE CONCAT('%', #{searchValue}, '%')
+             </if>
+             <if test="searchType eq 'LICENSE'">
+                 AND cp.licenseNo LIKE CONCAT('%', #{searchValue}, '%')
+             </if>
+         </if>
+        ) AS A, (SELECT @rownum:=0) TMP
+            <choose>
+                <when test="orderType != null and orderType != ''">
+                    <if test="orderType eq 'pmName'">
+                        ORDER BY pmName ASC
+                    </if>
+                    <if test="orderType eq 'companyName'">
+                        ORDER BY companyName ASC
+                    </if>
+                    <if test="orderType eq 'apprFlag'">
+                        ORDER BY apprFlag = 'N' DESC , pmName ASC
+                    </if>
+                </when>
+                <otherwise>
+                    ORDER BY (pmMemberId = #{memberId}) DESC , companyName ASC
+                </otherwise>
+            </choose>
+            <include refid="common.paging" />
+    </select>
+
+    <!-- 위펌 고객사 조회 (licenseNo/wefirmId) -->
+    <select id="selectClientPmInfo" parameterType="HhWefirmCustomerDTO" resultType="HhWefirmCustomerDTO">
+        /* com.fw.core.mapper.db1.hh.HhMyWefirmMapper.selectClientPmInfo, 위펌 고객사 조회 (licenseNo/wefirmId), YJW, HhMyWefirmMapper.xml */
+        SELECT cp.id AS pmId
+             , cp.memberId AS pmMemberId
+             , cp.licenseNo
+             , cp.companyName
+             , cp.createdAt
+             , DATE_FORMAT(cp.expiredAt,'%Y-%m-%d %H:%i:%s') AS expiredAt
+             , cp.expiredAt
+             , cp.updatedAt
+             , cp.certifiedAt
+             , cp.registerAt
+             , cp.delFlag
+             , cp.wefirm_id
+             , m.name AS pmName
+        FROM client_pm cp
+    INNER JOIN member m ON cp.memberId = m.id
+        WHERE cp.delFlag = 'N'
+        <if test="memberId != null and memberId != ''">
+          AND cp.wefirm_id IN (SELECT wefirm_id FROM headhunter WHERE member_id = #{memberId})
+        </if>
+        <if test="pmId != null and pmId != ''">
+            AND cp.id = #{pmId}
+        </if>
+        <if test="licenseNo != null and licenseNo != ''">
+          AND cp.licenseNo = #{licenseNo}
+        </if>
+    </select>
+
+    <!-- 위펌 고객사 관리 COUNT -->
+    <select id="selectWefirmCustomerListCnt" parameterType="HhWefirmCustomerDTO" resultType="int">
+        /* com.fw.core.mapper.db1.hh.HhMyWefirmMapper.selectWefirmCustomerListCnt, 위펌 고객사 관리 COUNT, YJW, HhMyWefirmMapper.xml */
+        SELECT COUNT(1)
+        FROM client_pm cp
+    INNER JOIN member m ON cp.memberId = m.id
+        WHERE cp.wefirm_id IN (SELECT wefirm_id FROM headhunter WHERE member_id = #{memberId})
+          AND cp.delFlag = 'N'
+         <if test="searchValue != '' and searchValue != null">
+             <if test="searchType eq 'COMPANY'">
+                 AND cp.companyName LIKE CONCAT('%', #{searchValue}, '%')
+             </if>
+             <if test="searchType eq 'PM'">
+                 AND m.name LIKE CONCAT('%', #{searchValue}, '%')
+             </if>
+             <if test="searchType eq 'LICENSE'">
+                 AND cp.licenseNo LIKE CONCAT('%', #{searchValue}, '%')
+             </if>
+         </if>
+    </select>
+
+    <!-- 합격자 리스트 조회 -->
+    <select id="selectClientPassList" parameterType="HhWefirmCustomerDTO" resultType="HhWefirmCustomerDTO">
+        /* com.fw.core.mapper.db1.hh.HhMyWefirmMapper.selectClientPassList, 합격자 리스트 조회, YJW, HhMyWefirmMapper.xml */
+        SELECT id AS clientPassId
+             , pmId
+             , passName
+             , apprFlag
+             , taxFileId
+             , rejectMemo
+             , createdAt
+             , updatedAt
+             , registerAt
+        FROM client_pass
+        WHERE pmId = #{pmId}
+        ORDER BY updatedAt DESC
+    </select>
+
+    <!-- 합격자 상세 조회 -->
+    <select id="selectClientPassInfo" parameterType="HhWefirmCustomerDTO" resultType="HhWefirmCustomerDTO">
+        /* com.fw.core.mapper.db1.hh.HhMyWefirmMapper.selectClientPassInfo, 합격자 상세 조회, YJW, HhMyWefirmMapper.xml */
+        SELECT id AS clientPassId
+             , pmId
+             , passName
+             , apprFlag
+             , taxFileId
+             , rejectMemo
+             , createdAt
+             , updatedAt
+             , registerAt
+        FROM client_pass
+        WHERE id = #{clientPassId}
+    </select>
+
+    <!-- 위펌 고객사 등록 -->
+    <insert id="insertClientPm" parameterType="HhWefirmCustomerDTO">
+        /* com.fw.core.mapper.db1.hh.HhMyWefirmMapper.insertClientPm, 위펌 고객사 등록, YJW, HhMyWefirmMapper.xml */
+        INSERT INTO client_pm (
+               memberId
+             , licenseNo
+             , companyName
+             , createdAt
+             , expiredAt
+             , updatedAt
+             , certifiedAt
+             , registerAt
+             , delFlag
+             , wefirm_id
+        ) VALUES (
+              #{pmMemberId}
+            , #{licenseNo}
+            , #{companyName}
+            , NOW()
+            , #{expiredAt}
+            , #{updatedAt}
+            , #{certifiedAt}
+            , NOW()
+            , 'N'
+            , #{wefirmId}
+       )
+    </insert>
+
+    <!-- 위펌 고객사 수정 -->
+    <update id="updateClientPm" parameterType="HhWefirmCustomerDTO">
+        /* com.fw.core.mapper.db1.hh.HhMyWefirmMapper.updateClientPm, 위펌 고객사 수정, YJW, HhMyWefirmMapper.xml */
+        UPDATE client_pm
+        SET updatedAt = NOW()
+        <if test="pmMemberId != null and pmMemberId != ''">
+            , memberId = #{pmMemberId}
+        </if>
+        <if test="licenseNo != null and licenseNo != ''">
+            , licenseNo = #{licenseNo}
+        </if>
+        <if test="companyName != null and companyName != ''">
+            , companyName = #{companyName}
+        </if>
+        <if test="expiredAt != null and expiredAt != ''">
+            , expiredAt = #{expiredAt}
+        </if>
+        <if test="certifiedAt != null and certifiedAt != ''">
+            , certifiedAt = #{certifiedAt}
+        </if>
+        WHERE id = #{pmId}
+    </update>
+
+    <!-- 위펌 합격자 등록 -->
+    <insert id="insertClientPass" parameterType="HhWefirmCustomerDTO">
+        /* com.fw.core.mapper.db1.hh.HhMyWefirmMapper.insertClientPass, 위펌 합격자 등록, YJW, HhMyWefirmMapper.xml */
+        INSERT INTO client_pass(
+               pmId
+             , passName
+             , apprFlag
+             , taxFileId
+             , rejectMemo
+             , registerAt
+             , createdAt
+        ) VALUES (
+               #{pmId}
+             , #{passName}
+             , #{apprFlag}
+             , #{taxFileId}
+             , #{rejectMemo}
+             , #{registerAt}
+             , NOW()
+        )
+    </insert>
+
+    <!-- 위펌 합격자 수정 -->
+    <update id="updateClientPass" parameterType="HhWefirmCustomerDTO">
+        /* com.fw.core.mapper.db1.hh.HhMyWefirmMapper.updateClientPass, 위펌 합격자 수정, YJW, HhMyWefirmMapper.xml */
+        UPDATE client_pass
+           SET updatedAt = NOW()
+           <if test="pmId != null and pmId != ''">
+             , pmId = #{pmId}
+           </if>
+           <if test="passName != null and passName != ''">
+             , passName = #{passName}
+           </if>
+           <if test="apprFlag != null and apprFlag != ''">
+             , apprFlag = #{apprFlag}
+           </if>
+           <if test="rejectMemo != null and rejectMemo != ''">
+             , rejectMemo = #{rejectMemo}
+           </if>
+           <if test="registerAt != null and registerAt != ''">
+             , registerAt = #{registerAt}
+           </if>
+           <if test="taxFileId != null and taxFileId != ''">
+             , taxFileId = #{taxFileId}
+           </if>
+        WHERE id = #{clientPassId}
+    </update>
+
+    <!-- 위펌 고객사 삭제 -->
+    <update id="deleteClientPm" parameterType="HhWefirmCustomerDTO">
+        /* com.fw.core.mapper.db1.hh.HhMyWefirmMapper.deleteClientPm, 위펌 고객사 삭제, YJW, HhMyWefirmMapper.xml */
+        UPDATE client_pm
+           SET delFlag = 'Y'
+             , updatedAt = NOW()
+        WHERE id = #{pmId}
+    </update>
+
+    <!-- 위펌 합격자 삭제 -->
+    <delete id="deleteClientPass" parameterType="HhWefirmCustomerDTO">
+        /* com.fw.core.mapper.db1.hh.HhMyWefirmMapper.deleteClientPass, 위펌 합격자 삭제 , YJW, HhMyWefirmMapper.xml */
+        DELETE
+        FROM client_pass
+        WHERE pmId = #{pmId}
+    </delete>
+
+    <!-- 위펌 권한 -->
+    <select id="selectWefirmAuth" parameterType="HhWefirmHeadhunterDTO" resultType="HhWefirmHeadhunterDTO">
+        /* com.fw.core.mapper.db1.hh.HhMyWefirmMapper.selectWefirmAuth, 위펌 권한, wsh, HhMyWefirmMapper.xml */
+        SELECT  (
+                    CASE
+                        WHEN wefirm_id IS NULL THEN 'NO'
+                        WHEN (SELECT COUNT(1) FROM wefirm w WHERE w.ceo_member_id = h.member_id) > 0 THEN 'MANAGER'
+                        WHEN (SELECT COUNT(1) FROM wefirm_admin wa WHERE wa.member_id = h.member_id) > 0 THEN 'MANAGER'
+                        ELSE 'STAFF'
+                        END
+                    ) AS wefirmAuth
+        FROM headhunter h
+        WHERE h.member_id = #{frontSession.id}
+    </select>
+    
+    <!-- 내가 PM일때 포지션 리스트 -->
+    <select id="selectPmPositionList" parameterType="HhWefirmHeadhunterDTO" resultType="HhWefirmHeadhunterDTO">
+    	/* com.fw.core.mapper.db1.hh.HhMyWefirmMapper.selectPmPositionList, 내가 PM일때 포지션 리스트, wsh, HhMyWefirmMapper.xml */
+	    SELECT p.id
+	  		 , p.title
+	  		 , p.isPrivate
+	  		 , TIMESTAMPDIFF(DAY, DATE_FORMAT(NOW(),'%Y.%m.%d'), DATE_FORMAT(p.endDate,'%Y.%m.%d')) AS dDay
+	  		 , hh.sfName
+	  		 , hc.companyScale
+	  		 , hc.companyName
+	  		 , m.name
+	  		 , m.id AS memberId
+		FROM position p
+	INNER JOIN member m ON p.member_id = m.id
+	INNER JOIN headhunter hh ON p.member_id = hh.member_id
+	INNER JOIN hr_company hc ON p.hr_company_id = hc.id
+		WHERE p.deleted = 0 AND p.status IN ('DOING') AND m.id = #{memberId}
+		<if test="type eq 'PM'">
+		 AND p.isCowork = '1' AND p.member_id = #{memberId}
+		 </if>
+		ORDER BY p.createdAt DESC
+    </select>
+</mapper>
+

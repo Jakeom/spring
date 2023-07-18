@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/default}">
+<body>
+	<div layout:fragment="contents" th:remove="tag">
+		<main id="content" role="main">
+			<h2 class="title">블랙리스트 조회 및 관리 > 등록</h2>
+			<div class="row p-3">
+				<div class="col-12">
+					<input type="hidden" name="memberCnt" value="0">
+					<div class="input-group m-1 form-inline">
+						<div class=" input-group date">
+							<div class="form-inline">
+								<label>회원ID <input class="form-control ml-2 mr-2" data-role="enter" id="inputId" type="text"></label>
+							</div>
+							<div class="form-inline">
+								<p>이름</p>
+								<input class="form-control ml-2 mr-2" data-role="enter" id="inputName" type="text">
+							</div>
+							<div class="form-inline">
+								<p>휴대폰</p>
+								<input class="form-control ml-2 mr-2" data-role="enter" id="inputPhone" type="text">
+							</div>
+							<div class="form-inline">
+								<p>이메일</p>
+								<input class="form-control ml-2" data-role="enter" id="inputEmail" type="text">
+							</div>
+						</div>
+						<div class="p-2 float-right">
+							<button type="submit" class="btn btn-primary" id="search" data-role="search">검색</button>
+							<button class='btn btn-dark' data-role='blacklistSave'>등록</button>
+						</div>
+					</div>
+					<table class="table" id="datatable">
+						<thead>
+							<tr>
+								<th><input type="checkbox" id="allCheck"></th>
+								<th>회원ID</th>
+								<th>이름</th>
+								<th>휴대폰</th>
+								<th>이메일</th>
+							</tr>
+						</thead>
+					</table>
+					<div class="col text-center mt-3">
+						<button data-role="blacklist" class="btn btn-primary">목록으로</button>
+					</div>
+				</div>
+			</div>
+		</main>
+	</div>
+</body>
+</html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <div th:fragment="common">
+        <header id="header">
+            <div class="container">
+                <div class="inner">
+                    <div class="col">
+                        <div class="row align-items-center justify-content-between gx-0">
+                            <div class="col-8 d-flex align-items-center">
+                                <div class="header-logo">
+                                    <a href="/hh"><img src="/static/images/logo.svg" alt="RESUME9"/></a>
+                                </div>
+                                <ul class="gnb-list hidden-flex-mobile">
+                                    <li class="gnb-depth">
+                                        <a href="/hh/position/position-list">포지션 관리</a>
+                                    </li>
+                                    <li class="gnb-depth">
+                                        <a href="">인재검색 </a>
+                                    </li>
+                                    <li class="gnb-depth">
+                                        <a href="/hh/myap/myap-list">내 인재관리</a>
+                                    </li>
+                                    <li class="gnb-depth">
+                                        <a href="/hh/address/address-list">내 주소록</a>
+                                    </li>
+                                    <li class="gnb-depth">
+                                        <a href="/hh/company/company-list">고객사 관리</a>
+                                    </li>
+                                    <li class="gnb-depth">
+                                        <a href="/hh/community/community-list">커뮤니티</a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-4 d-flex align-items-center justify-content-end">
+                                <ul class="sign-list hidden-flex-mobile">
+                                    <li class="sign-depth">
+                                        <a href="/hh/service/inquiry">1:1 문의</a>
+                                    </li>
+                                    <li class="sign-depth">
+                                        <a href="/hh/service/faq-individual">고객센터</a>
+                                    </li>
+                                    <li class="sign-depth mypage">
+                                        <!-- <a href="">로그인</a> -->
+                                        <a href="javascript:void(0)" class="mypage-con">MY</a>
+                                        <i class="icon-login m-l-10"></i>
+                                        <div class="my-info" style="display: none">
+                                            <div class="my-info__head">
+                                                <div class="info-head__my">
+                                                    <a href="../mypage/profile_info.html">
+                                                        <p class="info-head__name">홍길동</p>
+                                                    </a>
+                                                    <a href="" class="info-head__logout"> 로그아웃 <i class="icon-logout"></i>
+                                                    </a>
+                                                </div>
+                                                <div class="info-head__point">
+                                                    <i class="icon-reading-ticket"></i>
+                                                    <span class="my-reword">무료열람권</span>
+                                                    <span class="point">100개</span>
+                                                </div>
+                                                <div class="info-head__point">
+                                                    <i class="icon-point"></i>
+                                                    <span class="my-reword">개인포인트</span>
+                                                    <span class="point">100P</span>
+                                                </div>
+                                            </div>
+                                            <div class="my-info__list">
+                                                <ul>
+                                                    <li>
+                                                        <a href=""><span class="info-list__title">회원정보 수정</span></a>
+                                                    </li>
+                                                    <li class="active">
+                                                        <a href="../mypage/profile_info.html" class="category">회원정보 수정</a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="../mypage/password.html" class="category">비밀번호 변경</a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="../mypage/blacklist.html" class="category">블랙리스트 관리</a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                            <div class="my-info__list">
+                                                <ul>
+                                                    <li>
+                                                        <span class="info-list__title">보안</span>
+                                                    </li>
+                                                    <li class="active">
+                                                        <a href="../mypage/login.html" class="category">로그인 기록</a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                            <div class="my-info__list">
+                                                <ul>
+                                                    <li>
+                                                        <span class="info-list__title">리워드</span>
+                                                    </li>
+                                                    <li class="active">
+                                                        <a href="../mypage/reword.html" class="category">적립/사용내역</a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="../mypage/reword.html" class="category">리워드 Mall</a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+    </div>
+</html>

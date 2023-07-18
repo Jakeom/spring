@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/hh/hhMypageLayout">
+<body>
+<div id="container-block">
+    <div layout:fragment="contents" th:remove="tag">
+        <form name="certForm" th:action="${certServer}" method="POST" target="certForm">
+            <input type="hidden" name="tr_cert">
+            <input type="hidden" name="tr_url" th:value="${certCallbackUrl + '?mode=findId'}">
+            <input type="hidden" name="tr_add" value="N">
+        </form>
+        <form name="resultForm">
+            <input type="hidden" name="di" id="di"/>
+            <input type="hidden" name="name" id="name"/>
+            <input type="hidden" name="phone" id="phone"/>
+        </form>
+        <div class="layout-content">
+            <div class="row row-40 align-items-center">
+                <h3 class="subtitle">기본정보</h3>
+                <div class="title-line mt-4 mb-5"></div>
+                <input type="hidden" name="preDi" id="preDi" th:value="${basicInfo.di}"/>
+                <table class="table m-t-15 border-top-1">
+                    <colgroup>
+                        <col style="width:15%"/>
+                        <col style="width:35%"/>
+                        <col style="width:15%"/>
+                        <col style="width:35%"/>
+                    </colgroup>
+                    <tbody>
+                    <tr>
+                        <th class="text-center">
+                            <p>아이디</p>
+                        </th>
+                        <td>
+                            <p th:text="${basicInfo.loginId}">아이디</p>
+                        </td>
+                        <th class="text-center">
+                            <p>소속 We펌</p>
+                        </th>
+                        <td>
+                            <a href="/hh/wefirm/view-position" class="text-primary text-underline" th:text="${basicInfo.wefirmName}">이덕진</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="text-center">
+                            <p>이메일주소</p>
+                        </th>
+                        <td>
+                            <p>
+                                <span th:text="${basicInfo.email}"></span>
+                                <span class="text-primary font-size-14">인증완료</span>
+                            </p>
+                        </td>
+                        <th class="text-center">
+                            <p>소속 서치펌</p>
+                        </th>
+                        <td>
+                            <p th:text="${basicInfo.sfName}">맨쉬컨설팅(주)</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="text-center">
+                            <p>이름</p>
+                        </th>
+                        <td>
+                            <p name="hhName" th:text="${basicInfo.name}">이덕진</p>
+                        </td>
+                        <th class="text-center">
+                            <p>추천코드</p>
+                        </th>
+                        <td>
+                            <a href="javascript:void(0)"><span class="text-danger" id="referralCode" name="copyText" th:text="${basicInfo.referralCode}">BTBAGT157</span></a>
+                            <span class="icon-self-introduction m-l-5 m-r-5" name="copyIcon" th:data-code="${basicInfo.referralCode}"></span>
+                            <span>코드를 클릭하면 복사됩니다.</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="text-center">
+                            <p>휴대폰번호</p>
+                        </th>
+                        <td><span name="phone" th:text="${basicInfo.phone}">010-1234-5678</span>
+                            <button type="button" class="tag tag-sm tag-gray m-l-10" data-role="cert">변경하기</button>
+                        </td>
+                        <th class="text-center">
+                            <p>초대URL</p>
+                        </th>
+                        <td>
+                            <div>
+                                <a href="javascript:void(0)"> <span class="text-primary" id="inviteUrl" name="copyText" th:text="${'/fo/auth/signup?referralCode='+basicInfo.referralCode}"></span></a>
+                            </div>
+                            <span class="icon-self-introduction m-l-5 m-r-5" name="copyIcon" th:data-code="${'/fo/auth/signup?referralCode='+basicInfo.referralCode}"></span>
+                            <span>주소를 클릭하면 복사됩니다.</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="text-center">
+                            <p>비밀번호</p>
+                        </th>
+                        <td colspan="3">
+                            <button type="button" id="changePassword" class="tag tag-sm tag-gray" data-bs-toggle="modal" data-bs-target="#modal-pw-change">변경하기</button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="row row-40 align-items-center mt-5">
+                <h3 class="subtitle">이메일 서명<span class="font-size-14 m-l-10">모든 발신 메일에 추가되는 서명입니다.</span></h3>
+                <div class="title-line mt-4 mb-5"></div>
+                <div>
+                    <div class="d-flex">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" value="BASIC" name="signatureCd" id="signatureBasic" th:checked="${basicInfo.signatureCd} eq 'BASIC'" />
+                            <label class="form-check-label" for="signatureBasic">기본용</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" value="PROPOSAL" name="signatureCd" id="signatureProposal" th:checked="${basicInfo.signatureCd} eq 'PROPOSAL'"/>
+                            <label class="form-check-label" for="signatureProposal">제안</label>
+                        </div>
+                    </div>
+                    <div id="editor" class="m-t-30">
+                        <div>
+                            <textarea id="basic" name="signature" th:utext="${basicInfo.signatureBasic}" class="form-control col-xl-2" placeholder="내용을 입력하세요." rows="10" cols="50"></textarea>
+                        </div>
+                        <div style="display: none">
+                            <textarea id="proposal" name="signature" th:utext="${basicInfo.signatureProposal}" class="form-control col-xl-2" placeholder="내용을 입력하세요." rows="10" cols="50"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="send-btn">
+                <button type="button" class="btn btn-outline-dark btn-xl">취소</button>
+                <button type="button" class="btn btn-dark btn-xl" data-role="save">저장</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 비밀번호 변경 moal -->
+<div layout:fragment="modal" th:remove="tag">
+    <div class="modal fade" id="modal-pw-change" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-write modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">비밀번호 변경</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <table class="table border-top-1 m-t-30">
+                        <colgroup>
+                            <col style="width:25%"/>
+                        </colgroup>
+                        <tbody>
+                        <tr>
+                            <th class="">현재 비밀번호</th>
+                            <td class="">
+                                <input type="password" name="password" class="form-control form-lg" value="" placeholder="현재 비밀번호를 입력해주세요."/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="">신규 비밀번호</th>
+                            <td class="">
+                                <input type="password" id="newPassword" name="newPassword" class="form-control form-lg" value="" placeholder="새로운 비밀번호를 입력해주세요."/>
+                                <p class="form-text mt-2 text-danger" data-msg-target="newPassword"></p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="">비밀번호 확인</th>
+                            <td class="">
+                                <input type="password" id="newPasswordChk" name="newPasswordChk" class="form-control form-lg" value="" placeholder="새로운 비밀번호를 한번 더 입력해주세요."/>
+                                <p class="form-text mt-2 text-danger" data-msg-target="newPasswordChk"></p>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <p class="text-center m-t-30 m-b-20">비밀번호를 변경하시겠습니까?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal" data-role="close">취소</button>
+                    <button type="button" class="btn btn-primary" data-role="change">변경</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

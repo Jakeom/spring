@@ -1,0 +1,715 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.bo.BoMemberMapper">
+
+    <!-- 멤버 List 조회 -->
+    <select id="selectSearchMemberList" parameterType="BoMemberDTO" resultType="BoMemberDTO">
+        /* com.fw.core.mapper.db1.bo.BoMemberMapper.selectSearchMemberList, 멤버 리스트 조회, 22.09.30, dongbeom, BoMemberMapper.xml */
+        SELECT DTYPE
+             , id
+             , m.createdAt
+             , m.updatedAt
+             , agreeMarketing
+             , agreeMarketingAt
+             , deleted
+             , email
+             , isTemp
+             , loginId
+             , name
+             , phone
+             , privacyExpire
+             , privacyExpireDate
+             , profilePictureFileId
+             , deletedAt
+             , useAppPush
+             , isStop
+             , lastChangePassword
+             , (SELECT blacklist_type FROM tb_blacklist tb WHERE member_id = m.id and tb.del_flag = 'N') blacklistType
+        FROM member m
+        LEFT OUTER JOIN headhunter hh on m.id = hh.member_id
+        <where>
+            <if test='(startDate != null and startDate !="") and (endDate != null and endDate !="")'>
+                 AND date_format(m.createdAt, '%Y-%m-%d') BETWEEN #{startDate} AND #{endDate}
+            </if>
+
+            <if test='inputSelect != null and inputSelect !=""'>
+                <if test='searchSelect == "name"'>
+                    AND m.name LIKE CONCAT('%',#{inputSelect},'%')
+                </if>
+                <if test='searchSelect == "phone"'>
+                    AND phone LIKE CONCAT('%',#{inputSelect},'%')
+                </if>
+                <if test='searchSelect == "email"'>
+                    AND email LIKE CONCAT('%',#{inputSelect},'%')
+                </if>
+                <if test='searchSelect == "id"'>
+                    AND id LIKE CONCAT('%',#{inputSelect},'%')
+                </if>
+                <if test='searchSelect == "referralCode"'>
+                    AND id LIKE CONCAT('%',#{inputSelect},'%')
+                </if>
+                <if test='memberTypeOption != null and memberTypeOption !=""'>
+                    AND m.DTYPE = #{memberTypeOption}
+                </if>
+            </if>
+            <if test='DTYPE != null and DTYPE !=""'>
+                AND m.DTYPE = #{DTYPE}
+            </if>
+            <if test='deleted != null and deleted !=""'>
+                AND m.deleted = #{deleted}
+            </if>
+            <if test='isTemp != null and isTemp !=""'>
+                AND m.isTemp = #{isTemp}
+            </if>
+            <if test='isStop != null and isStop !=""'>
+                AND m.isStop = #{isStop}
+            </if>
+        </where>
+        ORDER BY id desc
+        <include refid="common.paging" />
+    </select>
+
+    <!-- 멤버 List 조회 -->
+    <select id="selectMemberList" parameterType="BoMemberDTO" resultType="BoMemberDTO">
+        /* com.fw.core.mapper.db1.bo.BoMemberMapper.selectMemberList, 멤버 리스트 조회, 22.01.26, dongbeom, BoMemberMapper.xml */
+        SELECT DTYPE
+        , id
+        , m.createdAt
+        , m.updatedAt
+        , agreeMarketing
+        , agreeMarketingAt
+        , deleted
+        , email
+        , isTemp
+        , loginId
+        , name
+        , phone
+        , privacyExpire
+        , privacyExpireDate
+        , profilePictureFileId
+        , deletedAt
+        , useAppPush
+        , isStop
+        , lastChangePassword
+        , (SELECT blacklist_type FROM tb_blacklist tb WHERE member_id = m.id and tb.del_flag = 'N') blacklistType
+        FROM member m
+        LEFT OUTER JOIN headhunter hh on m.id = hh.member_id
+        <where>
+            <if test='startDate != null and startDate !="" and endDate != null and endDate !=""'>
+                AND date_format(m.createdAt, '%Y-%m-%d') BETWEEN #{startDate} AND #{endDate}
+            </if>
+            <if test='nameOption != null and nameOption !=""'>
+                AND m.name LIKE CONCAT('%',#{nameOption},'%')
+            </if>
+            <if test='phoneOption != null and phoneOption !=""'>
+                AND phone LIKE CONCAT('%',#{phoneOption},'%')
+            </if>
+            <if test='emailOption != null and emailOption !=""'>
+                AND email LIKE CONCAT('%',#{emailOption},'%')
+            </if>
+            <if test='idOption != null and idOption !=""'>
+                AND id LIKE CONCAT('%',#{idOption},'%')
+            </if>
+            <if test='referralCodeOption != null and referralCodeOption !=""'>
+                AND hh.referralCode LIKE CONCAT('%',#{referralCodeOption},'%')
+            </if>
+            <if test='memberTypeOption != null and memberTypeOption !=""'>
+                AND m.DTYPE = #{memberTypeOption}
+            </if>
+            <if test='DTYPE != null and DTYPE !=""'>
+                AND m.DTYPE = #{DTYPE}
+            </if>
+            <if test='deleted != null and deleted !=""'>
+                AND m.deleted = #{deleted}
+            </if>
+            <if test='isTemp != null and isTemp !=""'>
+                AND m.isTemp = #{isTemp}
+            </if>
+            <if test='isStop != null and isStop !=""'>
+                AND m.isStop = #{isStop}
+            </if>
+        </where>
+        ORDER BY id desc
+    </select>
+
+    <!-- 멤버 List Cnt -->
+    <select id="selectSearchMemberListCnt" parameterType="BoMemberDTO" resultType="int">
+        /* com.fw.core.mapper.db1.bo.BoMemberMapper.selectSearchMemberListCnt, 멤버 리스트 카운트 조회, 23.01.25, dongbeom, BoMemberMapper.xml */
+        SELECT COUNT(1)
+        FROM member m
+        LEFT OUTER JOIN headhunter hh on m.id = hh.member_id
+        <where>
+            <if test='(startDate != null and startDate !="") and (endDate != null and endDate !="")'>
+                AND date_format(m.createdAt, '%Y-%m-%d') BETWEEN #{startDate} AND #{endDate}
+            </if>
+
+            <if test='inputSelect != null and inputSelect !=""'>
+                <if test='searchSelect == "name"'>
+                    AND m.name LIKE CONCAT('%',#{inputSelect},'%')
+                </if>
+                <if test='searchSelect == "email"'>
+                    AND email LIKE CONCAT('%',#{inputSelect},'%')
+                </if>
+                <if test='searchSelect == "phone"'>
+                    AND phone LIKE CONCAT('%',#{inputSelect},'%')
+                </if>
+                <if test='searchSelect == "id"'>
+                    AND id LIKE CONCAT('%',#{inputSelect},'%')
+                </if>
+                <if test='searchSelect == "referralCode"'>
+                    AND id LIKE CONCAT('%',#{inputSelect},'%')
+                </if>
+                <if test='memberTypeOption != null and memberTypeOption !=""'>
+                    AND m.DTYPE = #{memberTypeOption}
+                </if>
+            </if>
+            <if test='DTYPE != null and DTYPE !=""'>
+                AND m.DTYPE = #{DTYPE}
+            </if>
+            <if test='deleted != null and deleted !=""'>
+                AND m.deleted = #{deleted}
+            </if>
+            <if test='isTemp != null and isTemp !=""'>
+                AND m.isTemp = #{isTemp}
+            </if>
+            <if test='isStop != null and isStop !=""'>
+                AND m.isStop = #{isStop}
+            </if>
+        </where>
+        ORDER BY id desc
+    </select>
+
+    <!-- HH 멤버 조회 -->
+    <select id="selectHeadHunterMemberList" parameterType="BoMemberDTO" resultType="BoMemberDTO">
+        /* com.fw.core.mapper.db1.bo.BoMemberMapper.selectHeadHunterMemberList, HH 멤버 조회, 22.10.18, dongbeom, BoMemberMapper.xml */
+        SELECT date_format(mr.createdAt, '%Y-%m-%d %H:%i:%s') createdAt
+             , mr.id
+             , mr.loginId
+             , mr.email
+             , mr.name
+             , mr.phone
+             , mr.isStop
+             , hh.referralCode
+             , date_format(mr.deletedAt, '%Y-%m-%d %H:%i:%s') deletedAt
+             , mr.deleted
+             , mr.privacyExpireDate
+             , mr.privacyExpire
+             , mr.agreeMarketing
+             , date_format(mr.agreeMarketingAt, '%Y-%m-%d %H:%i:%s') agreeMarketingAt
+             , date_format(mr.lastChangePassword, '%Y-%m-%d %H:%i:%s') lastChangePassword
+             , hh.approved
+             , hh.sfName
+             , hh.sfCeoName
+             , hh.sfPhone
+             , hh.sfHomepageUrl
+             , hh.sfWorkerListFileId
+             , we.name as wefirmName
+        FROM member mr
+                 LEFT OUTER JOIN headhunter hh
+                            ON mr.id=hh.member_id
+                 LEFT OUTER JOIN wefirm we
+                             ON we.id=hh.wefirm_id
+        WHERE hh.member_id = #{id}
+        ORDER BY mr.id desc
+    </select>
+
+    <!-- 멤버 조회 -->
+    <select id="selectMember" parameterType="BoMemberDTO" resultType="BoMemberDTO">
+        /* com.fw.core.mapper.db1.bo.BoMemberMapper.selectMember, 멤버 조회, 22.10.18, dongbeom, BoMemberMapper.xml */
+        SELECT DTYPE
+             , id
+             , createdAt
+             , updatedAt
+             , agreeMarketing
+             , agreeMarketingAt
+             , deleted
+             , email
+             , isTemp
+             , loginId
+             , name
+             , phone
+             , privacyExpire
+             , privacyExpireDate
+             , profilePictureFileId
+             , deletedAt
+             , useAppPush
+             , isStop
+             , lastChangePassword
+        FROM member
+        WHERE id = #{id}
+        ORDER BY id desc
+    </select>
+
+    <!-- 멤버 조회 By Name -->
+    <select id="selectMemberWithName" parameterType="BoMemberDTO" resultType="BoMemberDTO">
+        /* com.fw.core.mapper.db1.bo.BoMemberMapper.selectMember, 멤버 조회, 22.10.18, dongbeom, BoMemberMapper.xml */
+        SELECT  id
+        FROM member
+        WHERE
+            name = #{nameOption}
+        <if test='phoneOption != null and phoneOption !=""'>
+            AND phone = #{phoneOption}
+        </if>
+        <if test='emailOption != null and emailOption !=""'>
+            AND email = #{emailOption}
+        </if>
+    </select>
+
+    <!-- 회원 정보 조회 -->
+    <select id="selectMemberInfo" parameterType="BoMemberDTO" resultType="BoMemberDTO">
+        /* com.fw.core.mapper.db1.bo.BoMemberMapper.selectMemberInfo, 회원 정보 조회, 22.10.18, dongbeom, BoMemberMapper.xml */
+        SELECT date_format(mr.createdAt, '%Y-%m-%d %H:%i:%s') createdAt
+             , mr.id
+             , mr.email
+             , mr.name
+             , mr.phone
+             , mr.isTemp
+             , mr.isStop
+             , date_format(mr.deletedAt, '%Y-%m-%d %H:%i:%s') deleteAt
+             , mr.deleted
+             , mr.privacyExpireDate
+             , mr.privacyExpire
+             , mr.agreeMarketing
+             , date_format(mr.agreeMarketingAt, '%Y-%m-%d %H:%i:%s') agreeMarketingAt
+             , date_format(mr.lastChangePassword, '%Y-%m-%d %H:%i:%s') lastChangePassword
+             , app.resumeRestricted
+             , app.findingJob
+             , app.birth
+             , app.genderCd
+             , app.isPrivateAgreement
+             , app.hhReferralCode
+             , app.contactExceptHoliday
+             , app.contactableTime
+        FROM member mr
+                 LEFT OUTER JOIN applicant app
+                            ON mr.id = app.member_id
+        WHERE mr.id = #{id}
+        ORDER BY mr.id desc
+    </select>
+
+    <!-- 멤버 이력서 정보 날짜 조회 -->
+    <select id="selectResumeList" parameterType="BoResumeDTO" resultType="BoResumeDTO">
+        /* com.fw.core.mapper.db1.bo.BoMemberMapper.selectResumeList, 멤버 이력서 정보 날짜 조회, 22.10.18, dongbeom, BoMemberMapper.xml */
+        SELECT r.id
+             , r.createdAt
+             , date_format(pa.createdAt, '%Y-%m-%d') createdAtFormat
+             , p.title
+             , r.representation
+             , r.name
+             , r.totalCareer
+             , r.birth
+             , (SELECT rab2.name
+                FROM resume_academic_background rab2
+                WHERE rab2.id = (SELECT max(id)
+                                 from resume_academic_background
+                                 WHERE graduationYm = (SELECT max(graduationYm) from resume_academic_background rab3 WHERE resume_id = rab.resume_id)
+                                   AND resume_id = rab.resume_id
+                )) lastAcademic
+             , (SELECT rc.companyName
+                FROM resume_career rc
+                WHERE rc.id = (SELECT max(id)
+                               FROM resume_career
+                               WHERE resignationYm = (SELECT max(resignationYm) FROM resume_career WHERE resume_id = rab.resume_id)
+                                 AND resume_id = rab.resume_id)) lastCareer
+        FROM resume r
+                 LEFT OUTER JOIN position_applicant pa on r.id = pa.resume_id
+                 LEFT OUTER JOIN position p on p.id = pa.position_id
+                 LEFT OUTER JOIN resume_academic_background rab on rab.resume_id = r.id
+        WHERE r.member_id = #{memberId}
+        AND date_format(r.createdAt, '%Y-%m-%d') BETWEEN #{startDate} AND #{endDate}
+        AND r.delFlag = 'N'
+        GROUP BY r.id
+        ORDER BY r.id desc
+    </select>
+
+    <!-- 멤버 이력서 정보 날짜 조회  수정예정 -->
+    <select id="selectResumeOtherOption" parameterType="BoResumeDTO" resultType="BoResumeDTO">
+        SELECT r.id
+             , r.createdAt
+             , date_format(pa.createdAt, '%Y-%m-%d') createdAtFormat
+             , p.title
+             , r.representation
+             , r.name
+             , r.totalCareer
+             , r.birth
+             , (SELECT rab2.name
+                FROM resume_academic_background rab2
+                WHERE rab2.id = (SELECT max(id)
+                                 from resume_academic_background
+                                 WHERE graduationYm = (SELECT max(graduationYm) from resume_academic_background rab3 WHERE resume_id = rab.resume_id)
+                                   AND resume_id = rab.resume_id
+                )) lastAcademic
+             , (SELECT rc.companyName
+                FROM resume_career rc
+                WHERE rc.id = (SELECT max(id)
+                               FROM resume_career
+                               WHERE resignationYm = (SELECT max(resignationYm) FROM resume_career WHERE resume_id = rab.resume_id)
+                                 AND resume_id = rab.resume_id)) lastCareer
+        FROM resume r
+                 LEFT OUTER JOIN position_applicant pa on r.id = pa.resume_id
+                 LEFT OUTER JOIN position p on p.id = pa.position_id
+                 LEFT OUTER JOIN resume_academic_background rab on rab.resume_id = r.id
+        WHERE r.member_id = #{memberId}
+          AND p.title is null
+          AND date_format(r.createdAt, '%Y-%m-%d') BETWEEN #{startDate} AND #{endDate}
+          AND r.delFlag = 'N'
+        GROUP BY r.id
+        ORDER BY r.id desc
+    </select>
+
+    <!-- 멤버 이력서 정보 날짜 조회  수정예정 -->
+    <select id="selectResumeApplicantOption" parameterType="BoResumeDTO" resultType="BoResumeDTO">
+        /* com.fw.core.mapper.db1.bo.BoMemberMapper.selectResumeOption, 멤버 이력서 정보 날짜 조회  수정예정, 22.10.18, dongbeom, BoMemberMapper.xml */
+        SELECT r.id
+             , r.createdAt
+             , date_format(pa.createdAt, '%Y-%m-%d') createdAtFormat
+             , p.title
+             , r.representation
+             , r.name
+             , r.totalCareer
+             , r.birth
+             , (SELECT rab2.name
+                FROM resume_academic_background rab2
+                WHERE rab2.id = (SELECT max(id)
+                                 from resume_academic_background
+                                 WHERE graduationYm = (SELECT max(graduationYm) from resume_academic_background rab3 WHERE resume_id = rab.resume_id)
+                                   AND resume_id = rab.resume_id
+                )) lastAcademic
+             , (SELECT rc.companyName
+                FROM resume_career rc
+                WHERE rc.id = (SELECT max(id)
+                               FROM resume_career
+                               WHERE resignationYm = (SELECT max(resignationYm) FROM resume_career WHERE resume_id = rab.resume_id)
+                                 AND resume_id = rab.resume_id)) lastCareer
+        FROM resume r
+                 LEFT OUTER JOIN position_applicant pa on r.id = pa.resume_id
+                 LEFT OUTER JOIN position p on p.id = pa.position_id
+                 LEFT OUTER JOIN resume_academic_background rab on rab.resume_id = r.id
+        WHERE r.member_id = #{memberId}
+          AND r.representation = 0
+          AND p.title is NOT NULL
+          AND date_format(r.createdAt, '%Y-%m-%d') BETWEEN #{startDate} AND #{endDate}
+          AND r.delFlag = 'N'
+        GROUP BY r.id
+        ORDER BY r.id desc
+    </select>
+
+    <!-- 멤버 이력서 정보 날짜 조회  수정예정 -->
+    <select id="selectResumeRepresentationOption" parameterType="BoResumeDTO" resultType="BoResumeDTO">
+        /* com.fw.core.mapper.db1.bo.BoMemberMapper.selectResumeOption, 멤버 이력서 정보 날짜 조회  수정예정, 22.10.18, dongbeom, BoMemberMapper.xml */
+        SELECT r.id
+             , r.createdAt
+             , date_format(pa.createdAt, '%Y-%m-%d') createdAtFormat
+             , p.title
+             , r.representation
+             , r.name
+             , r.totalCareer
+             , r.birth
+             , (SELECT rab2.name
+                FROM resume_academic_background rab2
+                WHERE rab2.id = (SELECT max(id)
+                                 from resume_academic_background
+                                 WHERE graduationYm = (SELECT max(graduationYm) from resume_academic_background rab3 WHERE resume_id = rab.resume_id)
+                                   AND resume_id = rab.resume_id
+                )) lastAcademic
+             , (SELECT rc.companyName
+                FROM resume_career rc
+                WHERE rc.id = (SELECT max(id)
+                               FROM resume_career
+                               WHERE resignationYm = (SELECT max(resignationYm) FROM resume_career WHERE resume_id = rab.resume_id)
+                                 AND resume_id = rab.resume_id)) lastCareer
+        FROM resume r
+                 LEFT OUTER JOIN position_applicant pa on r.id = pa.resume_id
+                 LEFT OUTER JOIN position p on p.id = pa.position_id
+                 LEFT OUTER JOIN resume_academic_background rab on rab.resume_id = r.id
+        WHERE r.member_id = #{memberId}
+          AND r.representation = 1
+          AND p.title is NOT NULL
+          AND r.delFlag = 'N'
+          AND date_format(r.createdAt, '%Y-%m-%d') BETWEEN #{startDate} AND #{endDate}
+        GROUP BY r.id
+        ORDER BY r.id desc
+    </select>
+
+    <!-- 멤버 포지션 리스트 날짜 조회 -->
+    <select id="selectPositionList" parameterType="BoPositionDTO" resultType="BoPositionDTO">
+        /* com.fw.core.mapper.db1.bo.BoMemberMapper.selectPositionList, 멤버 포지션 리스트 날짜 조회, 22.10.18, dongbeom, BoMemberMapper.xml */
+        SELECT poa.id
+             , poa.createdAt poaCreatedAt
+             , poa.receiptPath
+             , po.title
+             , poa.progressStep
+             , CASE WHEN regPath = 1 and progressStep = 'FAIL' and processStatus = 'FAIL' and proposalStatus = 'ACCEPT' THEN '제안승인'
+                    WHEN regPath = 1 and progressStep = 'PASS' and processStatus = 'PASS' and proposalStatus = 'ACCEPT' THEN '제안승인'
+                    WHEN regPath = 1 and progressStep = 'PROCESS' and processStatus = 'DOCUMENT_PASS' and proposalStatus = 'ACCEPT' THEN '제안승인'
+                    WHEN regPath = 1 and progressStep = 'FAIL' and processStatus = 'DOCUMENT_FAIL' and proposalStatus = 'ACCEPT' THEN '제안승인'
+                    WHEN regPath = 1 and progressStep = 'PROCESS' and processStatus is null and proposalStatus is null THEN '적합'
+                    WHEN regPath = 1 and progressStep = 'REGISTER' and processStatus is null and proposalStatus = 'ACCEPT' THEN '제안승인'
+                    WHEN regPath = 1 and progressStep = 'PROPOSAL' and processStatus is null and proposalStatus = 'PROPOSAL' THEN '-'
+                    WHEN regPath = 1 and progressStep = 'CONTACT' and processStatus is null and proposalStatus = 'UNDER_REVIEW' THEN '-'
+                    WHEN regPath = 1 and progressStep = 'CONTACT' and processStatus is null and proposalStatus = 'REJECT' THEN '-'
+
+                    WHEN regPath = 2 and progressStep = 'FAIL' and processStatus = 'FAIL' and proposalStatus = 'ACCEPT' THEN '제안승인'
+                    WHEN regPath = 2 and progressStep = 'PASS' and processStatus = 'PASS' and proposalStatus = 'ACCEPT' THEN '제안승인'
+                    WHEN regPath = 2 and progressStep = 'PROCESS' and processStatus = 'DOCUMENT_PASS' and proposalStatus = 'ACCEPT' THEN '제안승인'
+                    WHEN regPath = 2 and progressStep = 'PROCESS' and processStatus = 'DOCUMENT_REVIEW' and proposalStatus is null THEN '적합'
+                    WHEN regPath = 2 and progressStep = 'REGISTER' and processStatus = 'READY' and proposalStatus is null THEN '적합'
+                    WHEN regPath = 2 and progressStep = 'CONTACT' and processStatus = 'FAIL' and proposalStatus is null THEN '-'
+                    WHEN regPath = 2 and progressStep = 'CONTACT' and processStatus is null and proposalStatus is null THEN '-'
+
+                    WHEN regPath = 3 and progressStep = 'FAIL' and processStatus = 'FAIL' and proposalStatus = 'ACCEPT' THEN '제안승인'
+                    WHEN regPath = 3 and progressStep = 'PASS' and processStatus = 'PASS' and proposalStatus = 'ACCEPT' THEN '제안승인'
+                    WHEN regPath = 3 and progressStep = 'PROCESS' and processStatus = 'DOCUMENT_PASS' and proposalStatus = 'ACCEPT' THEN '제안승인'
+                    WHEN regPath = 3 and progressStep = 'FAIL' and processStatus = 'DOCUMENT_FAIL' and proposalStatus = 'ACCEPT' THEN '제안승인'
+                    WHEN regPath = 3 and progressStep = 'PROCESS' and processStatus is null and proposalStatus = 'ACCEPT' THEN '제안승인'
+                    WHEN regPath = 3 and progressStep = 'PROPOSAL' and processStatus is null and proposalStatus = 'PROPOSAL' THEN '제안중'
+                    WHEN regPath = 3 and progressStep = 'CONTACT' and processStatus is null and proposalStatus is null THEN '-'
+                    ELSE '-'
+               END AS 'receiptTabStatus'
+             , CASE WHEN regPath = 1 and progressStep = 'FAIL' and processStatus = 'FAIL' and proposalStatus = 'ACCEPT' THEN '탈락'
+                    WHEN regPath = 1 and progressStep = 'PASS' and processStatus = 'PASS' and proposalStatus = 'ACCEPT' THEN '최종합격'
+                    WHEN regPath = 1 and progressStep = 'PROCESS' and processStatus = 'DOCUMENT_PASS' and proposalStatus = 'ACCEPT' THEN '서류합격'
+                    WHEN regPath = 1 and progressStep = 'FAIL' and processStatus = 'DOCUMENT_FAIL' and proposalStatus = 'ACCEPT' THEN '탈락'
+                    WHEN regPath = 1 and progressStep = 'PROCESS' and processStatus is null and proposalStatus is null THEN '전형전'
+                    WHEN regPath = 1 and progressStep = 'REGISTER' and processStatus is null and proposalStatus = 'ACCEPT' THEN '전형중'
+                    WHEN regPath = 1 and progressStep = 'PROPOSAL' and processStatus is null and proposalStatus = 'PROPOSAL' THEN '-'
+                    WHEN regPath = 1 and progressStep = 'CONTACT' and processStatus is null and proposalStatus = 'UNDER_REVIEW' THEN '-'
+                    WHEN regPath = 1 and progressStep = 'CONTACT' and processStatus is null and proposalStatus = 'REJECT' THEN '-'
+
+                    WHEN regPath = 2 and progressStep = 'FAIL' and processStatus = 'FAIL' and proposalStatus = 'ACCEPT' THEN '탈락'
+                    WHEN regPath = 2 and progressStep = 'PASS' and processStatus = 'PASS' and proposalStatus = 'ACCEPT' THEN '최종합격'
+                    WHEN regPath = 2 and progressStep = 'PROCESS' and processStatus = 'DOCUMENT_PASS' and proposalStatus = 'ACCEPT' THEN '서류합격'
+                    WHEN regPath = 2 and progressStep = 'PROCESS' and processStatus = 'DOCUMENT_REVIEW' and proposalStatus is null THEN '서류심사'
+                    WHEN regPath = 2 and progressStep = 'REGISTER' and processStatus = 'READY' and proposalStatus is null THEN '전형전'
+                    WHEN regPath = 2 and progressStep = 'CONTACT' and processStatus = 'FAIL' and proposalStatus is null THEN '-'
+                    WHEN regPath = 2 and progressStep = 'CONTACT' and processStatus is null and proposalStatus is null THEN '-'
+
+                    WHEN regPath = 3 and progressStep = 'FAIL' and processStatus = 'FAIL' and proposalStatus = 'ACCEPT' THEN '탈락'
+                    WHEN regPath = 3 and progressStep = 'PASS' and processStatus = 'PASS' and proposalStatus = 'ACCEPT' THEN '최종합격'
+                    WHEN regPath = 3 and progressStep = 'PROCESS' and processStatus = 'DOCUMENT_PASS' and proposalStatus = 'ACCEPT' THEN '서류합격'
+                    WHEN regPath = 3 and progressStep = 'FAIL' and processStatus = 'DOCUMENT_FAIL' and proposalStatus = 'ACCEPT' THEN '탈락'
+                    WHEN regPath = 3 and progressStep = 'PROCESS' and processStatus is null and proposalStatus = 'ACCEPT' THEN '전형중'
+                    WHEN regPath = 3 and progressStep = 'PROPOSAL' and processStatus is null and proposalStatus = 'PROPOSAL' THEN '전형전'
+                    WHEN regPath = 3 and progressStep = 'CONTACT' and processStatus is null and proposalStatus is null THEN '-'
+                    ELSE '-'
+               END AS 'processResult'
+             , poa.regPath
+        FROM position po
+                 INNER JOIN position_applicant poa
+                      on poa.position_id = po.id
+        WHERE poa.ap_member_id = #{memberId}
+          AND date_format(poa.createdAt, '%Y-%m-%d') BETWEEN #{startDate} AND #{endDt}
+        <if test="regPath != null and regPath != '' ">
+          AND poa.regPath = #{regPath}
+        </if>
+        ORDER BY poa.id desc
+    </select>
+
+    <!-- HH member의 채용정보 table 리스트 -->
+    <select id="selectPositionInfo" parameterType="BoPositionDTO" resultType="BoPositionDTO">
+        /* com.fw.core.mapper.db1.bo.BoMemberMapper.selectPositionInfo, HH member의 채용정보 table 리스트, 22.10.19, dongbeom, BoMemberMapper.xml */
+        SELECT p.id
+             , p.createdAt
+             , title
+             , isCowork
+             , (SELECT fn_get_common_cd(status, 'POSITION_STATUS', 1)) status
+             , endDate
+             , pp.member_id participantId
+        FROM position p
+                 LEFT OUTER JOIN position_participant pp on p.id = pp.position_id
+        WHERE (p.member_id = #{memberId} || pp.member_id = #{memberId})
+          AND date_format(p.createdAt, '%Y-%m-%d') BETWEEN #{startDate} AND #{endDt}
+        GROUP BY p.id
+        ORDER BY p.id desc
+    </select>
+
+    <!-- HH member의 채용정보 table 리스트 -->
+    <select id="selectPositionInfoOption" parameterType="BoPositionDTO" resultType="BoPositionDTO">
+        /* com.fw.core.mapper.db1.bo.BoMemberMapper.selectPositionInfoOption, HH member의 채용정보 table 리스트, 22.10.19, dongbeom, BoMemberMapper.xml */
+        SELECT p.id
+             , p.createdAt
+             , title
+             , isCowork
+             , (SELECT fn_get_common_cd(status, 'POSITION_STATUS', 1)) status
+             , endDate
+             , pp.member_id participantId
+        FROM position p
+            LEFT OUTER JOIN position_participant pp ON p.id = pp.position_id
+        WHERE (p.member_id = #{memberId} || pp.member_id = #{memberId})
+          AND status = #{status}
+          AND date_format(p.createdAt, '%Y-%m-%d') BETWEEN #{startDate} AND #{endDt}
+        GROUP BY p.id
+        ORDER BY p.id desc
+    </select>
+
+    <!-- HH member의 채용정보 table 리스트 Option 추가(회수) -->
+    <select id="selectPointUseHistoryUse" parameterType="BoPointUseHistoryDTO" resultType="BoPointUseHistoryDTO">
+        /* com.fw.core.mapper.db1.bo.BoMemberMapper.selectPointUseHistoryUse, HH member의 채용정보 table 리스트 Option 추가(회수), 22.10.24, dongbeom, BoMemberMapper.xml */
+        SELECT puh.id
+             , puh.createdAt
+             , (SELECT fn_get_common_cd(reasonCd, 'POINT_USE_REASON', 1)) reasonCd
+             , freeIncrease
+             , paidIncrease
+             , adminReason
+             , freeBalance
+             , paidBalance
+             , backoffice_admin_id
+             , ba.name adminName
+        FROM point_use_history puh
+                 LEFT OUTER JOIN backoffice_admin ba
+                                 on puh.backoffice_admin_id = ba.id
+        WHERE member_id = #{memberId}
+        AND date_format(puh.createdAt, '%Y-%m-%d') BETWEEN #{startDate} AND #{endDate}
+        AND '0' > paidIncrease + freeIncrease
+        ORDER BY id desc
+    </select>
+
+    <!-- HH member의 채용정보 table 리스트 Option 추가 -->
+    <select id="selectPointUseHistoryGet" parameterType="BoPointUseHistoryDTO" resultType="BoPointUseHistoryDTO">
+        /* com.fw.core.mapper.db1.bo.BoMemberMapper.selectPointUseHistoryGet, HH member의 채용정보 table 리스트 Option 추가, 22.10.24, dongbeom, BoMemberMapper.xml */
+        SELECT puh.id
+             , puh.createdAt
+             , (SELECT fn_get_common_cd(reasonCd, 'POINT_USE_REASON', 1)) reasonCd
+             , freeIncrease
+             , paidIncrease
+             , adminReason
+             , freeBalance
+             , paidBalance
+             , backoffice_admin_id
+             , ba.name adminName
+        FROM point_use_history puh
+                 LEFT OUTER JOIN backoffice_admin ba
+                                 on puh.backoffice_admin_id = ba.id
+        WHERE member_id = #{memberId}
+        AND date_format(puh.createdAt, '%Y-%m-%d') BETWEEN #{startDate} AND #{endDate}
+        AND paidIncrease + freeIncrease > '0'
+        ORDER BY id desc
+    </select>
+
+    <!-- Member 정보 업데이트 -->
+    <update id="updateMember" parameterType="BoMemberDTO">
+        /* com.fw.core.mapper.db1.bo.BoMemberMapper.updateMember, Member 정보 업데이트, 22.10.18, dongbeom, BoMemberMapper.xml */
+        UPDATE member
+        SET name = #{name}
+          , phone = #{phone}
+          , agreeMarketing = #{agreeMarketing}
+          , updatedAt = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <!-- Member 정보 업데이트 마케팅 변경날짜 포함 -->
+    <update id="updateMemberMarketing" parameterType="BoMemberDTO">
+        /* com.fw.core.mapper.db1.bo.BoMemberMapper.updateMemberMarketing, Member 정보 업데이트 마케팅 변경날짜 포함, 22.10.18, dongbeom, BoMemberMapper.xml */
+        UPDATE member
+        SET name = #{name}
+          , phone = #{phone}
+          , agreeMarketing = #{agreeMarketing}
+          , updatedAt = NOW()
+          , agreeMarketingAt = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <!-- 회원 정보 업데이트 -->
+    <update id="updateApplicant" parameterType="BoMemberDTO">
+        /* com.fw.core.mapper.db1.bo.BoMemberMapper.updateApplicant, 회원 정보 업데이트, 22.10.18, dongbeom, BoMemberMapper.xml */
+        UPDATE applicant
+        SET resumeRestricted = #{resumeRestricted}
+          , findingJob = #{findingJob}
+          , isPrivateAgreement = #{isPrivateAgreement}
+          , contactExceptHoliday = #{contactExceptHoliday}
+          , contactableTime = #{contactableTime}
+        WHERE member_id = #{id}
+    </update>
+
+    <!--HH Member 정보 업데이트 -->
+    <update id="updateHHMember" parameterType="BoMemberDTO">
+        /* com.fw.core.mapper.db1.bo.BoMemberMapper.updateHHMember, HH Member 정보 업데이트, 22.10.21, dongbeom, BoMemberMapper.xml */
+        UPDATE member
+        SET name = #{name}
+          , email = #{email}
+          , agreeMarketing = #{agreeMarketing}
+          , updatedAt = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <!--HH Member 정보 업데이트 마케팅 변경날짜 포함 -->
+    <update id="updateHHMemberMarketing" parameterType="BoMemberDTO">
+        /* com.fw.core.mapper.db1.bo.BoMemberMapper.updateHHMemberMarketing, HH Member 정보 업데이트 마케팅 변경날짜 포함, 22.10.21, dongbeom, BoMemberMapper.xml */
+        UPDATE member
+        SET name = #{name}
+          , email = #{email}
+          , agreeMarketing = #{agreeMarketing}
+          , updatedAt = NOW()
+          , agreeMarketingAt = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <!-- 헤드헌터 정보 업데이트 -->
+    <update id="updateHeadHunter" parameterType="BoMemberDTO">
+        /* com.fw.core.mapper.db1.bo.BoMemberMapper.updateHeadHunter, 헤드헌터 정보 업데이트, 22.10.21, dongbeom, BoMemberMapper.xml */
+        UPDATE headhunter
+        SET sfName = #{sfName}
+          , sfCeoName = #{sfCeoName}
+          , sfPhone = #{sfPhone}
+          , sfHomepageUrl = #{sfHomepageUrl}
+          , updatedAt = NOW()
+          , updateSeq = #{adminSession.adminSeq}
+        WHERE member_id = #{id}
+    </update>
+
+    <!--회원 이용정지 업데이트-->
+    <update id="updateIsStop" parameterType="BoMemberDTO">
+        /* com.fw.core.mapper.db1.bo.BoMemberMapper.updateIsStop, 회원 이용정지 업데이트, 22.10.18, dongbeom, BoMemberMapper.xml */
+        UPDATE member
+        SET isStop = '1'
+          , updatedAt = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <!--회원 이용정지 해제 업데이트-->
+    <update id="updateIsStopNo" parameterType="BoMemberDTO">
+        /* com.fw.core.mapper.db1.bo.BoMemberMapper.updateIsStopNo, 회원 이용정지 해제 업데이트, 22.10.18, dongbeom, BoMemberMapper.xml */
+        UPDATE member
+        SET isStop = '0'
+          , updatedAt = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <!--회원 임시회원 삭제 업데이트-->
+    <delete id="deleteIstemp" parameterType="BoMemberDTO">
+        /* com.fw.core.mapper.db1.bo.BoMemberMapper.updateIsTemp, 회원 임시회원 삭제 업데이트, 22.10.19, dongbeom, BoMemberMapper.xml */
+        DELETE FROM member
+        WHERE id = #{id}
+    </delete>
+
+    <!--회원 강제 탈퇴 업데이트-->
+    <update id="updateDeleted" parameterType="BoMemberDTO">
+        /* com.fw.core.mapper.db1.bo.BoMemberMapper.updateDeleted, 회원 강제 탈퇴 업데이트, 22.10.19, dongbeom, BoMemberMapper.xml */
+        UPDATE member
+        SET deleted = '1'
+          , deletedAt = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <!--회원 강제 탈퇴 복구 업데이트-->
+    <update id="updateRestore" parameterType="BoMemberDTO">
+        /* com.fw.core.mapper.db1.bo.BoMemberMapper.updateRestore, 회원 강제 탈퇴 복구 업데이트, 22.11.16, dongbeom, BoMemberMapper.xml */
+        UPDATE member
+        SET deleted = '0'
+          , deletedAt = null
+          , updatedAt = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <!--비밀번호 초기화 업데이트-->
+    <update id="updatePassword" parameterType="BoMemberDTO">
+        /* com.fw.core.mapper.db1.bo.BoMemberMapper.updatePassword, 비밀번호 초기화 업데이트, 22.10.19, dongbeom, BoMemberMapper.xml */
+        UPDATE member
+        SET password = #{password}
+          , lastChangePassword = NOW()
+          , passwordChangeDate = NOW()
+          , updatedAt = NOW()
+        WHERE id = #{id}
+    </update>
+
+</mapper>

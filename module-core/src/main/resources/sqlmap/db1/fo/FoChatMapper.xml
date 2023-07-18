@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.fo.FoChatMapper">
+
+    <!-- 알림 리스트 -->
+    <select id="selectAlarmList" parameterType="PushHistDTO" resultType="PushHistDTO">
+        /* com.fw.core.mapper.db1.fo.FoChatMapper.selectAlarmList, 알림 리스트, 23.01.08, YJW, FoChatMapper.xml */
+        SELECT push_hist_seq
+             , disp_type
+             , fn_get_common_cd(disp_type,'NOTIFICATION_TYPE','1') AS dispTypeNm
+             , member_id
+             , title
+             , content
+             , img_nm
+             , img_path
+             , img_size
+             , url
+             , phone_type
+             , phone_token
+             , DATE_FORMAT(send_time, '%Y-%m-%d %H:%i') AS sendTime
+             , set_time
+             , send_yn
+             , reserve_yn
+             , create_id
+             , DATE_FORMAT(create_time, '%Y-%m-%d %H:%i:%s') AS createTime
+             , update_id
+             , update_time
+             , receive_yn
+             , receive_time
+             , (SELECT cd_replace1 FROM tb_common_cd WHERE cd = disp_type) AS userType -- 댓글 알림 AP/HH 구분
+        FROM tb_push_hist
+        WHERE member_id = #{memberId}
+          AND delFlag = 'N'
+          AND disp_type NOT IN ('AP_CHAT','HH_CHAT','CHAT')
+        <if test="searchValue != null and searchValue != ''">
+            AND (title LIKE CONCAT('%',#{searchValue},'%') OR content LIKE CONCAT('%',#{searchValue},'%'))
+        </if>
+        ORDER BY create_time DESC
+    </select>
+
+    <!-- 알림 읽음여부 처리 -->
+    <update id="updateAlarmReceive" parameterType="PushHistDTO">
+        /* com.fw.core.mapper.db1.fo.FoChatMapper.updateAlarmReceive, 알림 읽음여부 처리, 23.01.08, YJW, FoChatMapper.xml */
+        UPDATE tb_push_hist
+           SET receive_time = NOW()
+             , update_time = NOW()
+             , receive_yn = #{receiveYn}
+        WHERE push_hist_seq = #{pushHistSeq}
+    </update>
+    <!-- 읽지 않은 알림 -->
+    <select id="selectAlarmCnt" parameterType="PushHistDTO" resultType="PushHistDTO">
+    	/* com.fw.core.mapper.db1.fo.FoChatMapper.selectAlarmCnt, 읽지 않은 알림, 23.01.18, wsh, FoChatMapper.xml */
+    	SELECT (
+    	SELECT COUNT(1) FROM tb_push_hist 
+    	WHERE member_id = #{frontSession.id} AND receive_yn = 'N' AND disp_type NOT IN ('AP_CHAT','HH_CHAT','CHAT')) AS pushCnt
+    </select>
+    <!-- 읽지 않은 알림 -->
+    <select id="selectAlarmCntIncludeChat" parameterType="PushHistDTO" resultType="int">
+    	/* com.fw.core.mapper.db1.fo.FoChatMapper.selectAlarmCntIncludeChat, 읽지 않은 알림, 23.01.18, wsh, FoChatMapper.xml */
+    	SELECT COUNT(1) FROM tb_push_hist
+    	WHERE member_id = #{frontSession.id} AND receive_yn = 'N'
+    </select>
+
+</mapper>

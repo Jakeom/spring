@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+	 xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+	 layout:decorate="~{layouts/default}">
+<body>
+<!-- <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script> -->
+<div layout:fragment="contents" th:remove="tag">
+	<div id="container-block">
+		<main id="content" role="main">
+			<h2 class="title">도움말</h2>
+			<div class="p-3">
+				<div class="row">
+					<div class="col col-6">
+						<div class="row">
+							<div class="col-6 mb-2">
+								<button type="button" class="btn btn-success" data-role="form">Menu CD 등록</button>
+							</div>
+						</div>
+						<table class="table table-bordered table-center">
+							<thead>
+								<tr>
+									<th>Menu CD</th>
+									<th>Content</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="list : ${helpList}" style="cursor:pointer" th:data-menu-cd="${list.menuCd}" data-role="detailList">
+									<td th:text="${list.menuCd}"></td>
+									<td th:text="${list.content}"></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div class="col-6">
+						<table id="datatable">
+							<thead>
+								<tr>
+									<th>Menu CD</th>
+									<th>Content</th>
+									<th>Detail</th>
+								</tr>
+							</thead>
+							<tbody>
+							</tbody>
+						</table>
+					</div>
+<!-- 						<fieldset> -->
+<!-- 							<div class="form-group"> -->
+<!-- 								<label for="menuUrl">메뉴 URL</label> -->
+<!--                             	<input type="text" id="menuCd" name="menuCd" class="form-control" disabled value=""/> -->
+<!-- 							</div> -->
+							
+<!-- 							<div class="form-group"> -->
+<!-- 								<label for="menuUrl">메뉴 URL</label> -->
+<!--                             	<input type="text" id="contentCd" name="contentCd" class="form-control" disabled value=""/> -->
+<!-- 							</div> -->
+<!-- 						</fieldset> -->
+				</div>
+			</div>
+		</main>
+	</div>
+    <div layout:fragment="modal" th:remove="tag"></div>
+</div>
+</body>
+</html>

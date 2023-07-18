@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.fo.FoMemberRoleMapper">
+
+    <!-- 지원자 역할 등록 -->
+    <insert id="insertMemberRole" parameterType="FoMemberRoleDTO">
+        /* com.fw.core.mapper.db1.fo.FoMemberRoleMapper.insertMemberRole , 지원자 역할 등록, sjpaik, FoLoginMapper.xml */
+        INSERT INTO member_role (
+               member_id
+             , role_id
+        ) VALUES (
+               #{memberId}
+             , #{roleId}
+        )
+    </insert>
+
+</mapper>

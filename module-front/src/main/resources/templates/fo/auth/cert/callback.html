@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layouts/empty">
+    <body>
+        <div layout:fragment="contents" th:remove="tag">
+            <input type="hidden" id="di" th:value="${certInfo.di}" />
+            <input type="hidden" id="phoneN" th:value="${certInfo.phoneN}" />
+            <input type="hidden" id="name" th:value="${certInfo.name}" />
+            <input type="hidden" id="mode" th:value="${mode}" />
+            <script src="/static/lib/jquery/jquery.min.js"></script>
+            <script type="text/javascript" th:inline="javascript" th:src="@{/static/js/common/utils.js}"></script>
+            <script>
+                let mode = $("#mode").val();
+                if(mode == "" || typeof mode == "undefined"){
+                    $.ajax({
+                        url: "/fo/auth/duplicate-name-check",
+                        type: "POST",
+                        contentType: "application/json",
+                        data: JSON.stringify({
+                            name: $("#name").val(),
+                            phone: $("#phoneN").val()
+                        }),
+                        success: function(d){
+                            if(d.data) {
+                                alert("핸드폰 번호가 중복되었습니다.\nRESUME9 고객센터 또는 help@resume9.co.kr로 문의바랍니다.");
+                                window.close();
+                            } else {
+                                opener.document.getElementById("di").value = document.getElementById("di").value;
+                                opener.document.getElementById("name").value = document.getElementById("name").value;
+                                opener.document.getElementById("phone").value = document.getElementById("phoneN").value;
+                                $(opener.document).find("#di").click();
+                                window.close();
+                            }
+                        },
+                        error: function(e, t){
+                            alert(t);
+                        }
+                    });
+                } else if (mode == "findId"){
+                    opener.document.getElementById("di").value = document.getElementById("di").value;
+                    opener.document.getElementById("name").value = document.getElementById("name").value;
+                    opener.document.getElementById("phone").value = document.getElementById("phoneN").value;
+                    $(opener.document).find("#di").click();
+                    window.close();
+                } else if (mode == "signUpMobile"){ // 회원가입(모바일)
+                    $.ajax({
+                        url: "/fo/auth/duplicate-name-check",
+                        type: "POST",
+                        contentType: "application/json",
+                        data: JSON.stringify({
+                            name: $("#name").val(),
+                            phone: $("#phoneN").val()
+                        }),
+                        success: function(d){
+                            if(d.data) {
+                                alert("핸드폰 번호가 중복되었습니다.\nRESUME9 고객센터 또는 help@resume9.co.kr로 문의바랍니다.");
+                                window.close();
+                            } else {
+                                let os = Utils.checkMobile();
+                                if(os == "ANDROID") {
+                                    window.Resume9.signup($("#name").val() == "" ? "" : $("#name").val(), $("#phoneN").val() == "" ? "" : $("#phoneN").val(), $("#di").val() == "" ? "" : $("#di").val());
+                                } else if(os == "IOS") {
+                                    window.webkit.messageHandlers.Resume9.postMessage({
+                                        'action': 'signup',
+                                        'name': $("#name").val() == "" ? "" : $("#name").val(),
+                                        'phone': $("#phoneN").val() == "" ? "" : $("#phoneN").val(),
+                                        'di': $("#di").val() == "" ? "" : $("#di").val()
+                                    });
+                                }
+                            }
+                        },
+                        error: function(e, t){
+                            alert(t);
+                        }
+                    });
+                } else if (mode == "findIdMobile") { // 아이디 찾기
+                    let os = Utils.checkMobile();
+                    if(os == "ANDROID") {
+                        window.Resume9.findId($("#name").val() == "" ? "" : $("#name").val(), $("#phoneN").val() == "" ? "" : $("#phoneN").val(), $("#di").val() == "" ? "" : $("#di").val());
+                    } else if(os == "IOS") {
+                        window.webkit.messageHandlers.Resume9.postMessage({
+                            'action': 'findId',
+                            'name': $("#name").val() == "" ? "" : $("#name").val(),
+                            'phone': $("#phoneN").val() == "" ? "" : $("#phoneN").val(),
+                            'di': $("#di").val() == "" ? "" : $("#di").val()
+                        });
+                    }
+                } else if (mode == "findPwMobile") { // 비밀번호 찾기
+                    let os = Utils.checkMobile();
+                    if(os == "ANDROID") {
+                        window.Resume9.findPw($("#name").val() == "" ? "" : $("#name").val(), $("#phoneN").val() == "" ? "" : $("#phoneN").val(), $("#di").val() == "" ? "" : $("#di").val());
+                    } else if(os == "IOS") {
+                        window.webkit.messageHandlers.Resume9.postMessage({
+                            'action': 'findPw',
+                            'name': $("#name").val() == "" ? "" : $("#name").val(),
+                            'phone': $("#phoneN").val() == "" ? "" : $("#phoneN").val(),
+                            'di': $("#di").val() == "" ? "" : $("#di").val()
+                        });
+                    }
+                }
+            </script>
+        </div>
+    </body>
+</html>

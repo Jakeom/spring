@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/mypageLayout">
+<body>
+<div id="container-block">
+    <div layout:fragment="contents" th:remove="tag">
+        <div class="layout-content">
+            <div class="community-content">
+                <div class="">
+                    <h3 class="subtitle">적립/사용 내역</h3>
+                    <div class="title-line mt-4 mb-5"></div>
+                </div>
+                <div class="reword-wrap">
+                    <p class="reword-wrap-title">
+                        헤드헌터 내 이력서 상세정보를 열람할 때다<br/>
+                        <b>1,000포인트</b>의 <b class="text-primary">리워드 적립</b>됩니다.
+                    </p>
+                    <p class="desc">RESUME에 이력서 등록하고 리워드 mall에서 쇼핑도 하세요!</p>
+
+                    <div class="now-point">
+                        <i class="icon-point"></i>
+                        <span>내 리워드</span>
+                        <p class="my-point"><b class="text-primary" th:text="${#authentication.principal.balance == null?'0':#numbers.formatInteger(#authentication.principal.balance,0,'COMMA')}">1,350</b>P
+                        </p>
+                    </div>
+                </div>
+                <form name="searchForm">
+                    <input type="hidden" name="page" th:value="${searchInfo.page}"/>
+                    <div class="tbl-head">
+                        <div class="btn-group date-list" role="group">
+                            <p class="m-r-20 hidden-mobile">조회기간</p>
+                            <input type="hidden" name="selectPeriod" th:value="${searchInfo.selectPeriod}"/>
+                            <button type="button" class="btn btn-outline-primary" th:classappend="${searchInfo.selectPeriod} =='all' or ${searchInfo.selectPeriod} eq null ? 'active':'' " data-role="selectPeriod" data-period="all">전체</button>
+                            <button type="button" class="btn btn-outline-primary" th:classappend="${searchInfo.selectPeriod} =='1month'? 'active':'' " data-role="selectPeriod" data-period="1month">1개월</button>
+                            <button type="button" class="btn btn-outline-primary" th:classappend="${searchInfo.selectPeriod} =='3month'? 'active':'' " data-role="selectPeriod" data-period="3month">3개월</button>
+                            <button type="button" class="btn btn-outline-primary" th:classappend="${searchInfo.selectPeriod} =='6month'? 'active':'' " data-role="selectPeriod" data-period="6month">6개월</button>
+                            <button type="button" class="btn btn-outline-primary" th:classappend="${searchInfo.selectPeriod} =='12month'? 'active':'' " data-role="selectPeriod"data-period="12month">1년</button>
+                        </div>
+                        <div class="d-flex align-items-center gap-10">
+                            <!--<div class="date-range">
+                                <div class="form-date-wrap">
+                                    <input type="text" id="datepicker" class="form-date"/>
+                                </div>
+                                <span>~</span>
+                                <div class="form-date-wrap">
+                                    <input type="text" id="datepicker" class="form-date"/>
+                                </div>
+                            </div>-->
+                            <select class="select-design" name="goodsCd" style="width: 135px" onchange="changeGoodsCd()">
+                                <option value="">전체</option>
+                                <option value="HH_OPEN" th:selected="${searchInfo.goodsCd eq 'HH_OPEN'}">헤드헌터 열람</option>
+                                <option value="PURCHASE_GIFT" th:selected="${searchInfo.goodsCd eq 'PURCHASE_GIFT'}">기프티콘 구매</option>
+                                <option value="ADMIN_INPUT" th:selected="${searchInfo.goodsCd eq 'ADMIN_INPUT'}">관리자 입력</option>
+                                <option value="REVIEW_GIVE" th:selected="${searchInfo.goodsCd eq 'REVIEW_GIVE'}">합격후기 등록</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+                <table class="table m-t-15 border-top-1">
+                    <colgroup>
+                        <col width="20%"/>
+                        <col width="20%"/>
+                        <col width="20%"/>
+                        <col width="20%"/>
+                        <col width="20%"/>
+                    </colgroup>
+                    <thead>
+                    <tr>
+                        <th class="text-center">구분</th>
+                        <th class="text-center">일시</th>
+                        <th class="text-center">내역</th>
+                        <th class="text-center">포인트</th>
+                        <th class="text-center">상태</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <th:block th:if="${#lists.isEmpty(rewardHistoryList)}">
+                        <tr>
+                            <td class="text-center" colspan="5">
+                                <p class="m-t-30 m-b-30">리워드 적립/사용 내역이 없습니다.</p>
+                            </td>
+                        </tr>
+                    </th:block>
+                    <th:block th:each="list : ${rewardHistoryList}">
+                        <tr>
+                            <td class="text-center">
+                                <p th:text="${list.reasonCd eq 'REWARD'? '사용':'적립'}">적립</p>
+                            </td>
+                            <td class="text-center">
+                                <p th:text="${list.createdAt}"></p>
+                            </td>
+                            <td class="text-center">
+                                <th:if test="${list.reasonCd eq 'REWARD'}">
+                                    <p th:text="${list.goodsNm}">헤드헌터 열람</p>
+                                </th:if>
+                                <th:if test="${list.reasonCd ne 'REWARD'}">
+                                    <p th:text="${list.reasonCdNm}">헤드헌터 열람</p>
+                                </th:if>
+                            </td>
+                            <td class="text-center">
+                                <p th:text="${#strings.contains(list.increase, '-')? list.increase:'+'+list.increase}"></p>
+                            </td>
+                            <td class="text-center">
+                                <p th:if="${list.goodsCd eq 'PURCHASE_GIFT'} and ${!#strings.isEmpty(list.trId)}">발송완료</p>
+                                <p th:if="${list.goodsCd eq 'PURCHASE_GIFT'} and ${#strings.isEmpty(list.trId)}">발송대기</p>
+                                <p th:if="${list.goodsCd ne 'PURCHASE_GIFT'}">-</p>
+                            </td>
+                        </tr>
+                    </th:block>
+                    </tbody>
+                </table>
+                <div class="d-flex justify-content-center mt-5">
+                    <th:block
+                            th:include="common/paging :: paging_Fragment(fnc=*{'fn_go_page(this)'}, pageId=*{'pageName1'})"/>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

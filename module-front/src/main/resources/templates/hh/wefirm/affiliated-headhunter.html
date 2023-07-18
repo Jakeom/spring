@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layouts/hh/hhWefirmLayout">
+<body>
+	<div id="container-block">
+		<div layout:fragment="contents" th:remove="tag">
+			<div class="layout-content">
+				<h3 class="subtitle poppins">소속 헤드헌터</h3>
+				<div class="title-line mt-4 mb-5"></div>
+				<form name="searchForm" action="/hh/wefirm/affiliated-headhunter">
+					<input type="hidden" name="page" th:value="${searchInfo.page}" />
+					<div class="tbl-head address-tool justify-content-end">
+						<div class="d-flex gap-10">
+							<input type="text" class="form-control white form-md" name="searchValue" th:value="${searchInfo.searchValue}" style="width: 300px"
+								placeholder="검색어를 입력하세요." />
+							<button type="button" class="btn btn-outline-gray btn-md" data-role="search">검색</button>
+							<select class="select-design" style="width: 150px" name="orderType" >
+                                <option value="name" th:selected="${searchInfo.orderType} == 'name'">이름순</option>
+                                <option value="postingCnt" th:selected="${searchInfo.orderType} == 'postingCnt'">진행공고 많은
+                                    순
+                                </option>
+                            </select>
+						</div>
+					</div>
+				</form>
+		     	<th:block th:if="${#lists.isEmpty(wefirmHeadhunterList)}">
+                	<div class="fake-table-none text-center">헤드헌터 리스트가 없습니다.</div>
+            	</th:block>
+				<div class="card-list hunter border-0">
+					<div class="affiliated-card" data-bs-toggle="modal" data-bs-target="#modal-headhunter" th:each="list : ${wefirmHeadhunterList}"
+						data-role="hhInfo" th:data-member-id="${list.memberId}">
+						<div class="head">
+							<div class="headhunter-profile-img"
+								th:style="${!#lists.isEmpty(list.commonFileList)? 'background-image: url('+ list.commonFileList[0].url+');background-size:100% 100%': 'background-image: url(/static/images/no-img.png);background-size:100% 100%'}"></div>
+							<p class="name" th:text="${list.name}">이덕진</p>
+							<p class="position" th:text="${#strings.isEmpty(list.position)? '-': list.position}">대표이사</p>
+						</div>
+						<div class="desc">
+							<p>
+								<span class="key">연락처</span> <span class="value" th:text="${list.phone}">010-4386-9918</span>
+							</p>
+							<p>
+								<span class="key">이메일</span> <a href="javascript:void(0)" class="value text-primary text-underline"
+									th:text="${#strings.length(list.email) > 25 ? #strings.substring(list.email,0, 25) + '...' : list.email}"></a>
+							</p>
+							<p class="desc">
+                                <span class="desc-title">진행중공고</span>&nbsp;
+                                <a th:href="'/hh/wefirm/position-list?memberId='+${list.memberId}+'&type=PM'" class="desc-text"><b class="text-primary" th:text="${list.postingCnt}">0</b>건</a>
+                            </p>
+						</div>
+					</div>
+				</div>
+				<div layout:fragment="modal" th:remove="tag">
+					<div class="modal fade" id="modal-headhunter" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+						<div class="modal-dialog modal-headhunter modal-dialog-centered">
+							<div class="modal-content">
+								<div class="modal-header">
+									<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+								</div>
+								<div class="modal-body pt-0">
+									<form name="headhunterForm">
+										<input type="hidden" name="headhunterId" /> <input type="hidden" name="hhMemberId" />
+									</form>
+									<div class="headhunter-profile-content">
+										<div class="headhunter-profile">
+											<div class="headhunter-left">
+												<div class="headhunter-profile-img" data-bs-toggle="modal" data-bs-target="#modal-headhunter"></div>
+											</div>
+											<div class="headhunter-profile-info">
+												<div>
+													<p class="company" name="hhSfName">맨쉬컨설팅(주)</p>
+													<p class="name">
+														<span name="hhName">홍길동</span> <span name="hhPosition" class="rank">전무</span> <span name="hhSchool" class="txt">연세대학교 금속공학과</span>
+													</p>
+												</div>
+												<div>
+													<div class="phone">
+														<p>
+															<span>연락처</span> <span name="hhPhone" class="phone-number">***-****-****</span>
+														</p>
+													</div>
+												</div>
+												<ul class="info-list">
+													<li>
+														<p>이메일</p> <a href="" id="hhEmail">asdqwe1234@naver.com</a>
+													</li>
+													<li>
+														<p>최근로그인</p>
+														<p id="recentLogin">2022-10-11</p>
+													</li>
+												</ul>
+											</div>
+										</div>
+									</div>
+									<div class="apply-wrap">
+										<div class="apply-wrap-body">
+											<div class="content">
+												<h4 class="table-subtitle mb-3">인사말</h4>
+												<div class="desc">
+													<p class="introduce-text" name="hhIntro"></p>
+												</div>
+											</div>
+											<div class="content">
+												<h4 class="table-subtitle mb-3">주요이력</h4>
+												<div class="desc" name="hhCareer">
+													<ul class="history">
+														<li></li>
+														<li></li>
+														<li></li>
+													</ul>
+												</div>
+											</div>
+											<div class="content">
+												<h4 class="table-subtitle mb-3">전문분야</h4>
+												<div class="desc">
+													<div class="badge-box" name="hhFields">
+														<span class="tag tag-lg tag-outline-primary none-border m-0" name="hhFieldsLow"> <em name="field"></em>
+														</span>
+														<!-- <span class="tag tag-lg tag-outline-primary none-border m-0">
+                                         <em>IT/인터넷</em>
+                                       </span>
+                                         <span class="tag tag-lg tag-outline-primary none-border m-0">
+                                         <em>제조/생산/화학</em>
+                                       </span>
+                                         <span class="tag tag-lg tag-outline-primary none-border m-0">
+                                         <em>의료/제약</em>
+                                       </span>
+                                         <span class="tag tag-lg tag-outline-primary none-border m-0">
+                                         <em>유통/판매</em>
+                                       </span>-->
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="d-flex justify-content-center mt-5">
+					<th:block th:include="common/paging :: paging_Fragment(fnc=*{'fn_go_page(this)'}, pageId=*{'pageName1'})" />
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

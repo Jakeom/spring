@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.api.ApiBannerMapper">
+
+    <!-- 배너 리스트 조회 -->
+    <select id="selectBannerList" parameterType="ApiBannerDTO" resultType="ApiBannerDTO">
+        /* com.fw.core.mapper.db1.api.ApiBannerMapper.selectBannerList, 배너 리스트 조회, 22.12.01, YJW, ApiBannerMapper.xml */
+        SELECT banner_seq
+        	 , fn_get_common_cd(banner_type_cd, 'BANNER_TYPE', 1) AS bannerType
+             , banner_type_cd
+             , banner_nm
+             , content
+             , banner_order
+        	 , file_seq
+             , use_flag
+             , del_flag
+             , banner_start_dt
+             , banner_end_dt
+             , link_url
+             , create_seq
+             , date_format(create_dt, '%Y-%m-%d %H:%i:%s') AS create_dt
+             , update_seq
+             , date_format(update_dt, '%Y-%m-%d %H:%i:%s') AS update_dt
+        FROM tb_banner
+        WHERE use_flag = 'Y' AND del_flag = 'N'
+        <if test='bannerTypeCd != null and bannerTypeCd != ""'>
+            AND banner_type_cd = #{bannerTypeCd}
+        </if>
+        ORDER BY create_dt DESC
+        <if test='endRow > 0'>
+            LIMIT #{startRow}, #{endRow}
+        </if>
+    </select>
+</mapper>

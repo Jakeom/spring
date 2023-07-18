@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.api.ApiCommonInfoMapper">
+
+    <!-- 약관 조회 -->
+    <select id="selectCommonInfo" parameterType="ApiInfoDTO" resultType="ApiInfoDTO">
+        /* com.fw.core.mapper.db1.api.ApiCommonInfoMapper, selectCommonInfo, 22.12.01, YJW, ApiCommonInfoMapper.xml */
+        SELECT main_display_seq
+        	 , fn_get_common_cd(info_type, 'INFO', 1) AS info_type
+        	 , info_type AS infoTypeCd
+        	 , content
+        	 , file_seq
+        	 , use_flag
+        	 , del_flag
+        	 , reg_seq
+        	 , reg_date
+          FROM tb_info
+         WHERE del_flag = 'N' AND use_flag = 'Y'
+         <if test="infoTypeCd != null and infoTypeCd != ''">
+             AND info_type = #{infoTypeCd}
+         </if>
+    </select>
+</mapper>

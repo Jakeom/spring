@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.api.ApiCertMapper">
+
+    <!-- 인증번호 생성 -->
+    <insert id="insertToken" parameterType="ApiTokenDTO">
+        /* com.fw.core.mapper.db1.fo.ApiCertMapper.insertToken, 인증번호 생성, YJW, ApiCertMapper.xml */
+        INSERT INTO token (
+        createdAt
+        , auth
+        , expiredAt
+        , isConfirmed
+        , isUsed
+        , mediaType
+        , token
+        , useType
+        , delFlag
+        ) VALUES (
+        now()
+        , #{auth}
+        , DATE_ADD(NOW(), INTERVAL 5 MINUTE)
+        , 1
+        , 0
+        , #{mediaType}
+        , #{token}
+        , #{useType}
+        , 'N'
+        )
+        <selectKey order="AFTER" keyProperty="id" resultType="String">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <!-- 인증번호 확인 -->
+    <select id="selectToken" resultType="ApiTokenDTO" parameterType="ApiTokenDTO">
+        /* com.fw.core.mapper.db1.fo.ApiCertMapper.selectToken, 인증번호 확인, YJW, ApiCertMapper.xml */
+        SELECT id
+             , createdAt
+             , updatedAt
+             , auth
+             , DATE_FORMAT(expiredAt, '%Y-%m-%d %H:%i:%s') AS expiredAt
+             , isConfirmed
+             , isUsed
+             , mediaType
+             , token
+             , useType
+             , delFlag
+        FROM token
+        WHERE id = #{id}
+          AND token = #{token}
+          AND delFlag = 'N'
+    </select>
+
+    <!-- 인증번호 사용 처리 -->
+    <update id="updateToken" parameterType="ApiTokenDTO">
+        /* com.fw.core.mapper.db1.fo.ApiCertMapper.updateToken, 인증번호 사용 처리, YJW, ApiCertMapper.xml */
+        UPDATE token
+        SET isUsed = 1
+        WHERE id = #{id}
+    </update>
+</mapper>

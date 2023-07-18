@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.hh.HhMyProfileMapper">
+
+    <!-- #내 정보 관리 - 프로필 설정 - 내 프로필 정보 조회 -->
+    <select id="selectMyProfileInfo" parameterType="HhMyProfileDTO" resultType="HhMyProfileDTO">
+        /* com.fw.core.mapper.db1.hh.HhMyProfileMapper.selectMyProfileInfo, #내 정보 관리 - 프로필 설정 - 내 프로필 정보 조회, 22.12.22, YJW , HhMyProfileMapper.xml */
+        SELECT h.approved
+             , h.position
+             , h.school
+             , h.major
+             , h.greeting
+             , h.careerDesc
+             , h.sfName
+             , h.referralCode
+             , h.signatureBasic
+             , h.signatureProposal
+             , h.signatureCd
+             , m.password
+             , CASE LENGTH(m.phone)
+       						WHEN 11 THEN CONCAT(LEFT(m.phone, 3), '-', MID(m.phone, 4, 4), '-', RIGHT(m.phone, 4))
+      						WHEN 10 THEN CONCAT(LEFT(m.phone, 3), '-', MID(m.phone, 4, 3), '-', RIGHT(m.phone, 4)) END phone
+             , m.di
+             , m.email
+             , m.loginId
+             , m.name
+             , m.profilePictureFileId
+             , w.name AS wefirmName
+             , DATEDIFF(NOW(),m.createdAt) AS activityPeriod /* 활동기간 */
+             , DATE_FORMAT(m.createdAt,'%Y.%m.%d') AS joinDate  /* 가입일 */
+             , DATE_FORMAT((SELECT t.create_dt FROM tb_api_login_log t
+                             WHERE t.id = #{frontSession.id} AND t.result_flag = 'Y' ORDER BY t.create_dt DESC LIMIT 1),'%Y.%m.%d %H:%i:%s') AS recentLoginTime /* 최근 로그인 시간 */
+             , DATE_FORMAT((SELECT t.create_dt FROM tb_api_login_log t
+                            WHERE t.id = #{frontSession.id} AND t.result_flag = 'Y' ORDER BY t.create_dt DESC LIMIT 1),'%Y-%m-%d') AS recentLoginDate
+             , (SELECT COUNT(1) FROM position p WHERE p.member_id = #{frontSession.id} AND deleted = 0 AND endDate > NOW()) AS progressCnt /* 진행중인 공고 수 */
+        FROM headhunter h
+    INNER JOIN member m ON h.member_id = m.id
+    LEFT JOIN wefirm w ON h.wefirm_id = w.id
+        WHERE h.member_id = #{frontSession.id}
+    </select>
+
+    <!-- #내 정보 관리 - 프로필 설정 - 전문분야 조회 -->
+    <select id="selectHhPositionFieldList" parameterType="HhMyProfileDTO" resultType="HhMyProfileDTO">
+        /* com.fw.core.mapper.db1.hh.HhMyProfileMapper.selectHhPositionFieldList, #내 정보 관리 - 프로필 설정 - 전문분야 조회, 22.12.22, YJW , HhMyProfileMapper.xml */
+        SELECT id
+             , createdAt
+             , updatedAt
+             , fieldCd
+             , fn_get_common_cd(fieldCd,'HH_POSITION_FIELD',1) AS fieldNm
+             , type
+             , delFlag
+        FROM hh_position_field
+        WHERE member_id = #{memberId}
+    </select>
+
+    <!-- #내 정보 관리 - 프로필 설정 - 수정 -->
+    <update id="updateProfileSetting" parameterType="HhMyProfileDTO">
+        UPDATE headhunter
+           SET position = #{position}
+             , school = #{school}
+             , major = #{major}
+             , greeting = #{greeting}
+             , careerDesc = #{careerDesc}
+        WHERE member_id = #{frontSession.id}
+    </update>
+
+    <!-- #내 정보 관리 - member 수정 -->
+    <update id="updateMember" parameterType="HhMyProfileDTO">
+        /* com.fw.core.mapper.db1.hh.HhMyProfileMapper.updateMember, #내 정보 관리 - member 수정 - 프로필 사진 수정, 22.12.23, YJW, HhMyProfileMapper.xml */
+        UPDATE member
+           SET updatedAt = NOW()
+             <if test="profilePictureFileId != null and profilePictureFileId != ''">, profilePictureFileId = #{profilePictureFileId}</if>
+             <if test="preDi != di">, name = #{name}</if>
+             <if test="preDi != di">, phone = #{phone}</if>
+             <if test="preDi != di">, di = #{di}</if>
+        WHERE id = #{frontSession.id}
+    </update>
+
+    <!-- #내 정보 관리 - 프로필 설정 - 전문분야 삭제 -->
+    <delete id="deletePositionField" parameterType="HhMyProfileDTO">
+        /* com.fw.core.mapper.db1.hh.HhMyProfileMapper.deletePositionField, #내 정보 관리 - 프로필 설정 - 전문분야 삭제, 22.12.23, YJW, HhMyProfileMapper.xml */
+        DELETE
+        FROM hh_position_field
+        WHERE member_id = #{frontSession.id}
+    </delete>
+
+    <!-- #내 정보 관리 - 프로필 설정 - 전문분야 등록 -->
+    <insert id="insertPositionField" parameterType="HhMyProfileDTO">
+        /* com.fw.core.mapper.db1.hh.HhMyProfileMapper.insertPositionField, #내 정보 관리 - 프로필 설정 - 전문분야 등록, 22.12.23, YJW, HhMyProfileMapper.xml */
+        INSERT INTO hh_position_field (
+               createdAt
+             , fieldCd
+             , type
+             , member_id
+        ) VALUES
+        <foreach collection="checkFieldArr" item="item" separator=",">
+            (
+               NOW()
+             , #{item}
+             , 'SPECIAL'
+             , #{frontSession.id}
+        )
+        </foreach>
+    </insert>
+
+    <!-- #내 정보 관리 - 기본정보/이메일서명 - 이메일서명 수정 -->
+    <update id="updateSignature" parameterType="HhMyProfileDTO">
+        UPDATE headhunter
+           SET signatureBasic = #{signatureBasic}
+             , signatureProposal = #{signatureProposal}
+             , signatureCd = #{signatureCd}
+             , updatedAt = NOW()
+             , updateSeq = #{frontSession.id}
+        WHERE member_id = #{frontSession.id}
+    </update>
+    
+    <!-- #내 정보 관리 - 이용내역 cnt-->
+	<select id="selectMyLogListCnt" resultType="int">
+		/* com.fw.core.mapper.db1.hh.HhMyProfileMapper.selectMyLogListCnt, #내 정보 관리 - 이용내역 cnt, 23.01.16, wsh, HhMyProfileMapper.xml */
+		SELECT COUNT(1) AS CNT
+		FROM tb_headhunter_log
+		WHERE member_id = #{frontSession.id}
+		<if test="sortColumn != null and sortColumn != ''">
+              AND use_type = #{sortColumn}
+        </if>
+		<if test="selectPeriod != '' and selectPeriod != null">
+        	<if test="selectPeriod eq 'today'">
+                AND DATE_FORMAT(create_dt,'%Y-%m-%d') = DATE_FORMAT(NOW(),'%Y-%m-%d')
+            </if>
+            <if test="selectPeriod eq '1month'">
+                AND create_dt BETWEEN DATE_SUB(NOW(), INTERVAL 1 MONTH) AND NOW()
+            </if>
+            <if test="selectPeriod eq '3month'">
+                AND create_dt BETWEEN DATE_SUB(NOW(), INTERVAL 3 MONTH) AND NOW()
+            </if>
+         </if>
+	</select>
+	
+	<!-- #내 정보 관리 - 이용내역 -->
+	<select id="selectMyLogList" parameterType="HhMyProfileDTO" resultType="HhMyProfileDTO">
+		/* com.fw.core.mapper.db1.hh.HhMyProfileMapper.selectMyLogList, #내 정보 관리 - 이용내역, 23.01.16, wsh, HhMyProfileMapper.xml */
+		SELECT log_seq
+			 , member_id
+			 , fn_get_common_cd(use_type,'USE_TYPE','1') AS useTypeNm
+	  		 , access_ip
+	  		 , user_agent
+	  		 , process_time
+	  		 , DATE_FORMAT(create_dt,'%Y-%m-%d') AS createDt
+		FROM tb_headhunter_log
+		WHERE member_id = #{frontSession.id}
+        <if test="sortColumn != null and sortColumn != ''">
+            AND use_type = #{sortColumn}
+        </if>
+        <if test="selectPeriod != '' and selectPeriod != null">
+        	<if test="selectPeriod eq 'today'">
+                AND DATE_FORMAT(create_dt,'%Y-%m-%d') = DATE_FORMAT(NOW(),'%Y-%m-%d')
+            </if>
+            <if test="selectPeriod eq '1month'">
+                AND create_dt BETWEEN DATE_SUB(NOW(), INTERVAL 1 MONTH) AND NOW()
+            </if>
+            <if test="selectPeriod eq '3month'">
+                AND create_dt BETWEEN DATE_SUB(NOW(), INTERVAL 3 MONTH) AND NOW()
+            </if>
+         </if>
+        ORDER BY create_dt DESC
+		<include refid="common.paging" />
+	</select>
+	<!-- #내 정보 관리 - 이용내역 insert -->
+	<insert id="insertHist" parameterType="HhMyProfileDTO">
+		/* com.fw.core.mapper.db1.hh.HhMyProfileMapper.insertHist, #내 정보 관리 - 이용내역 insert, 23.01.16, wsh, HhMyProfileMapper.xml */
+		INSERT INTO tb_headhunter_log (
+				  member_id
+				, use_type
+				, access_ip
+				, user_agent
+				, process_time
+				, create_dt
+		) VALUES (
+			      #{memberId}
+				, #{useType}
+				, #{accessIp}
+				, #{userAgent}
+				, #{processTime}
+				, NOW() 
+		)
+	</insert>
+</mapper>

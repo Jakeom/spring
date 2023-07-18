@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:fragment="common">
+<aside>
+  <div class="resume-login">
+    <div class="resume-login-profile"
+         th:style="'background: url(' + ${#authentication.principal.profileUrl eq null ? '/static/images/no-img.png' : #authentication.principal.profileUrl} + '); background-size: 100% 100%'"></div>
+    <p class="name" th:text="${#authentication.principal.name}"><b>박근수</b>님</p>
+    <a href="/fo/user/resume/resume-write" class="btn btn-outline-primary btn-md">이력서 등록하기</a>
+    <span class="btn btn-primary btn-md" id ="resumeRestrictedText" th:text="${#authentication.principal.resumeRestricted eq '0'? '공개 중':'비공개'}">이력서 공개중</span>
+  </div>
+  <ul>
+    <li>
+      <a href=""><span class="poppins">내 이력서 관리</span></a>
+      <ul>
+        <li th:classappend="${activeMenuURI eq '/fo/user/resume/resume-write'} ? 'active' : ''">
+          <a href="/fo/user/resume/resume-write">이력서 등록</a>
+        </li>
+        <li th:classappend="${activeMenuURI eq '/fo/mypage/resume-list'} ? 'active' : ''">
+          <a href="/fo/mypage/resume-list">이력서 목록</a>
+        </li>
+        <li th:classappend="${activeMenuURI eq '/fo/user/resume/resume-setting'} ? 'active' : ''">
+          <a href="/fo/user/resume/resume-setting">이력서 공개설정</a>
+        </li>
+        <li th:classappend="${activeMenuURI eq '/fo/user/resume/customized-posting'} ? 'active' : ''">
+          <a href="/fo/user/resume/customized-posting">맞춤채용공고 관리</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</aside>
+</div>
+</html>

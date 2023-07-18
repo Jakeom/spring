@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.bo.BoGroupMapper">
+	
+	<!-- 그룹 리스트 조회  -->
+	<select id="selectGroupList" parameterType="BoGroupDTO" resultType="BoGroupDTO">
+	    /* com.fw.core.mapper.db1.bo.GroupMapper.selectGroupList, 그룹 리스트 조회, 22.09.06, shwoo, GroupMapper.xml */
+		SELECT tg.group_id
+			 , tg.group_nm
+			 , tg.use_flag
+			 , tg.create_seq
+			 , tg.create_dt
+			 , tg.update_seq
+			 , tg.update_dt
+			 , (SELECT ta.admin_nm FROM tb_admin ta WHERE ta.admin_seq = tg.create_seq) AS writer
+             , (SELECT ta.admin_nm FROM tb_admin ta WHERE ta.admin_seq = tg.update_seq) AS corrector
+	      FROM tb_group AS tg
+	      WHERE tg.del_flag = 'N'
+	      ORDER BY tg.group_id	
+	</select>
+
+	<!-- 그룹 정보 조회  -->
+	<select id="selectGroupInfo" parameterType="BoGroupDTO" resultType="BoGroupDTO">
+		/* com.fw.core.mapper.db1.bo.GroupMapper.selectGroupInfo, 그룹 정보 조회, 22.09.06, shwoo, GroupMapper.xml */
+		SELECT tg.group_id
+			 , tg.group_nm
+			 , tg.use_flag
+			 , tg.create_seq
+			 , tg.create_dt
+			 , tg.update_seq
+			 , tg.update_dt
+			 , (SELECT ta.admin_nm FROM tb_admin ta WHERE ta.admin_seq = tg.create_seq) AS writer
+             , (SELECT ta.admin_nm FROM tb_admin ta WHERE ta.admin_seq = tg.update_seq) AS corrector
+	      FROM tb_group AS tg 
+        WHERE tg.group_id = #{groupId}
+	</select>
+	
+	<!-- 그룹 상세 modify -->
+    <select id="selectGroupModify" parameterType="BoGroupDTO" resultType="BoGroupDTO">
+        /* com.fw.core.mapper.db1.bo.GroupMapper.selectGroupModify, 그룹 상세 조회, 22.09.16, wsh , GroupMapper.xml */
+        SELECT group_id
+			 , group_nm
+			 , use_flag
+			 , create_seq
+			 , date_format(create_dt, '%Y-%m-%d %H:%i') as create_dt
+			 , update_seq
+			 , date_format(update_dt, '%Y-%m-%d %H:%i') as update_dt
+          FROM tb_group
+          WHERE group_id = #{groupId}
+    </select>
+	
+	<!-- 그룹아이디 중복체크  -->
+	<select id="selectGroupIdCheck" resultType="int">
+		/* com.fw.core.mapper.db1.bo.GroupMapper.selectGroupIdcheck, 그룹 아이디 중복체크, 22.09.08, shwoo, GroupMapper.xml */
+		SELECT COUNT(*) 
+		  FROM tb_group
+		  WHERE group_id = #{groupId}
+	</select>		
+	
+	<!-- 그룹 정보 등록  -->
+	<insert id="insertGroupInfo" parameterType="BoGroupDTO">
+		/* com.fw.core.mapper.db1.bo.GroupMapper.insertGroupInfo, 그룹 정보 등록, 22.09.06, shwoo, GroupMapper.xml */
+	    INSERT INTO tb_group (
+	    	   group_id
+			 , group_nm
+			 , use_flag
+			 , create_seq
+			 , create_dt
+		  ) VALUES (
+		       #{groupId}
+			 , #{groupNm}
+			 , #{useFlag}
+			 , #{adminSession.adminSeq}
+			 , NOW()
+		  )
+	</insert>
+	
+	<!-- 그룹 정보 수정  -->
+	<update id="updateGroupInfo" parameterType="BoGroupDTO">
+		/* com.fw.core.mapper.db1.bo.GroupMapper.updateGroupInfo, 그룹 정보 수정, 22.09.07, shwoo, GroupMapper.xml */
+		UPDATE tb_group SET
+			   update_seq = #{adminSession.adminSeq}
+			 , update_dt = NOW()
+		<if test='groupId != null and groupId !=""'>
+		     , group_id = #{groupId}
+		</if>
+		<if test='groupNm != null and groupNm !=""'>
+		     , group_nm = #{groupNm}
+		</if>
+		<if test='useFlag != null and useFlag !=""'>
+		     , use_flag = #{useFlag}
+		</if>
+		WHERE group_id = #{groupId}
+	</update>
+	
+	<!-- 그룹 정보 삭제 -->
+	<update id="deleteGroupInfo" parameterType="BoGroupDTO">
+		/* com.fw.core.mapper.db1.bo.GroupMapper.deleteGroupInfo, 그룹 정보 삭제, 22.09.14, shwoo, GroupMapper.xml */
+		UPDATE tb_group
+		   SET del_flag = 'Y'
+		 WHERE group_id = #{groupId}
+	</update>
+</mapper>

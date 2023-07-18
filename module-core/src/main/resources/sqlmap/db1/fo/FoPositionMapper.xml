@@ -1,0 +1,421 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.fo.FoPositionMapper">
+
+    <!-- 채용공고 리스트 -->
+    <select id="selectPositionList" resultType="FoPositionDTO">
+        /*com.fw.core.mapper.db1.fo.FoPositionMapper.selectPositionList, 채용공고 리스트 , 2022.11 , skayhlj@gmail.com, FoPositionMapper.xml*/
+        SELECT @rownum:=@rownum+1 AS rownum
+             , A.*
+          FROM (
+                    SELECT POS.id
+                         , DATE_FORMAT(POS.endDate,'%Y.%m.%d') endDate
+                         , POS.createdAt
+                         , TIMESTAMPDIFF(DAY, DATE_FORMAT(NOW(),'%Y.%m.%d'), DATE_FORMAT(POS.endDate,'%Y.%m.%d')) dDay
+                         , POS.member_id
+                         , POS.title
+                         , POS.hr_company_id
+                         , MEM.name
+                         , HH.sfName
+                         , HC.companyScale
+                         , HC.companyName
+                         , POS.isPrivate
+                         , POS.public_cd
+                      FROM position POS
+                INNER JOIN member MEM ON POS.member_id = MEM.id
+                INNER JOIN headhunter HH ON POS.member_id = HH.member_id
+                INNER JOIN hr_company HC ON POS.hr_company_id = HC.id
+                     WHERE POS.deleted = 0
+                       AND POS.status IN ('DOING')
+                       AND POS.endDate >= DATE_FORMAT(NOW(),'%Y.%m.%d')
+                  ORDER BY createdAt DESC LIMIT 24
+        ) AS A
+        , (SELECT @rownum:=0) TMP order by rownum ASC
+    </select>
+
+    <!-- 채용공고 조회 카운트 취득-->
+    <select id="selectPositionListCntForPaging" resultType="int">
+        /*com.fw.core.mapper.db1.fo.FoPositionMapper.selectPositionListCntForPaging,  채용공고 조회 카운트 취득 , 2022.11 , skayhlj@gmail.com, FoPositionMapper.xml*/
+        SELECT COUNT(1) AS CNT
+          FROM position POS
+    INNER JOIN member MEM ON POS.member_id = MEM.id
+    INNER JOIN headhunter HH ON POS.member_id = HH.member_id
+    INNER JOIN hr_company HC ON POS.hr_company_id = HC.id
+         WHERE POS.deleted = 0
+           AND POS.status IN ('DOING')
+        /*AND POS.isPrivate = 0*/
+        <![CDATA[ AND POS.endDate >= DATE_FORMAT(NOW(),'%Y.%m.%d')  ]]>
+        <if test="searchVal != '' and searchVal != null">
+            AND ( HC.companyScale LIKE CONCAT('%', #{searchVal}, '%')
+            OR (HC.companyName LIKE CONCAT('%', #{searchVal}, '%') AND POS.public_cd = 0)
+            OR POS.industry LIKE CONCAT('%', #{searchVal}, '%')
+            OR POS.title LIKE CONCAT('%', #{searchVal}, '%') )
+        </if>
+        <if test="memberId != '' and memberId != null">
+            AND POS.member_id = #{memberId}
+        </if>
+    </select>
+
+    <!-- 채용공고 조회 페이징-->
+    <select id="selectPositionListPaging" resultType="FoPositionDTO">
+        /*com.fw.core.mapper.db1.fo.FoPositionMapper.selectPositionListPaging, 채용공고 조회 페이징 , 2022.11 , skayhlj@gmail.com, FoPositionMapper.xml*/
+        SELECT A.*
+        FROM (
+        SELECT @rownum:=@rownum+1 AS rownum
+             , POS.id
+             , DATE_FORMAT(POS.endDate,'%Y.%m.%d') endDate
+             , POS.createdAt
+             , TIMESTAMPDIFF(DAY, DATE_FORMAT(NOW(),'%Y.%m.%d'), DATE_FORMAT(POS.endDate,'%Y.%m.%d')) dDay
+             , POS.member_id
+             , POS.title
+             , POS.hr_company_id
+             , MEM.name
+             , HH.sfName
+             , HC.companyScale
+             , HC.companyName
+             , POS.isPrivate
+             , POS.public_cd
+             , (SELECT id FROM position_reading_history WHERE position_id = POS.id AND applicant_id = #{frontSession.id} AND delFlag = 'N') scrapId
+             , (SELECT COUNT(1) FROM position_applicant WHERE position_id = POS.id AND ap_member_id = #{frontSession.id} AND delFlag = 'N') applicantYn
+          FROM position POS
+    INNER JOIN member MEM ON POS.member_id = MEM.id
+    INNER JOIN headhunter HH ON POS.member_id = HH.member_id
+    INNER JOIN hr_company HC ON POS.hr_company_id = HC.id
+          , (SELECT @rownum:=0) TMP
+         WHERE POS.deleted = 0
+           AND POS.status IN ('DOING')
+        <![CDATA[ AND POS.endDate >= DATE_FORMAT(NOW(),'%Y.%m.%d')  ]]>
+        <if test="searchVal != '' and searchVal != null">
+           AND ( HC.companyScale LIKE CONCAT('%', #{searchVal}, '%')
+            OR (HC.companyName LIKE CONCAT('%', #{searchVal}, '%') AND POS.public_cd = 0)
+            OR POS.industry LIKE CONCAT('%', #{searchVal}, '%')
+            OR POS.title LIKE CONCAT('%', #{searchVal}, '%') )
+        </if>
+        <if test="memberId != '' and memberId != null">
+            AND POS.member_id = #{memberId}
+        </if>
+        <if test="sortColumn != '' and sortColumn != null">
+            <if test="sortColumn eq 'endDate'">
+                ORDER BY POS.endDate ASC
+            </if>
+            <if test="sortColumn eq 'createdAt'">
+                ORDER BY POS.createdAt DESC
+            </if>
+        </if>
+        <if test="sortColumn == '' or sortColumn == null">
+            ORDER BY POS.createdAt DESC
+        </if>
+          ) AS A
+        <include refid="common.paging" />
+    </select>
+    
+    <!--채용공고 상세보기-->
+    <select id="selectPositionInfo" resultType="FoPositionDTO">
+        /*com.fw.core.mapper.db1.fo.FoJopMapper.selectPositionInfo, 채용공고 상세보기징 , 2022.11 , skayhlj@gmail.com, FoPositionMapper.xml*/
+        SELECT POS.id
+             , DATE_FORMAT(POS.endDate,'%Y.%m.%d') endDate
+             , TIMESTAMPDIFF(DAY, DATE_FORMAT(NOW(),'%Y.%m.%d'), DATE_FORMAT(POS.endDate,'%Y.%m.%d')) dDay
+             , POS.member_id
+             , POS.title
+             , POS.hr_company_id
+             , MEM.name
+             , MEM.email
+             , MEM.profilePictureFileId
+             , (SELECT url FROM file_mgr WHERE id = MEM.profilePictureFileId) profileSrc
+             , HH.sfName
+             , HC.companyScale
+             , HC.companyName
+             , HC.id AS companySeq
+             , (SELECT COUNT(1) FROM position WHERE member_id = POS.member_id AND deleted = 0 AND endDate > NOW() AND status = 'DOING' ) AS postingCnt
+             , POS.jobDescription
+             , POS.isPrivate
+             , POS.public_cd
+             , (SELECT id FROM interest_hh WHERE headhunter_id = POS.member_id AND applicant_id = #{frontSession.id} AND delFlag = 'N') interestHh
+             , POS.industry
+             , (SELECT id FROM position_reading_history WHERE position_id = POS.id AND applicant_id = #{frontSession.id} AND delFlag = 'N') scrapId
+             , (SELECT COUNT(1) FROM position_applicant WHERE position_id = POS.id AND ap_member_id = #{frontSession.id} AND delFlag = 'N') applicantYn
+          FROM position POS
+    INNER JOIN member MEM ON POS.member_id = MEM.id
+    INNER JOIN headhunter HH ON POS.member_id = HH.member_id
+    INNER JOIN hr_company HC ON POS.hr_company_id = HC.id
+         WHERE POS.deleted = 0
+           AND POS.id = #{id}
+    </select>
+
+    <!--채용공고 지원하기-->
+    <insert id="insertPositionApplicant" parameterType="FoPositionApplicantDTO">
+        /*com.fw.core.mapper.db1.fo.FoPositionMapper.insertPositionApplicant, 채용공고 지원하기 , 2022.11 , skayhlj@gmail.com, FoPositionMapper.xml*/
+        INSERT INTO position_applicant (
+               createdAt
+             , passedStatus
+             , phoneOpened /*not null */
+             , pmSubmitted /*not null */
+             , processStatus
+             , progressStep
+             , proposalAt
+             , proposalStatus
+             , proposedEamil /*not null */
+             , proposedSms /*not null */
+             , receiptPath
+             , receiptStatus
+             , regPath
+             , resultNoticed /*not null */
+             , updateRequest /*not null */
+             , ap_member_id
+             , hh_member_id
+             , position_id /*not null */
+             , resume_id /*not null */
+             , submit_resume_file_id
+             , delFlag
+             , resume_modify_flag
+             , updatedAt
+        ) VALUES (
+               NOW()
+             , #{passedStatus}
+             , #{phoneOpened}  /*not null */
+             , #{pmSubmitted}  /*not null */
+             , #{processStatus}
+             , #{progressStep}
+             , <choose>
+                   <when test="regPath eq '2'.toString">
+                       NOW()
+                   </when>
+                   <otherwise>
+                       NULL
+                   </otherwise>
+               </choose>
+             , #{proposalStatus}
+             , #{proposedEamil}  /*not null */
+             , #{proposedSms}  /*not null */
+             , #{receiptPath}
+             , #{receiptStatus}
+             , #{regPath}
+             , false /*not null */
+             , #{updateRequest} /*not null */
+             , #{apMemberId}
+             , #{hhMemberId}
+             , #{positionId} /*not null */
+             , #{resumeId} /*not null */
+             , #{submitResumeFileId}
+             , 'N'
+             , 'N'
+             , NOW()
+        )
+        <selectKey keyProperty="id" resultType="String" order="AFTER">
+            SELECT LAST_INSERT_ID() FROM DUAL
+        </selectKey>
+    </insert>
+
+    <!-- 이력서 수정동의-->
+    <update id="updateApplicant" parameterType="FoPositionApplicantDTO">
+        /*com.fw.core.mapper.db1.fo.FoJopMapper.updateApplicant, 이력서 수정동의 , 2022.11 , skayhlj@gmail.com, FoPositionMapper.xml*/
+        UPDATE position_applicant
+           SET resume_modify_flag = 'Y'
+         WHERE id = #{id}
+    </update>
+
+    <!--스크랩 하기-->
+    <insert id="insertScrap" parameterType="FoPositionDTO">
+        /*com.fw.core.mapper.db1.fo.FoJopMapper.insertScrap, 스크랩 하기 , 2022.11 , skayhlj@gmail.com, FoPositionMapper.xml*/
+        INSERT INTO scrap_position (
+               createdAt
+             , applicant_id
+             , position_id
+             , delFlag
+        ) VALUES (
+               NOW()
+             , #{frontSession.id}
+             , #{positionId}
+             , 'N'
+        )
+    </insert>
+
+    <!--스크랩 취소-->
+    <update id="updateScrap" parameterType="FoPositionDTO">
+        /*com.fw.core.mapper.db1.fo.FoJopMapper.updateScrap, 스크랩 하기 , 2022.11 , skayhlj@gmail.com, FoPositionMapper.xml*/
+        UPDATE scrap_position
+           SET delFlag = 'Y'
+         WHERE applicant_id =  #{frontSession.id}
+           AND position_id = #{positionId}
+    </update>
+
+    <!--지원유무-->
+    <select id="selectApplicant" resultType="int">
+        /*com.fw.core.mapper.db1.fo.FoJopMapper.selectApplicant, 지원유무 , 2022.12 , skayhlj@gmail.com, FoPositionMapper.xml*/
+        SELECT COUNT(1)
+          FROM position_applicant
+         WHERE position_id = #{id}
+           AND ap_member_id = #{frontSession.id}
+           AND delFlag = 'N'
+    </select>
+
+    <!-- 최종합격 채용공고 -->
+    <select id="selectMyPassPosition" parameterType="FoPositionDTO" resultType="FoPositionDTO">
+        /*com.fw.core.mapper.db1.fo.FoPositionMapper.selectMyPassPosition, 최종합격 채용공고 , 2022.12 , YJW, FoPositionMapper.xml*/
+        SELECT hc.id AS companySeq
+             , hc.companyName
+             , p.id
+             , p.title
+             , (SELECT count(1) FROM tb_community WHERE company_seq = hc.id AND create_seq = #{frontSession.id} AND community_type = 'PASS_REVIEW') passCommunityCnt
+          FROM position_applicant pa
+    INNER JOIN position p ON pa.position_id = p.id
+    INNER JOIN hr_company hc ON p.hr_company_id = hc.id
+         WHERE pa.progressStep = 'PASS'
+           AND pa.ap_member_id = #{memberId}
+    </select>
+
+    <!-- 합격후기 작성이력없는 최종합격 채용공고 조회 -->
+    <select id="selectMyPassPositionNotReview" parameterType="FoPositionDTO" resultType="FoPositionDTO">
+        /*com.fw.core.mapper.db1.fo.FoPositionMapper.selectMyPassPositionNotReview, 합격후기 작성이력없는 최종합격 채용공고 조회 , 2023.01 , YJW, FoPositionMapper.xml*/
+        SELECT hc.id AS companySeq
+             , hc.companyName
+             , p.id
+             , p.title
+        FROM position_applicant pa
+    INNER JOIN position p ON pa.position_id = p.id
+    INNER JOIN hr_company hc ON p.hr_company_id = hc.id
+        WHERE pa.progressStep = 'PASS'
+          AND pa.ap_member_id = #{memberId}
+          AND 0 >= (SELECT COUNT(1) FROM tb_community WHERE create_seq = #{memberId} AND community_type = 'PASS_REVIEW' AND company_seq = hc.id AND del_flag = 'N') -- 이미 합격후기 등록한 경우 리스트에서 제외
+    </select>
+
+    <!-- 스크랩 채용공고 조회 카운트 취득-->
+    <select id="selectScrapPositionListCntForPaging" resultType="int">
+        /*com.fw.core.mapper.db1.fo.FoPositionMapper.selectScrapPositionListCntForPaging,  스크랩 채용공고 조회 카운트 취득 , 2022.12 , skayhlj@gmail.com, FoPositionMapper.xml*/
+        SELECT COUNT(1) AS CNT
+        FROM position POS
+        INNER JOIN member MEM ON POS.member_id = MEM.id
+        INNER JOIN headhunter HH ON POS.member_id = HH.member_id
+        INNER JOIN hr_company HC ON POS.hr_company_id = HC.id
+        WHERE POS.deleted = 0
+        <if test="positionType == 'positionIdListEmpty'">
+            AND POS.id is null
+        </if>
+          <if test="positionType == 'scrap' ">
+              AND POS.id in (SELECT position_id FROM scrap_position WHERE delFlag = 'N' AND applicant_id = #{frontSession.id})
+          </if>
+          <if test="positionType == 'positionIdList' ">
+              AND POS.id in
+              <foreach collection="positionIdList" item="positionIdList" open="(" close=")"  index="index" separator=",">'${positionIdList}'</foreach>
+          </if>
+    </select>
+
+    <!-- 스크랩 채용공고 조회 페이징-->
+    <select id="selectScrapPositionListPaging" resultType="FoPositionDTO">
+        /*com.fw.core.mapper.db1.fo.FoPositionMapper.selectScrapPositionListPaging, 스크랩 채용공고 조회 페이징 , 2022.12 , skayhlj@gmail.com, FoPositionMapper.xml*/
+        SELECT @rownum:=@rownum+1 AS rownum
+        , A.*
+        FROM (
+        SELECT POS.id
+        , DATE_FORMAT(POS.endDate,'%Y.%m.%d') endDate
+        , POS.createdAt
+        , TIMESTAMPDIFF(DAY, DATE_FORMAT(NOW(),'%Y.%m.%d'), DATE_FORMAT(POS.endDate,'%Y.%m.%d')) dDay
+        , POS.member_id
+        , POS.title
+        , POS.hr_company_id
+        , MEM.name
+        , HH.sfName
+        , HC.companyScale
+        , HC.companyName
+        , POS.isPrivate
+        , POS.public_cd
+        , (SELECT id FROM scrap_position WHERE position_id = POS.id AND applicant_id = #{frontSession.id} AND delFlag = 'N') scrapId
+        , (SELECT COUNT(1) FROM position_applicant WHERE position_id = POS.id AND ap_member_id = #{frontSession.id} AND delFlag = 'N') applicantYn
+     FROM position POS
+    INNER JOIN member MEM ON POS.member_id = MEM.id
+    INNER JOIN headhunter HH ON POS.member_id = HH.member_id
+    INNER JOIN hr_company HC ON POS.hr_company_id = HC.id
+    WHERE POS.deleted=0
+        <if test="positionType == 'positionIdListEmpty'">
+            AND POS.id is null
+        </if>
+        <if test="positionType == 'scrap' ">
+            AND POS.id in (SELECT position_id FROM scrap_position WHERE delFlag = 'N' AND applicant_id = #{frontSession.id})
+        </if>
+        <if test="positionType == 'positionIdList' ">
+            AND POS.id in
+            <foreach collection="positionIdList" item="positionIdList" open="(" close=")"  index="index" separator=",">'${positionIdList}'</foreach>
+        </if>
+        ) AS A
+        , (SELECT @rownum:=0) TMP order by
+        <if test="positionType == 'positionIdList' ">
+          FIELD(A.id ,
+            <foreach collection="positionIdList" item="positionIdList" index="index" separator=",">'${positionIdList}'</foreach>
+          )
+        </if>
+        <if test="positionType != 'positionIdList' ">
+            rownum DESC
+        </if>
+
+        <include refid="common.paging" />
+    </select>
+
+    <!-- 포지션 존재여부 by 회사 -->
+    <select id="selectPositionExistByCompany" parameterType="FoPositionDTO" resultType="boolean">
+        /* com.fw.core.mapper.db1.fo.FoPositionMapper.selectPositionExistByCompany, 포지션 존재여부 by 회사, YJW, FoPositionMapper.xml */
+        SELECT EXISTS (
+                       SELECT 1
+                       FROM position
+                       WHERE hr_company_id = #{companySeq}
+                   ) AS CNT
+    </select>
+
+    <!-- 진행중인 포지션 조회 -->
+    <select id="selectDoingPositionList" parameterType="FoPositionDTO" resultType="FoPositionDTO">
+        /* com.fw.core.mapper.db1.fo.FoPositionMapper.selectDoingPositionList, 진행중인 포지션 조회, YJW, FoPositionMapper.xml */
+        SELECT createdAt
+             , deleted
+             , delFlag
+             , direct_position_flag
+             , end_add_cnt
+             , DATE_FORMAT(endDate,'%Y-%m-%d') AS endDate
+             , etc
+             , etc_comment
+             , feeInfo
+             , hr_company_id
+             , id
+             , industry
+             , isCowork
+             , isPrivate
+             , jobDescription
+             , jopDescription
+             , keywords
+             , member_id
+             , pmComment
+             , position_reason
+             , public_cd
+             , salary
+             , status
+             , stopReason
+             , target_company
+             , team
+             , title
+             , updatedAt
+             , warrantyTerm
+        FROM position
+        WHERE deleted = 0
+          AND status IN ('DOING')
+    </select>
+
+    <!-- 포지션 진행상태 변경 -->
+    <update id="updatePositionStatus" parameterType="FoPositionDTO">
+        /* com.fw.core.mapper.db1.fo.FoPositionMapper.updatePositionStatus, 포지션 진행상태 변경, YJW, FoPositionMapper.xml */
+        UPDATE position
+           SET status = #{status}
+             , updatedAt = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <!-- 이력서 및 동의서 업데이트 -->
+    <update id="updatePositionApplicant" parameterType="FoPositionDTO">
+        /* com.fw.core.mapper.db1.fo.FoPositionMapper.updatePositionApplicant, 이력서 및 동의서 업데이트, YJW, FoPositionMapper.xml */
+        UPDATE position_applicant
+           SET resume_file_id = #{resumeFileId}
+             , agree_file_id = #{agreeFileId}
+             , receiptPath = 'PROPOSAL_ACCEPT'
+             , progressStep = 'PROCESS'
+             , proposalStatus = 'ACCEPT'
+         WHERE ap_member_id = #{memberId}
+    </update>
+
+</mapper>

@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layouts/mainLayout">
+<body>
+    <div id="container-block" layout:fragment="contents" th:remove="tag">
+        <div class="container">
+            <div class="sub-content">
+                <p class="center-title">헤드헌터 검색</p>
+                <form name="searchForm">
+                    <input type="hidden" name="page" th:value="${searchInfo.page}"/>
+                    <div class="headhunter-search-wrap">
+                        <div class="content">
+                            <div class="txt-box">
+                                <i class="icon-hunter-search"></i>
+                                <p class="hunter-search-title">기본검색</p>
+                            </div>
+                            <select name="searchType" class="select-design select-lg">
+                                <option value="name" th:selected="${searchInfo.searchType eq 'name'}">이름</option>
+                                <option value="email" th:selected="${searchInfo.searchType eq 'email'}">이메일</option>
+                                <option value="phone" th:selected="${searchInfo.searchType eq 'phone'}">휴대폰번호</option>
+                            </select>
+                            <input type="text" name="searchVal" th:value="${searchInfo.searchVal}"
+                                   class="form-control form-lg" placeholder="전화번호는 '-'없이 입력해주세요."/>
+                            <button type="button" class="btn btn-primary btn-lg" data-role="search">검색하기</button>
+                        </div>
+                        <div class="content m-t-30">
+                            <div class="txt-box">
+                                <i class="icon-hunter-list"></i>
+                                <p class="hunter-search-title">전문분야</p>
+                            </div>
+                            <div class="check-badge-wrap">
+                                <th:block th:if="${searchInfo.checkedFields != null and searchInfo.checkedFields != ''}">
+                                    <div>
+                                        <input type="checkbox" class="check-badge" name="checkFieldArr" id="check1" value="SERVICE"
+                                               th:checked="${#strings.contains(searchInfo.checkedFields,'SERVICE')}"/>
+                                        <label for="check1" class="check-badge-label">서비스</label>
+                                    </div>
+                                    <div>
+                                        <input type="checkbox" class="check-badge" name="checkFieldArr" id="check2"
+                                               value="EDUCATION" th:checked="${#strings.contains(searchInfo.checkedFields,'EDUCATION')}"/>
+                                        <label for="check2" class="check-badge-label">교육</label>
+                                    </div>
+                                    <div>
+                                        <input type="checkbox" class="check-badge" name="checkFieldArr" id="check3"
+                                               value="FINANCE"
+                                               th:checked="${#strings.contains(searchInfo.checkedFields,'FINANCE')}"/>
+                                        <label for="check3" class="check-badge-label">금융/은행</label>
+                                    </div>
+                                    <div>
+                                        <input type="checkbox" class="check-badge" name="checkFieldArr" id="check4"
+                                               value="ASSOCIATION"
+                                               th:checked="${#strings.contains(searchInfo.checkedFields,'ASSOCIATION')}"/>
+                                        <label for="check4" class="check-badge-label">기관/협회</label>
+                                    </div>
+                                    <div>
+                                        <input type="checkbox" class="check-badge" name="checkFieldArr" id="check5"
+                                               value="MEDIA"
+                                               th:checked="${#strings.contains(searchInfo.checkedFields,'MEDIA')}"/>
+                                        <label for="check5" class="check-badge-label">미디어/광고/출판</label>
+                                    </div>
+                                    <div>
+                                        <input type="checkbox" class="check-badge" name="checkFieldArr" id="check6"
+                                               value="CONSTRUCTION"
+                                               th:checked="${#strings.contains(searchInfo.checkedFields,'CONSTRUCTION')}"/>
+                                        <label for="check6" class="check-badge-label">건설/건축</label>
+                                    </div>
+                                    <div>
+                                        <input type="checkbox" class="check-badge" name="checkFieldArr" id="check7"
+                                               value="IT" th:checked="${#strings.contains(searchInfo.checkedFields,'IT')}"/>
+                                        <label for="check7" class="check-badge-label">IT/인터넷</label>
+                                    </div>
+                                    <div>
+                                        <input type="checkbox" class="check-badge" name="checkFieldArr" id="check8"
+                                               value="ELECTRONIC"
+                                               th:checked="${#strings.contains(searchInfo.checkedFields,'ELECTRONIC')}"/>
+                                        <label for="check8" class="check-badge-label">전자/통신/반도체</label>
+                                    </div>
+                                    <div>
+                                        <input type="checkbox" class="check-badge" name="checkFieldArr" id="check9"
+                                               value="MEDICAL"
+                                               th:checked="${#strings.contains(searchInfo.checkedFields,'MEDICAL')}"/>
+                                        <label for="check9" class="check-badge-label">의료/제약</label>
+                                    </div>
+                                    <div>
+                                        <input type="checkbox" class="check-badge" name="checkFieldArr" id="check10"
+                                               value="SALE"
+                                               th:checked="${#strings.contains(searchInfo.checkedFields,'SALE')}"/>
+                                        <label for="check10" class="check-badge-label">유통/판매</label>
+                                    </div>
+                                    <div>
+                                        <input type="checkbox" class="check-badge" name="checkFieldArr" id="check11"
+                                               value="ART"
+                                               th:checked="${#strings.contains(searchInfo.checkedFields,'ART')}"/>
+                                        <label for="check11" class="check-badge-label">문화/예술/디자인</label>
+                                    </div>
+                                    <div>
+                                        <input type="checkbox" class="check-badge" name="checkFieldArr" id="check12"
+                                               value="CHEMISTRY"
+                                               th:checked="${#strings.contains(searchInfo.checkedFields,'CHEMISTRY')}"/>
+                                        <label for="check12" class="check-badge-label">제조/생산/화학</label>
+                                    </div>
+                                </th:block>
+                                <th:block th:if="${searchInfo.checkedFields == null or searchInfo.checkedFields == ''}">
+                                    <div>
+                                        <input type="checkbox" class="check-badge" name="checkFieldArr" id="ccheck1"
+                                               value="SERVICE"/>
+                                        <label for="ccheck1" class="check-badge-label">서비스</label>
+                                    </div>
+                                    <div>
+                                        <input type="checkbox" class="check-badge" name="checkFieldArr" id="ccheck2"
+                                               value="EDUCATION"/>
+                                        <label for="ccheck2" class="check-badge-label">교육</label>
+                                    </div>
+                                    <div>
+                                        <input type="checkbox" class="check-badge" name="checkFieldArr" id="ccheck3"
+                                               value="FINANCE"/>
+                                        <label for="ccheck3" class="check-badge-label">금융/은행</label>
+                                    </div>
+                                    <div>
+                                        <input type="checkbox" class="check-badge" name="checkFieldArr" id="ccheck4"
+                                               value="ASSOCIATION"/>
+                                        <label for="ccheck4" class="check-badge-label">기관/협회</label>
+                                    </div>
+                                    <div>
+                                        <input type="checkbox" class="check-badge" name="checkFieldArr" id="ccheck5"
+                                               value="MEDIA"/>
+                                        <label for="ccheck5" class="check-badge-label">미디어/광고/출판</label>
+                                    </div>
+                                    <div>
+                                        <input type="checkbox" class="check-badge" name="checkFieldArr" id="ccheck6"
+                                               value="CONSTRUCTION"/>
+                                        <label for="ccheck6" class="check-badge-label">건설/건축</label>
+                                    </div>
+                                    <div>
+                                        <input type="checkbox" class="check-badge" name="checkFieldArr" id="ccheck7"
+                                               value="IT"/>
+                                        <label for="ccheck7" class="check-badge-label">IT/인터넷</label>
+                                    </div>
+                                    <div>
+                                        <input type="checkbox" class="check-badge" name="checkFieldArr" id="ccheck8"
+                                               value="ELECTRONIC"/>
+                                        <label for="ccheck8" class="check-badge-label">전자/통신/반도체</label>
+                                    </div>
+                                    <div>
+                                        <input type="checkbox" class="check-badge" name="checkFieldArr" id="ccheck9"
+                                               value="MEDICAL"/>
+                                        <label for="ccheck9" class="check-badge-label">의료/제약</label>
+                                    </div>
+                                    <div>
+                                        <input type="checkbox" class="check-badge" name="checkFieldArr" id="ccheck10"
+                                               value="SALE"/>
+                                        <label for="ccheck10" class="check-badge-label">유통/판매</label>
+                                    </div>
+                                    <div>
+                                        <input type="checkbox" class="check-badge" name="checkFieldArr" id="ccheck11"
+                                               value="ART"/>
+                                        <label for="ccheck11" class="check-badge-label">문화/예술/디자인</label>
+                                    </div>
+                                    <div>
+                                        <input type="checkbox" class="check-badge" name="checkFieldArr" id="ccheck12"
+                                               value="CHEMISTRY"/>
+                                        <label for="ccheck12" class="check-badge-label">제조/생산/화학</label>
+                                    </div>
+                                </th:block>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tbl-head">
+                        <p class="tbl-head-cnt">총 <span th:text="${searchInfo.totalCount}"></span>명의 헤드헌터가 있습니다.</p>
+                        <div class="">
+                            <select class="select-design" style="width: 150px" name="sortColumn" >
+                                <option value="createdAt" th:selected="${searchInfo.sortColumn} == 'createdAt'">최근 가입순
+                                </option>
+                                <option value="name" th:selected="${searchInfo.sortColumn} == 'name'">이름순</option>
+                                <option value="postingCnt" th:selected="${searchInfo.sortColumn} == 'postingCnt'">진행공고 많은
+                                    순
+                                </option>
+                                <option value="recentLogin" th:selected="${searchInfo.sortColumn} == 'recentLogin'">최근로그인순</option>
+                                <option value="recentPosting" th:selected="${searchInfo.sortColumn} == 'recentPosting'">
+                                    최근공고순
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+                    <th:block th:if="${#lists.isEmpty(hhList)}">
+                        <div class="" style="border-top: 1px solid #000;">
+                        <div class="text-center">데이터가 없습니다.</div>
+                        </div>
+                    </th:block>
+                    <div class="card-list hunter" th:if="${!#lists.isEmpty(hhList)}">
+                    <th:block th:each="list : ${hhList}" >
+                        <div class="card" th:data-member-id="${list.memberId}">
+                            <div class="headhunter-profile-img" th:style="${!#lists.isEmpty(list.commonFileList)? 'background-image: url('+ list.commonFileList[0].url+')':''}"></div>
+                            <div class="headhunter-info">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div class="d-flex">
+                                        <p class="name" data-bs-toggle="modal" data-bs-target="#modal-headhunter" data-role="hhInfo" th:data-member-id="${list.memberId}" th:text="${list.name}">홍길동</p>
+                                        <p class="company" th:text="${list.sfName}">맨쉬컨설팅(주)</p>
+                                    </div>
+                                    <button type="button" data-role="likeHh" th:data-member-id="${list.memberId}" th:classappend="${list.interestHh != null? 'active':''}">
+                                        <i class="icon-like-off"></i>
+                                    </button>
+                                </div>
+                                <p class="email" th:text="${list.email}">abcd1234@naver.com</p>
+                                <div class="m-t-15">
+                                    <p class="desc">
+                                        <span class="desc-title">HH한마디</span>
+                                        <span class="desc-text" th:text="${list.greeting}">한 마디 하십시오! 한 마디 하십시오! 두줄까지만 노출 넘으면 두줄까지만 노출 넘으면</span>
+                                    </p>
+                                    <p class="desc">
+                                        <span class="desc-title">전문분야</span>
+                                        <span class="desc-text" th:text="${list.fieldCdNm}">서비스, 교육, 금융/은행, 기관/협회, 미디어/광고/출판, 두줄까지 노출넘으면</span>
+                                    </p>
+                                    <p class="desc">
+                                        <span class="desc-title">진행중공고</span>
+                                        <a th:href="'/fo/user/jop/posting-hunter?memberId='+${list.memberId}" class="desc-text"><b class="text-primary" th:text="${list.postingCnt}">0</b>건</a>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </th:block>
+                </div>
+                <div class="d-flex justify-content-center mt-5">
+                <th:block th:include="common/paging :: paging_Fragment(fnc=*{'fn_go_page(this)'}, pageId=*{'pageName1'})"/>
+                    <script>
+                        $(document).ready(function () {
+                            /*<![CDATA[*/
+                            var result = '[[${searchInfo.totalCount}]]';
+                            $("#callCount").text(result);
+                            /*]]>*/
+                        });
+                    </script>
+                </div>
+            </div>
+        </div>
+        <!-- 헤드헌터 상세 -->
+        <div class="modal fade" id="modal-headhunter" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-headhunter modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body pt-0">
+                        <form name="headhunterForm">
+                            <input type="hidden" name="headhunterId" />
+                            <input type="hidden" name="hhMemberId" />
+                        </form>
+                        <div class="headhunter-profile-content">
+                            <div class="headhunter-profile">
+                                <div class="headhunter-left">
+                                    <div class="headhunter-profile-img" data-bs-toggle="modal" data-bs-target="#modal-headhunter"></div>
+                                    <button type="button" class="btn btn-outline-dark btn-sm" data-role="addBlack">블랙리스트 추가</button>
+                                </div>
+                                <div class="headhunter-profile-info">
+                                    <div>
+                                        <p class="company">맨쉬컨설팅(주)</p>
+                                        <p class="name">
+                                            <span name="hhName">홍길동</span>
+                                            <span name="hhPosition" class="rank">전무</span>
+                                            <span name="hhSchool" class="txt">연세대학교 금속공학과</span>
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <div class="phone">
+                                            <p>
+                                                <span>연락처</span>
+                                                <span name="hhPhone" class="phone-number">***-****-****</span>
+                                            </p>
+                                            <button type="button" class="btn btn-outline-dark btn-sm" data-role="showPhone">연락처 보기</button>
+                                        </div>
+                                    </div>
+                                    <ul class="info-list">
+                                        <li>
+                                            <p>이메일</p>
+                                            <a href="" id="hhEmail">asdqwe1234@naver.com</a>
+                                        </li>
+                                        <li>
+                                            <p>최근로그인</p>
+                                            <p id="recentLogin">2022-10-11</p>
+                                        </li>
+                                        <li>
+                                            <p>진행중공고</p>
+                                            <p><a href="" class="text-danger" id="hhPostingCnt">3</a>건</p>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="apply-wrap">
+                            <div class="apply-wrap-body">
+                                <div class="content">
+                                    <h4 class="table-subtitle mb-3">인사말</h4>
+                                    <div class="desc">
+                                        <p class="introduce-text" name="hhIntro"></p>
+                                    </div>
+                                </div>
+                                <div class="content">
+                                    <h4 class="table-subtitle mb-3">주요이력</h4>
+                                    <div class="desc" name="hhCareer">
+                                        <ul class="history">
+                                            <li></li>
+                                            <li></li>
+                                            <li></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="content">
+                                    <h4 class="table-subtitle mb-3">전문분야</h4>
+                                    <div class="desc">
+                                        <div class="badge-box" name="hhFields">
+                                      <span class="tag tag-lg tag-outline-primary none-border m-0" name="hhFieldsLow">
+                                        <em name="field"></em>
+                                      </span>
+                                            <!-- <span class="tag tag-lg tag-outline-primary none-border m-0">
+                                             <em>IT/인터넷</em>
+                                           </span>
+                                             <span class="tag tag-lg tag-outline-primary none-border m-0">
+                                             <em>제조/생산/화학</em>
+                                           </span>
+                                             <span class="tag tag-lg tag-outline-primary none-border m-0">
+                                             <em>의료/제약</em>
+                                           </span>
+                                             <span class="tag tag-lg tag-outline-primary none-border m-0">
+                                             <em>유통/판매</em>
+                                           </span>-->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

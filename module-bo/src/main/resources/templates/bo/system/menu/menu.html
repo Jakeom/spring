@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"  layout:decorate="~{layouts/default}">
+<body>
+    <div layout:fragment="contents" th:remove="tag">
+        <div id="container-block">
+            <main id="content" role="main">
+                <h2 class="title">메뉴 관리</h2>
+                <div class="row p-3">
+                    <div class="col-12">
+                        <div class="row mt5">
+                            <div class="col-xs-12 col-sm-8 col-md-8 mb5">
+                                <button class="btn btn-primary" type="button" data-type="add"><span
+                                        class="glyphicon glyphicon-plus"></span> 추가
+                                </button>
+                                <button class="btn btn-warning" type="button" data-type="modify"><span
+                                        class="glyphicon glyphicon-pencil"></span> 이름 수정
+                                </button>
+                                <button class="btn btn-danger" type="button" data-type="delete"><span
+                                        class="glyphicon glyphicon-remove"></span> 삭제
+                                </button>
+                            </div>
+                            <div class="col-xs-12 col-sm-4 col-md-4 mb5">
+                                <button type="button" class="btn btn-default btn-xs" data-role="treeOpen"><i
+                                        class="fa fa-plus" aria-hidden="true"></i> 전체 펼치기
+                                </button>
+                                <button type="button" class="btn btn-default btn-xs" data-role="treeClose"><i
+                                        class="fa fa-minus" aria-hidden="true"></i> 전체 접기
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-sm-5 col-md-5 mb5">
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="메뉴 검색" id="searchText" name="searchText"/>
+                            <span class="input-group-btn">
+                                <button class="btn btn-primary" type="button" data-type="search"><span class="glyphicon glyphicon-search"></span></button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-12 col-sm-6 col-md-6">
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                                <div class="menu_tree" style="color: #5a5a5a;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-sm-6 col-md-6">
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                                <form id="menuInfoFrm" name="menuInfoFrm">
+                                    <fieldset>
+                                        <div class="row">
+                                            <div class="col-xs-12 col-sm-12 col-md-12">
+                                                <div class="form-group">
+                                                    <label for="upperMenuCd">상위 메뉴 CD</label>
+                                                    <input type="text" id="upperMenuCd" name="upperMenuCd"
+                                                           class="form-control" disabled value=""/>
+                                                </div>
+                                            </div>
+                                            <div class="col-xs-12 col-sm-12 col-md-12">
+                                                <div class="form-group">
+                                                    <label for="menuUrl">메뉴 CD</label>
+                                                    <input type="text" id="menuCd" name="menuCd" class="form-control"
+                                                           disabled value=""/>
+                                                </div>
+                                            </div>
+                                            <div class="col-xs-12 col-sm-12 col-md-12">
+                                                <div class="form-group">
+                                                    <label for="menuUrl">메뉴 URL</label>
+                                                    <input type="text" id="menuUrl" name="menuUrl" class="form-control"
+                                                           value=""/>
+                                                </div>
+                                            </div>
+                                            <div class="col-xs-12 col-sm-12 col-md-12">
+                                                <div class="form-group">
+                                                    <label for="menuOpenTypeCd">메뉴 OPENTYPE</label>
+                                                    <select id="menuOpenTypeCd" name="menuOpenTypeCd"
+                                                            class="selectpicker form-control">
+                                                        <option value="SELF">SELF</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-xs-12 col-sm-12 col-md-12">
+                                                <div class="form-group">
+                                                    <label>접근가능일시</label>
+                                                    <div class="row gx-3 align-items-center">
+                                                        <div class="col">
+                                                            <input type="text" class="form-control form-datepicker"
+                                                                   name="accessAbleStartDt" id="accessAbleStartDt">
+                                                        </div>
+                                                        <div class="col-auto">
+                                                            <span class="fw-bold"> ~ </span>
+                                                        </div>
+                                                        <div class="col">
+                                                            <input type="text" class="form-control form-datepicker"
+                                                                   name="accessAbleEndDt" id="accessAbleEndDt">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-xs-12 col-sm-12 col-md-12">
+                                                <div class="form-group">
+                                                    <label>차단일시</label>
+                                                    <div class="row gx-3 align-items-center">
+                                                        <div class="col">
+                                                            <input type="text" class="form-control form-datepicker"
+                                                                   name="blockStartDt" id="blockStartDt">
+                                                        </div>
+                                                        <div class="col-auto">
+                                                            <span class="fw-bold"> ~ </span>
+                                                        </div>
+                                                        <div class="col">
+                                                            <input type="text" class="form-control form-datepicker"
+                                                                   name="blockEndDt" id="blockEndDt">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-xs-12 col-sm-12 col-md-12 mb10">
+                                                <a href="#" class="btn btn-block btn-primary" data-toggle="modal"
+                                                   data-target="#manageModal"><span
+                                                        class="glyphicon glyphicon-tasks"></span> 프로그램11 관리</a>
+                                            </div>
+                                            <div class="col-xs-12 col-sm-12 col-md-12">
+                                                <button class="btn btn-block btn-success" type="button" data-type="apply">
+                                                    <span class="glyphicon glyphicon-ok"></span> 적용
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </fieldset>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-12 col-sm-12 col-md-12">
+                        <button class="btn btn-success btn-block btn-lg" type="button" data-type="send"><span
+                                class="glyphicon glyphicon-ok"></span> 저장
+                        </button>
+                    </div>
+                </div>
+            </main>
+        </div>
+        <div layout:fragment="modal" th:remove="tag">
+            <div class="modal fade" id="manageModal" role="dialog" aria-labelledby="manageModal">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header modal-color-dark-grey">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                    aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">프로그램 관리 <small class="subTitle" style="color: #FFEB3B;"></small>
+                            </h4>
+                        </div>
+                        <div class="modal-body">
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active">
+                                    <a href="#menu-master-list" aria-controls="menu-master-list" role="tab"
+                                       data-toggle="tab">리스트</a>
+                                </li>
+                                <li role="presentation">
+                                    <a href="#menu-master-form" aria-controls="menu-master-form" role="tab"
+                                       data-toggle="tab">등록</a>
+                                </li>
+                            </ul>
+                            <div class="tab-content" style="background-color: transparent; padding: 10px;">
+                                <div role="tabpanel" class="tab-pane active" id="menu-master-list">
+                                    <div class="table-responsive">
+                                        <table class="table table-striped table-hover">
+                                            <colgroup>
+                                                <col width=""/>
+                                                <col width="200px"/>
+                                                <col width="60px"/>
+                                                <col width="160px"/>
+                                                <col width="160px"/>
+                                                <col width="80px"/>
+                                            </colgroup>
+                                            <thead>
+                                            <tr>
+                                                <th class="text-center">URL</th>
+                                                <th class="text-center">이름</th>
+                                                <th class="text-center">ATTR</th>
+                                                <th class="text-center">수정일</th>
+                                                <th class="text-center">등록일</th>
+                                                <th class="text-center">삭제</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div role="tabpanel" class="tab-pane" id="menu-master-form">
+                                    <form id="menuProgramFrm" name="menuProgramFrm">
+                                        <fieldset>
+                                            <div class="row">
+                                                <div class="col-xs-12 col-sm-12 col-md-12">
+                                                    <div class="form-group">
+                                                        <label for="programUrl">프로그램 URL</label>
+                                                        <input type="text" id="programUrl" name="programUrl"
+                                                               class="form-control" value="" required/>
+                                                    </div>
+                                                </div>
+                                                <div class="col-xs-12 col-sm-12 col-md-12">
+                                                    <div class="form-group">
+                                                        <label for="programNm">프로그램 명</label>
+                                                        <input type="text" id="programNm" name="programNm"
+                                                               class="form-control" value="" required/>
+                                                    </div>
+                                                </div>
+                                                <div class="col-xs-12 col-sm-12 col-md-12">
+                                                    <div class="form-group">
+                                                        <label for="programAttrCd">프로그램 ATTR</label>
+                                                        <select id="programAttrCd" name="programAttrCd"
+                                                                class="selectpicker form-control">
+                                                            <option value="R">R</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <!-- <div class="col-xs-12 col-sm-12 col-md-12">
+                                                     <div class="form-group">
+                                                         <label for="programAccepttype">프로그램 ACCEPTTYPE</label>
+                                                         <input type="text" id="programAccepttype" name="programAccepttype" class="form-control" value=""/>
+                                                     </div>
+                                                 </div>-->
+                                                <!-- <div class="col-xs-12 col-sm-12 col-md-12">
+                                                    <div class="form-group">
+                                                        <label for="programAttr">프로그램 ATTR</label>
+                                                        <select id="programAttr" name="programAttr" class="selectpicker form-control" data-url="/cmm/biz/codes/0002" data-value-name="cdAttr" data-show-name="name">
+                                                        </select>
+                                                    </div>
+                                                </div> -->
+                                                <!--
+                                                        프로그램 속성은 그룹별,사용자별 메뉴 사용에 대한 권한 설정을 위함인듯 함
+                                                        현재 프레임워크에서는 접근권한(읽기:R)에 대한 설정만 가능하므로 'R'값으로만 세팅해놓음
+                                                        사용자 혼동(쓸데없는 문의를 방지하기 위함)을 없애기 위해 주석처리 함.
+                                                 -->
+                                                <div class="col-xs-12 col-sm-12 col-md-12">
+                                                    <button class="btn btn-block btn-success" data-role="programAdd">
+                                                        <span class="glyphicon glyphicon-ok"></span> 등록
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </fieldset>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer modal-color-dark-grey">
+                            <button type="button" class="btn btn-clear-white" data-dismiss="modal">닫기</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

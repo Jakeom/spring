@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layouts/hh/mainLayout}">
+<body>
+<div id="container-block" layout:fragment="contents" th:remove="tag">
+    <div class="container">
+      <div class="sub-content">
+        <h3 class="subtitle poppins">포지션 상세보기</h3>
+        <div class="title-line mt-4 mb-5"></div>
+        <div class="apply-wrap-body write">
+          <div class="content d-flex justify-content-between">
+            <div class="d-flex align-items-center mb-3">
+              <h4 class="table-subtitle" th:text="${positionDetail.title}">테스트 포지션등록 (지원하지마세요)</h4>
+              <span class="m-l-10">포지션 등록일:</span>
+              <span class="m-l-5 text-danger" th:text="${positionDetail.createdAt}">2022.11.01</span>
+            </div>
+            <div>
+              <input type="hidden" name="registerId" th:value="${positionDetail.memberId}" />
+              <input type="hidden" name="registerName" th:value="${positionDetail.memberName}" />
+              <input type="hidden" name="headhunterId" th:value="${#authentication.principal.id}" />
+              <input type="hidden" name="headhunterName" th:value="${#authentication.principal.name}" />
+              <input type="hidden" name="title" th:value="${positionDetail.title}" />
+              <input type="hidden" name="positionId" th:value="${positionDetail.id}" />
+              <input type="hidden" name="coJoinFlag" th:value="${positionDetail.coJoinFlag}" />
+              <th:block th:if="${positionDetail.memberId != #authentication.principal.id}">
+              	<button type="button" th:class="${positionDetail.coJoinFlag eq 'Y' ? 'btn btn-danger btn-md m-l-10' : 'btn btn-primary btn-md m-l-10'}" data-role="cowork" th:text="${positionDetail.coJoinFlag eq 'Y' ? 'Co-work 참여중' : 'Co-Work 참여하기'}">Co-Work 참여하기</button>
+              </th:block>
+              <button type="button" class="btn btn-primary btn-md m-l-10" data-role="goBack">목록</button>
+            </div>
+          </div>
+          <!-- 기업정보 -->
+          <div class="content">
+            <h4 class="table-subtitle mb-3 m-t-25">기업정보</h4>
+            <div class="desc">
+              <table class="table">
+                <caption>
+                  기업정보
+                </caption>
+                <colgroup>
+                  <col width="15%" />
+                  <col width="35%" />
+                  <col width="15%" />
+                  <col width="35%" />
+                </colgroup>
+                <tbody>
+                  <tr>
+                    <th class="">기업명</th>
+                    <td class="" th:text="${companyDetail.companyName}">
+                      <p>(주)삼성전자</p>
+                    </td>
+                    <th class="">설립일</th>
+                    <td class="" th:text="${companyDetail.establishDate}">
+                      <p>2017.04.10</p>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th class="">대표자</th>
+                    <td class="" th:text="${companyDetail.ceo}">
+                      <p>이재용</p>
+                    </td>
+                    <th class="">도로명주소</th>
+                    <td class="" th:text="${companyDetail.address}">
+                      <p>서울 구로구 디지털로 272, 1007호</p>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th class="">전화번호</th>
+                    <td class="" th:text="${companyDetail.phone}">
+                      <p></p>
+                    </td>
+                    <th class="">업종명 10차</th>
+                    <td class="" th:text="${companyDetail.industry}">
+                      <p>정상</p>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th class="">기업규모</th>
+                    <td class="" th:text="${companyDetail.companyScale}">
+                      <p>대기업</p>
+                    </td>
+                    <th class="">기업상태</th>
+                    <td class="" th:text="${companyDetail.companyStatus}">
+                      <p>정상</p>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th class="">상장</th>
+                    <td class="" colspan="3" th:text="${companyDetail.marketListing}">
+                      <p>대상</p>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <!-- 직무명 -->
+          <div class="content">
+            <div class="d-flex align-items-center mb-3">
+              <h4 class="table-subtitle">직무</h4>
+              <span class="m-l-10"></span>
+            </div>
+            <div class="desc border-bottom-0" th:text="${positionDetail.industry}">
+            </div>
+          </div>
+          <!-- 공고내용 -->
+          <div class="content">
+            <div class="d-flex align-items-center mb-3">
+              <h4 class="table-subtitle">공고내용</h4>
+              <span class="m-l-10">공고내용은 사용자에게 전체공개 됩니다.</span>
+            </div>
+            <div class="desc border-bottom-0" th:utext="${positionDetail == null ? '' : positionDetail.jobDescription}">
+            </div>
+          </div>
+          <!-- 코웍정보 -->
+          <div class="content">
+            <div class="d-flex align-items-center mb-3">
+              <h4 class="table-subtitle">코웍정보</h4>
+            </div>
+            <div class="desc border-bottom-0">
+              <table class="table">
+                <caption>
+                  코웍정보
+                </caption>
+                <colgroup>
+                  <col width="15%" />
+                  <col width="35%" />
+                  <col width="15%" />
+                  <col width="35%" />
+                </colgroup>
+                <tbody>
+                  <tr>
+                    <th class="">코웍 참여자 수</th>
+                    <td class="">
+                      <p><span class="text-danger" th:text="${positionDetail.coworkCnt}">1</span>명</p>
+                    </td>
+                    <th class="">이력서 제출 수</th>
+                    <td class="">
+                      <p><span class="font-bold" th:text="${positionDetail.resumeCnt}">2</span>건</p>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <!-- 코웍내용 -->
+          <div class="content">
+            <div class="d-flex align-items-center mb-3">
+              <h4 class="table-subtitle"></h4>
+            </div>
+            <div class="desc">
+              <table class="table">
+                <caption>
+                  코웍조건
+                </caption>
+                <colgroup>
+                  <col width="15%" />
+                  <col width="15%" />
+                  <col width="15%" />
+                  <col width="15%" />
+                  <col width="15%" />
+                  <col width="15%" />
+                </colgroup>
+                <tbody>
+                  <tr>
+                    <th class="">채용사유</th>
+                    <td class="" colspan="6" th:text="${#strings.isEmpty(positionDetail.positionReason) ? '-' : positionDetail.positionReason}">
+                      <p>10</p>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th class="">팀 구성</th>
+                    <td class="" colspan="6" th:text="${#strings.isEmpty(positionDetail.team) ? '-' : positionDetail.team}">
+                      <p>6개월</p>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th class="">연봉 수준 및 연봉 조정 여부</th>
+                    <td class="" colspan="6" th:text="${#strings.isEmpty(positionDetail.salary) ? '-' : positionDetail.salary}">
+                      <p>10</p>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th class="">타깃 회사</th>
+                    <td class="" colspan="6" th:text="${#strings.isEmpty(positionDetail.targetCompany) ? '-' : positionDetail.targetCompany}">
+                      <p>10</p>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th class="">직접채용 여부</th>
+                    <td class="" colspan="6" th:text="${#strings.isEmpty(positionDetail.directPositionFlag) ? '-' : positionDetail.directPositionFlag}">
+                      <p>10</p>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th class="">기타 코멘트</th>
+                    <td class="" colspan="6" th:text="${#strings.isEmpty(positionDetail.etcComment) ? '-' : positionDetail.etcComment}">
+                      <p>테스트 포지션 등록</p>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <!-- 코웍조건 -->
+          <div class="content">
+            <div class="d-flex align-items-center mb-3">
+              <h4 class="table-subtitle">코웍조건</h4>
+            </div>
+            <div class="desc">
+              <table class="table">
+                <caption>
+                  코웍조건
+                </caption>
+                <colgroup>
+                  <col width="15%" />
+                  <col width="35%" />
+                  <col width="15%" />
+                  <col width="35%" />
+                </colgroup>
+                <tbody>
+                  <tr>
+                    <th class="">계약수수료율</th>
+                    <td class="" colspan="3" th:text="${#strings.isEmpty(positionDetail.feeInfo) ? '-' : positionDetail.feeInfo}">
+                      <p>10</p>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th class="">보증기간</th>
+                    <td class="" colspan="3" th:text="${#strings.isEmpty(positionDetail.warrantyTerm) ? '-' : positionDetail.warrantyTerm}">
+                      <p>6개월</p>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th class="">기타사항</th>
+                    <td class="" colspan="3" th:text="${#strings.isEmpty(positionDetail.etcComment) ? '-' : positionDetail.etcComment}">
+                      <p>테스트 포지션 등록</p>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </body>
+</html>

@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/default}">
+<body>
+	<div layout:fragment="contents" th:remove="tag">
+		<main id="content" role="main">
+			<h2 class="title">채용 관리</h2>
+			<div class="row p-3">
+				<div class="col-12">
+					<!-- Search -->
+					<div>
+						<form id="searchRecruit" name="searchRecruit">
+							<fieldset>
+								<input type="hidden" name="page" th:value="${searchInfo.page}">
+								<input type="hidden" name="totalCount" th:value="${searchInfo.totalCount}"/>
+								<table class="table table-bordered">
+									<tr>
+										<th class="active text-center">작성기간</th>
+										<td>
+											<div class="input-group m-1 form-inline">
+												<div class=" input-group date">
+													<div class="form-group m-r-5">
+														<input type="text" id="recruitStartDt" name="recruitStartDt"
+															class="form-control form-datepicker" th:value="${searchInfo.recruitStartDt}" placeholder="날짜 선택">
+													</div>
+													<span>~</span>
+													<div class="form-group m-r-5">
+														<input type="text" id="recruitEndDt" name="recruitEndDt"
+															class="form-control form-datepicker" th:value="${searchInfo.recruitEndDt}" placeholder="날짜 선택">
+													</div>
+												</div>
+												<div class="form-group float-right m-2">
+													<button type="button" class="btn btn-dark" data-role="all">전체</button>
+													<button type="button" class="btn btn-dark" data-role="today">오늘</button>
+													<button type="button" class="btn btn-dark" data-role="week">7일</button>
+													<button type="button" class="btn btn-dark" data-role="month">1개월</button>
+												</div>
+											</div>
+										</td>
+									</tr>
+									<tr>
+										<th class="active text-center">회원</th>
+										<td>
+											<div class="row no-gutters">
+												<div class="col-2">
+													<div class="m-1">
+														<select id="personalInfo" name="personalInfo" class="form-control"
+															data-role="select-dropdown" data-profile="minimal">
+															<option th:selected="${searchInfo.personalInfo eq 'name'}" value="name">이름</option>
+															<option th:selected="${searchInfo.personalInfo eq 'phone'}" value="phone">휴대번호</option>
+															<option th:selected="${searchInfo.personalInfo eq 'email'}" value="email">이메일주소</option>
+														</select>
+													</div>
+												</div>
+												<div class="col m-1">
+													<input type="text" th:value="${searchInfo.inputSelect}" class="form-control col-lg-3"
+														name="inputSelect" data-role="writer" />
+												</div>
+											</div>
+										</td>
+									</tr>
+									<tr>
+										<th class="active text-center">상태</th>
+										<td>
+											<div class="form-check form-check-inline m-1">
+												<input class="form-check-input" type="radio"
+													name="inlineRadioOptions" th:checked="${searchInfo.inlineRadioOptions eq ''}" id="inlineRadio1" value="">
+												<label class="form-check-label" for="inlineRadio1">전체</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input class="form-check-input" type="radio"
+													name="inlineRadioOptions" th:checked="${searchInfo.inlineRadioOptions eq 'DOING'}" id="inlineRadio2" value="DOING">
+												<label class="form-check-label" for="inlineRadio2">진행중</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input class="form-check-input" type="radio"
+													name="inlineRadioOptions" th:checked="${searchInfo.inlineRadioOptions eq 'CLOSE'}" id="inlineRadio4" value="CLOSE">
+												<label class="form-check-label" for="inlineRadio2">종료</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input class="form-check-input" type="radio"
+													name="inlineRadioOptions" th:checked="${searchInfo.inlineRadioOptions eq 'DEL'}" id="inlineRadio5" value="DEL">
+												<label class="form-check-label" for="inlineRadio2">삭제</label>
+											</div>
+										</td>
+									</tr>
+									<tr>
+										<th class="active text-center">검색어(기업명)</th>
+										<td><input th:value="${searchInfo.companyName}" type="text" name="companyName"
+											class="form-control col-lg-3 m-1" /></td>
+									</tr>
+									<tr>
+										<th class="active text-center">검색어(키워드,제목,내용)</th>
+										<td><input type="text" th:value="${searchInfo.keywords}" name="keywords"
+											class="form-control col-lg-3 m-1" /></td>
+									</tr>
+									<tr>
+										<th class="active text-center">금칙어 관리</th>
+										<td class="banWordSpan m-1"><th:block
+												th:each="list, i : ${banWord}">
+												<span th:name="${list.id}"
+													th:if="${i.count eq banWord.size()}" th:text="${list.word}"></span>
+												<span th:name="${list.id}"
+													th:if="${i.count ne banWord.size()}"
+													th:text="${list.word + ','}"></span>
+											</th:block>
+											<button type="button" class="btn btn-dark"
+												data-toggle="modal" data-target="#myModal" data-role="manage">관리
+											</button></td>
+									</tr>
+								</table>
+								<div class="form-group d-flex justify-content-center m-1 p-5">
+									<button type="button" class="btn btn-primary form-control col-1"
+										data-role="search">검색하기</button>
+								</div>
+								<div>
+									<select id="isCowork" name="isCowork" data-role="select"
+											class="form-control w-auto" style="float: right">
+										<option th:selected="${searchInfo.isCowork eq ''}" value="">전체</option>
+										<option th:selected="${searchInfo.isCowork eq '1'}" value="1">코웍</option>
+										<option th:selected="${searchInfo.isCowork eq '0'}" value="0">단독</option>
+									</select>
+								</div>
+							</fieldset>
+						</form>
+					</div>
+					<!-- /Search -->
+					<div class="">
+						<table class="table">
+							<thead>
+								<tr>
+									<th>No.</th>
+									<th>등록자</th>
+									<th>기업명</th>
+									<th>등록일시</th>
+									<th>제목</th>
+									<th>직무명</th>
+									<th>마감일</th>
+									<th>구분</th>
+								</tr>
+							</thead>
+							<tbody>
+							<th:block th:unless="${#lists.isEmpty(recruitList)}" th:each="list : ${recruitList}">
+								<tr>
+									<td class="" th:text="${list.id}"></td>
+									<td class="">
+										<a th:href="${'/bo/management/complaint/member/detail?id=' + list.id}" th:text="${list.name}"></a>
+									</td>
+									<td class="" th:text="${list.companyName}"></td>
+									<td class="" th:text="${list.createdAt}"></td>
+									<td class="">
+										<a th:href="${'/bo/management/operation/recruit/detail?id=' + list.id}" th:text="${list.title}"></a>
+									</td>
+									<td class="" th:text="${list.industry}"></td>
+									<td class="" th:text="${list.endDate}"></td>
+									<td class="">
+										<p th:if="${list.isCowork eq '1'}">코웍</p>
+										<p th:if="${list.isCowork eq '0'}">단독</p>
+									</td>
+								</tr>
+							</th:block>
+							</tbody>
+						</table>
+						<div class="d-flex justify-content-center mt-5">
+							<th:block th:include="fragments/paging :: paging_Fragment(fnc=*{'fn_go_page(this)'}, pageId=*{'pageName1'})"/>
+						</div>
+					</div>
+					<!-- Modal -->
+					<div class="modal fade" tabindex="-1" id="myModal" role="dialog">
+						<div class="modal-dialog modal-dialog-centered">
+							<!-- Modal content-->
+							<div class="modal-content">
+								<div class="modal-header">
+									<h4 class="modal-title">채용공고 금칙어 관리</h4>
+								</div>
+								<div class="modal-body">
+									<p>※ 금칙어를 등록하면 해당 단어가 포함된 공고는 등록이 불가능합니다.</p>
+									<br> <label for="bannedWord"> 금칙어로 등록할 단어를 입력하세요. </label>
+									<br>
+									<div class="form-group form-inline ">
+										<input type="text" id="bannedWord" data-role="bannedWord"
+											name="bannedWord" class="form-control col">
+										<button type="button" class="btn btn-secondary"
+											data-role="banWordSubmit">등록</button>
+									</div>
+									<div class="banWordContent">
+										<th:block th:each="list : ${banWord}">
+											<div class="p-l-20" th:name="${list.id}">
+												<span th:text="${list.word}"></span>
+												<button type="button" class="btn" id="deleteBanWordBtn"
+													data-role="deleteBanWord" th:name="${list.id}">&times;</button>
+											</div>
+										</th:block>
+									</div>
+								</div>
+								<div class="modal-footer d-flex justify-content-center">
+									<button type="button" class="btn btn-default"
+										data-dismiss="modal">닫기</button>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!--/modal-->
+				</div>
+			</div>
+		</main>
+	</div>
+</body>
+</html>

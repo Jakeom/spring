@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/default}">
+
+<body>
+	<div layout:fragment="contents" th:remove="tag">
+		<input type="hidden" id="detailUseFlag" name="detailUseFlag"
+			th:value="${detail.useFlag}" /> <input type="hidden"
+			id="detailMainDisplaySeq" name="detailMainDisplaySeq"
+			th:value="${detail.mainDisplaySeq}" /> <input type="hidden"
+			id="detailDisplayType" name="detailDisplayType"
+			th:value="${detail.displayType}" /> <input type="hidden"
+			id="mainDisplayFileSeq" name="mainDisplayFileSeq"
+			th:value="${detail.fileSeq}" />
+		<main id="content" role="main">
+			<h2 class="title">서치펌/고객사 배너 수정</h2>
+			<div class="row p-3">
+	            <div class="col-12">
+					<form id="updateNoticeForm" name="updateNotice"	th:object="${modify}">
+						<table class="table table-bordered">
+							<colgroup>
+								<col style="width:120px" />
+								<col />
+							</colgroup>
+							<tr>
+								<th class="text-center">URL</th>
+								<td><input class="form-control" type="text" id="url"
+									th:value="${detail.url}"></td>
+							</tr>
+							<tr>
+								<th class="text-center">회사명</th>
+								<td><input class="form-control" type="text" id="companyName"
+									th:value="${detail.companyName}"></td>
+							</tr>
+							<tr>
+								<th class="text-center">순서</th>
+								<td><input class="form-control" type="text" id="sort"
+									th:value="${detail.sort}"></td>
+							</tr>
+							<tr>
+								<th class="text-center">노출종류</th>
+								<td><select id="displayType" name="displayType"
+									class="form-control w-auto">
+										<option value="CUSTOMER">고객사</option>
+										<option value="SEARCH">서치펌</option>
+								</select></td>
+							</tr>
+							<tr>
+								<th class="text-center">사용여부</th>
+								<td><label><input type="radio"
+									th:checked="${detail.useFlag eq 'Y'}" name="useFlag" value="Y"> 활성</label>
+									<label><input type="radio" th:checked="${detail.useFlag eq 'N'}"
+									name="useFlag" value="N"> 비활성</label></td>
+							</tr>
+							<tr>
+								<th class="text-center">첨부 파일</th>
+								<td>
+									<div th:if="${file ne null}">
+										<div th:if="${file.size() ne 0}" id="imgViewArea"
+											style="margin-top: 10px;">
+											<img th:src="${file.get(0).url}" id="imgArea"
+												style="width: 200px; height: 100px;" data-role="imgView" />
+											<button type="button" class="btn btn-sm btn-danger" data-role="fileDelete" th:name="${file.get(0).id}">이미지 삭제</button>
+											<input type="hidden" value="0" name="fileDeleteCheck">
+											<input type="hidden" value="0" name="fileChangeCheck">
+										</div>
+									</div></td>
+							</tr>
+							<tr>
+								<td colspan="2">
+									<input class="form-control" type="file" id="u_file"
+									name="u_file" accept="image/*">
+								</td>
+							</tr>
+						</table>
+						<div class="m-t-10 text-right">
+							<button type="button" class="btn btn-dark" data-role="save">수정하기</button>
+							<button type="button" class="btn btn-dark" data-role="cancel">취소</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</main>
+	</div>
+</body>
+</html>

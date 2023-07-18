@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.fo.FoApplicantMapper">
+
+    <!-- 지원자 정보 등록 -->
+    <insert id="insertApplicant" parameterType="FoApplicantDTO">
+        /* com.fw.core.mapper.db1.fo.FoMemberMapper.insertApplicant, 지원자 정보 등록, sjpaik, FoApplicantMapper.xml */
+        INSERT INTO applicant (
+               member_id
+             , hhReferralCode
+        ) VALUES (
+               #{memberId}
+             , #{referralCode}
+        )
+    </insert>
+
+    <!-- 지원자 정보 수정 -->
+    <update id="updateApplicant" parameterType="FoApplicantDTO">
+        /* com.fw.core.mapper.db1.fo.FoMemberMapper.updateApplicant, 지원자 정보 수정, sjpaik, FoApplicantMapper.xml */
+        UPDATE applicant
+           SET contactableTime = #{contactableTime}
+             , contactExceptHoliday = #{contactExceptHoliday}
+             , genderCd = #{genderCd}
+             , birth = #{birth}
+         WHERE member_id = #{memberId}
+    </update>
+
+</mapper>

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/default}">
+<body>
+<div layout:fragment="contents" th:remove="tag">
+    <main id="content" role="main">
+        <h2 class="title">회원조희 및 관리</h2>
+        <div class="row p-3">
+            <div class="col-12">
+                <form id="searchMember" th:action="${'/bo/management/complaint/member'}" name="searchMember">
+                    <fieldset>
+                        <input type="hidden" name="page" th:value="${searchInfo.page}">
+                        <input type="hidden" name="totalCount" th:value="${searchInfo.totalCount}"/>
+                        <div class="row mt-5">
+                            <div class="col-4">
+                                <div class="d-flex align-items-center">
+                                    <input th:value="${searchInfo.startDate}" type="text" id="startDate"
+                                           name="startDate"
+                                           class="form-control form-datepicker" placeholder="날짜 선택">
+                                    <div class="mr-2">~</div>
+                                    <input th:value="${searchInfo.endDate}" type="text" id="endDate" name="endDate"
+                                           class="form-control form-datepicker" placeholder="날짜 선택">
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="d-flex align-items-center">
+                                    <button type="button" class="btn btn-dark" id="all"
+                                            name="colorChange" data-role="all">전체
+                                    </button>
+                                    <button type="button" class="btn btn-dark" id="today"
+                                            name="colorChange" data-role="today">오늘
+                                    </button>
+                                    <button type="button" class="btn btn-dark" id="week"
+                                            name="colorChange" data-role="week">7일
+                                    </button>
+                                    <button type="button" class="btn btn-dark" id="month"
+                                            name="colorChange" data-role="month">1개월
+                                    </button>
+                                    <button type="button" class="btn btn-dark" id="months"
+                                            name="colorChange" data-role="months">3개월
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="d-flex" style="float:right">
+                                    <select class="form-control w-auto mr-2" name="memberTypeOption"
+                                            id="memberTypeOption">
+                                        <option th:selected="${searchInfo.memberTypeOption eq ''}" value="">전체</option>
+                                        <option th:selected="${searchInfo.memberTypeOption eq 'AP'}" value="AP">AP
+                                        </option>
+                                        <option th:selected="${searchInfo.memberTypeOption eq 'HH'}" value="HH">HH
+                                        </option>
+                                    </select>
+                                    <select name="searchSelect" id="searchSelect" class="form-control w-auto">
+                                        <option th:selected="${searchInfo.searchSelect eq 'name'}" value="name">이름
+                                        </option>
+                                        <option th:selected="${searchInfo.searchSelect eq 'phone'}" value="phone">휴대번호
+                                        </option>
+                                        <option th:selected="${searchInfo.searchSelect eq 'email'}" value="email">
+                                            이메일주소
+                                        </option>
+                                        <option th:selected="${searchInfo.searchSelect eq 'id'}" value="id">회원ID
+                                        </option>
+                                        <option th:selected="${searchInfo.searchSelect eq 'referralCode'}"
+                                                th:if="${searchInfo.memberTypeOption eq 'HH'}" value="referralCode">추천코드
+                                        </option>
+                                    </select>
+                                    <input th:value="${searchInfo.inputSelect}" type="text" class="form-control w-auto"
+                                           name="inputSelect" value="" id="inputSelect"/>
+                                    <button type="button" class="btn btn-primary" id="search" data-role="search">검색하기
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-12 mt-3">
+                                <div class="d-flex">
+                                    <select class="form-control w-auto mr-2" name="DTYPE" id="DTYPE">
+                                        <option th:selected="${searchInfo.DTYPE eq ''}" value="">전체</option>
+                                        <option th:selected="${searchInfo.DTYPE eq 'AP'}" value="AP">AP</option>
+                                        <option th:selected="${searchInfo.DTYPE eq 'HH'}" value="HH">HH</option>
+                                    </select> <select class="form-control w-auto mr-2" name="isTemp">
+                                    <option th:selected="${searchInfo.isTemp eq ''}" value="">전체</option>
+                                    <option th:selected="${searchInfo.isTemp eq '1'}" value="1">임시회원</option>
+                                    <option th:selected="${searchInfo.isTemp eq '0'}" value="0">회원</option>
+                                </select> <select class="form-control w-auto mr-2" name="deleted">
+                                    <option th:selected="${searchInfo.deleted eq ''}" value="">전체</option>
+                                    <option th:selected="${searchInfo.deleted eq '1'}" value="1">탈퇴회원</option>
+                                    <option th:selected="${searchInfo.deleted eq '0'}" value="0">회원</option>
+                                </select> <select class="form-control w-auto mr-2" name="isStop">
+                                    <option th:selected="${searchInfo.isStop eq ''}" value="">전체</option>
+                                    <option th:selected="${searchInfo.isStop eq '1'}" value="1">정지회원</option>
+                                    <option th:selected="${searchInfo.isStop eq '0'}" value="0">회원</option>
+                                </select>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+                </form>
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>회원ID</th>
+                                <th>구분</th>
+                                <th>이름</th>
+                                <th>아이디</th>
+                                <th>이메일</th>
+                                <th>휴대폰</th>
+                                <th>임시회원 여부</th>
+                                <th>탈퇴 여부</th>
+                                <th>정지 여부</th>
+                                <th>조회 및 관리</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <th:block th:unless="${#lists.isEmpty(memberList)}" th:each="list : ${memberList}">
+                                <tr>
+                                    <td class="" th:text="${list.id}"></td>
+                                    <td class="" th:text="${list.DTYPE}"></td>
+                                    <td th:if="${list.blacklistType eq null}" class="text-center"
+                                        th:text="${list.name}"></td>
+                                    <td th:if="${list.blacklistType ne null}" class="text-center"
+                                        th:text="${list.name}"><span calss="text-danger">(BL)</span></td>
+                                    <td class="" th:text="${list.loginId}"></td>
+                                    <td class="" th:text="${list.email}"></td>
+                                    <td class="" th:text="${list.phone}"></td>
+                                    <td class="">
+                                        <p th:if="${list.isTemp eq '1'}">Y</p>
+                                        <p th:if="${list.isTemp eq '0'}">N</p>
+                                    </td>
+                                    <td class="">
+                                        <p th:if="${list.deleted eq '1'}">Y</p>
+                                        <p th:if="${list.deleted eq '0'}">N</p>
+                                    </td>
+                                    <td class="">
+                                        <p th:if="${list.isStop eq '1'}">Y</p>
+                                        <p th:if="${list.isStop eq '0'}">N</p>
+                                    </td>
+                                    <td class="">
+                                        <a th:href="${'/bo/management/complaint/member/detail?id=' + list.id}">조회</a>
+                                    </td>
+                                </tr>
+                            </th:block>
+                            </tbody>
+                        </table>
+                        <div class="d-flex justify-content-center mt-5">
+                            <th:block th:include="fragments/paging :: paging_Fragment(fnc=*{'fn_go_page(this)'}, pageId=*{'pageName1'})"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+<div layout:fragment="modal" th:remove="tag"></div>
+</body>
+</html>

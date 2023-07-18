@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/default}">
+<body>
+	<div layout:fragment="contents" th:remove="tag">
+		<main id="content" role="main">
+			<h2 class="title">FAQ 등록</h2>
+			<div class="row p-3">
+	            <div class="col-12">
+					<form name="insertForm">
+						<table class="table table-bordered">
+							<colgroup>
+								<col style="width:120px" />
+								<col />
+							</colgroup>
+							<tr>
+								<th class="text-center">FAQ 종류</th>
+								<td>
+									<div class="d-flex align-items-center">
+										<button class="btn" data-role="AP" id="AP">AP</button><button class="btn mr-2" data-role="HH" id="HH">HH</button>
+										<select class="select form-control w-auto" id="selectBox" name="selectBox" required>
+										</select>
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<th class="text-center">FAQ 제목</th>
+								<td>
+									<input name="title" type="text" class="form-control" autocomplete="off" placeholder="제목을 입력하세요 *">
+								</td>
+							</tr>
+							<tr>
+								<td colspan="2">
+									<textarea class="form-control ckeditor" name="faqContent" autocomplete="off" placeholder="내용을 입력하세요."></textarea>
+								</td>
+							</tr>
+						</table>
+						<div class="m-t-10 text-right">
+							<button type="button" class="btn btn-dark" data-role="save">등록하기</button>
+							<button type="button" class="btn btn-dark" data-role="cancel">취소</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</main>
+	</div>
+</body>
+</html>

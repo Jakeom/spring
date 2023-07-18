@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.hh.HhMemberMapper">
+
+     <!-- 멤버 중복 체크 -->
+     <select id="selectExistMember" parameterType="FoMemberDTO" resultType="FoMemberDTO">
+        /* com.fw.core.mapper.db1.hh.HhMemberMapper.selectExistMember, 멤버 중복 체크, sjpaik, HhMemberMapper.xml */
+        SELECT DTYPE
+             , id
+             , createdAt
+             , updatedAt
+             , agreeMarketing
+             , agreeMarketingAt
+             , deleted
+             , email
+             , isTemp
+             , loginId
+             , name
+             , password
+             , passwordChangeDate
+             , phone
+             , privacyExpire
+             , privacyExpireDate
+             , profilePictureFileId
+             , deletedAt
+             , lastChangePassword
+             , pushToken
+             , useAppPush
+             , isStop
+             , passwordFailCount
+             , agreeAd
+             , agreeAdAt
+             , di
+             , ap_alarm_flag
+             , ap_comm_flag
+             , ap_posi_flag
+             , hh_resu_flag
+             , hh_msg_flag
+             , hh_ap_msg_flag
+             , hh_comm_flag
+             , hh_ap_flag
+          FROM member
+         <where>
+           AND DTYPE = 'AP'
+            <if test="email != null and email != ''">
+           AND email = #{email}
+            </if>
+            <if test="phone != null and phone != ''">
+           AND phone = #{phone}
+            </if>
+         </where>
+         LIMIT 1
+     </select>
+
+    <!-- 내 인재 등록 -->
+    <insert id="insertHhResumeReadingHistory" parameterType="FoMemberDTO">
+        /* com.fw.core.mapper.db1.m.MPointMapper.insertHhResumeReadingHistory, 열람권 구매 시 이력서 열람내역 추가 , 22.12.14, YJW, MPointMapper.xml */
+        INSERT INTO hh_resume_reading_history (
+               createdAt
+             , updatedAt
+             , expireAt
+             , registerPathCd
+             , member_id
+             , resume_id
+             , group_id
+             , delFlag
+        ) VALUES (
+               NOW()
+             , NOW()
+             , DATE_ADD(NOW(), INTERVAL 12 MONTH)
+             , 'REGISTER'
+             , #{frontSession.id}
+             , #{resumeId}
+             , (SELECT id FROM hh_resume_reading_history_group WHERE member_id = #{frontSession.id} LIMIT 1)
+             , 'N'
+        )
+    </insert>
+
+    <!-- 이용정지 헤드헌터 서치펌 변경신청 이력확인 -->
+    <select id="selectSfChangeHistory" parameterType="FoMemberDTO" resultType="boolean">
+        /* com.fw.core.mapper.db1.hh.HhMemberMapper.selectSfChangeHistory, 이용정지 헤드헌터 서치펌 변경신청 이력확인, YJW, HhMemberMapper.xml */
+        SELECT EXISTS (
+                       SELECT 1
+                       FROM sf_change_request
+                       WHERE delFlag = 'N'
+                         AND status IN ('ACCEPT')
+                         AND member_id = (SELECT id FROM member WHERE loginId=#{loginId})
+                   ) AS CNT
+    </select>
+
+    <!-- 이용정지 헤드헌터 서치펌 변경신청 -->
+    <insert id="insertSfChange" parameterType="HhSfChangeRequestDTO">
+        /* com.fw.core.mapper.db1.hh.HhMemberMapper.insertSfChange, 이용정지 헤드헌터 서치펌 변경신청, YJW, HhMemberMapper.xml */
+        INSERT INTO sf_change_request (
+               createdAt
+             , updatedAt
+             , sfCeoName
+             , sfHomepageUrl
+             , sfName
+             , sfPhone
+             , sfRegNumber
+             , sfWorkerListFileId
+             , status
+             , member_id
+             , delFlag
+        ) VALUES (
+               NOW()
+             , NOW()
+             , #{sfCeoName}
+             , #{sfHomepageUrl}
+             , #{sfName}
+             , #{sfPhone}
+             , #{sfRegNumber}
+             , #{sfWorkerListFileId}
+             , #{status}
+             , (SELECT id FROM member WHERE loginId = #{loginId})
+             , 'N'
+        )
+    </insert>
+</mapper>
+

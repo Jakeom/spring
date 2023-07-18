@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.hh.HhPickApMapper">
+
+	<!-- 나를 pick한 후보자 조회 -->
+	<select id="selectPickApList" parameterType="HhPickApDTO" resultType="HhPickApDTO">
+		/* com.fw.core.mapper.db1.hh.HhPickApMapper.selectPickApList, 나를 pick한 후보자 조회, wsh, HhPickApMapper.xml */
+		SELECT A.name
+			 , A.birthYear
+			 , A.age
+			 , A.gender
+			 , A.totalCareerNm
+			 , A.finalCompany
+			 , A.finalSchool
+			 , A.regDate
+			 , A.myApFlag
+			 , A.id
+		  FROM (SELECT m.name
+			 		 , YEAR(r.birth) AS birthYear
+			  		 , LEFT(DATE_FORMAT(NOW(), '%Y%m%d') - r.birth, 2)  AS age
+					 , substring(fn_get_common_cd(r.genderCd,'GENDER',1), 1, 1) AS gender
+					 , CONCAT((r.totalCareer DIV 12),'년',MOD(r.totalCareer,12),'개월') AS totalCareerNm
+					 , (SELECT companyName FROM resume_career AS rc WHERE rc.delFlag='N' AND rc.resume_id = r.id ORDER BY rc.resignationYm DESC LIMIT 1) AS finalCompany
+					 , (SELECT name FROM resume_academic_background as rab WHERE rab.resume_id = r.id  and rab.delFlag = 'N' ORDER BY rab.entranceYm DESC LIMIT 1) AS finalSchool
+					 , DATE_FORMAT(hrh.reg_date,'%Y-%m-%d') AS regDate
+					 , IF(EXISTS(SELECT * FROM hh_resume_reading_history hrrh WHERE hrrh.resume_id = r.id AND hrrh.member_id = #{frontSession.id}),'Y','N') AS myApFlag
+					 , r.id
+					 , 'phone' AS orderType
+			      FROM hh_reading_history hrh
+			INNER JOIN member m ON m.id = hrh.ap_member_id
+			INNER JOIN resume AS r ON r.member_id = m.id AND representation = 1
+				 WHERE hh_member_id = #{frontSession.id}
+
+				 UNION 
+
+				SELECT m.name
+					 , YEAR(r.birth) AS birthYear
+					 , LEFT(DATE_FORMAT(NOW(), '%Y%m%d') - r.birth, 2)  AS age
+					 , substring(fn_get_common_cd(r.genderCd,'GENDER',1), 1, 1) AS gender
+					 , CONCAT((r.totalCareer DIV 12),'년',MOD(r.totalCareer,12),'개월') AS totalCareerNm
+					 , (SELECT companyName FROM resume_career AS rc WHERE rc.delFlag='N' AND rc.resume_id = r.id ORDER BY rc.resignationYm DESC LIMIT 1) AS finalCompany
+					 , (SELECT name FROM resume_academic_background as rab WHERE rab.resume_id = r.id and rab.delFlag = 'N' ORDER BY rab.entranceYm DESC LIMIT 1) AS finalSchool
+					 , DATE_FORMAT(ih.createdAt,'%Y-%m-%d') AS createdAt
+					 , IF(EXISTS(SELECT * FROM hh_resume_reading_history hrrh WHERE hrrh.resume_id = r.id AND hrrh.member_id = #{frontSession.id}),'Y','N') AS myApFlag
+					 , r.id
+					 , 'interest' AS orderType
+				  FROM interest_hh ih
+			INNER JOIN member m ON m.id = ih.applicant_id
+			INNER JOIN resume AS r ON r.member_id = m.id AND representation = 1
+				 WHERE ih.headhunter_id = #{frontSession.id} AND ih.delFlag = 'N'
+			) AS A
+			<where>
+				<if test="orderType != '' and orderType != null">
+					AND A.orderType = #{orderType}
+				</if>
+			</where>
+		GROUP BY A.id
+		ORDER BY regDate DESC
+	</select>
+</mapper>

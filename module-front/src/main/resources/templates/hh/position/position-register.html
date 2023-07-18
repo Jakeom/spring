@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layouts/hh/mainLayout}">
+<body>
+    <div id="container-block" layout:fragment="contents" th:remove="tag">
+        <div class="container">
+            <input type="hidden" name="registerId" th:value="${#authentication.principal.id}" />
+            <input type="hidden" name="registerName" th:value="${#authentication.principal.name}" />
+            <div class="sub-content">
+                <h3 class="subtitle poppins">포지션 등록하기</h3>
+                <div class="title-line mt-4 mb-5"></div>
+                <div class="apply-wrap-body write">
+                    <!-- 기업정보 -->
+                    <div class="content company-information">
+                        <div class="mb-3">
+                            <h4 class="table-subtitle mb-3 m-t-25">기등록 회사정보 불러오기</h4>
+                            <table class="table border-top-1">
+                                <caption>
+                                    기업정보
+                                </caption>
+                                <colgroup>
+                                    <col style="width:15%"/>
+                                    <col style="width:35%"/>
+                                    <col style="width:15%"/>
+                                    <col style="width:35%"/>
+                                </colgroup>
+                                <tbody>
+                                <tr>
+                                    <th class="">회사정보</th>
+                                    <td class="">
+                                        <select name="companyInfo" class="form-control selectajax"
+                                                data-url="/hh/position/reg-company-list"
+                                                data-after-target-jquery-selector="select[name=positionInfo]"
+                                                data-after-target-parameter-name="hrCompanyId"
+                                                data-value-name="id"
+                                                data-show-name="companyName"
+                                                data-default-option="선택"></select>
+                                    </td>
+                                    <th class="">포지션정보</th>
+                                    <td class="">
+                                        <select name="positionInfo"
+                                                class="form-control"
+                                                data-url="/hh/position/reg-position-list"
+                                                data-value-name="id"
+                                                data-show-name="title"
+                                                data-default-option="선택"></select>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <div class="d-flex align-items-center mb-3">
+                                <h4 class="table-subtitle">공고제목</h4>
+                                <span class="m-l-10">공고제목은 포지션명 위주로 작성해 주세요.</span>
+                            </div>
+                            <div class="desc">
+                                <div class="row align-items-center">
+                                    <div class="col-12">
+                                        <input type="text" name="title" class="form-control form-lg" value="" placeholder="예시) 계열사 제약회사 HR기획(평가보상) 대리급 채용"/>
+                                    </div>
+                                </div>
+                                <h4 class="table-subtitle mb-3 m-t-25">기업정보</h4>
+                                <table class="table border-top-1">
+                                    <caption>
+                                        기업정보
+                                    </caption>
+                                    <colgroup>
+                                        <col style="width:15%"/>
+                                        <col style="width:35%"/>
+                                        <col style="width:15%"/>
+                                        <col style="width:35%"/>
+                                    </colgroup>
+                                    <tbody>
+                                    <tr>
+                                        <th class="">기업검색</th>
+                                        <td class="">
+                                            <div class="search-box search-lg">
+                                                <input type="text" name="companyName" class="" placeholder="회사 이름을 입력하세요"/>
+                                                <input type="hidden" name="directInput" value="0" />
+                                                <button type="button" class="search-btn"><i class="icon-search-dark"></i>
+                                                </button>
+                                            </div>
+                                            <div class="search-result-list company">
+                                                <ul>
+                                                </ul>
+                                            </div>
+                                        </td>
+                                        <th class="">사업자등록번호</th>
+                                        <td class="">
+                                            <input type="text" name="licenseNumber" class="form-control form-lg" value="" placeholder=""/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th class="">대표자</th>
+                                        <td class="">
+                                            <input type="text" name="ceo" class="form-control form-lg" value="" placeholder=""/>
+                                        </td>
+                                        <th class="">설립일</th>
+                                        <td class="">
+                                            <input type="text" name="establishDate" class="form-control form-lg" value="" placeholder=""/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th class="">전화번호</th>
+                                        <td class="">
+                                            <input type="text" name="phone" class="form-control form-lg" value="" placeholder=""/>
+                                        </td>
+                                        <th class="">도로명주소</th>
+                                        <td class="">
+                                            <input type="text" name="address" class="form-control form-lg" value="" placeholder=""/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th class="">기업규모</th>
+                                        <td class="">
+                                            <input type="text" name="companyScale" class="form-control form-lg" value="" placeholder=""/>
+                                        </td>
+                                        <th class="">업종명</th>
+                                        <td class="">
+                                            <input type="text" name="companyIndustry" class="form-control form-lg" value="" placeholder=""/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th class="">상장</th>
+                                        <td class="">
+                                            <input type="text" name="marketListing" class="form-control form-lg" value="" placeholder=""/>
+                                        </td>
+                                        <th class="">기업상태</th>
+                                        <td class="">
+                                            <input type="text" name="companyStatus" class="form-control form-lg" value="" placeholder=""/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th class="">기업키워드</th>
+                                        <td class="" colspan="3">
+                                            <input type="text" name="keywords" class="form-control form-lg" value="" placeholder="기업의 인증, 수상, 특징(최대 3개) 벤쳐기업, 고용우수, 가족친화기업"/>
+                                        </td>
+                                    </tr>
+                                    <tr class="license-area" style="display:none">
+                                        <th class="">사업자등록증 사본<span class="text-danger">(필수)</span></th>
+                                        <td class="" colspan="3">
+                                            <div class="form-upload">
+                                                <input type="file" name="licenceFile" class="" id="licenceFile"/>
+                                                <label for="licenceFile"><span class="file-name m-r-10"></span><i class="icon-input-add"></i></label>
+                                            </div>
+                                            <p class="text-danger mt-3">NICE평가정보에 등록되지 않은 회사는 사업자등록증을 첨부해야합니다.</p>
+                                            <div class="m-t-20">
+                                                <p>첨부가능 용량: 최대 10MB</p>
+                                                <p>첨부가능 확장자명: jpg, gif, bmp, ppt, pptx, hwp, pdf, png</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th class="">기업 정보 공개 범위 설정</th>
+                                        <td class="" colspan="3">
+                                            <div class="d-flex">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="publicCd" value="0" id="publicCd0" checked />
+                                                    <label class="form-check-label" for="publicCd0">회사명 전체공개</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="publicCd" value="1" id="publicCd1"/>
+                                                    <label class="form-check-label" for="publicCd1">전체 비공개</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="publicCd" value="2" id="publicCd2"/>
+                                                    <label class="form-check-label" for="publicCd2">CO-WORKER까지만 공개</label>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- end -->
+
+                    <!-- 공고내용 -->
+                    <div class="content">
+                        <div class="d-flex align-items-center mb-3">
+                            <h4 class="table-subtitle">공고내용</h4>
+                            <span class="m-l-10">공고내용은 사용자에게 전체공개 됩니다.</span>
+                        </div>
+                        <div class="desc">
+                            <table class="table border-top-1">
+                                <caption>
+                                    공고내용
+                                </caption>
+                                <colgroup>
+                                    <col style="width:15%" />
+                                    <col style="width:35%" />
+                                    <col style="width:15%" />
+                                    <col style="width:35%" />
+                                </colgroup>
+                                <tbody>
+                                <tr>
+                                    <th class="">직무<span class="text-danger">(필수)</span></th>
+                                    <td class="" colspan="3">
+                                        <input type="text" name="industry" class="form-control form-lg" value="" placeholder=""/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="">채용공고 JD<span class="text-danger">(필수)</span></th>
+                                    <td class="" colspan="3">
+                                        <div class="form-textarea m-0">
+                                            <textarea name="jobDescription" id="jobDescription" cols="30" rows="10" class=""></textarea>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="">채용마감일<span class="text-danger">(필수)</span></th>
+                                    <td class="" colspan="3">
+                                        <div class="form-date-wrap">
+                                            <input type="text" name="endDate" id="datepicker" class="form-date" />
+                                        </div>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <!-- end -->
+
+                    <!-- 복리후생 및 기업소개 -->
+                    <div class="content">
+                        <div class="d-flex align-items-center mb-3">
+                            <h4 class="table-subtitle">복리후생 및 기업소개(선택)</h4>
+                            <span class="m-l-10">기업으로부터 수신한 IR자료, 직무기술서 등 기타 첨부파일을 등록할 수 있습니다. 첨부파일은 코워커(CO)에게만 공개됩니다.</span>
+                        </div>
+                        <div class="desc">
+                            <div class="company-introduce">
+                                <div class="row align-items-center company-introduce-area">
+                                    <div class="col-md-2 col-6 col m-b-10">
+                                        <select class="select-design select-lg select2-hidden-accessible" style="width: 100%"
+                                                data-select2-id="select2-data-52-ksaj" tabindex="-1" aria-hidden="true">
+                                            <option value="3" data-select2-id="select2-data-54-flob">파일첨부</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-10 col-12 col m-b-10">
+                                        <div class="form-upload">
+                                            <input type="file" name="companyInFiles" id="companyInfoFile" />
+                                            <label for="companyInfoFile"><span class="file-name m-r-10"></span><i class="icon-input-add"></i></label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="btn-group d-flex justify-content-center m-t-20">
+                                <button type="button" data-role="companyIntroduceAdd" class="btn btn-outline-dark btn-lg m-r-10">추가하기 <i class="icon-row-add"></i></button>
+                                <button type="button" data-role="companyIntroduceDelete" class="btn btn-outline-primary btn-sm">삭제 <i class="icon-resume-minus"></i></button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 고객사 인사담당자 연락처 -->
+                    <div class="content">
+                        <div class="d-flex align-items-center mb-3">
+                            <h4 class="table-subtitle">고객사 인사담당자 연락처</h4>
+                            <p class="m-l-10">인사담당자의 연락처는 <span class="text-danger">공개되지 않으며</span>, 후보자 추천 시 기업 인사담당자에게 메일을
+                                발송하기 위한 정보입니다.</p>
+                        </div>
+                        <div class="desc">
+                            <div class="contact">
+                                <div class="row align-items-center contact-area">
+                                    <div class="col-md-2 col-6 col m-b-10">
+                                        <input type="text" name="name" class="form-control form-lg" value="" placeholder="이름"/>
+                                    </div>
+                                    <div class="col-md-2 col-6 col m-b-10">
+                                        <input type="text" name="email" class="form-control form-lg" value="" placeholder="이메일"/>
+                                    </div>
+                                    <div class="col-md-2 col-6 col m-b-10">
+                                        <input type="text" name="phone" class="form-control form-lg" value="" placeholder="유선연락처"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="btn-group d-flex justify-content-center m-t-20">
+                                <button type="button" data-role="contactAdd" class="btn btn-outline-dark btn-lg m-r-10">연락처 추가하기 <i class="icon-row-add"></i></button>
+                                <button type="button" data-role="contactDelete" class="btn btn-outline-primary btn-sm">삭제 <i class="icon-resume-minus"></i></button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 코웍정보 -->
+                    <div class="content">
+                        <div class="d-flex align-items-center mb-3">
+                            <h4 class="table-subtitle">코웍정보</h4>
+                        </div>
+                        <div class="row align-items-center m-0">
+                            <div class="col-12 list-info d-flex align-items-center">
+                                <p class="table-subtitle m-r-10">코웍으로 진행하시겠습니까?</p>
+                                <p>코웍정보는 코웍공고 및 코워커(CO)에게만 공개됩니다.</p>
+                                <div class="form-check m-l-15">
+                                    <input class="form-check-input" type="checkbox" name="isCowork" value="1" />
+                                </div>
+                            </div>
+
+                            <div class="col-12 list-info cowork" style="display:none">
+                                <div class="d-flex align-items-center">
+                                    <div class="d-flex">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="isPrivate" value="0" id="isPrivate0" checked />
+                                            <label class="form-check-label" for="isPrivate0"> 전체공개 </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="isPrivate" value="1" id="isPrivate1"/>
+                                            <label class="form-check-label" for="isPrivate1"> 선택공개 </label>
+                                        </div>
+                                    </div>
+                                    <p>(선택공개 시 등록한 코워커 CO만 공고를 확인할 수 있습니다.)</p>
+                                </div>
+                                <div class="coworker-wrap" style="display: none;">
+                                    <div class="coworker-registration">
+                                        <button type="button" class="btn btn-sm btn-primary round" data-role="coworkerRegister">+ 코워커 등록</button>
+                                    </div>
+                                    <div class="coworker-list">
+                                    </div>
+                                    <div class="coworker-search">
+                                        <div class="d-flex align-items-center justify-content-end m-b-15">
+                                            <button type="button" class="close" data-role="coworkerSearchClose"><i class="icon-b-close"></i></button>
+                                        </div>
+                                        <div class="search-box">
+                                            <input type="text" name="searchValue" class="" placeholder=""/>
+                                            <button type="button" class="search-btn" data-role="coworkerSearch"><i class="icon-search-dark"></i></button>
+                                        </div>
+                                        <div class="coworker-search-result">
+                                            <ul>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="content cowork" style="display:none">
+                            <table class="table border-top-1 m-t-30">
+                                <colgroup>
+                                    <col style="width:15%" />
+                                    <col style="width:35%" />
+                                    <col style="width:15%" />
+                                    <col style="width:35%" />
+                                </colgroup>
+                                <tbody>
+                                <tr>
+                                    <th class="">채용사유<span class="text-danger font-size-14 d-inline-block m-l-5">필수</span>
+                                    </th>
+                                    <td class="" colspan="3">
+                                        <input type="text" name="positionReason" class="form-control form-lg" value="" placeholder="채용사유 입력 (예: 충원, 증원, 사내이동 등)"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="">팀 구성<span class="text-danger font-size-14 d-inline-block m-l-5">필수</span>
+                                    </th>
+                                    <td class="" colspan="3">
+                                        <input type="text" name="team" class="form-control form-lg" value="" placeholder="팀 구성 입력"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="">
+                                        연봉 수준 및 <br/>
+                                        연봉 조정 여부<span class="text-danger font-size-14 d-inline-block m-l-5">필수</span>
+                                    </th>
+                                    <td class="" colspan="3">
+                                        <input type="text" name="salary" class="form-control form-lg" value="" placeholder="연봉 수준 및 연봉 조정 여부 (예: 회사 내규 협의)"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="">타깃 회사<span class="text-danger font-size-14 d-inline-block m-l-5">필수</span>
+                                    </th>
+                                    <td class="" colspan="3">
+                                        <input type="text" name="targetCompany" class="form-control form-lg" value="" placeholder="타깃 회사 입력 (원하는 출신기업 또는 계열의 기업)"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="">직접채용 여부 <span class="text-danger font-size-14 d-inline-block m-l-5">필수</span></th>
+                                    <td class="" colspan="3">
+                                        <div class="d-flex">
+                                            <div class="form-check">
+                                                <input class="form-check-input" name="directPositionFlag" type="radio" value="0" id="directPositionFlag0" checked />
+                                                <label class="form-check-label" for="directPositionFlag0"> 헤드헌팅만 진행 </label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" name="directPositionFlag" type="radio" value="1" id="directPositionFlag1"/>
+                                                <label class="form-check-label" for="directPositionFlag1"> 직접채용 진행 </label>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="">기타 코멘트</th>
+                                    <td class="" colspan="3">
+                                        <input type="text" name="etcComment" class="form-control form-lg" value="" placeholder=""/>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="content cowork" style="display:none">
+                            <div class="desc border-0">
+                                <h4 class="table-subtitle m-b-5">코웍조건</h4>
+                                <table class="table border-top-1">
+                                    <caption>코웍조건</caption>
+                                    <colgroup>
+                                        <col style="width:15%" />
+                                        <col style="width:35%" />
+                                        <col style="width:15%" />
+                                        <col style="width:35%" />
+                                    </colgroup>
+                                    <tbody>
+                                    <tr>
+                                        <th class="">계약수수료율</th>
+                                        <td class="" colspan="3">
+                                            <input type="text" name="feeInfo" class="form-control form-lg" value="" placeholder="수수료율을 입력해 주세요."/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th class="">보증기간</th>
+                                        <td class="" colspan="3">
+                                            <div class="d-flex align-items-center">
+                                                <input type="number" name="warrantyTerm" class="form-control form-lg w-50px p-0 text-center" value="" placeholder=""/>
+                                                <span class="m-l-10">개월</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th class="">기타사항</th>
+                                        <td class="" colspan="3">
+                                            <div class="form-textarea m-0">
+                                                <textarea name="etc" id="" cols="30" rows="10" placeholder="배분율 등 기타사항을 입력해 주세요." class=""></textarea>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- end -->
+
+                    <div class="content">
+                        <div class="example-form">
+                            <ul>
+                                <li class="d-flex align-items-center justify-content-between">
+                                    <p>이 채용정보에는 허위내용이 포함되지 않았음을 확인합니다. 만약 허위사실로 인한 피해발생 시 모든 책임은 등록자에게 있음을 확인합니다.</p>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="1" id="positionAgree"/>
+                                        <label class="form-check-label" for="positionAgree">동의합니다.</label>
+                                    </div>
+                                </li>
+                                <li class="d-flex align-items-center justify-content-between">
+                                    <p>등록되는 채용정보는 채용 관련 법령 및 RESUME9의 채용정보 정책에 위반될 경우, 동의 없이 삭제 또는 게시중단 될 수 있습니다.</p>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="1" id="positionAgree2"/>
+                                        <label class="form-check-label" for="positionAgree2">동의합니다.</label>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="btn-group d-flex justify-content-center m-t-10">
+                        <button type="button" class="btn btn-outline-dark m-r-10" data-role="positionCancel">취소</button>
+                        <button type="button" class="btn btn-outline-primary" data-role="positionRegister">등록</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

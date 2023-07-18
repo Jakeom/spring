@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.fo.searchHh.FoSearchHhMapper">
+
+    <!-- 헤드헌터검색 카운트 취득-->
+    <select id="selectSearchHhListCntForPaging" resultType="int">
+        /*com.fw.core.mapper.db1.fo.searchHh.FoSearchHhMapper.selectSearchHhListCntForPaging,  헤드헌터검색 카운트 취득 , 2022.11 , skayhlj@gmail.com, FoJopMapper.xml*/
+        SELECT COUNT(1) AS CNT
+        FROM (
+        SELECT HH.member_id
+        , HH.delFlag
+        , MEM.email
+        , MEM.name
+        , MEM.phone
+        , HH.approved
+        , HH.greeting
+        , HH.sfName
+        , MEM.createdAt
+        , (SELECT COUNT(1) FROM position WHERE member_id = HH.member_id AND deleted = 0 AND endDate > NOW() AND status = 'DOING' ) AS postingCnt
+        , (SELECT GROUP_CONCAT(fieldCd SEPARATOR ',')  FROM hh_position_field WHERE member_id = HH.member_id AND delFlag = 'N') fieldCd
+        , (SELECT createdAt FROM position WHERE member_id = 4328 AND deleted = 0 AND endDate > NOW() order by createdAt desc LIMIT 1) recentPosting
+        , (SELECT create_dt FROM tb_api_login_log WHERE id = HH.member_id ORDER BY create_dt DESC LIMIT 1 ) recentLogin
+        FROM headhunter HH
+        INNER JOIN member MEM ON HH.member_id = MEM.id
+        WHERE HH.approved = 1
+          AND HH.delFlag = 'N'
+          AND MEM.isStop = 0
+          AND MEM.deleted = 0
+        <if test="searchVal != '' and searchVal != null">
+            <if test="searchType eq 'name'">
+                AND MEM.name LIKE CONCAT('%', #{searchVal}, '%')
+            </if>
+            <if test="searchType eq 'email'">
+                AND MEM.email LIKE CONCAT('%', #{searchVal}, '%')
+            </if>
+            <if test="searchType eq 'phone'">
+                AND MEM.phone LIKE CONCAT('%', #{searchVal}, '%')
+            </if>
+        </if>
+        <if test="sortColumn != '' and sortColumn != null">
+            <if test="sortColumn eq 'name'">
+                ORDER BY ${sortColumn} DESC LIMIT 18446744073709551615
+            </if>
+            <if test="sortColumn eq 'createdAt'">
+                ORDER BY ${sortColumn} LIMIT 18446744073709551615
+            </if>
+            <if test="sortColumn eq 'postingCnt'">
+                ORDER BY ${sortColumn} LIMIT 18446744073709551615
+            </if>
+            <if test="sortColumn eq 'recentPosting'">
+                ORDER BY ${sortColumn} LIMIT 18446744073709551615
+            </if>
+            <if test="sortColumn eq 'recentLogin'">
+                ORDER BY ${sortColumn} LIMIT 18446744073709551615
+            </if>
+        </if>
+        /*ORDER BY MEM.createdAt LIMIT 18446744073709551615*/
+        ) AS A
+        WHERE 1=1
+        <if test="checkFieldArr != null and checkFieldArr !='' ">
+            AND (
+            <foreach collection="checkFieldArr" item="checkFieldArr" separator="OR" index="index">
+                 A.fieldCd LIKE '%${checkFieldArr}%'
+            </foreach>
+            )
+        </if>
+
+    </select>
+
+    <!-- 헤드헌터검색 조회 페이징-->
+    <select id="selectSearchHhListPaging" resultType="FoSearchHhDTO">
+        /*com.fw.core.mapper.db1.fo.searchHh.FoSearchHhMapper.selectSearchHhListPaging, 헤드헌터검색 조회 페이징 , 2022.11 , skayhlj@gmail.com, FoJopMapper.xml*/
+        SELECT @rownum:=@rownum+1 AS rownum
+             , A.*
+        FROM (
+        SELECT HH.member_id
+             , HH.delFlag
+             , MEM.profilePictureFileId
+             , MEM.email
+             , MEM.name
+             , MEM.phone
+             , HH.approved
+             , HH.greeting
+             , HH.sfName
+             , MEM.createdAt
+             , (SELECT COUNT(1) FROM position WHERE member_id = HH.member_id AND deleted = 0 AND endDate > NOW() AND status = 'DOING') AS postingCnt
+             , (SELECT GROUP_CONCAT(fieldCd SEPARATOR ',') FROM hh_position_field WHERE member_id = HH.member_id AND delFlag = 'N') fieldCd
+             , (SELECT GROUP_CONCAT(TCD.cd_nm SEPARATOR ',') FROM tb_common_cd TCD, hh_position_field HPF WHERE HPF.member_id = HH.member_id AND TCD.cd = HPF.fieldCd AND delFlag = 'N') fieldCdNm
+             , (SELECT createdAt FROM position WHERE member_id = HH.member_id AND deleted = 0 AND endDate > NOW() AND status = 'DOING' order by createdAt desc LIMIT 1) recentPosting
+             , (SELECT id FROM interest_hh WHERE headhunter_id = HH.member_id AND applicant_id = #{frontSession.id} AND delFlag = 'N') interestHh
+             , MEM.updatedAt recentLogin
+          FROM headhunter HH
+    INNER JOIN member MEM ON HH.member_id = MEM.id
+         WHERE HH.approved = 1
+           AND HH.delFlag = 'N'
+           AND MEM.isStop = 0
+           AND MEM.deleted = 0
+        <if test="searchVal != '' and searchVal != null">
+            <if test="searchType eq 'name'">
+                AND MEM.name LIKE CONCAT('%', #{searchVal}, '%')
+            </if>
+            <if test="searchType eq 'email'">
+                AND MEM.email LIKE CONCAT('%', #{searchVal}, '%')
+            </if>
+            <if test="searchType eq 'phone'">
+                AND MEM.phone LIKE CONCAT('%', #{searchVal}, '%')
+            </if>
+        </if>
+        <if test="sortColumn != '' and sortColumn != null">
+            <if test="sortColumn eq 'name'">
+                ORDER BY ${sortColumn} DESC LIMIT 18446744073709551615
+            </if>
+            <if test="sortColumn eq 'createdAt'">
+                ORDER BY ${sortColumn} LIMIT 18446744073709551615
+            </if>
+            <if test="sortColumn eq 'postingCnt'">
+                ORDER BY ${sortColumn} LIMIT 18446744073709551615
+            </if>
+            <if test="sortColumn eq 'recentPosting'">
+                ORDER BY ${sortColumn} LIMIT 18446744073709551615
+            </if>
+            <if test="sortColumn eq 'recentLogin'">
+                ORDER BY ${sortColumn} LIMIT 18446744073709551615
+            </if>
+        </if>
+     /*ORDER BY MEM.createdAt LIMIT 18446744073709551615*/
+     ) AS A
+             , (SELECT @rownum:=0) TMP
+        WHERE 1=1
+        <if test="checkFieldArr != null and checkFieldArr !='' ">
+        AND (
+        <foreach collection="checkFieldArr" item="checkFieldArr" separator="OR" index="index">
+            A.fieldCd LIKE '%${checkFieldArr}%'
+        </foreach>
+        )
+        </if>
+        order by rownum DESC
+        <include refid="common.paging" />
+    </select>
+
+    <!-- 헤드헌터 보기 -->
+    <select id="selectHhInfo" resultType="FoSearchHhDTO">
+        SELECT HH.member_id
+             , MEM.name
+             , HH.position
+             , HH.school
+             , HH.major
+             , HH.sfName
+             , MEM.phone
+             , MEM.email
+             , HH.greeting
+             , HH.careerDesc
+             , MEM.profilePictureFileId
+             , (SELECT COUNT(1) FROM position WHERE member_id = HH.member_id AND deleted = 0 AND endDate > NOW() AND status = 'DOING') AS postingCnt
+             , (SELECT COUNT(1) FROM hh_reading_history WHERE hh_member_id = HH.member_id AND ap_member_id = #{frontSession.id}) AS readCnt
+             , (SELECT COUNT(1) FROM blacklist_hh WHERE headhunter_id = HH.member_id AND delFlag = 'N' AND applicant_id = #{frontSession.id}) AS blackCnt
+             , (SELECT GROUP_CONCAT(TCD.cd_nm SEPARATOR ',') FROM tb_common_cd TCD, hh_position_field HPF WHERE HPF.member_id = HH.member_id AND TCD.cd = HPF.fieldCd AND delFlag = 'N') fieldCdNm
+             , (SELECT create_dt FROM tb_api_login_log WHERE id = HH.member_id ORDER BY create_dt DESC LIMIT 1 ) recentLogin
+             , DATE_FORMAT(MEM.updatedAt, '%Y-%m-%d') AS updatedAt
+          FROM headhunter HH
+    INNER JOIN member MEM ON HH.member_id = MEM.id
+         WHERE HH.member_id = #{memberId}
+    </select>
+
+    <select id="selectHhFieldInfo" resultType="FoSearchHhDTO">
+        SELECT fieldCd
+             , (SELECT cd_nm FROM tb_common_cd WHERE cd = fieldCd) AS fieldCdNm
+          FROM hh_position_field
+         WHERE member_id = #{memberId}
+           AND delFlag = 'N'
+           AND type = 'SPECIAL'
+    </select>
+    <!--관심헤드헌터 등록-->
+    <insert id="insertInterestHh" parameterType="FoSearchHhDTO">
+        /*com.fw.core.mapper.db1.fo.FoSearchHhMapper.insertInterestHh, 관심헤드헌터 등록 , 2022.11 , skayhlj@gmail.com, FoPositionMapper.xml*/
+        INSERT INTO interest_hh (
+               createdAt
+             , headhunter_id
+             , applicant_id
+             , delFlag
+        ) VALUES (
+                   NOW()
+                 , #{memberId}
+                 , #{frontSession.id}
+                 , 'N'
+                 )
+    </insert>
+
+    <!--관심헤드헌터 취소-->
+    <update id="updateInterestHh" parameterType="FoSearchHhDTO">
+        /*com.fw.core.mapper.db1.fo.FoSearchHhMapper.updateInterestHh, 관심헤드헌터 취소 , 2022.11 , skayhlj@gmail.com, FoPositionMapper.xml*/
+        UPDATE interest_hh
+           SET delFlag = 'Y'
+         WHERE applicant_id =  #{frontSession.id}
+           AND headhunter_id = #{memberId}
+    </update>
+</mapper>

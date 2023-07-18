@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.hh.HhResumeMapper">
+
+    <!-- 이력서 등록 거절 내역 확인 -->
+    <select id="selectResumeRejectList" parameterType="HhResumeDTO" resultType="int">
+        /* com.fw.core.mapper.db1.hh.HhResumeMapper.selectResumeRejectList, 이력서 등록 거절 내역 확인, sjpaik, HhResumeMapper.xml */
+        SELECT COUNT(1)
+          FROM hh_resume_reject hrr
+         WHERE hrr.member_id = #{memberId}
+           AND hrr.email = #{email}
+    </select>
+
+    <!-- 임시회원 기본이력서 생성 -->
+    <insert id="insertTempResume" parameterType="HhResumeDTO">
+        /*com.fw.core.mapper.db1.hh.HhResumeMapper.insertTempResume, 임시회원 기본이력서 생성, sjpaik, HhResumeMapper.xml*/
+        INSERT INTO resume (
+               address
+             , name
+             , birth
+             , genderCd
+             , bylaws /*not null*/
+             , desiredPosition
+             , desiredSalary
+             , disability /*not null*/
+             , militaryServiceCd
+             , isVeterans /*not null*/
+             , employmentStatusCd
+             , selfIntroduction
+             , deleted /*not null*/
+             , existTemp /*not null*/
+             , opened /*not null*/
+             , representation /*not null*/
+             , firstOpenChanged /*not null*/
+             , create_member_id /*not null*/
+             , member_id /*not null*/
+             , createdAt
+             , careerDescription
+             , joinDateCd
+             , totalCareer
+             , picture_file_id
+             , last_salary
+             , desiredHire
+        ) VALUES (
+               #{address}
+             , #{name}
+             , #{birth}
+             , #{genderCd}
+             , #{bylaws}
+             , #{desiredPosition}
+             , #{desiredSalary}
+             , #{disability}
+             , #{militaryServiceCd}
+             , #{isVeterans}
+             , #{employmentStatusCd}
+             , #{selfIntroduction}
+             , 0
+             , 0
+             , 1
+             , 1
+             , 0
+             , #{createMemberId}
+             , #{memberId}
+             , NOW()
+             , #{careerDescription}
+             , #{joinDateCd}
+             , #{totalCareer}
+             , #{pictureFileId}
+             , #{lastSalary}
+             , #{desiredHire}
+        )
+        <selectKey order="AFTER" keyProperty="id" resultType="String">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+</mapper>
+

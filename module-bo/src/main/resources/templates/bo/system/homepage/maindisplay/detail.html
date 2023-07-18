@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/default}">
+<body>
+	<div layout:fragment="contents" th:remove="tag">
+		<main id="content" role="main">
+			<input type="hidden" id="mainDisplaySeq" name="mainDisplaySeq" th:value="${detail.mainDisplaySeq}" />
+				<input type="hidden"id="mainDisplayFileSeq" name="mainDisplayFileSeq" th:value="${detail.fileSeq}" />
+			<h2 class="title">서치펌/고객사 배너 상세</h2>
+			<div class="row p-3">
+            	<div class="col-12">
+					<!-- table -->
+					<table class="table table-bordered">
+						<colgroup>
+							<col style="width:120px" />
+							<col />
+						</colgroup>
+						<tbody>
+							<tr>
+								<th class="text-center">등록일</th>
+								<td th:text="${detail.regDate}"></td>
+							</tr>
+							<tr>
+								<th class="text-center">URL</th>
+								<td th:text="${detail.url}"></td>
+							</tr>
+							<tr>
+								<th class="text-center">회사명</th>
+								<td th:text="${detail.companyName}"></td>
+							</tr>
+							<tr>
+								<th class="text-center">순서</th>
+								<td th:text="${detail.sort}"></td>
+							</tr>
+							<tr>
+								<th class="text-center">노출종류</th>
+								<td th:text="${detail.commoncdType}"></td>
+							</tr>
+							<tr>
+								<th class="text-center">사용여부</th>
+								<td th:if="${detail.useFlag eq 'Y'}">활성</td>
+								<td th:if="${detail.useFlag eq 'N'}">비활성</td>
+							</tr>
+							<tr>
+								<th class="text-center">첨부 파일</th>
+								<td>
+									<div th:if="${file ne null}" id="imgViewArea"
+										style="margin-top: 10px;">
+										<div th:if="${file.size() ne 0}">
+											<img th:src="${file.get(0).url}" id="imgArea"
+												style="width: 200px; height: 100px;" data-role="imgView" />
+										</div>
+									</div>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<!-- table -->
+					<div class="m-t-10 text-right">
+						<button type="button" class="btn btn-dark" data-role="modify">수정하기</button>
+						<button type="button" class="btn btn-dark" data-role="delete">삭제하기</button>
+						<button type="button" class="btn btn-dark" data-role="cancel">목록</button>
+					</div>
+				</div>
+			</div>
+		</main>
+	</div>
+</body>
+</html>

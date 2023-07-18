@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.bo.BoOrgMapper">   
+
+    <!-- 조직 리스트 조회 -->
+    <select id="selectOrgList" parameterType="BoOrgDTO" resultType="BoOrgDTO">
+        /* com.fw.core.mapper.db1.bo.OrgMapper.selectOrgList, 조직 리스트 조회, 22.09.04, jhmoon, OrgMapper.xml */
+        SELECT tg.org_id
+             , tg.org_nm
+             , tg.use_flag
+             , tg.create_seq
+             , tg.create_dt
+             , tg.update_seq
+             , tg.update_dt
+             , (SELECT ta.admin_nm FROM tb_admin ta WHERE ta.admin_seq = tg.create_seq) AS writer
+             , (SELECT ta.admin_nm FROM tb_admin ta WHERE ta.admin_seq = tg.update_seq) AS corrector
+          FROM tb_org AS tg
+          WHERE tg.del_flag = 'N'
+          ORDER BY tg.org_id
+    </select>
+    <!-- 상세 조회 -->
+    <select id="selectOrg" parameterType="BoOrgDTO" resultType="BoOrgDTO">
+    /* com.fw.core.mapper.db1.bo.OrgMapper.selectOrg, 조직 리스트 조회, 22.09.04, jhmoon, OrgMapper.xml */ 
+    	SELECT tg.org_id
+             , tg.org_nm
+             , tg.use_flag
+             , tg.create_seq
+             , tg.create_dt
+             , tg.update_seq
+             , tg.update_dt
+             , (SELECT ta.admin_nm FROM tb_admin ta WHERE ta.admin_seq = tg.create_seq) AS writer
+             , (SELECT ta.admin_nm FROM tb_admin ta WHERE ta.admin_seq = tg.update_seq) AS corrector
+        FROM tb_org AS tg
+        WHERE tg.org_id = #{orgId}
+    </select>
+    <!-- 수정 부분 -->
+    <update id="updateOrgInfo" parameterType="BoOrgDTO">
+    	/* com.fw.core.mapper.db1.bo.OrgMapper.updateOrgInfo, 조직 리스트 수정, 22.09.07, jhmoon, OrgMapper.xml */
+    	 UPDATE tb_org
+             SET org_nm = #{orgNm}
+             , use_flag = #{useFlag}
+             , update_seq = #{adminSession.adminSeq}
+             , update_dt = NOW()
+          WHERE org_id = #{orgId}
+    </update>
+    <!-- 정보 등록 -->
+    <insert id="insertOrgInfo" parameterType="BoOrgDTO" >
+    	/* com.fw.core.mapper.db1.bo.OrgMapper.insertOrgInfo, 조직 리스트 수정, 22.09.07, jhmoon, OrgMapper.xml */
+    	 INSERT INTO tb_org(
+    	 	     org_id
+    	 	   , org_nm
+    	 	   , use_flag
+    	 	   , create_seq
+    	 	   , create_dt
+    	 ) VALUES (
+    	 	     #{orgId}
+    	 	   , #{orgNm}
+    	 	   , #{useFlag}
+    	 	   , #{adminSession.adminSeq}
+    	 	   , NOW()
+    	 )
+    </insert>
+    <!-- 중복 체크 -->
+    <select id="selectOrgOverLap" parameterType="BoOrgDTO" resultType="int">
+    	/* com.fw.core.mapper.db1.bo.OrgMapper.selectOrgOverLap, 중복 체크,22.09.07 jhmoon, OrgMapper.xml*/
+    	SELECT COUNT(*)
+    	FROM tb_org
+    	WHERE org_id = #{orgId}
+    </select>
+    <!-- 그룹 정보 삭제 -->
+	<delete id="deleteOrgInfo" parameterType="BoOrgDTO">
+	/* com.fw.core.mapper.db1.bo.OrgMapper.overlapCheck, 중복 체크,22.09.07 jhmoon, OrgMapper.xml*/
+		 UPDATE tb_org
+		 SET del_flag = 'Y'
+		 WHERE org_id = #{orgId}
+	</delete>
+</mapper>

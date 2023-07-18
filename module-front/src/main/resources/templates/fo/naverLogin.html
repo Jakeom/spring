@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="layouts/loginLayout">
+    <body>
+        <div layout:fragment="contents" th:remove="tag">
+            간편로그인
+            <input type="hidden" id="returnURL" th:value="${@environment.getProperty('service.web_domain')}">
+        </div>
+    </body>
+</html>

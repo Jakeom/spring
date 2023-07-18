@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/hh/hhWefirmLayout">
+<body>
+<div id="container-block">
+    <div layout:fragment="contents" th:remove="tag">
+        <div class="layout-content">
+            <h3 class="subtitle">We펌 관리</h3>
+            <div class="title-line mt-4 mb-5"></div>
+            <div>
+                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home"
+                                type="button" role="tab" aria-controls="home" aria-selected="true">운영자 추가
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile"
+                                type="button" role="tab" aria-controls="profile" aria-selected="false" tabindex="-1">We펌
+                            정보관리
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact"
+                                type="button" role="tab" aria-controls="contact" aria-selected="false">We펌 폐쇄
+                        </button>
+                    </li>
+                </ul>
+                <div class="tab-content" id="myTabContent">
+                    <div class="tab-pane fade active show" id="home" role="tabpanel" aria-labelledby="home-tab">
+                        <p class="text-center m-t-30 m-b-30">We펌에 가입한 회원 중 <span class="text-danger">1명</span>을 운영자로 지정할
+                            수 있으며, We펌 대표자와 동일한 권한을 부여합니다.</p>
+                        <form name="searchForm" action="/hh/wefirm/management">
+                            <input type="hidden" name="wefirmId" th:value="${detail.id}" />
+                            <div class="sub-content-head p-0">
+                                <div class="search-area">
+                                    <div class="input-group">
+                                        <select class="select-design" name="searchType" style="width: 150px">
+                                            <option value="NAME" th:selected="${'NAME' eq searchInfo.searchType}">이름</option>
+                                            <option value="EMAIL" th:selected="${'EMAIL' eq searchInfo.searchType}">이메일</option>
+                                        </select>
+                                        <input type="text" class="form-control p-l-20" placeholder="" name="searchValue" th:value="${searchInfo.searchValue}" />
+                                        <div class="input-group-append">
+                                            <button class="btn btn-primary btn-input-search" type="button" data-role="search">검색</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                        <table class="table border-top-1 m-t-15">
+                            <thead>
+                                <tr>
+                                    <th class="text-center"></th>
+                                    <th class="text-center">No.</th>
+                                    <th class="text-center">사진</th>
+                                    <th class="text-center">이름</th>
+                                    <th class="text-center">연락처</th>
+                                    <th class="text-center">이메일</th>
+                                    <th class="text-center">가입일</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <th:block th:if="${#lists.isEmpty(headhunterList)}">
+                                    <tr>
+                                        <td colspan="7" class="text-center">헤드헌터 리스트가 없습니다.</td>
+                                    </tr>
+                                </th:block>`
+                                <th:block th:each="list : ${headhunterList}">
+                                    <tr>
+                                        <td class="text-center">
+                                            <th:block th:if="${!#strings.equals('대표', list.adminRole) and !#strings.equals('운영자', list.adminRole)}">
+                                                <input type="checkbox" name="idArr" th:value="${list.memberId}" />
+                                            </th:block>
+                                        </td>
+                                        <td class="text-center">
+                                            <p th:text="${list.adminRole}">대표</p>
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="img-box">
+                                                <th:block th:each="item, status : ${list.commonFileList}" th:if="${status.index == 0}">
+                                                    <img th:src="${item.url eq null ? '/static/images/about-01.png' : item.url}" alt="헤드헌터 사진"/>
+                                                </th:block>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                            <p th:text="${list.name}">홍길동</p>
+                                        </td>
+                                        <td class="text-center">
+                                            <p th:text="${list.phone}">010-1234-5678</p>
+                                        </td>
+                                        <td class="text-center">
+                                            <p th:text="${list.email}">asdb@naver.com</p>
+                                        </td>
+                                        <td class="text-center">
+                                            <p th:text="${list.createdAt}">2020.12.01</p>
+                                        </td>
+                                    </tr>
+                                </th:block>
+                            </tbody>
+                        </table>
+                        <div class="d-flex justify-content-end m-t-15">
+                            <button type="button" class="btn btn-outline-gray btn-md" data-role="addAdmin" th:disabled="${detail.ceoMemberId != searchInfo.memberId}">운영자로 추가</button>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+                        <table class="table border-top-1 m-t-30">
+                            <caption>
+                                기업정보
+                            </caption>
+                            <tbody>
+                            <tr>
+                                <th class="">회사홈페이지</th>
+
+                                <td class="">
+                                    <input type="text" class="form-control form-lg" name="websiteUrl" th:value="${detail.websiteUrl}" placeholder=""/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="">회사 로고이미지<br /><span class="text-danger">(로고 이미지 변경시 첨부바랍니다)</span></th>
+                                <td class="">
+                                    <div class="form-upload">
+                                        <input type="file" class="" name="logoFiles" id="form-file"/>
+                                        <label for="form-file"><span class="file-name m-r-10"></span><i class="icon-input-add"></i></label>
+                                    </div>
+                                    <p class="text-end font-size-14 text-gray m-t-5">(10MB 이하의 .jpg, .gif, .png)</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="">We펌 상세설명</th>
+                                <td class="">
+                                    <div class="form-textarea textarea-sm m-0">
+                                        <textarea name="description" id="" cols="30" rows="10" placeholder="" class="" th:text="${detail.description}"></textarea>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <p class="m-t-10">사업자등록증상의 정보가 변경된 경우, 고객센터 1:1문의에 요청해 주시기 바랍니다.</p>
+                        <div class="d-flex justify-content-center gap-10 m-t-30">
+                            <button type="button" class="btn btn-dark btn-xl" data-role="modifyWefirm">수정</button>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
+                        <div class="mt-5">
+                            <div class="example-form mt-4">
+                                <ul>
+                                    <li>We펌 폐쇄는 대표자만 가능하며, 대표자를 제외한 모든 회원을 탈퇴처리 한 후에 가능합니다.</li>
+                                    <li>폐쇄 후에는 게시글 등을 복구할 수 없으니 필요하신 자료가 있으면 폐쇄 전 미리 저장해 주시기 바랍니다.</li>
+                                </ul>
+                            </div>
+                            <p class="notice-text"></p>
+
+                            <div class="apply-wrap">
+                                <div class="fake-table password">
+                                    <div class="fake-table-column">
+                                        <div class="fake-table-cell">
+                                            <p class="table-cell-title">현재 비밀번호</p>
+                                            <input type="password" name="recentPassword" class="form-control form-lg" value="" placeholder="현재 비밀번호"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-center gap-10 m-t-30">
+                                <button type="button" class="btn btn-dark btn-xl" data-role="deleteWefirm" th:disabled="${detail.ceoMemberId != searchInfo.memberId}">탈퇴</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

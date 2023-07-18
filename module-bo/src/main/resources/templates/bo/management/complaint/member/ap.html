@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/blank}">
+<body>
+	<div layout:fragment="contents" th:remove="tag">
+		<div id="APDiv" class="col-12">
+			<div class="row">
+				<div class="col-5">
+					<button class="btn btn-primary" name="menuColorChange" id="memberInfo">회원정보</button>
+					<button class="btn btn-secondary" name="menuColorChange" id="resumeInfo">이력서정보</button>
+					<button class="btn btn-secondary" name="menuColorChange" id="APPosition">채용정보</button>
+				</div>
+				<div id="functionDiv" class="col-7 text-right">
+					<span id="eventDiv">
+						<button class="btn btn-primary" id="apModify" data-role="apModify">수정하기</button>
+					</span>
+					<button type="button" th:if="${detail.isTemp eq '1'}" class="btn btn-danger" id="isTemp">임시회원 삭제</button>
+					<button type="button" th:if="${detail.isStop eq '0'}" class="btn btn-danger" id="isStop">이용정지</button>
+					<button type="button" th:if="${detail.isStop eq '1'}" class="btn btn-danger" id="isStopNo">이용정지해제</button>
+					<button type="button" class="btn btn-danger" data-toggle="modal" data-target="#passwordModal">비밀번호 초기화</button>
+					<button type="button" class="btn btn-danger" id="deleted">강제탈퇴</button>
+				</div>
+			</div>
+			<!-- 날짜 선택 div -->
+			<form id="searchDetail" name="searchDetail">
+				<div id="searchDt" class="row mt-3" style="display: none;">
+					<div class="col-4">
+						<div class="d-flex align-items-center">
+							<input type="text" id="detailStartDt" name="detailStartDt" class="form-control form-datepicker" placeholder="날짜 선택">
+							<div class="mr-2">~</div>
+							<input type="text" id="detailEndDt" name="detailEndDt" class="form-control form-datepicker" placeholder="날짜 선택">
+						</div>
+					</div>
+					<div class="col-2">
+						<div class="d-flex align-items-center">
+							<button type="button" class="btn btn-dark" name="colorChange" id="all" data-role="all">전체</button>
+							<button type="button" class="btn btn-dark" name="colorChange" id="today" data-role="today">오늘</button>
+							<button type="button" class="btn btn-dark" name="colorChange" id="week" data-role="week">7일</button>
+							<button type="button" class="btn btn-dark" name="colorChange" id="month" data-role="month">1개월</button>
+						</div>
+					</div>
+					<div class="col-6 text-right">
+						<select name="divisionSelect" id="divisionSelect" class="form-control">
+					</select>
+						<button type="button" class="btn btn-primary" id="search">조회하기</button>
+					</div>
+				</div>
+			</form>
+			<div id="rewardDiv" class="row p-r-60" style="display: none">
+				<div id="rewardBalanceDiv" class="col text-right">
+					<p id="balance"></p>
+					<button class="btn btn-primary" data-toggle="modal"
+						data-target="#rewardModal">지급/회수</button>
+				</div>
+			</div>
+			<!-- 각 테이블 구분 select div -->
+			<div id="selectDiv" class="row p-l-60" style="display: none">
+				<div class="col">
+					
+				</div>
+			</div>
+			<div class="row mt-3">
+				<!-- 회원정보 테이블 div-->
+				<div class="col" id="tableDiv">
+					<table class="table table-bordered" id="infoTable">
+						<colgroup>
+							<col style="width: 15%" />
+							<col style="width: 35%" />
+							<col style="width: 15%" />
+							<col style="width: 35%" />
+						</colgroup>
+						<tbody>
+							<tr>
+								<th class="text-center">가입일시</th>
+								<td>[[${detail.createdAt}]]</td>
+								<th class="text-center">최종비밀번호 변경일</th>
+								<td>[[${detail.lastChangePassword}]]</td>
+							</tr>
+							<tr>
+								<th class="text-center">회원ID</th>
+								<td>[[${detail.id}]]</td>
+								<th class="text-center">이력서 열람제한여부</th>
+								<td name="inputChange" id="inputRestricted"
+									th:if="${detail.resumeRestricted eq '1'}">Y</td>
+								<td name="inputChange" id="inputRestricted"
+									th:if="${detail.resumeRestricted eq '0'}">N</td>
+								<td name="inputChange" id="inputRestricted"
+									th:if="${detail.resumeRestricted eq null}">-</td>
+							</tr>
+							<tr>
+								<th class="text-center">이메일주소</th>
+								<td>[[${detail.email}]]</td>
+								<th class="text-center">구직의사</th>
+								<td name="inputChange" id="inputFindingJob"
+									th:if="${detail.findingJob eq '1'}">Y</td>
+								<td name="inputChange" id="inputFindingJob"
+									th:if="${detail.findingJob eq '0'}">N</td>
+								<td name="inputChange" id="inputFindingJob"
+									th:if="${detail.findingJob eq null}">-</td>
+							</tr>
+							<tr>
+								<th class="text-center">이름</th>
+								<td name="inputChange" id="inputName">[[${detail.name}]]</td>
+								<th class="text-center">생년</th>
+								<td>[[${detail.birth}]]</td>
+							</tr>
+							<tr>
+								<th class="text-center">휴대폰번호</th>
+								<td name="inputChange" id="inputPhone">[[${detail.phone}]]</td>
+								<th class="text-center">성별</th>
+								<td>[[${detail.birth}]]</td>
+							</tr>
+							<tr>
+								<th class="text-center">임시회원</th>
+								<td th:if="${detail.isTemp eq '1'}">Y</td>
+								<td th:if="${detail.isTemp eq '0'}">N</td>
+								<td th:if="${detail.isTemp eq null}">-</td>
+								<th class="text-center">이력서 개인정보수집 동의여부</th>
+								<td name="inputChange" id="inputPrivate"
+									th:if="${detail.isPrivateAgreement eq '1'}">Y</td>
+								<td name="inputChange" id="inputPrivate"
+									th:if="${detail.isPrivateAgreement eq '0'}">N</td>
+								<td name="inputChange" id="inputPrivate"
+									th:if="${detail.isPrivateAgreement eq null}">-</td>
+							</tr>
+							<tr>
+								<th class="text-center">탈퇴일시</th>
+								<td>[[${detail.deletedAt}]]</td>
+								<th class="text-center">헤드헌터 추천코드</th>
+								<td>[[${detail.hhReferralCode}]]</td>
+							</tr>
+							<tr>
+								<th class="text-center">개인정보유효기간</th>
+								<td>[[${detail.privacyExpireDate}]]</td>
+								<th class="text-center">연락가능 주말/휴일 제외여부</th>
+								<td name="inputChange" id="inputExceptHoliday"
+									th:if="${detail.contactExceptHoliday eq '1'}">Y</td>
+								<td name="inputChange" id="inputExceptHoliday"
+									th:if="${detail.contactExceptHoliday eq '0'}">N</td>
+								<td name="inputChange" id="inputExceptHoliday"
+									th:if="${detail.contactExceptHoliday eq null}">-</td>
+							</tr>
+							<tr>
+								<th class="text-center">개인정보유효기간 선택년도</th>
+								<td>[[${detail.privacyExpire}]]</td>
+								<th class="text-center">연락가능시간</th>
+								<td name="inputChange" id="inputTime"
+									th:if="${detail.contactableTime eq 'ALWAYS'}">상시</td>
+								<td name="inputChange" id="inputTime"
+									th:if="${detail.contactableTime eq 'EVENING'}">18시~22시</td>
+								<td name="inputChange" id="inputTime"
+									th:if="${detail.contactableTime eq null}">-</td>
+							</tr>
+							<tr>
+								<th class="text-center">마케팅정보수신제공동의</th>
+								<td name="inputChange" id="inputMarketing"
+									th:if="${detail.agreeMarketing eq '1'}">Y</td>
+								<td name="inputChange" id="inputMarketing"
+									th:if="${detail.agreeMarketing eq '0'}">N</td>
+								<td name="inputChange" id="inputMarketing"
+									th:if="${detail.agreeMarketing eq null}">-</td>
+								<th class="text-center">상태</th>
+								<td id="inputDeleted" th:if="${detail.deleted eq '1'}">탈퇴회원</td>
+								<td id="inputDeleted"
+									th:if="${detail.isTemp eq '1' and detail.deleted eq '0'}">임시회원</td>
+								<td id="inputDeleted"
+									th:if="${detail.isTemp eq '0' and detail.deleted eq '0'}">정상</td>
+							</tr>
+							<tr>
+								<th class="text-center">마케팅정보수신제공동의(거부)날짜</th>
+								<td>[[${detail.agreeMarketingAt}]]</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="row mt-3">
+				<!-- 이력서정보, 채용정보, 리워드 datatable div-->
+				<div class="col-12" id="datatableDiv"></div>
+			</div>
+		</div>
+		<!-- 비밀번호 초기화 모달 -->
+		<div class="modal fade" id="passwordModal" tabindex="-1" role="dialog"
+			aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<p>비밀번호 초기화</p>
+					</div>
+					<div class="modal-body">
+						<div class="container">
+							<div class="row m-3">
+								<div class="col">비밀번호 초기화는 회원이 비밀번호 재설정이 불가능한 경우, 관리자가
+									본인확인을 한 뒤 비밀번호 재설정을 하고 회원에게 변경된 비밀번호를 통보해야합니다.</div>
+							</div>
+							<div class="row m-3">
+								<div class="col-12">
+									<table>
+										<tr>
+											<td><label>신규 비밀번호 <input type="password"
+													id="password"></label></td>
+										</tr>
+										<tr>
+											<td><label>비밀번호 확인 <input type="password"
+													id="passwordCheck"></label></td>
+										</tr>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<div class="container">
+							<div class="row">
+								<div class="col text-center">
+									<button type="button" class="btn btn-primary"
+										id="passwordChange">변경</button>
+									<button type="button" class="btn btn-secondary"
+										data-dismiss="modal">취소</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

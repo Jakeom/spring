@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.hh.HhPositionViewMapper">
+
+    <!-- 기업 정보 상세 -->
+    <select id="selectCompanyDetail" parameterType="HhCompanyDTO" resultType="HhCompanyDTO">
+        /* com.fw.core.mapper.db1.hh.HhPositionViewMapper.selectCompanyDetail, 기업 정보 상세, wsh, HhPositionViewMapper.xml */
+        SELECT hc.id
+             , DATE_FORMAT(hc.createdAt,'%Y-%m-%d') AS createdAt
+             , DATE_FORMAT(hc.updatedAt,'%Y-%m-%d') AS updatedAt
+             , hc.address
+             , hc.ceo
+             , hc.companyName
+             , hc.companyScale
+             , hc.companyStatus
+             , DATE_FORMAT(hc.establishDate, '%Y.%m.%d') AS establishDate
+             , hc.industry
+             , hc.licenseNumber
+             , hc.marketListing
+             , CASE LENGTH(hc.phone)
+       				WHEN 11 THEN CONCAT(LEFT(hc.phone, 3), '-', MID(hc.phone, 4, 4), '-', RIGHT(hc.phone, 4))
+      				WHEN 10 THEN CONCAT(LEFT(hc.phone, 3), '-', MID(hc.phone, 4, 3), '-', RIGHT(hc.phone, 4)) END phone
+             , hc.member_id
+             , hc.delFlag
+             , p.title
+             , DATE_FORMAT(p.endDate,'%Y-%m-%d') AS endDate
+             , fn_get_common_cd(p.status , 'POSITION_STATUS' , '1') AS status
+             , p.id
+             , DATE_FORMAT(p.createdAt,'%Y-%m-%d') AS positionCreatedAt
+        FROM hr_company AS hc
+      LEFT JOIN position AS p
+      ON hc.id = p.hr_company_id
+        WHERE hc.id = #{companyId}
+      <if test="licenseNumber != null and licenseNumber != ''">
+          AND hc.licenseNumber = #{licenseNumber}
+      </if>
+          AND hc.delFlag = 'N'
+    </select>
+	
+	<!-- 포지션 리스트 -->
+    <select id="selectPositionDetail" parameterType="HhCompanyDTO" resultType="HhCompanyDTO">
+        /* com.fw.core.mapper.db1.hh.HhPositionViewMapper.selectPositionDetail, 포지션 리스트, wsh, HhPositionViewMapper.xml */
+        SELECT p.id
+        	 , p.title
+             , DATE_FORMAT(p.endDate,'%Y-%m-%d') AS endDate
+             , fn_get_common_cd(p.status , 'POSITION_STATUS' , '1') AS status
+             , DATE_FORMAT(p.createdAt,'%Y-%m-%d') AS createdAt
+             , p.jobDescription
+             , (SELECT COUNT(1) FROM position_participant AS pp WHERE pp.position_id = p.id) AS coworkCnt
+             , (SELECT COUNT(1) FROM position_participant AS pp INNER JOIN position_applicant AS pa ON pp.member_id = pa.ap_member_id AND pp.position_id = p.id) AS resumeCnt
+             , p.feeInfo
+             , p.warrantyTerm
+             , p.etc_comment
+             , p.member_id
+             , (SELECT name FROM member WHERE id = p.member_id) AS memberName
+             , p.industry
+             , IF(EXISTS(SELECT (1) FROM position_participant pp WHERE pp.position_id = p.id AND pp.member_id = #{frontSession.id} AND stoped != 1 AND delFlag = 'N'),'Y','N') AS coJoinFlag
+        FROM position AS p
+      INNER JOIN hr_company AS hc
+      ON hc.id = p.hr_company_id
+        WHERE p.id = #{positionId} AND p.delFlag = 'N'
+        ORDER BY p.createdAt DESC
+    </select>
+
+    <!-- 포지션 리스트 -->
+    <select id="selectPositionDetailByPositionId" parameterType="HhCompanyDTO" resultType="HhCompanyDTO">
+        /* com.fw.core.mapper.db1.hh.HhPositionViewMapper.selectPositionDetailByPositionId, 포지션 리스트, wsh, HhPositionViewMapper.xml */
+        SELECT p.id
+        	 , p.title
+             , DATE_FORMAT(p.endDate,'%Y-%m-%d') AS endDate
+             , fn_get_common_cd(p.status , 'POSITION_STATUS' , '1') AS status
+             , DATE_FORMAT(p.createdAt,'%Y-%m-%d') AS createdAt
+             , p.jobDescription
+             , (SELECT COUNT(1) FROM position_participant AS pp WHERE pp.position_id = p.id) AS coworkCnt
+             , (SELECT COUNT(1) FROM position_applicant AS pp WHERE pp.position_id = p.id) AS resumeCnt
+             , p.feeInfo
+             , p.warrantyTerm
+             , p.etc_comment
+             , p.member_id
+             , (SELECT name FROM member WHERE id = p.member_id) AS memberName
+             , p.industry
+             , IF(EXISTS(SELECT (1) FROM position_participant pp WHERE pp.position_id = p.id AND pp.member_id = #{frontSession.id} AND pp.stoped != 1 AND pp.delFlag = 'N'),'Y','N') AS coJoinFlag
+             , position_reason
+             , team
+             , salary
+             , target_company
+             , etc_comment
+             , direct_position_flag
+             , CASE WHEN direct_position_flag = 0 THEN '헤드헌팅만 진행'
+					WHEN direct_position_flag = 1 THEN '직접채용 진행' END AS directPositionFlag
+        FROM position AS p
+      INNER JOIN hr_company AS hc
+      ON hc.id = p.hr_company_id
+        WHERE p.id = #{positionId}
+    </select>
+
+    <!-- 기업 정보 상세 -->
+    <select id="selectCompanyDetailByPositionId" parameterType="HhCompanyDTO" resultType="HhCompanyDTO">
+        /* com.fw.core.mapper.db1.hh.HhPositionViewMapper.selectCompanyDetailByPositionId, 기업 정보 상세, wsh, HhPositionViewMapper.xml */
+        SELECT hc.id
+            , DATE_FORMAT(hc.createdAt,'%Y-%m-%d') AS createdAt
+            , DATE_FORMAT(hc.updatedAt,'%Y-%m-%d') AS updatedAt
+            , hc.address
+            , hc.ceo
+            , hc.companyName
+            , hc.companyScale
+            , hc.companyStatus
+            , DATE_FORMAT(hc.establishDate, '%Y.%m.%d') AS establishDate
+            , hc.industry
+            , hc.licenseNumber
+            , hc.marketListing
+            , CASE LENGTH(hc.phone)
+            WHEN 11 THEN CONCAT(LEFT(hc.phone, 3), '-', MID(hc.phone, 4, 4), '-', RIGHT(hc.phone, 4))
+            WHEN 10 THEN CONCAT(LEFT(hc.phone, 3), '-', MID(hc.phone, 4, 3), '-', RIGHT(hc.phone, 4)) END phone
+            , hc.member_id
+            , hc.delFlag
+            , p.title
+            , DATE_FORMAT(p.endDate,'%Y-%m-%d') AS endDate
+            , fn_get_common_cd(p.status , 'POSITION_STATUS' , '1') AS status
+            , p.id
+            , DATE_FORMAT(p.createdAt,'%Y-%m-%d') AS positionCreatedAt
+        FROM position AS p
+        LEFT JOIN hr_company AS hc
+        ON hc.id = p.hr_company_id
+        WHERE p.id = #{positionId}
+    </select>
+
+</mapper>

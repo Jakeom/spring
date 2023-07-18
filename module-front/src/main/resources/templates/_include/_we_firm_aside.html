@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:fragment="common">
+<aside>
+  <ul>
+    <th:block th:if="${selectWefirmAuth.wefirmAuth eq 'MANAGER' || selectWefirmAuth.wefirmAuth eq 'STAFF'}">
+      <li>
+        <a href="/hh/wefirm/view-position"><span class="poppins">내 We펌</span></a>
+        <ul>
+          <li th:classappend="${activeMenuURI eq '/hh/wefirm/view-position'} ? 'active' : ''">
+            <a href="/hh/wefirm/view-position">포지션 공고보기</a>
+          </li>
+          <li th:classappend="${activeMenuURI eq '/hh/wefirm/affiliated-headhunter'} ? 'active' : ''">
+            <a href="/hh/wefirm/affiliated-headhunter">소속 헤드헌터</a>
+          </li>
+          <li th:classappend="${activeMenuURI eq '/hh/wefirm/customer'} ? 'active' : ''">
+          	<a href="/hh/wefirm/customer">고객사 관리</a>
+          </li>
+        </ul>
+      </li>
+    </th:block>
+    <th:block th:if="${selectWefirmAuth.wefirmAuth eq 'MANAGER'}">
+      <li>
+        <a href="/hh/wefirm/headhunter-list"><span class="poppins">We펌 운영</span></a>
+        <ul>
+          <li th:classappend="${activeMenuURI eq '/hh/wefirm/headhunter-list'} ? 'active' : ''">
+              <a href="/hh/wefirm/headhunter-list">헤드헌터 리스트</a>
+          </li>
+          <li th:classappend="${activeMenuURI eq '/hh/wefirm/subscription-approval'} ? 'active' : ''">
+              <a href="/hh/wefirm/subscription-approval">가입신청 승인</a>
+          </li>
+          <li th:classappend="${activeMenuURI eq '/hh/wefirm/management'} ? 'active' : ''">
+          	<a href="/hh/wefirm/management">We펌 관리</a>
+          </li>
+        </ul>
+      </li>
+    </th:block>
+    <th:block th:if="${selectWefirmAuth.wefirmAuth eq 'NO'}">
+      <li>
+        <a href="/hh/wefirm/search"><span class="poppins">We펌</span></a>
+        <ul>
+          <li th:classappend="${activeMenuURI eq '/hh/wefirm/search'} ? 'active' : ''">
+          	<a href="/hh/wefirm/search">We펌 검색</a>
+          </li>
+          <li th:classappend="${activeMenuURI eq '/hh/wefirm/subscription-approval-status'} ? 'active' : ''">
+            <a href="/hh/wefirm/subscription-approval-status">가입승인상태</a>
+          </li>
+          <li th:classappend="${activeMenuURI eq '/hh/wefirm/application-open'} ? 'active' : ''">
+          	<a href="/hh/wefirm/application-open">We펌 개설신청</a>
+          </li>
+        </ul>
+      </li>
+    </th:block>
+  </ul>
+</aside>
+</div>
+</html>

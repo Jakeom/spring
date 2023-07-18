@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/default}">
+<body>
+	<div layout:fragment="contents" th:remove="tag">
+		<main id="content" role="main">
+			<h2 class="title">이력서 수정</h2>
+			<div class="row p-3">
+				<div class="col-12">
+					<h4 class="table-subtitle mb-3">인적사항</h4>
+					<input type="hidden" id="resumeId" name="id" th:value="${resumeInfo.id}">
+					<div class="mt-3 mb-3">
+						<div class="img-upload" style="position: relative">
+							<input type="file" id="img-upload" style="display:none;"/>
+							<img id="img-upload-file" data-role="clickImg"
+								th:if="${resumeInfo.pictureFileId ne null}"
+								th:src="${resumeInfo.commonFileList[0].url}"
+								style="width: 165px; height: 160px;" />
+							<label for="img-upload" class="img-upload-label" style="opacity: 0;">
+								<i class="icon-img-add"></i>
+								<span>이미지 올리기</span> <em>png, jpg 형식, 2MB 미만, <br />360*360 사이즈 권장
+							</em>
+							</label> <input type="hidden" name="photoChangeFlag" value="N">
+						</div>
+					</div>
+					<table class="table">
+						<colgroup>
+							<col style="width: 7%">
+							<col style="width: 25.5%">
+							<col style="width: 7%">
+							<col style="width: 25.5%">
+						</colgroup>
+						<tbody>
+							<tr>
+								<th class="text-center">이름</th>
+								<td>
+									<input type="hidden" name="totalCareer" value="0" />
+									<input th:value="${resumeInfo.name}" type="text" class="form-control form-lg inp-name" placeholder="이름" name="userName" readonly />
+								</td>
+								<th class="text-center">주소</th>
+								<td>
+									<input type="text" th:value="${resumeInfo.address}" class="form-control form-lg inp-address" name="address" placeholder="주소" />
+								</td>
+							</tr>
+							<tr>
+								<th class="text-center">생년월일</th>
+								<td>
+									<input th:value="${resumeInfo.birth}" type="text" class="form-control form-lg inp-birth" name="birth" value="" placeholder="생년월일(8자리)" readonly />
+								</td>
+								<th class="text-center">최종연봉</th>
+								<td>
+									<input type="text" th:value="${resumeInfo.lastSalary}" class="form-control form-lg inp-birth" name="lastSalary" value="" placeholder="최종연봉(만원)" />
+								</td>
+							</tr>
+							<tr>
+								<th class="text-center">연락처</th>
+								<td>
+									<input type="number" th:value="${resumeInfo.phone}" class="form-control form-lg inp-phone" name="phone" placeholder="번호" readonly />
+								</td>
+								<th class="text-center">이메일</th>
+								<td>
+									<input type="text" th:value="${resumeInfo.email}" class="form-control form-lg inp-email" name="email" placeholder="이메일" readonly />
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<div class="content">
+						<h4 class="table-subtitle mb-3 mt-3">핵심역량</h4>
+						<div class="desc">
+							<table class="table">
+								<colgroup>
+									<col style="width: 7%">
+									<col style="width: 25.5%">
+									<col style="width: 7%">
+									<col style="width: 25.5%">
+								</colgroup>
+								<tbody>
+									<th:block th:each="list : ${specInfo}">
+										<tr th:if="${list.specType eq 'MAIN'}">
+											<th class="text-center">Main</th>
+											<td colspan="3">
+												<input type="hidden" name="specType" value="MAIN"/>
+												<input th:value="${list.spec}" type="text" name="spec" class="form-control form-lg" placeholder="인사, 회계, 기획, 설계, 영업, 관리, 개발, 용접 등" />
+											</td>
+										</tr>
+										<tr th:if="${list.specType eq 'DETAIL'}">
+											<th class="text-center">상세</th>
+											<td colspan="3">
+												<input type="hidden" name="specType" value="DETAIL"/>
+												<input th:value="${list.spec}" type="text" name="spec" class="form-control form-lg" placeholder="인사기획, 평가보상, 내부회계, IT기획, 전략기획, 마케팅기획, 홍보, IR, 투자 등" />
+											</td>
+										</tr>
+										<tr th:if="${list.specType eq 'ETC'}">
+											<th class="text-center">기타</th>
+											<td colspan="3">
+												<input type="hidden" name="specType" value="ETC"/>
+												<input th:value="${list.spec}" type="text" name="spec" class="form-control form-lg" placeholder="자격증(의사, 변호사, 회계사 등), 주요실적, 주재원, 어학 등" />
+											</td>
+										</tr>
+									</th:block>
+									<th:block th:if="${#lists.isEmpty(specInfo)}">
+										<tr>
+											<th class="text-center">Main</th>
+											<td colspan="3">
+												<input type="text" name="spec" class="form-control form-lg" placeholder="인사, 회계, 기획, 설계, 영업, 관리, 개발, 용접 등" />
+											</td>
+										</tr>
+										<tr>
+											<th class="text-center">상세</th>
+											<td colspan="3">
+												<input type="text" name="spec" class="form-control form-lg" placeholder="인사기획, 평가보상, 내부회계, IT기획, 전략기획, 마케팅기획, 홍보, IR, 투자 등" />
+											</td>
+										</tr>
+										<tr>
+											<th class="text-center">기타</th>
+											<td colspan="3">
+												<input type="text" name="spec" class="form-control form-lg" placeholder="자격증(의사, 변호사, 회계사 등), 주요실적, 주재원, 어학 등" />
+											</td>
+										</tr>
+									</th:block>
+								</tbody>
+							</table>
+						</div>
+					</div>
+					<h4 class="table-subtitle mb-3 mt-3">학력</h4>
+					<div class="desc">
+						<th:block th:each="list : ${academicInfo}" th:if="${list.degreeCd eq 'HIGH'}">
+							<div class="high-school-area">
+								<table class="table">
+									<colgroup>
+										<col style="width: 7%">
+										<col style="width: 25.5%">
+										<col style="width: 7%">
+										<col style="width: 25.5%">
+									</colgroup>
+									<tbody>
+										<tr>
+											<th class="text-center"><input type="text" name="degreeCd" class="form-control form-lg" value="고등학교" readonly /></th>
+											<td>
+												<input type="hidden" name="id" th:value="${list.id}">
+												<div class="search-box search-lg">
+													<input type="hidden" name="schoolCd" value="" />
+													<div class="d-flex align-items-center">
+														<input th:value="${list.schoolName}" type="text" name="schoolName" class="form-control w-auto" placeholder="학교명" />
+														<button type="button" class="btn btn-primary search-btn">검색</button>
+														<input type="hidden" name="majorClassCd" value="" />
+														<input type="hidden" name="majorName" value="" />
+														<input type="hidden" name="majorGrades" value="" />
+														<input type="hidden" name="minorClassCd" value="" />
+														<input type="hidden" name="minorName" value="" />
+														<input type="hidden" name="minorGrades" value="" />
+														<input type="hidden" name="entranceYm" value="" />
+														<input type="hidden" name="estType" value="" />
+														<input type="hidden" name="schoolType" value="" />
+														<input type="hidden" name="inOverseas" value="0" />
+														<input class="m-l-20" th:checked="${list.inOverseas eq 1}" type="checkbox" value="1" id="overseas" />
+														<label class="" for="overseas">해외</label>
+													</div>
+												</div>
+												<div class="search-result-list high-school">
+													<ul></ul>
+												</div>
+											</td>
+											<th class="text-center">소재지</th>
+											<td>
+												<input th:value="${list.locationCd}" type="text" name="locationCd" class="form-control form-lg" placeholder="소재지" />
+											</td>
+										</tr>
+										<tr>
+											<th class="text-center">졸업년월</th>
+											<td>
+												<input th:value="${list.graduationYmNo}" type="text" name="graduationYm" class="form-control form-lg" placeholder="졸업년월(6자리)" />
+											</td>
+											<th class="text-center">졸업상태</th>
+											<td>
+												<select class="form-control" name="graduationStatusCd" style="width: 100%">
+													<option value="GRADUATION">졸업</option>
+												</select>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</th:block>
+						<th:block th:if="${#lists.isEmpty(academicInfo)}">
+							<div class="high-school-area">
+								<table class="table">
+									<colgroup>
+										<col style="width: 7%">
+										<col style="width: 25.5%">
+										<col style="width: 7%">
+										<col style="width: 25.5%">
+									</colgroup>
+									<tbody>
+										<tr>
+											<th class="text-center"><input type="text" name="degreeCd" class="form-control form-lg" value="고등학교" readonly /></th>
+											<td>
+												<div class="search-box search-lg">
+													<input type="hidden" name="schoolCd" value="" />
+													<div class="d-flex align-items-center">
+														<input type="text" name="schoolName" class="form-control w-auto" placeholder="학교명" />
+														<button type="button" class="btn btn-primary search-btn">검색</button>
+														<input type="hidden" name="majorClassCd" value="" />
+														<input type="hidden" name="majorName" value="" />
+														<input type="hidden" name="majorGrades" value="" />
+														<input type="hidden" name="minorClassCd" value="" />
+														<input type="hidden" name="minorName" value="" />
+														<input type="hidden" name="minorGrades" value="" />
+														<input type="hidden" name="entranceYm" value="" />
+														<input type="hidden" name="estType" value="" />
+														<input type="hidden" name="schoolType" value="" />
+														<input type="hidden" name="inOverseas" value="0" />
+														<input class="m-l-20" type="checkbox" value="0" id="overseas" />
+														<label class="" for="overseas">해외</label>
+													</div>
+												</div>
+												<div class="search-result-list high-school">
+													<ul></ul>
+												</div>
+											</td>
+											<th class="text-center">소재지</th>
+											<td>
+												<input type="text" name="locationCd" class="form-control form-lg" placeholder="소재지" />
+											</td>
+										</tr>
+										<tr>
+											<th class="text-center">졸업년월</th>
+											<td>
+												<input type="text" name="graduationYm" class="form-control form-lg" placeholder="졸업년월(6자리)" />
+											</td>
+											<th class="text-center">졸업상태</th>
+											<td>
+												<select class="form-control" name="graduationStatusCd" style="width: 100%">
+													<option value="GRADUATION">졸업</option>
+												</select>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</th:block>
+						<th:block th:each="list : ${academicInfo}" th:if="${list.degreeCd ne 'HIGH'}">
+							<div class="university-area add-education">
+								<table class="table mt-2"><!-- TODO :: 클론 클래스 필요 -->
+									<colgroup>
+										<col style="width: 7%">
+										<col style="width: 25.5%">
+										<col style="width: 7%">
+										<col style="width: 25.5%">
+									</colgroup>
+									<tbody>
+										<tr class="">
+											<th class="text-center">
+												<input type="hidden" name="id" th:value="${list.id}" />
+												<input type="hidden" name="sqlType" value="U" />
+												<select class="form-control" name="degreeCd" style="width: 100%">
+													<option th:selected="${list.degreeCd eq 'JUNIOR_COLLEGE'}" value="JUNIOR_COLLEGE">대학(2/3년)</option>
+													<option th:selected="${list.degreeCd eq 'COLLEGE'}" value="COLLEGE">대학교(4년)</option>
+													<option th:selected="${list.degreeCd eq 'MASTER'}" value="MASTER">석사</option>
+													<option th:selected="${list.degreeCd eq 'PHD'}" value="PHD">박사</option>
+												</select>
+											</th>
+											<td>
+												<div class="search-box search-lg">
+													<input type="hidden" name="schoolCd" value="" />
+													<input type="hidden" name="inOverseas" value="0" />
+													<input type="hidden" name="estType" />
+													<input type="hidden" name="schoolType" />
+													<div class="d-flex align-items-center">
+														<input th:value="${list.schoolName}" class="form-control form-lg w-auto" type="text" name="universityName" />
+														<button type="button" class="btn btn-primary search-btn">검색</button>
+														<input class="m-l-20 univ-oversea" th:checked="${list.inOverseas eq 1}" type="checkbox" value="" id="univOversea" />
+														<label class="" for="univOversea">해외</label>
+													</div>
+												</div>
+												<div class="search-result-list university">
+													<ul></ul>
+												</div>
+											</td>
+											<th class="text-center">소재지</th>
+											<td>
+												<input th:value="${list.locationCd}" type="text" name="locationCd" class="form-control form-lg" />
+											</td>
+										</tr>
+										<tr>
+											<th class="text-center">입학년월</th>
+											<td>
+												<input name="entranceYm" th:value="${list.entranceYm}" type="text" class="form-control form-lg" />
+											</td>
+											<th class="text-center">입학상태</th>
+											<td>
+												<select class="form-control" name="entranceStatusCd" style="width: 100%">
+													<option th:selected="${list.entranceStatusCd eq ''}" value="">입학상태</option>
+													<option th:selected="${list.entranceStatusCd eq 'ENTRANCE'}" value="ENTRANCE">입학</option>
+													<option th:selected="${list.entranceStatusCd eq 'TRANSFER'}" value="TRANSFER">편입</option>
+												</select>
+											</td>
+										</tr>
+										<tr>
+											<th class="text-center">졸업년월</th>
+											<td>
+												<input type="text" th:value="${list.graduationYmNo}" class="form-control form-lg" name="graduationYm" value="" placeholder="졸업년월(6자리)" />
+											</td>
+											<th class="text-center">졸업상태</th>
+											<td>
+												<select class="form-control" name="graduationStatusCd" style="width: 100%">
+													<option th:selected="${list.graduationStatusCd eq ''}" value="">졸업상태</option>
+													<option th:selected="${list.graduationStatusCd eq 'GRADUATION'}" value="GRADUATION">졸업</option>
+													<option th:selected="${list.graduationStatusCd eq 'EXPECTANT_GRADUATION'}" value="EXPECTANT_GRADUATION">졸업예정</option>
+													<option th:selected="${list.graduationStatusCd eq 'DOING'}" value="DOING">재학중</option>
+													<option th:selected="${list.graduationStatusCd eq 'BREAK'}" value="BREAK">휴학중</option>
+													<option th:selected="${list.graduationStatusCd eq 'SELF_LEAVE'}" value="SELF_LEAVE">중퇴</option>
+													<option th:selected="${list.graduationStatusCd eq 'COMPLETION'}" value="COMPLETION">수료</option>
+												</select>
+											</td>
+										</tr>
+										<tr>
+											<th class="text-center">주전공명</th>
+											<td>
+												<input type="hidden" name="majorClassCd" value="MAJOR" />
+												<input type="text" th:value="${list.majorName}" name="majorName" class="form-control form-lg" placeholder="주 전공명" />
+											</td>
+											<th class="text-center">학점</th>
+											<td>
+												<input type="text" name="majorGrades" th:value="${list.grades}" class="form-control form-lg" placeholder="학점" />
+											</td>
+										</tr>
+										<tr>
+											<th class="text-center">부전공명</th>
+											<td>
+												<input type="hidden" name="minorClassCd" value="MINOR" />
+												<input type="text" name="minorName" class="form-control form-lg" th:value="${list.minorName}" placeholder="부 전공명" />
+											</td>
+											<th class="text-center">학점</th>
+											<td>
+												<input type="text" name="minorGrades" class="form-control form-lg" th:value="${list.minorGrades}" placeholder="학점" />
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</th:block>
+						<div class="text-center mt-3">
+							<button type="button" class="btn btn-dark" data-role="addEducation"> 항목추가 <i class="icon-row-add"></i></button>
+							<button type="button" class="btn btn-danger" data-role="deleteEducation"> 항목삭제 <i class="icon-resume-minus  resume"></i></button>
+						</div>
+					</div>
+					<div class="content company-area">
+						<h4 class="table-subtitle mb-3 mt-3">경력사항</h4>
+						<table class="table">
+							<colgroup>
+								<col style="width: 7%">
+								<col style="width: 25.5%">
+								<col style="width: 7%">
+								<col style="width: 25.5%">
+							</colgroup>
+							<tbody>
+								<tr>
+									<th class="text-center">회사명</th>
+									<td>
+										<div class="search-box search-lg">
+											<input type="text" name="companyNames" class="form-control" placeholder="회사 이름을 입력하세요" />
+										</div>
+										<div class="search-result-list company">
+											<ul></ul>
+										</div>
+									</td>
+									<th class="text-center">부서명</th>
+									<td>
+										<input type="text" name="departmentNames" class="form-control form-lg" placeholder="부서명" />
+									</td>
+								</tr>
+								<tr>
+									<th class="text-center">입사년월</th>
+									<td>
+										<input type="text" name="entranceYms" class="form-control form-lg" placeholder="입사년월" />
+									</td>
+									<th class="text-center">퇴사년월</th>
+									<td>
+										<div class="d-flex align-items-center">
+											<input type="text" name="resignationYms" class="form-control form-lg w-auto" placeholder="퇴사년월" />
+											<input type="hidden" name="holdOffices" value="0" />
+											<input class="m-l-10" type="checkbox" value="" id="holdOffice" />
+											<label class="" for="holdOffice">재직중</label>
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<th class="text-center">직급</th>
+									<td>
+										<input type="text" name="positionInputs" class="form-control form-lg" placeholder="직급" />
+									</td>
+									<th class="text-center">직책</th>
+									<td>
+										<input type="text" name="dutyInputs" class="form-control form-lg" placeholder="직책" />
+									</td>
+								</tr>
+								<tr>
+									<th class="text-center">최종연봉</th>
+									<td>
+										<input type="text" name="salarys" class="form-control form-lg" placeholder="최종연봉" />
+									</td>
+									<th class="text-center"></th>
+									<td></td>
+								</tr>
+								<tr>
+									<th class="text-center">담당업무</th>
+									<td colspan="3">
+										<textarea name="inputTasks" cols="30" rows="10" placeholder="담당업무" class="form-control"></textarea>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<div class="text-center m-t-10">
+							<button type="button" class="btn btn-dark" data-role="careerSave">저장</button>
+						</div>
+					</div>
+					<h4 class="table-subtitle mb-3 mt-3 ">경력기술서 <span th:text="${'(' + resumeInfo.totalCareers + ')'}"></span></h4>
+					<div class="career-area">
+						<th:block th:each="list : ${careerInfo}">
+							<div class="career">
+								<table class="table">
+									<colgroup>
+										<col style="width: 7%">
+										<col style="width: 25.5%">
+										<col style="width: 7%">
+										<col style="width: 25.5%">
+									</colgroup>
+									<tbody>
+										<tr>
+											<th class="text-center">회사명</th>
+											<td class="company" th:text="${list.companyname}"></td>
+											<th class="text-center">부서명</th>
+											<td class="department-name" th:text="${list.departmentName}"></td>
+										</tr>
+										<tr>
+											<th class="text-center">입사년월</th>
+											<td>
+												<input type="hidden" name="mode" value="INSERT" />
+												<input type="hidden" name="id" th:value="${list.id}" />
+												<input type="hidden" name="sqlType" value="U">
+												<input type="hidden" name="companyName" th:value="${list.companyname}" />
+												<input type="hidden" name="departmentName" th:value="${list.departmentName}" />
+												<input type="hidden" name="entranceYm" th:value="${list.entranceYm}" />
+												<input type="hidden" name="resignationYm" th:value="${list.resignationYm}" />
+												<input type="hidden" name="holdOffice" th:value="${list.holdOffice}" />
+												<input type="hidden" name="positionInput" th:value="${list.positionInput}" />
+												<input type="hidden" name="dutyInput" th:value="${list.dutyInput}" />
+												<input type="hidden" name="salary" th:value="${list.salary}" />
+												<input type="hidden" name="inputTask" th:value="${list.task}" />
+												<th:block th:if="${list.holdOffice eq 1}">
+													<span class="entranceYms" th:text="${list.entranceYm}"></span>
+												</th:block>
+												<th:block th:if="${list.holdOffice ne 1}">
+													<span class="entranceYms" th:text="${list.entranceYmCareer}"></span>
+												</th:block>
+											</td>
+											<th class="text-center">퇴사년월</th>
+											<td>
+												<th:block th:if="${list.holdOffice eq 1}">
+													<span class="holdOffices">재직중</span>
+												</th:block>
+												<th:block th:if="${list.holdOffice ne 1}">
+													<span class="resignationYms" th:text="${list.resignationYmCareer}"></span>
+												</th:block>
+											</td>
+										</tr>
+										<tr>
+											<th class="text-center">직급 / 직책</th>
+											<td class="position-input" th:text="${list.positionInput + ' / ' + list.dutyInput}"></td>
+											<th class="text-center">최종연봉</th>
+											<td>
+												<span class="salary" th:if="${list.salary ne null}" th:text="${list.salary + '만원'}">졸업</span>
+												<span class="salary" th:if="${list.salary eq null}"></span>
+											</td>
+										</tr>
+										<tr>
+											<th class="text-center">담당업무</th>
+											<td class="career-text" colspan="3" th:text="${list.task}"></td>
+										</tr>
+									</tbody>
+								</table>
+								<div class="text-center mt-3">
+									<button type="button" data-role="careerModify" class="btn btn-dark">수정</button>
+									<button type="button" data-role="careerDelete" class="btn btn-danger">삭제</button>
+								</div>
+							</div>
+						</th:block>
+					</div>
+					<h4 class="table-subtitle mb-3 mt-3">희망근무조건</h4>
+					<table class="table">
+						<colgroup>
+							<col style="width: 7%">
+							<col style="width: 25.5%">
+							<col style="width: 7%">
+							<col style="width: 25.5%">
+						</colgroup>
+						<tbody>
+							<tr>
+								<th class="text-center">고용형태</th>
+								<td>
+									<select name="desiredHire" class="form-control" style="width: 100%">
+										<option th:selected="${resumeInfo.desiredHire eq ''}" value="">고용형태</option>
+										<option th:selected="${resumeInfo.desiredHire eq 'FULL_TIME'}" value="FULL_TIME">정규직</option>
+										<option th:selected="${resumeInfo.desiredHire eq 'PART_TIME'}" value="PART_TIME">계약직</option>
+										<option th:selected="${resumeInfo.desiredHire eq 'INTERN'}" value="INTERN">인턴</option>
+										<option th:selected="${resumeInfo.desiredHire eq 'DISPATCH'}" value="DISPATCH">파견직</option>
+										<option th:selected="${resumeInfo.desiredHire eq 'FREELANCER'}" value="FREELANCER">프리랜서</option>
+										<option th:selected="${resumeInfo.desiredHire eq 'MILITARY_SERVICE'}" value="MILITARY_SERVICE">병역특례</option>
+									</select>
+								</td>
+								<th class="text-center">희망근무지</th>
+								<td>
+									<select name="desiredLocationCd" class="form-control" style="width: 100%">
+										<option th:selected="${resumeInfo.desiredLocationCd eq ''}" value="">희망근무지</option>
+										<option th:selected="${resumeInfo.desiredLocationCd eq 'SEOUL'}" value="SEOUL">서울</option>
+										<option th:selected="${resumeInfo.desiredLocationCd eq 'IN'}" value="IN">수도권</option>
+										<option th:selected="${resumeInfo.desiredLocationCd eq 'ALL'}" value="ALL">전국</option>
+									</select>
+								</td>
+							</tr>
+							<tr>
+								<th class="text-center">입사가능시기</th>
+								<td>
+									<select class="form-control" name="joinDateCd" style="width: 100%">
+										<option th:selected="${resumeInfo.joinDateCd eq ''}" value="">입사가능시기</option>
+										<option th:selected="${resumeInfo.joinDateCd eq 'IMMEDIATELY'}" value="IMMEDIATELY">채용후즉시</option>
+										<option th:selected="${resumeInfo.joinDateCd eq 'TWO_WEEKS'}" value="TWO_WEEKS">2주이내</option>
+										<option th:selected="${resumeInfo.joinDateCd eq 'MONTH'}" value="MONTH">한달이내</option>
+										<option th:selected="${resumeInfo.joinDateCd eq 'CONSULTATION'}" value="CONSULTATION">협의후결정</option>
+									</select>
+								</td>
+								<th class="text-center">희망직급</th>
+								<td>
+									<input type="text" th:value="${resumeInfo.desiredPosition}" name="desiredPosition" class="form-control form-lg" placeholder="희망직급" />
+								</td>
+							</tr>
+							<tr>
+								<th class="text-center">희망연봉</th>
+								<td>
+									<div class="d-flex align-items-center">
+										<input type="text" th:value="${resumeInfo.desiredSalary}" name="desiredSalary" class="form-control form-lg w-auto" placeholder="희망연봉" />
+										<input th:checked="${resumeInfo.bylaws eq '1'}" class="m-l-10" type="checkbox" value="bylaws" id="bylaws" /> <label class="" for="bylaws">내규에 따름</label>
+										<input type="hidden" th:value="${resumeInfo.bylaws}" name="bylaws">
+									</div>
+								</td>
+								<th class="text-center"></th>
+								<td></td>
+							</tr>
+						</tbody>
+					</table>
+					<h4 class="table-subtitle mb-3 mt-3">채용우대자격</h4>
+					<table class="table">
+						<colgroup>
+							<col style="width: 7%">
+							<col style="width: 25.5%">
+							<col style="width: 7%">
+							<col style="width: 25.5%">
+						</colgroup>
+						<tbody>
+							<tr>
+								<th class="text-center">보훈대상</th>
+								<td>
+									<select name="isVeterans" class="form-control" style="width: 100%">
+										<option th:selected="${resumeInfo.isVeterans eq ''}" value="">보훈대상</option>
+										<option th:selected="${resumeInfo.isVeterans eq '1'}" value="1">대상</option>
+										<option th:selected="${resumeInfo.isVeterans eq '0'}" value="0">비대상</option>
+									</select>
+								</td>
+								<th class="text-center">장애여부</th>
+								<td>
+									<select name="disability" class="form-control" style="width: 100%">
+										<option th:selected="${resumeInfo.disability eq ''}" value="">장애</option>
+										<option th:selected="${resumeInfo.disability eq '1'}" value="1">대상</option>
+										<option th:selected="${resumeInfo.disability eq '0'}" value="0">비대상</option>
+									</select>
+								</td>
+							</tr>
+							<tr>
+								<th class="text-center">병역</th>
+								<td>
+									<select name="militaryServiceCd" class="form-control" style="width: 100%">
+										<option th:selected="${resumeInfo.militaryServiceCd eq ''}" value="">병역</option>
+										<option th:selected="${resumeInfo.militaryServiceCd eq 'INCOMPLETE'}" value="INCOMPLETE">군필</option>
+										<option th:selected="${resumeInfo.militaryServiceCd eq 'NOT'}" value="NOT">미필</option>
+										<option th:selected="${resumeInfo.militaryServiceCd eq 'SERVICING'}" value="SERVICING">복무중</option>
+										<option th:selected="${resumeInfo.militaryServiceCd eq 'EXCEPTION'}" value="EXCEPTION">해당없음</option>
+								</select>
+								</td>
+								<th class="text-center"></th>
+								<td></td>
+							</tr>
+						</tbody>
+					</table>
+					<h4 class="table-subtitle mb-3 mt-3">어학</h4>
+					<table class="table">
+						<colgroup>
+							<col style="width: 7%">
+							<col style="width: 25.5%">
+							<col style="width: 7%">
+							<col style="width: 25.5%">
+						</colgroup>
+						<tbody>
+							<th:block th:each="list : ${languageInfo}">
+								<tr>
+									<th class="text-center">어학</th>
+									<td colspan="3">
+										<textarea th:text="${list.languageInput}" name="languageInput" cols="30" rows="10" placeholder="공인시험 점수, 회화수준 등" class="form-control"></textarea>
+									</td>
+								</tr>
+							</th:block>
+							<th:block th:if="${#lists.isEmpty(languageInfo)}">
+								<tr>
+									<th class="text-center">어학</th>
+									<td colspan="3">
+										<textarea name="languageInput" cols="30" rows="10" placeholder="공인시험 점수, 회화수준 등" class="form-control"></textarea>
+									</td>
+								</tr>
+							</th:block>
+						</tbody>
+					</table>
+					<h4 class="table-subtitle mb-3 mt-3">자격증</h4>
+					<table class="table">
+						<colgroup>
+							<col style="width: 7%">
+							<col style="width: 25.5%">
+							<col style="width: 7%">
+							<col style="width: 25.5%">
+						</colgroup>
+						<tbody>
+							<th:block th:each="list : ${licenseInfo}">
+								<tr>
+									<th class="text-center">자격증</th>
+									<td colspan="3">
+										<textarea th:text="${list.licenseName}" name="licenseName" cols="30" rows="10" placeholder="자격증명, 취득기관, 취득년월 등" class="form-control"></textarea>
+									</td>
+								</tr>
+							</th:block>
+							<th:block th:if="${#lists.isEmpty(licenseInfo)}">
+								<tr>
+									<th class="text-center">자격증</th>
+									<td colspan="3">
+										<textarea name="licenseName" cols="30" rows="10" placeholder="자격증명, 취득기관, 취득년월 등" class="form-control"></textarea>
+									</td>
+								</tr>
+							</th:block>
+						</tbody>
+					</table>
+					<h4 class="table-subtitle mb-3 mt-3">수상</h4>
+					<table class="table">
+						<colgroup>
+							<col style="width: 7%">
+							<col style="width: 25.5%">
+							<col style="width: 7%">
+							<col style="width: 25.5%">
+						</colgroup>
+						<tbody>
+							<th:block th:each="list : ${awardInfo}">
+								<tr>
+									<th class="text-center">수상</th>
+									<td colspan="3">
+										<textarea th:text="${list.awardName}" name="awardName" cols="30" rows="10" placeholder="수상명, 수여기관, 취득년월 등" class="form-control"></textarea>
+									</td>
+								</tr>
+							</th:block>
+							<th:block th:if="${#lists.isEmpty(awardInfo)}">
+								<tr>
+									<th class="text-center">수상</th>
+									<td colspan="3">
+										<textarea name="awardName" cols="30" rows="10" placeholder="수상명, 수여기관, 취득년월 등" class="form-control"></textarea>
+									</td>
+								</tr>
+							</th:block>
+						</tbody>
+					</table>
+					<h4 class="table-subtitle mb-3 mt-3">대외활동</h4>
+					<table class="table">
+						<colgroup>
+							<col style="width: 7%">
+							<col style="width: 25.5%">
+							<col style="width: 7%">
+							<col style="width: 25.5%">
+						</colgroup>
+						<tbody>
+							<th:block th:each="list : ${activityInfo}">
+								<tr>
+									<th class="text-center">대외활동</th>
+									<td colspan="3">
+										<textarea th:text="${list.content}" name="content" cols="30" rows="10" placeholder="대외활동내용" class="form-control"></textarea>
+									</td>
+								</tr>
+							</th:block>
+							<th:block th:if="${#lists.isEmpty(activityInfo)}">
+								<tr>
+									<th class="text-center">대외활동</th>
+									<td colspan="3">
+										<textarea name="content" cols="30" rows="10" placeholder="대외활동내용" class="form-control"></textarea>
+									</td>
+								</tr>
+							</th:block>
+						</tbody>
+					</table>
+					<div class="content">
+						<h4 class="table-subtitle mb-3 mt-3">포트폴리오</h4>
+						<div class="portfolio-area">
+							<div class="portfolio-list">
+								<table class="table">
+									<colgroup>
+										<col style="width: 7%">
+										<col style="width: 25.5%">
+										<col style="width: 7%">
+										<col style="width: 25.5%">
+									</colgroup>
+									<tbody>
+										<th:block th:each="list, i : ${portfolioInfo}" >
+											<tr>
+												<th class="text-center">
+													<input type="hidden" name="id" th:value="${list.id}">
+													<input type="hidden" name="sqlType" value="U">
+													<select class="form-control attach-type" name="attachType" style="width: 100%">
+														<option value="URL" th:selected="${list.attachType eq 'URL'}">URL</option>
+														<option value="FILE" th:selected="${list.attachType eq 'FILE'}">파일첨부</option>
+													</select>
+												</th>
+												<td colspan="3">
+													<input th:style="${list.attachType eq 'URL'? '':'display:none;'}" type="text" name="url" class="form-control form-lg portfolio-url" th:value="${list.url}" placeholder="http://" />
+													<div th:style="${list.attachType eq 'FILE'? '':'display:none;'}" class="form-upload portfolio-file">
+														<input type="file" th:id="${'portfolioFile'+i.index}" class="portfolio-files" data-role="fileChangeFlag" style="display:none;" />
+														<input type="hidden" name="fileChangeFlag" value="N">
+														<label th:for="${'portfolioFile'+i.index}">
+															<span class="file-name m-r-10" th:text="${list.attachType eq 'FILE'? list.commonFileList[0].originName:''}"></span>
+														</label>
+													</div>
+												</td>
+											</tr>
+										</th:block>
+									</tbody>
+								</table>
+							</div>
+						</div>
+						<div class="text-center mt-3">
+							<button type="button" class="btn btn-dark" data-role="addPortfolio">항목추가</button>
+							<button type="button" class="btn btn-danger" data-role="deletePortfolio">항목삭제</button>
+						</div>
+					</div>
+					<h4 class="table-subtitle mb-3 mt-3">영문이력서</h4>
+					<table class="table">
+						<colgroup>
+							<col style="width: 7%">
+							<col style="width: 25.5%">
+							<col style="width: 7%">
+							<col style="width: 25.5%">
+						</colgroup>
+						<tbody>
+							<tr>
+								<th class="text-center">영문이력서</th>
+								<td colspan="3">
+									<input type="hidden" name="id">
+									<input type="hidden" name="sqlType" value="I">
+									<input name="enAttachType" type="file" class="" id="enResumeFile"/>
+									<input type="hidden" name="enFileChangeFlag" value="N">
+									<label th:if="${englishResumeInfo ne null}" for="enResumeFile"><span class="file-name m-r-10" th:text="${englishResumeInfo.commonFileList[0].originName}"></span></label>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<h4 class="table-subtitle mb-3 mt-3">자기소개서</h4>
+					<table class="table">
+						<colgroup>
+							<col style="width: 7%">
+							<col style="width: 25.5%">
+							<col style="width: 7%">
+							<col style="width: 25.5%">
+						</colgroup>
+						<tbody>
+							<th:block>
+								<tr>
+									<th class="text-center">자기소개서</th>
+									<td colspan="3">
+										<textarea th:utext="${resumeInfo.selfIntroduction eq null ? '' : resumeInfo.selfIntroduction.replaceAll('\n','<br/>')}"
+												name="selfIntroduction" class="form-control" id="" cols="30" rows="30" placeholder="내용을 입력하세요"></textarea>
+									</td>
+								</tr>
+							</th:block>
+						</tbody>
+					</table>
+					<div class="text-center m-t-20 m-b-20">
+						<button data-role="save" type="button" class="btn btn-primary" name="resumeSave">저장하기</button>
+					</div>
+				</div>
+
+
+
+
+
+
+
+				<div class="cloneArea" style="display:none;">
+					<div class="career" style="display:none;">
+						<table class="table">
+							<colgroup>
+								<col style="width: 7%">
+								<col style="width: 25.5%">
+								<col style="width: 7%">
+								<col style="width: 25.5%">
+							</colgroup>
+							<tbody>
+							<tr>
+								<th class="text-center">회사명</th>
+								<td>
+									<p class="company text-dark font-bold"></p>
+								</td>
+								<th class="text-center">부서명</th>
+								<td>
+									<span class="value department-name"></span>
+								</td>
+							</tr>
+							<tr>
+								<th class="text-center">입사년월</th>
+								<td>
+									<input type="hidden" name="mode" value="INSERT" />
+									<input type="hidden" name="id">
+									<input type="hidden" name="sqlType" value="I">
+									<input type="hidden" name="companyName" value="" />
+									<input type="hidden" name="departmentName" value="" />
+									<input type="hidden" name="entranceYm" value="" />
+									<input type="hidden" name="resignationYm" value="" />
+									<input type="hidden" name="holdOffice" value="" />
+									<input type="hidden" name="positionInput" value="" />
+									<input type="hidden" name="dutyInput" value="" />
+									<input type="hidden" name="salary" value="" />
+									<input type="hidden" name="inputTask" value="" />
+									<span class="entranceYms"></span>
+								</td>
+								<th class="text-center">퇴사년월</th>
+								<td>
+									<span class="holdOffice"></span>
+									<span class="resignationYms"></span>
+								</td>
+							</tr>
+							<tr>
+								<th class="text-center">직급 / 직책</th>
+								<td>
+									<span class="value position-input"></span>/<span class="value duty-input"></span>
+								</td>
+								<th class="text-center">최종연봉</th>
+								<td>
+									<span class="value salary"></span>
+								</td>
+							</tr>
+							<tr>
+								<th class="text-center">담당업무</th>
+								<td colspan="3">
+									<div class="career-txt">
+									</div>
+								</td>
+							</tr>
+							</tbody>
+						</table>
+						<div class="text-center mt-3">
+							<button type="button" data-role="careerModify" class="btn btn-dark">수정</button>
+							<button type="button" data-role="careerDelete" class="btn btn-danger">삭제</button>
+						</div>
+					</div>
+
+
+
+
+
+
+
+					<div class="row add-education university-area">
+						<table class="table mt-2">
+							<colgroup>
+								<col style="width: 7%">
+								<col style="width: 25.5%">
+								<col style="width: 7%">
+								<col style="width: 25.5%">
+							</colgroup>
+							<tbody>
+							<tr>
+								<th class="text-center">
+									<select class="select-design select-lg" name="degreeCd" style="width: 100%">
+										<option value="JUNIOR_COLLEGE">대학(2/3년)</option>
+										<option value="COLLEGE">대학교(4년)</option>
+										<option value="MASTER">석사</option>
+										<option value="PHD">박사</option>
+									</select>
+								</th>
+								<td>
+									<div class="search-box search-lg">
+										<input type="hidden" name="inOverseas" value="0"/>
+										<input type="hidden" name="estType" />
+										<input type="hidden" name="schoolType" />
+										<input type="hidden" name="schoolCd" value="" />
+										<div class="d-flex align-items-center">
+											<input type="text" name="universityName" class="form-control form-lg w-auto"  placeholder="학교명" />
+											<button type="button" class="btn btn-primary search-btn">검색</button>
+											<input class="m-l-20 univ-oversea" type="checkbox" value="" id="univOversea" />
+											<label class="" for="univOversea">해외</label>
+										</div>
+									</div>
+									<div class="search-result-list university">
+										<ul></ul>
+									</div>
+								</td>
+								<th class="text-center">소재지</th>
+								<td>
+									<input type="text" name="locationCd" class="form-control form-lg" placeholder="소재지" />
+								</td>
+							</tr>
+							<tr>
+								<th class="text-center">입학년월</th>
+								<td>
+									<input type="text" class="form-control form-lg" name="entranceYm" value="" placeholder="입학년월(6자리)"/>
+								</td>
+								<th class="text-center">입학상태</th>
+								<td>
+									<select class="form-control" name="entranceStatusCd" style="width: 100%">
+										<option value="">입학상태</option>
+										<option value="ENTRANCE">입학</option>
+										<option value="TRANSFER">편입</option>
+									</select>
+								</td>
+							</tr>
+							<tr>
+								<th class="text-center">졸업년월</th>
+								<td>
+									<input type="text" class="form-control form-lg" name="graduationYm" value="" placeholder="졸업년월(6자리)"/>
+								</td>
+								<th class="text-center">졸업상태</th>
+								<td>
+									<select class="form-control" name="graduationStatusCd" style="width: 100%">
+										<option value="">졸업상태</option>
+										<option value="GRADUATION">졸업</option>
+										<option value="EXPECTANT_GRADUATION">졸업예정</option>
+										<option value="DOING">재학중</option>
+										<option value="BREAK">휴학중</option>
+										<option value="SELF_LEAVE">중퇴</option>
+										<option value="COMPLETION">수료</option>
+									</select>
+								</td>
+							</tr>
+							<tr>
+								<th class="text-center">주전공명</th>
+								<td>
+									<input type="hidden" name="majorClassCd" value="MAJOR"/>
+									<input type="text" name="majorName" class="form-control form-lg" value="" placeholder="주 전공명"/>
+								</td>
+								<th class="text-center">학점</th>
+								<td>
+									<input type="text" name="majorGrades" class="form-control form-lg" value="" placeholder="학점"/>
+								</td>
+							</tr>
+							<tr>
+								<th class="text-center">부전공명</th>
+								<td>
+									<input type="hidden" name="minorClassCd" value="MINOR"/>
+									<input type="text" name="minorName" class="form-control form-lg" value="" placeholder="부 전공명"/>
+								</td>
+								<th class="text-center">학점</th>
+								<td>
+									<input type="text" name="minorGrades" class="form-control form-lg" value="" placeholder="학점"/>
+								</td>
+							</tr>
+							</tbody>
+						</table>
+					</div>
+
+
+
+
+
+					<div class="row align-items-center portfolio-list">
+						<table class="table">
+							<colgroup>
+								<col style="width: 7%">
+								<col style="width: 25.5%">
+								<col style="width: 7%">
+								<col style="width: 25.5%">
+							</colgroup>
+							<tbody>
+							<tr>
+								<th class="text-center">
+									<input type="hidden" name="sqlType" value="U">
+									<select class="form-control attach-type" name="attachType" style="width: 100%">
+										<option value="URL">URL</option>
+										<option value="FILE">파일첨부</option>
+									</select>
+								</th>
+								<td colspan="3">
+									<input type="text" name="url" class="form-control form-lg portfolio-url" value="" placeholder="http://" />
+									<div class="form-upload portfolio-file" style="display:none">
+										<input type="file" id="portfolioFile" class="portfolio-files"/>
+									</div>
+								</td>
+							</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</main>
+	</div>
+</body>
+</html>

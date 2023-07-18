@@ -1,0 +1,560 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.api.ApiPositionMapper">
+
+    <sql id="paging">
+        <choose>
+            <when test='sortColumn != null and sortColumn != "" and orderType != null and orderType != ""'>
+                ORDER BY ISNULL(xx.${sortColumn}) , xx.${sortColumn} ${orderType} , xx.createdAt DESC
+            </when>
+            <otherwise>
+                ORDER BY xx.createdAt DESC
+            </otherwise>
+        </choose>
+        <if test='endRow > 0'>
+            LIMIT #{startRow}, #{endRow}
+        </if>
+    </sql>
+
+    <!--포지션 전체 리스트 조회-->
+    <select id="selectPositionList" resultType="ApiPositionDTO" parameterType="ApiPositionDTO">
+    /* com.fw.core.mapper.db1.api.ApiPositionMapper.selectPositionList, 포지션 전체 리스트 조회, 22.11.27, YJW, ApiPositionMapper.xml */
+        SELECT xx.id AS positionId
+             , DATE_FORMAT(xx.createdAt,'%Y-%m-%d %H:%i:%s') AS createdAt
+             , DATE_FORMAT(xx.endDate,'%Y-%m-%d %H:%i:%s') AS endDate
+             , xx.isPrivate
+             , hc.companyName
+             , hc.companyScale
+             , hc.companyStatus
+             , xx.industry
+             , fn_get_common_cd(xx.status, 'POSITION_STATUS', 1) AS status
+             , xx.status AS statusCd
+             , xx.title
+             , xx.isPrivate
+             , xx.public_cd
+             , IF(EXISTS(SELECT * FROM position_applicant pa WHERE pa.position_id = xx.id AND pa.ap_member_id = #{memberId}),'Y','N') AS applyFlag
+             , IF(EXISTS(SELECT * FROM scrap_position sp WHERE sp.position_id = xx.id AND sp.applicant_id = #{memberId} AND sp.delFlag = 'N'),'Y','N') AS scrapFlag
+        FROM position xx
+    INNER JOIN hr_company hc ON hc.id = xx.hr_company_id
+        WHERE xx.deleted = 0
+          AND xx.status IN ('DOING')
+        <if test='headhunterId != null and headhunterId !=""'>
+            AND xx.member_id = #{headhunterId}
+        </if>
+        <!-- 통합검색 -->
+        <if test='searchList != null and searchList != "" and searchList.size > 0'>
+            AND
+            <foreach collection="searchList" item="item" index="index" open="(" separator="or">
+               xx.title LIKE CONCAT('%',#{item},'%')
+            </foreach>
+            <foreach collection="searchList" item="item" index="index" open="or" separator="or">
+                hc.companyName LIKE CONCAT('%',#{item},'%')
+            </foreach>
+            <foreach collection="searchList" item="item" index="index" open="or" separator="or">
+                xx.industry LIKE CONCAT('%',#{item},'%')
+            </foreach>
+            <foreach collection="searchList" item="item" index="index" open="or" separator="or">
+                hc.companyScale LIKE CONCAT('%',#{item},'%')
+            </foreach>
+            <foreach collection="searchList" item="item" index="index" open="or" separator="or" close=")">
+                xx.keywords LIKE CONCAT('%',#{item},'%')
+            </foreach>
+        </if>
+        <include refid="paging"/>
+    </select>
+
+    <!--포지션 전체 리스트 COUNT-->
+    <select id="selectPositionCnt" parameterType="ApiPositionDTO" resultType="int">
+    /* com.fw.core.mapper.db1.api.ApiPositionMapper.selectPositionCnt, 포지션 전체 리스트 COUNT, 22.11.27, YJW, ApiPositionMapper.xml */
+        SELECT COUNT(*)
+        FROM position xx
+    INNER JOIN hr_company hc ON hc.id = xx.hr_company_id
+        WHERE xx.deleted = 0
+          AND xx.status IN ('DOING')
+        <if test='headhunterId != null and headhunterId !=""'>
+            AND xx.member_id = #{headhunterId}
+        </if>
+        <!-- 통합검색 -->
+        <if test='searchList != null and searchList != "" and searchList.size > 0'>
+            AND
+            <foreach collection="searchList" item="item" index="index" open="(" separator="or">
+                xx.title LIKE CONCAT('%',#{item},'%')
+            </foreach>
+            <foreach collection="searchList" item="item" index="index" open="or" separator="or">
+                hc.companyName LIKE CONCAT('%',#{item},'%')
+            </foreach>
+            <foreach collection="searchList" item="item" index="index" open="or" separator="or">
+                xx.industry LIKE CONCAT('%',#{item},'%')
+            </foreach>
+            <foreach collection="searchList" item="item" index="index" open="or" separator="or">
+                hc.companyScale LIKE CONCAT('%',#{item},'%')
+            </foreach>
+            <foreach collection="searchList" item="item" index="index" open="or" separator="or" close=")">
+                xx.keywords LIKE CONCAT('%',#{item},'%')
+            </foreach>
+        </if>
+    </select>
+
+    <!-- 포지션 상세 -->
+    <select id="selectPositionDetail" parameterType="ApiPositionDTO" resultType="ApiPositionDTO">
+    /* com.fw.core.mapper.db1.api.ApiPositionMapper.selectPositionDetail, 포지션 상세, 22.11.27, YJW, ApiPositionMapper.xml */
+        SELECT m.profilePictureFileId
+             , xx.id AS positionId
+             , m.name AS hhName    /* 헤드헌터 이름 */
+             , m.email             /* 헤드헌터 이메알 */
+             , h.sfName            /* 소속서치펌 */
+             , (SELECT COUNT(*) FROM position WHERE member_id = xx.member_id AND status IN ('DOING') AND endDate >= NOW()) AS progressCnt   /* 진행중인 공고 수 */
+             , IF(EXISTS(SELECT * FROM position_applicant pa WHERE pa.position_id = xx.id AND pa.ap_member_id = #{memberId}),'Y','N') AS applyFlag
+             , IF(EXISTS(SELECT * FROM scrap_position sp WHERE sp.position_id = xx.id AND sp.delFlag = 'N' AND sp.applicant_id = #{memberId}),'Y','N') AS scrapFlag
+             , m.id AS headhunterId
+             , xx.member_id
+        FROM position xx
+    INNER JOIN member m ON m.id = xx.member_id
+    INNER JOIN headhunter h ON h.member_id = xx.member_id
+        WHERE xx.id = #{positionId}
+    </select>
+
+    <!-- searchHh = "Y" 내 포지션 관리(헤드헌터) 조회 -->
+    <select id="selectHhPositionList" parameterType="ApiPositionDTO" resultType="ApiPositionDTO">
+    /* com.fw.core.mapper.db1.api.ApiPositionMapper.selectHhPositionList, 내 포지션 관리(헤드헌터) 조회, 22.11.27, YJW, ApiPositionMapper.xml */
+        SELECT xx.title
+            ,  xx.id AS positionId
+            ,  DATE_FORMAT(xx.endDate,'%Y-%m-%d %H:%i:%s') AS endDate
+            ,  DATE_FORMAT(xx.createdAt,'%Y-%m-%d %H:%i:%s') AS createdAt
+            ,  fn_get_common_cd(xx.status, 'POSITION_STATUS', 1) AS status
+            ,  xx.status AS statusCd
+            ,  (SELECT companyName FROM hr_company AS hc WHERE hc.id = xx.hr_company_id) AS companyName
+            ,  (SELECT companyScale FROM hr_company AS hc WHERE hc.id = xx.hr_company_id) AS companyScale
+            ,  (CASE  /* 담당자명 */
+                  WHEN xx.isCowork = '1' AND xx.member_id != #{memberId}    /* CO일때 */
+                  THEN (SELECT name FROM member WHERE id = xx.member_id)
+                  ELSE (SELECT name FROM member WHERE id = #{memberId})   /* PM/단독일때 */
+                END) AS manager
+            ,  (SELECT COUNT(*) FROM position_applicant WHERE position_id = xx.id AND hh_member_id = #{memberId}) AS contactCnt /* 컨택리스트 COUNT */
+            ,  (CASE  /* 단독/PM/CO 여부 */
+                  WHEN xx.isCowork = '1' AND xx.member_id = #{memberId} THEN 'PM'
+                  WHEN xx.isCowork = '1' AND xx.member_id != #{memberId} THEN 'CO'
+                  ELSE '단독'
+                END) AS hhPositionType
+            ,  xx.end_add_cnt
+        FROM position xx
+        WHERE (xx.member_id = #{memberId}
+                    OR xx.id IN (SELECT position_id FROM position_participant WHERE member_id = #{memberId} AND stoped = 0))
+          AND xx.status IN ('DOING')
+          AND xx.deleted = 0
+        ORDER BY xx.createdAt DESC
+        <if test='endRow > 0'>
+            LIMIT #{startRow}, #{endRow}
+        </if>
+    </select>
+
+    <!-- searchHh = "Y" 내 포지션 관리(헤드헌터) COUNT -->
+    <select id="selectHhPositionCnt" parameterType="ApiPositionDTO" resultType="int">
+    /* com.fw.core.mapper.db1.api.ApiPositionMapper.selectHhPositionCnt, 내 포지션 관리(헤드헌터) COUNT, 22.11.27, YJW, ApiPositionMapper.xml */
+        SELECT COUNT(*)
+        FROM position xx
+        WHERE (xx.member_id = #{memberId}
+                     OR xx.id IN (SELECT position_id FROM position_participant WHERE member_id = #{memberId} AND stoped = 0))
+          AND xx.status IN ('DOING')
+          AND xx.deleted = 0
+    </select>
+
+    <!-- searchApply = "Y" (후보자) 내가 지원한 포지션 조회 -->
+    <select id="selectApplyPositionList" parameterType="ApiPositionDTO" resultType="ApiPositionDTO">
+    /* com.fw.core.mapper.db1.api.ApiPositionMapper.selectApplyPositionList, 내가 지원한 포지션 조회, 22.11.27, YJW, ApiPositionMapper.xml */
+        SELECT p.id AS positionId
+             , DATE_FORMAT(p.endDate,'%Y-%m-%d %H:%i:%s') AS endDate
+             , DATE_FORMAT(xx.createdAt,'%Y-%m-%d %H:%i:%s') AS appliedAt /* 지원일자 */
+             , hc.id AS companySeq
+             , hc.companyName
+             , hc.companyScale
+             , hc.companyStatus
+             , fn_get_common_cd(p.status, 'POSITION_STATUS', 1) AS status
+             , p.status AS statusCd
+             , p.title
+             , IF(EXISTS(SELECT * FROM scrap_position sp WHERE sp.position_id = xx.position_id AND sp.delFlag = 'N' AND sp.applicant_id = #{memberId}),'Y','N') AS scrapFlag
+             , IF(EXISTS(SELECT * FROM position_applicant pa WHERE pa.position_id = p.id AND pa.ap_member_id = #{memberId}),'Y','N') AS applyFlag
+             , p.jopDescription
+             , p.pmComment
+             , xx.regPath
+             , xx.receiptPath AS receiptPathCd
+             , xx.processStatus AS processStatusCd
+             , xx.progressStep AS progressStepCd
+             , xx.proposalStatus AS proposalStatusCd
+             , xx.resume_id
+        FROM position_applicant xx
+    INNER JOIN position p ON p.id = xx.position_id
+    INNER JOIN hr_company hc ON p.hr_company_id = hc.id
+        WHERE xx.delFlag = 'N'
+          AND xx.ap_member_id = #{memberId}
+          AND (regPath = '2' OR (regPath ='1' AND (proposalStatus IN ('ACCEPT'))) OR (regPath ='3' AND proposalStatus IN ('ACCEPT')))
+        ORDER BY xx.createdAt DESC
+        <if test='endRow > 0'>
+            LIMIT #{startRow}, #{endRow}
+        </if>
+    </select>
+
+    <!-- searchApply = "Y" (후보자) 내가 지원한 포지션 COUNT -->
+    <select id="selectApplyPositionCnt" parameterType="ApiPositionDTO" resultType="int">
+    /* com.fw.core.mapper.db1.api.ApiPositionMapper.selectApplyPositionCnt, 내가 지원한 포지션 COUNT, 22.11.27, YJW, ApiPositionMapper.xml */
+        SELECT COUNT(*)
+        FROM position_applicant xx
+    INNER JOIN position p ON p.id = xx.position_id
+    INNER JOIN hr_company hc ON p.hr_company_id = hc.id
+        WHERE xx.delFlag = 'N'
+          AND xx.ap_member_id = #{memberId}
+          AND (regPath = '2' OR (regPath ='1' AND (proposalStatus IN ('ACCEPT'))) OR (regPath ='3' AND proposalStatus IN ('ACCEPT')))
+    </select>
+
+    <!-- searchScrap = "Y" (후보자) 내가 스크랩한 포지션 조회 -->
+    <select id="selectScrapPositionList" parameterType="ApiPositionDTO" resultType="ApiPositionDTO">
+    /* com.fw.core.mapper.db1.api.ApiPositionMapper.selectScrapPositionList, 내가 스크랩한 포지션 조회, 22.11.27, YJW, ApiPositionMapper.xml */
+        SELECT p.id AS positionId
+             , p.createdAt
+             , DATE_FORMAT(p.endDate,'%Y-%m-%d %H:%i:%s') AS endDate
+             , hc.companyName
+             , hc.companyScale
+             , hc.companyStatus
+             , fn_get_common_cd(p.status, 'POSITION_STATUS', 1) AS status
+             , p.status AS statusCd
+             , p.title
+             , IF(EXISTS(SELECT * FROM scrap_position sp WHERE sp.position_id = p.id AND sp.delFlag = 'N' AND sp.applicant_id = #{memberId}),'Y','N') AS scrapFlag
+             , IF(EXISTS(SELECT * FROM position_applicant pa WHERE pa.position_id = xx.position_id AND pa.ap_member_id = #{memberId}),'Y','N') AS applyFlag
+             , p.jopDescription
+             , p.pmComment
+        FROM scrap_position xx
+    INNER JOIN position p ON p.id = xx.position_id
+    INNER JOIN hr_company hc ON hc.id = p.hr_company_id
+        WHERE xx.applicant_id = #{memberId}
+          AND xx.delFlag = 'N'
+          AND p.status IN ('DOING')
+          AND p.deleted = 0
+        ORDER BY xx.createdAt DESC
+        <if test='endRow > 0'>
+            LIMIT #{startRow}, #{endRow}
+        </if>
+    </select>
+
+    <!-- searchScrap = "Y" (후보자) 내가 스크랩한 포지션 COUNT -->
+    <select id="selectScrapPositionCnt" parameterType="ApiPositionDTO" resultType="int">
+    /* com.fw.core.mapper.db1.api.ApiPositionMapper.selectScrapPositionCnt, 내가 스크랩한 포지션 COUNT, 22.11.27, YJW, ApiPositionMapper.xml */
+        SELECT COUNT(*)
+        FROM scrap_position xx
+    INNER JOIN position p ON p.id = xx.position_id
+    INNER JOIN hr_company hc ON hc.id = p.hr_company_id
+        WHERE xx.applicant_id = #{memberId}
+          AND xx.delFlag = 'N'
+          AND p.status IN ('DOING')
+          AND p.deleted = 0
+    </select>
+
+    <!-- searchContact = "Y" (헤드헌터) 컨택리스트 조회 -->
+    <select id="selectContactPositionList" parameterType="ApiPositionDTO" resultType="ApiPositionDTO">
+    /* com.fw.core.mapper.db1.api.ApiPositionMapper.selectContactPositionList, 컨택리스트 조회, 22.11.27, YJW, ApiPositionMapper.xml */
+        SELECT xx.position_id AS positionId
+             , (CASE WHEN xx.regPath = '1' THEN '내인재'
+                     WHEN xx.regPath = '2' THEN '직접지원'
+                     WHEN xx.regPath = '3' THEN '수동입력'
+                END) AS regPath
+             , xx.regPath AS regPathCd
+             , r.picture_file_id /* 이력서에 등록된 사진 */
+             , m.name /* 이름 */
+             , r.birth /* 생년월일 */
+             , LEFT(DATE_FORMAT(NOW(), '%Y%m%d') - r.birth, 2)  AS age
+             , fn_get_common_cd(r.genderCd, 'GENDER', 1) as gender /* 성별 */
+             , r.genderCd AS genderCd
+             , (SELECT name FROM resume_academic_background rab WHERE rab.resume_id = xx.resume_id and rab.delFlag = 'N' ORDER BY rab.entranceYm DESC LIMIT 1) AS finalSchool
+             , (SELECT companyName FROM resume_career rc WHERE rc.delFlag='N' AND rc.resume_id = xx.resume_id ORDER BY holdOffice DESC, resignationYm DESC LIMIT 1) AS finalCompany
+             , m.phone /* 연락처 */
+             , r.totalCareer /* 총 경력 */
+             , xx.resume_id
+             , m.id AS userSeq
+             , m.DTYPE AS dtype
+        FROM position_applicant xx
+    LEFT JOIN resume r ON xx.resume_id = r.id
+    INNER JOIN member m ON xx.ap_member_id = m.id
+        WHERE xx.position_id = #{positionId}
+          AND (xx.hh_member_id = #{memberId} OR xx.receiptPath = 'CO')
+          AND (xx.receiptPath != 'CO' OR xx.receiptPath IS NULL)
+        <if test='endRow > 0'>
+            LIMIT #{startRow}, #{endRow}
+        </if>
+    </select>
+
+    <!-- searchContact = "Y" (헤드헌터) 컨택리스트 COUNT -->
+    <select id="selectContactPositionCnt" parameterType="ApiPositionDTO" resultType="int">
+    /* com.fw.core.mapper.db1.api.ApiPositionMapper.selectContactPositionCnt, 컨택리스트 COUNT, 22.11.27, YJW, ApiPositionMapper.xml */
+        SELECT COUNT(*)
+        FROM position_applicant xx
+    LEFT JOIN resume r ON xx.resume_id = r.id
+    INNER JOIN member m ON xx.ap_member_id = m.id
+        WHERE xx.position_id = #{positionId}
+          AND (xx.hh_member_id = #{memberId} OR xx.receiptPath = 'CO')
+          AND (xx.receiptPath != 'CO' OR xx.receiptPath IS NULL)
+    </select>
+
+    <!-- 포지션 상세 조회 -->
+    <select id="selectPositionInfo" parameterType="ApiPositionDTO" resultType="ApiPositionDTO">
+        /* com.fw.core.mapper.db1.api.ApiPositionMapper.selectPositionInfo, 포지션 상세 조회 , 22.11.27, YJW, ApiPositionMapper.xml */
+        SELECT id
+             , DATE_FORMAT(createdAt,'%Y-%m-%d %H:%i:%s') AS createdAt
+             , updatedAt
+             , deleted
+             , endDate
+             , etc
+             , feeInfo
+             , industry
+             , isCowork
+             , isPrivate
+             , jobDescription
+             , pmComment
+             , status
+             , stopReason
+             , title
+             , warrantyTerm
+             , hr_company_id
+             , member_id
+             , keywords
+        FROM position
+        WHERE id = #{positionId}
+          AND member_id = #{memberId}
+    </select>
+
+    <!-- 포지션(채용공고) 수정 (마감일연장) -->
+    <update id="updatePosition" parameterType="ApiPositionDTO">
+    /* com.fw.core.mapper.db1.api.ApiPositionMapper.updatePosition, 포지션(채용공고) 수정, 22.11.27, YJW, ApiPositionMapper.xml */
+        UPDATE position
+        SET endDate = #{endDate}
+            /* 마감일 연장 시 마감 연장 횟수 증가 */
+            ,end_add_cnt = IFNULL(end_add_cnt, 0) + 1
+        WHERE id = #{positionId} AND member_id = #{memberId}
+    </update>
+
+    <!-- 포지션 스크랩 여부 확인 -->
+    <select id="selectIsScrap" parameterType="ApiScrapPositionDTO" resultType="boolean">
+    /* com.fw.core.mapper.db1.api.ApiPositionMapper.selectIsScrap, 스크랩 여부 확인, 22.11.27, YJW, ApiPositionMapper.xml */
+        SELECT EXISTS(
+                      SELECT 1
+                        FROM scrap_position
+                      WHERE position_id = #{positionId}
+                        AND applicant_id = #{memberId}
+                        AND delFlag = 'N'
+                   ) AS isScrap
+    </select>
+
+    <!-- 포지션 스크랩 -->
+    <insert id="insertScrap" parameterType="ApiScrapPositionDTO">
+    /* com.fw.core.mapper.db1.api.ApiPositionMapper.insertScrap, 스크랩, 22.11.27, YJW, ApiPositionMapper.xml */
+        INSERT INTO scrap_position (
+               position_id
+             , applicant_id
+             , createdAt
+        ) VALUES (
+               #{positionId}
+             , #{memberId}
+             , NOW()
+        )
+    </insert>
+
+    <!-- 포지션 스크랩 취소 -->
+    <update id="updateScrap" parameterType="ApiScrapPositionDTO">
+    /* com.fw.core.mapper.db1.api.ApiPositionMapper.updateScrap, 스크랩 취소, 22.11.27, YJW, ApiPositionMapper.xml */
+        UPDATE scrap_position
+           SET updatedAt = NOW()
+             , delFlag = 'Y'
+        WHERE position_id = #{positionId} AND applicant_id = #{memberId}
+    </update>
+
+    <!-- 열람여부 확인 -->
+    <select id="selectIsRead" parameterType="ApiPositionReadingHistoryDTO" resultType="boolean">
+    /* com.fw.core.mapper.db1.api.ApiPositionMapper.selectIsRead, 열람여부 확인, 22.11.27, YJW, ApiPositionMapper.xml */
+        SELECT EXISTS(
+                       SELECT 1
+                        FROM position_reading_history
+                       WHERE position_id = #{positionId}
+                         AND applicant_id = #{memberId}
+                   ) AS isRead
+    </select>
+
+    <!-- 열람이력 등록 -->
+    <insert id="insertPositionHistory" parameterType="ApiPositionReadingHistoryDTO">
+    /* com.fw.core.mapper.db1.api.ApiPositionMapper.insertPositionHistory, 열람이력 등록, 22.11.27, YJW, ApiPositionMapper.xml */
+        INSERT INTO position_reading_history (
+               createdAt
+             , updatedAt
+             , applicant_id
+             , position_id
+        ) VALUES (
+               NOW()
+             , NOW()
+             , #{memberId}
+             , #{positionId}
+        )
+    </insert>
+
+    <!-- 최근 열람시간 갱신 -->
+    <update id="updatePositionHistory" parameterType="ApiPositionReadingHistoryDTO">
+    /* com.fw.core.mapper.db1.api.ApiPositionMapper.updatePositionHistory, 최근 열람시간 갱신, 22.11.27, YJW, ApiPositionMapper.xml */
+        UPDATE position_reading_history
+           SET updatedAt = NOW()
+        WHERE position_id = #{positionId} AND applicant_id = #{memberId}
+    </update>
+
+    <!-- 포지션(채용공고) 열람 이력 조회 -->
+    <select id="selectPositionReadingHistory" parameterType="ApiPositionReadingHistoryDTO" resultType="ApiPositionReadingHistoryDTO">
+    /* com.fw.core.mapper.db1.api.ApiPositionMapper.selectPositionReadingHistory, 열람 이력 조회, 22.11.27, YJW, ApiPositionMapper.xml */
+        SELECT p.id AS positionId
+             , DATE_FORMAT(p.createdAt,'%Y-%m-%d %H:%i:%s') AS createdAt
+             , DATE_FORMAT(p.endDate,'%Y-%m-%d %H:%i:%s') AS endDate
+             , hc.companyName
+             , hc.companyScale
+             , hc.companyStatus
+             , fn_get_common_cd(p.status, 'POSITION_STATUS', 1) AS status
+             , p.status AS statusCd
+             , p.title
+             , IF(EXISTS(SELECT 1 FROM position_applicant pa WHERE pa.position_id = xx.position_id AND pa.ap_member_id = #{memberId}),'Y','N') AS applyFlag
+        FROM position_reading_history xx
+    INNER JOIN position p ON p.id = xx.position_id
+    INNER JOIN hr_company hc ON hc.id = p.hr_company_id
+        WHERE xx.applicant_id = #{memberId}
+          AND p.status IN ('DOING')
+          AND p.deleted = 0
+        ORDER BY xx.updatedAt DESC
+        <if test='endRow > 0'>
+            LIMIT #{startRow}, #{endRow}
+        </if>
+    </select>
+
+    <!-- 포지션(채용공고) 열람 이력 COUNT -->
+    <select id="selectPositionReadingHistoryCnt" parameterType="ApiPositionReadingHistoryDTO" resultType="int">
+    /* com.fw.core.mapper.db1.api.ApiPositionMapper.selectPositionReadingHistoryCnt, 열람 이력 COUNT, 22.11.27, YJW, ApiPositionMapper.xml */
+        SELECT COUNT(*)
+        FROM position_reading_history xx
+    INNER JOIN position p ON p.id = xx.position_id
+    INNER JOIN hr_company hc ON hc.id = p.hr_company_id
+        WHERE xx.applicant_id = #{memberId}
+          AND p.status IN ('DOING')
+          AND p.deleted = 0
+    </select>
+
+    <!-- 포지션(채용공고) 지원 -->
+    <insert id="insertPositionApply" parameterType="ApiPositionApplicantDTO">
+    /* com.fw.core.mapper.db1.api.ApiPositionMapper.insertPositionApply, 포지션(채용공고) 지원, 22.12.25, YJW, ApiPositionMapper.xml */
+        INSERT INTO position_applicant (
+               createdAt
+             , passedStatus
+             , phoneOpened /*not null */
+             , pmSubmitted /*not null */
+             , processStatus
+             , progressStep
+             , proposalAt
+             , proposalStatus
+             , proposedEamil /*not null */
+             , proposedSms /*not null */
+             , receiptPath
+             , receiptStatus
+             , regPath
+             , resultNoticed /*not null */
+             , updateRequest /*not null */
+             , ap_member_id
+             , hh_member_id
+             , position_id /*not null */
+             , resume_id /*not null */
+             , submit_resume_file_id
+             , delFlag
+             , resume_modify_flag
+        ) VALUES (
+               NOW()
+             , #{passedStatus}
+             , #{phoneOpened}  /*not null */
+             , #{pmSubmitted}  /*not null */
+             , #{processStatus}
+             , #{progressStep}
+             , #{proposalAt}
+             , #{proposalStatus}
+             , #{proposedEamil}  /*not null */
+             , #{proposedSms}  /*not null */
+             , #{receiptPath}
+             , #{receiptStatus}
+             , #{regPath}
+             , false /*not null */
+             , #{updateRequest} /*not null */
+             , #{apMemberId}
+             , #{hhMemberId}
+             , #{positionId} /*not null */
+             , #{resumeId} /*not null */
+             , #{submitResumeFileId}
+             , 'N'
+             , 'N'
+        )
+        <selectKey order="AFTER" keyProperty="applicantId" resultType="String">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <!-- 이력서 수정권한 여부 설정 -->
+    <update id="updateModifyFlag" parameterType="ApiPositionApplicantDTO">
+        /* com.fw.core.mapper.db1.api.ApiPositionMapper.updateModifyFlag, 이력서 수정권한 여부 설정, 22.12.20, YJW, ApiPositionMapper.xml */
+        UPDATE position_applicant
+        <if test="resumeModifyFlag != null and resumeModifyFlag != ''">
+            SET resume_modify_flag = #{resumeModifyFlag}
+        </if>
+        WHERE id = #{applicantId}
+    </update>
+
+    <!-- 포지션(채용공고) 채용현황 조회 -->
+    <select id="selectPositionStatus" parameterType="ApiPositionStatusDTO" resultType="ApiPositionStatusDTO">
+    /* com.fw.core.mapper.db1.api.ApiPositionMapper.selectPositionStatus, 채용현황 조회, 22.11.27, YJW, ApiPositionMapper.xml */
+        SELECT
+        (SELECT COUNT(*)
+           FROM position WHERE deleted = 0
+                           AND member_id = #{memberId}
+                           AND status IN ('DOING')
+                       ) AS progressCnt
+        , (SELECT COUNT(*)
+             FROM position WHERE deleted = 0
+                             AND member_id = #{memberId}
+                             AND status IN ('END','CLOSE')
+                         ) AS closedCnt
+        , (SELECT COUNT(1) FROM position_applicant WHERE hh_member_id = #{memberId} AND DATE_FORMAT(createdAt, '%Y%m%d') = DATE_FORMAT(NOW(), '%Y%m%d') AND regPath = '2') +
+          (SELECT COUNT(1) FROM position_applicant WHERE hh_member_id = #{memberId} AND DATE_FORMAT(createdAt, '%Y%m%d') = DATE_FORMAT(NOW(), '%Y%m%d') AND ((regPath = '1' AND proposalStatus = 'ACCEPT') OR (regPath = '3' AND proposalStatus = 'ACCEPT'))) AS applyCnt
+        ,  (SELECT COUNT(1)
+            FROM position_applicant pa
+        INNER JOIN position p ON pa.position_id = p.id
+            WHERE hh_member_id = #{memberId}
+              AND changeAt IS NULL
+              AND p.deleted = 0
+              AND p.status IN ('DOING')
+            ) AS uncollectedCnt
+    </select>
+
+    <!-- 포지션 등록 헤드헌터 조회 - 포지션 지원 시 -->
+    <select id="selectPositionHh" parameterType="ApiPositionApplicantDTO" resultType="ApiPositionApplicantDTO">
+        /* com.fw.core.mapper.db1.api.ApiPositionMapper.selectPositionHh, 포지션 등록 헤드헌터 조회, 22.12.25, YJW, ApiPositionMapper.xml */
+        SELECT member_id
+        FROM position
+        WHERE id = #{positionId}
+    </select>
+
+    <!-- 합격한 포지션 합격후기 작성여부 조회 -->
+    <select id="selectPassReviewExists" parameterType="ApiPositionDTO" resultType="boolean">
+        /* com.fw.core.mapper.db1.api.ApiPositionMapper.selectPassReviewExists, 합격한 포지션 합격후기 작성여부 조회, 23.01.09, YJW, ApiPositionMapper.xml */
+        SELECT EXISTS (
+                       SELECT 1
+                       FROM tb_community
+                       WHERE community_type = 'PASS_REVIEW'
+                         AND create_seq = #{memberId}
+                         AND company_seq = #{companySeq}
+                         AND del_flag = 'N'
+                   ) AS CNT
+    </select>
+
+    <!-- 마감 연장 횟수 조회 (2회 이상일 경우 수정 막기위함) -->
+    <select id="selectEndAddCnt" parameterType="ApiPositionDTO" resultType="Integer">
+         /* com.fw.core.mapper.db1.api.ApiPositionMapper.selectEndAddCnt, 마감 연장 횟수 조회, 22.11.27, YJW, ApiPositionMapper.xml */
+        SELECT end_add_cnt
+        FROM position
+        WHERE id = #{positionId}
+    </select>
+</mapper>
+

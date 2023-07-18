@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/default}">
+
+<body>
+	<div layout:fragment="contents" th:remove="tag">
+		<main id="content" role="main">
+			<h2 class="title">상세보기</h2>
+			<div class="row p-3">
+            	<div class="col-12">
+					<!-- table -->
+					<table class="table table-bordered">
+						<colgroup>
+							<col style="width:120px" />
+							<col />
+						</colgroup>
+						<tr>
+							<th class="text-center">ID</th>
+							<td th:text="${detail.id}"></td>
+						</tr>
+						<tr>
+							<th class="text-center">작성자 ID</th>
+							<td th:text="${detail.memberId}"></td>
+						</tr>
+						<tr>
+							<th class="text-center">작성일</th>
+							<td th:text="${detail.createdAt}"></td>
+						</tr>
+						<tr>
+							<th class="text-center">구분</th>
+							<td th:text="${detail.qnaTypeCd}"></td>
+						</tr>
+						<tr>
+							<th class="text-center">제목</th>
+							<td th:text="${detail.subject}" colspan="5"></td>
+						</tr>
+						<tr>
+							<th class="text-center">처리상태</th>
+							<td th:if="${detail.answer eq null}" colspan="2">접수</td>
+							<td th:if="${detail.answer ne null}" colspan="2">답변완료</td>
+						</tr>
+						<tr>
+							<th class="text-center">내용</th>
+							<td th:text="${detail.content}"></td>
+						</tr>
+						<tr>
+							<th class="text-center">답변</th>
+							<td th:utext="${detail.answer}" colspan="7"></td>
+						</tr>
+						<tr>
+							<th class="text-center">답변 작성자</th>
+							<td th:text="${detail.adminName}"></td>
+						</tr>
+						<tr>
+							<th class="text-center">첨부 파일</th>
+							<td><a th:if="${detail.commonFileList ne null and detail.commonFileList.size() ne 0}" th:href="${detail.commonFileList.get(0).url}" th:text="${detail.commonFileList.get(0).originName}"></a></td>
+						</tr>
+					</table>
+					<input type="hidden" id="id" th:value="${detail.id}" />
+					<!-- table -->
+					<div class="m-t-10 text-right">
+						<button type="button" class="btn btn-dark"
+							data-role="update" th:if="${detail.answerYn == 'Y'}">수정하기</button>
+						<button type="button" class="btn btn-dark"
+							data-role="update" th:if="${detail.answerYn == 'N'}">답변하기</button>
+						<button type="button" class="btn btn-dark"
+							data-role="list">목록</button>
+					</div>
+					
+				</div>
+			</div>
+		</main>
+	</div>
+	<div layout:fragment="modal" th:remove="tag"></div>
+</body>
+</html>

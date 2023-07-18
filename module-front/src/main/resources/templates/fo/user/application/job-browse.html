@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html  xmlns:th="http://www.thymeleaf.org"
+       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+       layout:decorate="~{layouts/applicationLayout}">
+<body>
+<div id="container-block">
+  <div layout:fragment="contents" th:remove="tag">
+          <div class="layout-content">
+            <h3 class="subtitle poppins">받은 포지션 제안</h3>
+            <div class="title-line mt-4 mb-5"></div>
+            <div class="row row-0">
+              <ol class="step mt-n3">
+                <li class="">
+                  <a href="/fo/user/application/job-position"><span>포지션 제안내역</span></a>
+                </li>
+                <li class="active">
+                  <a href="/fo/user/application/job-browse"><span>내 이력서 열람 내역</span></a>
+                </li>
+              </ol>
+            </div>
+            <form name="searchForm">
+              <input type="hidden" name="page" th:value="${searchInfo.page}"/>
+            </form>
+            <div class="fake-table">
+              <div class="fake-table-head">
+                <div class="fake-table-cell">열람일</div>
+                <div class="fake-table-cell">헤드헌터</div>
+                <div class="fake-table-cell">소속</div>
+                <div class="fake-table-cell">진행중 공고</div>
+                <div class="fake-table-cell">열람제한</div>
+              </div>
+              <th:block th:if="${#lists.isEmpty(positionList)}">
+                <div class="fake-table-column none-data">
+                  <div class="fake-table-cell">
+                    <p></p>
+                  </div>
+                  <div class="fake-table-cell">
+                    <p></p>
+                  </div>
+                  <div class="fake-table-cell">
+                    <p></p>
+                  </div>
+                  <div class="fake-table-cell">
+                    <p class="none-data__desc">데이터가 없습니다.</p>
+                  </div>
+                  <div class="fake-table-cell">
+                    <p></p>
+                  </div>
+                </div>
+              </th:block>
+              <th:block  th:each="list : ${positionList}">
+                <div class="fake-table-column">
+                  <div class="fake-table-cell" th:text="${list.createdAt}">2022.10.19</div>
+                  <div class="fake-table-cell" th:text="${list.name}">장영은</div>
+                  <div class="fake-table-cell" th:text="${list.sfName}">앤쉬컨설팅(주)</div>
+                  <div class="fake-table-cell"><a class="text-danger" th:href="'/fo/user/jop/posting-hunter?memberId='+${list.memberId}" th:text="${list.postingCnt}">1</a>건</div>
+                  <div class="fake-table-cell">
+                    <div class="form-check justify-content-center p-0">
+                      <input class="form-check-input" type="checkbox" data-role="addBlack" th:checked="${list.blackCnt eq '1'}"
+                             th:data-id="${list.memberId}" th:data-black-id="${list.blackId}" value="" id="addBlack" />
+                    </div>
+                  </div>
+                </div>
+              </th:block>
+            </div>
+            <div class="d-flex justify-content-center mt-5">
+              <th:block th:include="common/paging :: paging_Fragment(fnc=*{'fn_go_page(this)'}, pageId=*{'pageName1'})"/>
+            </div>
+          </div>
+      </div>
+    </div>
+  </body>
+</html>

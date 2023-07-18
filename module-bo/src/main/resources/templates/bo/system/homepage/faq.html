@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/default}">
+<body>
+	<div layout:fragment="contents" th:remove="tag">
+		<main id="content" role="main">
+			<h2 class="title">FAQ 관리</h2>
+			<div class="row p-3">
+				<div class="col-12">
+					<div class="row">
+						<div class="col">
+							<h5 class="mb-3">AP 메인 FAQ</h5>
+							<table class="table" id="displayDatatable">
+								<thead>
+									<tr>
+										<th>NO</th>
+										<th>구분</th>
+										<th>카테고리</th>
+										<th>제목</th>
+										<th>등록일</th>
+										<th>등록자</th>
+										<th>삭제</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr id="displayTable1">
+										<td>1</td>
+									</tr>
+									<tr id="displayTable2">
+										<td>2</td>
+									</tr>
+									<tr id="displayTable3">
+										<td>3</td>
+									</tr>
+									<tr id="displayTable4">
+										<td>4</td>
+									</tr>
+									<tr id="displayTable5">
+										<td>5</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<div class="col">
+							<h5 class="mb-3">HH 메인 FAQ</h5>
+							<table class="table" id="HHdisplayDatatable">
+								<thead>
+									<tr>
+										<th>NO</th>
+										<th>구분</th>
+										<th>카테고리</th>
+										<th>제목</th>
+										<th>등록일</th>
+										<th>등록자</th>
+										<th>삭제</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr id="HHdisplayTable6">
+										<td>1</td>
+									</tr>
+									<tr id="HHdisplayTable7">
+										<td>2</td>
+									</tr>
+									<tr id="HHdisplayTable8">
+										<td>3</td>
+									</tr>
+									<tr id="HHdisplayTable9">
+										<td>4</td>
+									</tr>
+									<tr id="HHdisplayTable10">
+										<td>5</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				
+					<form id="searchFaq" name="searchFaq">
+						<div class="row mt-5">
+							<div class="col-4">
+								<div class="d-flex align-items-center">
+									<input type="text" id="faqStartDt" name="faqStartDt" class="form-control form-datepicker" placeholder="날짜 선택">
+									<div class="mr-2">~</div>
+									<input type="text" id="faqEndDt" name="faqEndDt" class="form-control form-datepicker" placeholder="날짜 선택">
+								</div>
+							</div>
+							<div class="col-2">
+								<div class="d-flex align-items-center">
+									<button type="button" class="btn btn-dark" name="colorChange" id="all" data-role="all">전체</button>
+									<button type="button" class="btn btn-dark" name="colorChange" id="today" data-role="today">오늘</button>
+									<button type="button" class="btn btn-dark" name="colorChange" id="week" data-role="week">7일</button>
+									<button type="button" class="btn btn-dark" name="colorChange" id="month" data-role="month">1개월</button>
+								</div>
+							</div>
+							<div class="col-6 text-right">
+								<select id="memberTypeSelect" class="custom-select w-auto mr-2">
+									<option selected="selected" value="">전체</option>
+									<option value="AP">AP</option>
+									<option value="HH">HH</option>
+								</select>
+								<select id="subMemberTypeSelect" class="custom-select w-auto mr-2">
+									<option selected="selected" value="">전체</option>
+								</select>
+								<button type="button" class="btn btn-primary" data-role="search">검색하기</button>
+								<button type="button" class="btn btn-dark" data-role="saveDisplay">메인등록</button>
+								<button type="button" class="btn btn-dark"
+									data-role="faqCreate">FAQ 등록</button>
+								<button type="button" class="btn btn-dark" data-toggle="modal"
+									data-target="#categoryModal">카테고리 관리</button>
+							</div>
+						</div>
+					</form>
+				
+					<div class="row mt-3">
+						<div class="col">
+							<table class="table" id="datatable">
+								<thead>
+									<tr>
+										<th>체크박스</th>
+										<th>No.</th>
+										<th>구분</th>
+										<th>카테고리</th>
+										<th>제목</th>
+										<th>작성일시</th>
+										<th>등록자</th>
+										<th>수정일시</th>
+										<th>수정자</th>
+									</tr>
+								</thead>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</main>
+		<div layout:fragment="modal" th:remove="tag">
+			<div class="modal fade" id="categoryModal" tabindex="-1"
+				role="dialog" aria-hidden="true">
+				<div class="modal-dialog modal-dialog-centered" role="document">
+					<div class="modal-content">
+						<div class="modal-header">
+							<p class="font-size-18px">FAQ 카테고리 관리</p>
+						</div>
+						<div class="modal-body">
+							<button class="btn" data-role="AP" id="AP">AP</button>
+							<button class="btn" data-role="HH" id="HH">HH</button>
+							<table class="table mt-2" id="modaltable" name="modaltable">
+								<tbody>
+								</tbody>
+							</table>
+							<div class="input-group mt-2">
+								<input type="text" name="categoryNm" class="form-control" id="categoryNm">
+								<button class="btn btn-primary input-group-addon" data-role="save">추가</button>
+							</div>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-secondary"
+								data-dismiss="modal">닫기</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

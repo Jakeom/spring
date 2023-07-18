@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/default}">
+<head>
+</head>
+<body>
+<div layout:fragment="contents" th:remove="tag">
+    <div id="container-block">
+        <main id="content" role="main">
+            <h2 class="title">팝업 등록</h2>
+            <div class="p-3">
+                <form id="insertPopupForm" name="insertPopupForm">
+                    <div class="form-group">
+                        <label for="title">제목</label>
+                        <input type="text" class="form-control col-xl-2" id="title" name="title"
+                               placeholder="제목을 입력하세요">
+                    </div>
+                    <div class="form-group">
+                        <label for="popupContent">내용</label>
+                        <textarea id="popupContent" name="content" class="form-control col-xl-2"
+                                  placeholder="내용을 입력하세요." rows="10" cols="50"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="popupOrder">메뉴 순서</label>
+                        <input type="text" class="form-control col-xl-2" id="popupOrder" name="popupOrder"
+                               placeholder="메뉴순서를 입력하세요" maxlength='10'>
+                    </div>
+                    <div class="form-group">
+                        <label>사용 여부</label>
+                        <input type="radio" id="useFlagY" name="useFlag" value="Y" checked/>
+                        <label for="useFlagY">사용</label>
+                        <input type="radio" id="useFlagN" name="useFlag" value="N"/>
+                        <label for="useFlagN">미사용</label>
+                    </div>
+                    <div class="form-group">
+                        <label for="popupStartDt">팝업일시</label>
+                        <div class="input-group mb-3">
+                            <input type="text" id="popupStartDt" name="popupStartDt"
+                                   class="form-control form-datepicker col-xl-1" placeholder="날짜 선택" readonly>
+                            <span class="input-group-text">~</span>
+                            <label for="popupEndDt"></label>
+                            <input type="text" id="popupEndDt" name="popupEndDt"
+                                   class="form-control form-datepicker col-xl-1" placeholder="날짜 선택" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="linkUrl">링크 URL</label>
+                        <input type="text" class="form-control col-xl-2" name="linkUrl" id="linkUrl"
+                               placeholder="링크URL을 입력하세요">
+                    </div>
+                    <div class="form-group">
+                        <label for="offsetX">오프셋X</label>
+                        <input type="text" class="form-control col-xl-2" name="offsetX" id="offsetX"
+                               placeholder="오프셋x를 입력하세요" maxlength='10'>
+                    </div>
+                    <div class="form-group">
+                        <label for="offsetY">오프셋Y</label>
+                        <input type="text" class="form-control col-xl-2" name="offsetY" id="offsetY"
+                               placeholder="오프셋y를 입력하세요" maxlength='10'>
+                    </div>
+                    <button type="button" class="btn btn-info btn-lg" data-role="save">등록</button>
+                    <button type="button" class="btn btn-danger btn-lg" data-role="list">취소</button>
+                </form>
+            </div>
+        </main>
+    </div>
+    <div layout:fragment="modal" th:remove="tag"></div>
+</div>
+</body>
+</html>

@@ -1,0 +1,80 @@
+spring:
+  profiles:
+    active: local
+    include:
+      - app
+      - db
+      - file
+  devtools:
+    livereload:
+      enabled: true
+  config:
+    messages:
+      basename: messages/batch/message
+      encoding: UTF-8
+  mvc:
+    pathmatch:
+      matching-strategy: ant-path-matcher
+    throw-exception-if-no-handler-found: true
+    dispatch-options-request: false
+  web:
+    resources:
+      add-mappings: false
+  datasource:
+    hikari:
+      connection-timeout: 8000
+      max-lifetime: 28000
+
+---
+# local
+spring:
+  config:
+    activate:
+      on-profile: local
+server:
+  port: 8078
+
+# JWT Setting
+# AccessToken = Minute, RefreshToken = Day
+jwt:
+  secret:
+    key: xxx
+  access:
+    token:
+      expiration: 10
+  refresh:
+    token:
+      expiration: 30
+service:
+  mail_path: C:/Users/MyCom/mail/
+push:
+  android_auth_key: xxx
+  ios_database_url: xxx
+
+---
+# dev
+spring:
+  config:
+    activate:
+      on-profile: dev
+server:
+  port: 8078
+
+
+# JWT Setting
+# AccessToken = Minute, RefreshToken = Day
+jwt:
+  secret:
+    key: xxx
+  access:
+    token:
+      expiration: 10
+  refresh:
+    token:
+      expiration: 30
+service:
+  mail_path: /www/sites/uploadFiles/batch/
+push:
+  android_auth_key: xxx
+  ios_database_url: xxx
+---

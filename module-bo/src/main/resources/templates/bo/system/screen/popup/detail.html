@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/default}">
+<body>
+<div layout:fragment="contents" th:remove="tag">
+    <div id="container-block">
+        <input type="hidden" id="popupDetailSeq" th:value="${detail.popupSeq}"/>
+        <main id="content" role="main">
+            <h2 class="title">팝업 상세</h2>
+            <div class="p-3">
+                <table class="table table-bordered">
+                    <colgroup>
+                        <col style="width:15%">
+                        <col style="width:35%">
+                        <col style="width:15%">
+                        <col style="width:35%">
+                        <col style="width:35%">
+                    </colgroup>
+                    <tbody>
+                    <tr>
+                        <th class="text-center none-sort" style="background-color:#D2DAFF">순번</th>
+                        <td th:text="${detail.popupSeq}"></td>
+
+                        <th class="text-center none-sort" style="background-color:#D2DAFF">제목</th>
+                        <td th:text="${detail.title}"></td>
+                    </tr>
+                    <tr>
+                        <th class="text-center none-sort" style="background-color:#D2DAFF">메뉴순서</th>
+                        <td th:text="${detail.popupOrder}"></td>
+                        <th class="text-center none-sort" style="background-color:#D2DAFF">사용여부</th>
+                        <td th:text="${detail.useFlag}"></td>
+                    </tr>
+                    <tr>
+                        <th class="text-center none-sort" style="background-color:#D2DAFF">팝업 시작 ~ 종료 일시</th>
+                        <td th:text="${detail.popupStartDt} + '~' + ${detail.popupEndDt}"></td>
+                        <th class="text-center none-sort" style="background-color:#D2DAFF">링크URL</th>
+                        <td th:text="${detail.linkUrl}"></td>
+                    </tr>
+                    <tr>
+                        <th class="text-center none-sort" style="background-color:#D2DAFF">생성일시</th>
+                        <td th:text="${detail.createDt}"></td>
+                        <th class="text-center none-sort" style="background-color:#D2DAFF">수정일시</th>
+                        <td th:text="${detail.updateDt}"></td>
+                    </tr>
+                    <tr>
+                        <th class="text-center none-sort" style="background-color:#D2DAFF">오프셋X</th>
+                        <td th:text="${detail.offsetX}"></td>
+                        <th class="text-center none-sort" style="background-color:#D2DAFF">오프셋Y</th>
+                        <td th:text="${detail.offsetY}"></td>
+                    </tr>
+                    <tr>
+                        <th class="text-center none-sort" style="background-color:#D2DAFF">내용</th>
+                        <td colspan="3">
+                            <textarea cols="200" rows="5" id="detailCkeditor" name="detailCkeditor"
+                                      th:text="${detail.content}" readonly></textarea>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <button type="button" class="btn btn-success btn-lg float-lg-right" data-role="detail">목록</button>
+                <button type="button" class="btn btn-danger btn-lg float-lg-right" data-role="delete">삭제</button>
+                <button type="button" class="btn btn-info btn-lg float-lg-right" data-role="modify">수정</button>
+            </div>
+        </main>
+    </div>
+    <div layout:fragment="modal" th:remove="tag"></div>
+</div>
+</body>
+</html>

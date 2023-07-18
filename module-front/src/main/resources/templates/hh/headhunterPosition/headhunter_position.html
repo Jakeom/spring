@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="x-ua-Compatible" content="IE=edge" />
+    <title>Resume9</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,shrink-to-fit=no,viewport-fit=cover" />
+    <meta name="format-detection" content="telephone=no" />
+    <!-- 
+<link rel="icon" type="image/png" href="../assets/images/favicon-16x16.png" sizes="16x16" />
+<link rel="icon" type="image/png" href="../assets/images/favicon-32x32.png" sizes="32x32" /> -->
+    <!-- jquery js -->
+    <script src="../assets/lib/jquery/jquery.min.js"></script>
+
+    <!-- jquery ui -->
+    <link rel="stylesheet" href="../assets/lib/jquery-ui/jquery-ui.min.css" />
+    <script src="../assets/lib/jquery-ui/jquery-ui.min.js"></script>
+
+    <!-- select2 -->
+    <link rel="stylesheet" href="../assets/lib/select2/select2.min.css" />
+    <script src="../assets/lib/select2/select2.min.js"></script>
+
+    <!-- library css -->
+    <link rel="stylesheet" href="../assets/css/bootstrap-grid.css" />
+    <!-- <link rel="stylesheet" href="../assets/css/bootstrap.css" /> -->
+
+    <!-- publilshing css -->
+    <link rel="stylesheet" href="../assets/css/style.css" />
+
+    <!-- library js -->
+    <script src="../assets/lib/bootstrap/bootstrap.bundle.min.js"></script>
+
+    <!-- publishing js -->
+    <script src="../assets/js/ui.js" async></script>
+
+    <!-- swiper -->
+    <link rel="stylesheet" href="../assets/lib/swiper/css/swiper-bundle.min.css" />
+    <script src="../assets/lib/swiper/js/swiper-bundle.min.js"></script>
+  </head>
+  <body>
+    <header id="header">
+      <div class="container">
+        <div class="inner">
+          <div class="col">
+            <div class="row align-items-center justify-content-between gx-0">
+              <div class="col-8 d-flex align-items-center">
+                <div class="header-logo"><img src="../assets/images/logo.svg" alt="SAMSUNG Dispatcher Logo" /></div>
+                <ul class="gnb-list hidden-flex-mobile">
+                  <li class="gnb-depth">
+                    <a href="../jop/posting.html">포지션 관리</a>
+                  </li>
+                  <li class="gnb-depth">
+                    <a href="">인재검색 </a>
+                  </li>
+                  <li class="gnb-depth">
+                    <a href="../resume/resume_main.html">내 인재관리</a>
+                  </li>
+                  <li class="gnb-depth">
+                    <a href="../application/application_status.html">내 주소록</a>
+                  </li>
+                  <li class="gnb-depth">
+                    <a href="../_layout/community.html">고객사 관리</a>
+                  </li>
+                  <li class="gnb-depth">
+                    <a href="../_layout/community.html">We펌</a>
+                  </li>
+                </ul>
+              </div>
+              <div class="col-4 d-flex align-items-center justify-content-end">
+                <ul class="sign-list hidden-flex-mobile">
+                  <li class="sign-depth">
+                    <a href="">1:1 문의</a>
+                  </li>
+                  <li class="sign-depth">
+                    <a href="">고객센터</a>
+                  </li>
+                  <li class="sign-depth mypage">
+                    <!-- <a href="">로그인</a> -->
+                    <a href="javascript:void(0)" class="mypage-con">MY</a>
+                    <i class="icon-login m-l-10"></i>
+                    <div class="my-info" style="display: none">
+                      <div class="my-info__head">
+                        <div class="info-head__my">
+                          <a href="../mypage/profile_info.html">
+                            <p class="info-head__name">홍길동</p>
+                          </a>
+                          <a href="" class="info-head__logout"> 로그아웃 <i class="icon-logout"></i> </a>
+                        </div>
+                        <div class="info-head__point">
+                          <i class="icon-point"></i>
+                          <span class="my-reword">내 리워드</span>
+                          <span class="point">100P</span>
+                        </div>
+                      </div>
+                      <div class="my-info__list">
+                        <ul>
+                          <li>
+                            <a href=""><span class="info-list__title">회원정보 수정</span></a>
+                          </li>
+                          <li class="active">
+                            <a href="../mypage/profile_info.html" class="category">회원정보 수정</a>
+                          </li>
+                          <li>
+                            <a href="../mypage/password.html" class="category">비밀번호 변경</a>
+                          </li>
+                          <li>
+                            <a href="../mypage/blacklist.html" class="category">블랙리스트 관리</a>
+                          </li>
+                        </ul>
+                      </div>
+                      <div class="my-info__list">
+                        <ul>
+                          <li>
+                            <span class="info-list__title">보안</span>
+                          </li>
+                          <li class="active">
+                            <a href="../mypage/login.html" class="category">로그인 기록</a>
+                          </li>
+                        </ul>
+                      </div>
+                      <div class="my-info__list">
+                        <ul>
+                          <li>
+                            <span class="info-list__title">리워드</span>
+                          </li>
+                          <li class="active">
+                            <a href="../mypage/reword.html" class="category">적립/사용내역</a>
+                          </li>
+                          <li>
+                            <a href="../mypage/reword.html" class="category">리워드 Mall</a>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div id="container-block">
+      <div class="container">
+        <div class="sub-content">
+          <div>
+            <div class="d-flex align-items-center justify-content-between">
+              <ul class="nav nav-tabs border-bottom-0" id="myTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">진행중</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false" tabindex="-1">종료</button>
+                </li>
+              </ul>
+              <div class="d-flex gap-10">
+                <select class="select-design" style="width: 150px">
+                  <option value="1">코웍참가자</option>
+                </select>
+                <input type="text" class="form-control white form-md" style="width: 250px" />
+                <button type="button" class="btn btn-primary btn-md">검색</button>
+              </div>
+            </div>
+            <div class="tab-content" id="myTabContent">
+              <div class="tab-pane fade active show" id="home" role="tabpanel" aria-labelledby="home-tab">
+                <div class="position-wrap">
+                  <div class="position-list">
+                    <div class="position-card"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- 게시물 쓰기 -->
+      <div class="modal fade" id="modal-write" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-write modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">게시글 쓰기</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="select-form">
+                <select class="select-design" style="width: 100%">
+                  <option value="1">직장인의 고민</option>
+                  <option value="3">Wyoming</option>
+                  <option value="3">Wyoming</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <input type="text" class="form-control form-md" placeholder="제목을 입력하세요" />
+              </div>
+              <div class="form-textarea">
+                <textarea name="" id="" cols="30" rows="10" placeholder="내용을 입력하세요" class=""></textarea>
+              </div>
+              <div class="form-upload">
+                <input type="file" class="" id="form-file" />
+                <label for="form-file"><i class="icon-input-add"></i></label>
+              </div>
+              <div class="preview-image-wrap">
+                <div class="preview-image" style="background-image: url('../assets/images/about-01.png')">
+                  <div class="hover-close">
+                    <button type="button"><i class="icon-del"></i></button>
+                  </div>
+                </div>
+                <div class="preview-image" style="background-image: url('../assets/images/about-01.png')"></div>
+                <div class="preview-image" style="background-image: url('../assets/images/about-01.png')"></div>
+                <div class="preview-image" style="background-image: url('../assets/images/about-01.png')"></div>
+                <div class="preview-image" style="background-image: url('../assets/images/about-01.png')"></div>
+                <div class="preview-image" style="background-image: url('../assets/images/about-01.png')"></div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">닫기</button>
+              <button type="button" class="btn btn-primary">등록</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 게시물 쓰기 (회사검색) -->
+      <div class="modal fade" id="modal-write-company-search" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-write modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">게시글 쓰기</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="select-form">
+                <select class="form-select form-md">
+                  <option value="">직장인 고민</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <input type="text" class="form-control form-md" placeholder="제목을 입력하세요" />
+              </div>
+              <div class="form-group position-relative">
+                <div class="search-box">
+                  <input type="text" class="" placeholder="회사 이름을 입력하세요" />
+                  <button type="button" class="search-btn"><i class="icon-search-dark"></i></button>
+                </div>
+                <div class="search-result-list">
+                  <ul>
+                    <li class="active">
+                      <div class="result-company">
+                        <a href="">
+                          <p class="company-name">(주)삼성전자</p>
+                          <p class="company-obj">중소기업 | 시스템소프트웨어 | 중공업</p>
+                        </a>
+                      </div>
+                    </li>
+                    <li>
+                      <div class="result-company">
+                        <a href="">
+                          <p class="company-name">(주)삼성전자</p>
+                          <p class="company-obj">중소기업 | 시스템소프트웨어 | 중공업</p>
+                        </a>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              <div class="form-textarea">
+                <textarea name="" id="" cols="30" rows="10" placeholder="내용을 입력하세요" class=""></textarea>
+              </div>
+              <div class="form-upload">
+                <input type="file" class="" id="form-file" />
+                <label for="form-file"><i class="icon-input-add"></i></label>
+              </div>
+              <div class="preview-image-wrap">
+                <div class="preview-image" style="background-image: url('../assets/images/about-01.png')">
+                  <div class="hover-close">
+                    <button type="button"><i class="icon-del"></i></button>
+                  </div>
+                </div>
+                <div class="preview-image" style="background-image: url('../assets/images/about-01.png')"></div>
+                <div class="preview-image" style="background-image: url('../assets/images/about-01.png')"></div>
+                <div class="preview-image" style="background-image: url('../assets/images/about-01.png')"></div>
+                <div class="preview-image" style="background-image: url('../assets/images/about-01.png')"></div>
+                <div class="preview-image" style="background-image: url('../assets/images/about-01.png')"></div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">닫기</button>
+              <button type="button" class="btn btn-primary">등록</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 게시물 쓰기 + 비밀글 설정 (회사검색) -->
+      <div class="modal fade" id="modal-write-secret-search" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-write modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">게시글 쓰기</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="select-form">
+                <select class="form-select form-md">
+                  <option value="">직장인 고민</option>
+                </select>
+              </div>
+              <div class="form-check justify-content-start">
+                <input class="form-check-input" type="checkbox" value="" id="multipleCheck" />
+                <label class="form-check-label" for="multipleCheck"> 비밀글 설정 (체크시 해당 기업 헤드헌터와 작성자만 볼 수 있습니다.) </label>
+              </div>
+              <div class="form-group">
+                <input type="text" class="form-control form-md" placeholder="제목을 입력하세요" />
+              </div>
+              <div class="form-group position-relative">
+                <div class="search-box">
+                  <input type="text" class="" placeholder="회사 이름을 입력하세요" />
+                  <button type="button" class="search-btn"><i class="icon-search-dark"></i></button>
+                </div>
+                <div class="search-result-list">
+                  <ul>
+                    <li class="active">
+                      <div class="result-company">
+                        <a href="">
+                          <p class="company-name">(주)삼성전자</p>
+                          <p class="company-obj">중소기업 | 시스템소프트웨어 | 중공업</p>
+                        </a>
+                      </div>
+                    </li>
+                    <li>
+                      <div class="result-company">
+                        <a href="">
+                          <p class="company-name">(주)삼성전자</p>
+                          <p class="company-obj">중소기업 | 시스템소프트웨어 | 중공업</p>
+                        </a>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              <div class="form-textarea">
+                <textarea name="" id="" cols="30" rows="10" placeholder="내용을 입력하세요" class=""></textarea>
+              </div>
+              <div class="form-upload">
+                <input type="file" class="" id="form-file" />
+                <label for="form-file"><i class="icon-input-add"></i></label>
+              </div>
+              <div class="preview-image-wrap">
+                <div class="preview-image" style="background-image: url('../assets/images/about-01.png')">
+                  <div class="hover-close">
+                    <button type="button"><i class="icon-del"></i></button>
+                  </div>
+                </div>
+                <div class="preview-image" style="background-image: url('../assets/images/about-01.png')"></div>
+                <div class="preview-image" style="background-image: url('../assets/images/about-01.png')"></div>
+                <div class="preview-image" style="background-image: url('../assets/images/about-01.png')"></div>
+                <div class="preview-image" style="background-image: url('../assets/images/about-01.png')"></div>
+                <div class="preview-image" style="background-image: url('../assets/images/about-01.png')"></div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">닫기</button>
+              <button type="button" class="btn btn-primary">등록</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 일반 팝업 취소 -->
+      <div class="modal fade" id="modal-cancel" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-cancel modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="text-form">지원을 취소하시겠습니까?</div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">취소</button>
+                <button type="button" class="btn btn-primary">확인</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 경력인증 -->
+      <div class="modal fade" id="modal-certification" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-default modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="text-form">(주)소프트퍼즐</div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-primary m-r-5">경력인증 받기</button>
+                <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">닫기</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- 경력 나이스 확인불가 -->
+      <div class="modal fade" id="modal-nice-certification" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-default modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-body">
+              <div class="text-form qna">
+                <span class="m-r-15">사업자등록번호</span>
+                <input type="text" class="form-control" placeholder="숫자만입력" />
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-primary m-r-5">경력인증 받기</button>
+                <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">닫기</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 인증 완료/실패 -->
+      <div class="modal fade" id="modal-certification-result" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-default modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="btn-close" data-bs-sdismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="text-form">인증되었습니다</div>
+              <div class="text-form">인증에 실패하였습니다.</div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">확인</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 헤드헌터 상세 -->
+      <div class="modal fade" id="modal-headhunter" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-headhunter modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body pt-0">
+              <div class="headhunter-profile-content">
+                <div class="headhunter-profile">
+                  <div class="headhunter-left">
+                    <div class="headhunter-profile-img" data-bs-toggle="modal" data-bs-target="#modal-headhunter"></div>
+                    <button type="button" class="btn btn-outline-dark btn-sm">블랙리스트 추가</button>
+                  </div>
+                  <div class="headhunter-profile-info">
+                    <div>
+                      <p class="company">맨쉬컨설팅(주)</p>
+                      <p class="name">
+                        <span>홍길동</span>
+                        <span class="rank">전무</span>
+                        <span class="txt">연세대학교 금속공학과</span>
+                      </p>
+                    </div>
+                    <div>
+                      <div class="phone">
+                        <p>
+                          <span>연락처</span>
+                          <span class="phone-number">***-****-****</span>
+                        </p>
+                        <button type="button" class="btn btn-outline-dark btn-sm">연락처 보기</button>
+                      </div>
+                    </div>
+                    <ul class="info-list">
+                      <li>
+                        <p>이메일</p>
+                        <a href="">asdqwe1234@naver.com</a>
+                      </li>
+                      <li>
+                        <p>최근로그인</p>
+                        <p>2022-10-11</p>
+                      </li>
+                      <li>
+                        <p>진행중공고</p>
+                        <p><a href="../resume/headhunter.html" class="text-danger">3</a>건</p>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="apply-wrap">
+                <div class="apply-wrap-body">
+                  <div class="content">
+                    <h4 class="table-subtitle mb-3">인사말</h4>
+                    <div class="desc">
+                      <p class="introduce-text">저는 해외 영업직에 20년 이상 근무하면서 철강 금속, 기계 부품 및 생활 용품 등의 수출입을 담당 및 총괄하였으며, 현재는 써치펌 맨쉬컨설팅에서 ...</p>
+                    </div>
+                  </div>
+                  <div class="content">
+                    <h4 class="table-subtitle mb-3">주요이력</h4>
+                    <div class="desc">
+                      <ul class="history">
+                        <li>2007 ~ 2013 Flowserve KSM Project OEM Team 팀장/이사</li>
+                        <li>2005 ~ 2007 농원금속(주) 해외영업팀장</li>
+                        <li>2003 ~ 2005 피죤(주) 해외영업팀장</li>
+                      </ul>
+                    </div>
+                  </div>
+                  <div class="content">
+                    <h4 class="table-subtitle mb-3">전문분야</h4>
+                    <div class="desc">
+                      <div class="badge-box">
+                        <span class="tag tag-lg tag-outline-primary none-border m-0">
+                          <em>건설/건축</em>
+                        </span>
+                        <span class="tag tag-lg tag-outline-primary none-border m-0">
+                          <em>IT/인터넷</em>
+                        </span>
+                        <span class="tag tag-lg tag-outline-primary none-border m-0">
+                          <em>제조/생산/화학</em>
+                        </span>
+                        <span class="tag tag-lg tag-outline-primary none-border m-0">
+                          <em>의료/제약</em>
+                        </span>
+                        <span class="tag tag-lg tag-outline-primary none-border m-0">
+                          <em>유통/판매</em>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 지원하기 -->
+      <div class="modal fade" id="modal-apply" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-comment modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header justify-content-end">
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="text-title">지원이 완료되었습니다.</div>
+              <div class="text-form">
+                채용기업의 규격에 맞게 이력서 변경이 필요한 경우<br />
+                본 채용공고 담당 헤드헌터가 지원이력서를 수정할 수 있는<br />
+                권한을 주시겠습니까?<br />
+                이력서 수정 권한을 주지 않는 경우 전형에 불이익이 있을 수 있습니다.
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-primary m-r-10" data-bs-toggle="modal" data-bs-target="#modal-apply-success" data-bs-dismiss="modal">동의</button>
+                <button type="button" class="btn btn-outline-primary m-r-5" data-bs-toggle="modal" data-bs-target="#modal-apply-success" data-bs-dismiss="modal">미동의</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- 지원 완료 -->
+      <div class="modal fade" id="modal-apply-success" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-comment modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header justify-content-end">
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="text-title">지원이 완료되었습니다.</div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- 경력인증 팝업 -->
+      <div class="modal fade" id="modal-career-certification" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-comment modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header justify-content-end">
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="text-form">
+                경력 인증을 받지 않으셨습니다.<br />
+                인증 받지 않은 경력 사항을 저장하시겠습니까?
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-primary m-r-10">확인</button>
+                <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">취소</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- data-bs-backdrop="static" 배경 클릭해도 안 꺼지는 속성 -->
+      <!-- 회원가입 -->
+      <div class="modal fade" id="modal-signup-agree" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel">
+        <div class="modal-dialog modal-comment modal-dialog-centered modal-dialog-scrollable">
+          <div class="modal-content">
+            <div class="modal-header justify-content-end">
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="text-form">
+                후보자의 정보주도권을 인정하는 국내 유일의 Platform ! <br />
+                <br />
+                RESUME9은 후보자의 정보주도권을 인정하는 국내 유일한 Platform입니다.<br />
+                <br />
+                국내의 수많은 Platform에서 회원의 개인정보 (이름, 연락처 및 검색내역 등)를 기업이나 개인에게 해당 정보를 상업적으로 판매하면서, 어떤 Platform도 실제 그 정보의 주인인 회원에게는 단 1원도 보상을 하지 않는 것이 현실입니다.<br />
+                <br />
+                특히, 채용 Platform의 경우는 구직자(후보자)회원이 “을”이라는 점을 악용하여 해당 후보자의 직접적인 개인정보(이름, 전화번호, 이메일주소)를 구인회사와 헤드헌터에게 일정 금액을 받고 판매하고 있습니다.<br />
+                <br />
+                그러나, 어떤 Platform에서도 그 판매금액의 1%도 정보의 주인에게 보상하지 않고 있습니다. <br />
+                <br />
+                RESUME9은 구청에 등록된 실명확인 된 헤드헌터에 한하여<br /><br />
+                그리고 해당 헤드헌터가 의뢰 받은 구인 오더를 등록한 경우에 한하여 후보자 회원의 개인정보를 건당 2,000원을 받고 상업적으로 판매하고 있으며, (단, 경력사항 중 50% 이상의 경력에 대한 고용보험 확인을 인증 받은 이력서에 한하여)<br /><br />
+                이 중 50%인 1,000원을 정보의 주인인 후보자 회원에게 돌려드리고 있습니다.(국내유일, 특허출원)<br /><br />
+                RESUME9은 앞으로도 지속적으로 정보의 주인인 후보자 회원의 정보주도권(정보민주화)를 지키는데 최선을 다할 것입니다.
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 기본 공용 모달 링크이동 -->
+      <div class="modal fade" id="modal-default-link" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-comment modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header justify-content-end">
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="text-form text-center">
+                보유하신 포인트가 없습니다.<br />
+                포인트를 충전하시겠습니까?
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">취소</button>
+                <a href="마이페이지 충전" class="btn btn-primary m-r-10">확인</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- 기본 공용 모달 -->
+      <div class="modal fade" id="modal-default" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-comment modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header justify-content-end">
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="text-form text-center">
+                내 인재에서 삭제할 경우,<br />
+                인재검색 등에서 인재정보를 열람하기 위해서는 열람권을 다시 사용해야 합니다. 삭제 하시겠습니까?
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">취소</button>
+                <button type="button" class="btn btn-primary">확인</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- 포지션 선택-->
+      <div class="modal fade" id="modal-select-position" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-write modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">관심인재 추가 > 포지션 추천</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <p class="font-bold m-b-25 font-size-18">포지션 선택</p>
+              <p class="m-b-25">추가한 인재의 이력서는 선택한 포지션의 컨택리스트 목록으로 추가됩니다.</p>
+              <div class="select-form">
+                <select class="select-design" style="width: 100%">
+                  <option value="1">포지션을 선택해주세요.</option>
+                  <option value="3">-</option>
+                </select>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">취소</button>
+              <button type="button" class="btn btn-primary">추가</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- 포지션 상세 - 컨택리스트 상태 적합/부적합 선택 -->
+      <div class="modal fade" id="modal-position-state" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-comment modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header justify-content-end">
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="text-form text-center">
+                직접지원한 인재의 경우 이력서를 확인 후<br />
+                적합, 부적합 여부를 선택해주세요.
+              </div>
+              <div class="d-flex justify-content-center m-b-25">
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" value="" id="multipleCheck1" />
+                  <label class="form-check-label" for="multipleCheck1"> 적합 </label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" value="" id="multipleCheck1" />
+                  <label class="form-check-label" for="multipleCheck1"> 부적합 </label>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">취소</button>
+                <button type="button" class="btn btn-primary">확인</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 이메일 제안 -->
+      <div class="modal fade" id="modal-suggest-email" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-comment modal-dialog-centered" style="max-width: 900px">
+          <div class="modal-content">
+            <div class="modal-header justify-content-end">
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <ul class="nav nav-tabs" id="myTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">SMS/MMS</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false" tabindex="-1">이메일</button>
+                </li>
+              </ul>
+              <div class="tab-content" id="myTabContent">
+                <div class="tab-pane fade active show" id="home" role="tabpanel" aria-labelledby="home-tab">
+                  <div class="row email-wrap m-0">
+                    <div class="col-12 m-t-20">
+                      <div class="d-flex justify-content-between">
+                        <div class="d-flex">
+                          <div class="form-check">
+                            <input class="form-check-input" type="radio" value="" id="multipleCheck5" />
+                            <label class="form-check-label" for="multipleCheck5">직접 작성</label>
+                          </div>
+                          <div class="form-check">
+                            <input class="form-check-input" type="radio" value="" id="multipleCheck5" />
+                            <label class="form-check-label" for="multipleCheck5">자주쓰는 메일</label>
+                          </div>
+                        </div>
+                        <div class="d-flex gap-10">
+                          <select class="select-design" style="width: 200px">
+                            <option value="1">제안 메일 (기본 그룹)</option>
+                          </select>
+                          <select class="select-design" style="width: 250px">
+                            <option value="1">불러올 메일 선택</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <table class="table border-top-1 m-t-30">
+                    <colgroup>
+                      <col width="15%" />
+                    </colgroup>
+                    <tbody>
+                      <tr>
+                        <th class="">관련 포지션</th>
+                        <td class="">
+                          <select class="select-design" style="width: 100%">
+                            <option value="1">테스트 포지션등록 (지원하지 마세요)</option>
+                          </select>
+                        </td>
+                      </tr>
+                      <tr>
+                        <th class="">받는 사람</th>
+                        <td class="">
+                          <div class="d-flex align-items-center justify-content-between">
+                            <div class="coworker-wrap m-r-15 bg-white">
+                              <div class="coworker-list">
+                                <div class="btn btn-sm btn-outline-gray round d-flex justify-content-around">
+                                  <span class="name">김남극</span>
+                                  <button type="button" class="close"><i class="icon-b-close"></i></button>
+                                </div>
+                              </div>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-primary round">+ 직접추가</button>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <th class="">제목</th>
+                        <td class="">
+                          <input type="text" class="form-control form-lg" value="" placeholder="제목을 입력해주세요." />
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">...</div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">취소</button>
+                <button type="button" class="btn btn-primary">확인</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- 목록추가(수동) -->
+      <div class="modal fade" id="modal-position-list" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-write modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">목록추가(수동)</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <p class="m-b-25">기본정보를 알고있는 후보자의 경우 컨택리스트에 추가 후, 포지션 제안을 할 수 있습니다.</p>
+              <table class="table border-top-1 m-t-30">
+                <colgroup>
+                  <col width="25%" />
+                </colgroup>
+                <tbody>
+                  <tr>
+                    <th class="">이름</th>
+                    <td class="">
+                      <input type="text" class="form-control form-lg" value="" placeholder="이름" />
+                    </td>
+                  </tr>
+                  <tr>
+                    <th class="">휴대폰번호</th>
+                    <td class="">
+                      <input type="text" class="form-control form-lg" value="" placeholder="(-)를 제외하고 입력" />
+                    </td>
+                  </tr>
+                  <tr>
+                    <th class="">이메일주소</th>
+                    <td class="">
+                      <input type="text" class="form-control form-lg" value="" placeholder="email@example.com" />
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">취소</button>
+              <button type="button" class="btn btn-primary">확인</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 고객사 등록 -->
+      <div class="modal fade" id="modal-customer-registration" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-write modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">고객사 등록</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <p class="tbl-head-cnt text-danger">내 고객사 리스트는 외부에 절대 공개되지 않습니다.</p>
+
+              <p class="table-title m-t-30">기업정보</p>
+              <table class="table border-top-1">
+                <colgroup>
+                  <col width="25%" />
+                </colgroup>
+                <tbody>
+                  <tr>
+                    <th class="">기업명</th>
+                    <td class="">
+                      <input type="text" class="form-control form-lg" value="" placeholder="기업명 또는 사업자등록번호로 검색" />
+                    </td>
+                  </tr>
+                  <tr>
+                    <th class="">사업자등록번호</th>
+                    <td class="">
+                      <input type="text" class="form-control form-lg" value="" placeholder="" />
+                    </td>
+                  </tr>
+                  <tr>
+                    <th class="">소재지</th>
+                    <td class="">
+                      <input type="text" class="form-control form-lg" value="" placeholder="" />
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <p class="table-title m-t-30">인사담당자 정보</p>
+              <table class="table border-top-1">
+                <colgroup>
+                  <col width="25%" />
+                </colgroup>
+                <tbody>
+                  <tr>
+                    <th class="">이름</th>
+                    <td class="">
+                      <input type="text" class="form-control form-lg" value="" placeholder="이름" />
+                    </td>
+                  </tr>
+                  <tr>
+                    <th class="">이메일주소</th>
+                    <td class="">
+                      <input type="text" class="form-control form-lg" value="" placeholder="email@example.com" />
+                    </td>
+                  </tr>
+                  <tr>
+                    <th class="">유선연락처</th>
+                    <td class="">
+                      <input type="text" class="form-control form-lg" value="" placeholder="(-)를 제외하고 입력" />
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">취소</button>
+              <button type="button" class="btn btn-primary">등록</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 새 연락처 추가 -->
+      <div class="modal fade" id="modal-add-address" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-write modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">새 연락처 추가</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <select class="select-design" style="width: 100%">
+                <option value="1">그룹을 선택하세요</option>
+                <option value="1">기본그룹</option>
+                <option value="1">테스트</option>
+              </select>
+              <table class="table border-top-1 m-t-30">
+                <colgroup>
+                  <col width="25%" />
+                </colgroup>
+                <tbody>
+                  <tr>
+                    <th class="">이름</th>
+                    <td class="">
+                      <input type="text" class="form-control form-lg" value="" placeholder="이름" />
+                    </td>
+                  </tr>
+                  <tr>
+                    <th class="">휴대폰번호</th>
+                    <td class="">
+                      <input type="text" class="form-control form-lg" value="" placeholder="(-)를 제외하고 입력" />
+                    </td>
+                  </tr>
+                  <tr>
+                    <th class="">이메일주소</th>
+                    <td class="">
+                      <input type="text" class="form-control form-lg" value="" placeholder="email@example.com" />
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <div class="memo-content">
+                <p class="text-start">메모<span class="font-size-14 text-gray">(100자 이내)</span></p>
+                <div class="memo-form m-t-10">
+                  <textarea name="" id="" cols="30" rows="10"></textarea>
+                </div>
+              </div>
+              <p>내 주소록에서 후보자에게 제안 이후에 연락처를 수정하게 되면 시스템의 정보의 불일치가 발생하여 수정을 금지하고 있습니다.</p>
+              <p class="text-danger m-t-5">불가피하게 제안 전 수정이 필요한 경우 삭제후 다시 연락처를 추가해 주시기 바랍니다.</p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">취소</button>
+              <button type="button" class="btn btn-primary">확인</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 받는사람 직접추가 -->
+      <div class="modal fade" id="modal-email-add" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-write modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">받는사람 직접추가</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table border-top-1 m-t-30">
+                <colgroup>
+                  <col width="25%" />
+                </colgroup>
+                <tbody>
+                  <tr>
+                    <th class="">이름</th>
+                    <td class="">
+                      <input type="text" class="form-control form-lg" value="" placeholder="이름" />
+                    </td>
+                  </tr>
+                  <tr>
+                    <th class="">이메일주소</th>
+                    <td class="">
+                      <input type="text" class="form-control form-lg" value="" placeholder="email@example.com" />
+                    </td>
+                  </tr>
+                  <tr>
+                    <th class="">휴대폰번호</th>
+                    <td class="">
+                      <input type="text" class="form-control form-lg" value="" placeholder="(-)를 제외하고 입력" />
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <div class="form-check m-t-20">
+                <input class="form-check-input" type="checkbox" value="" id="multipleCheck" />
+                <label class="form-check-label" for="multipleCheck"> 이 정보를 [내 주소록]에도 추가합니다. </label>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">취소</button>
+              <button type="button" class="btn btn-primary">추가</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer">
+      <div class="container">
+        <div class="footer-desc left">
+          <div class="footer-logo"></div>
+          <ul class="company-info">
+            <li>레쥬메나인(주)</li>
+            <li>사업자등록번호 : 543-81-01709</li>
+            <li class="hide-bar">직업정보제공사업 : J1200020200017</li>
+            <li>통신판매업 : 제 2021-서울강남-02745호</li>
+            <li class="hide-bar">서울시 강남구 테헤란로 16길 9, 1층</li>
+            <li>대표번호 : 02-6956-2715</li>
+            <li>대표이사 : 이덕진</li>
+            <li class="hide-bar">개인정보보호책임자 : 오길석</li>
+          </ul>
+          <p class="email">Email : resume9@resume9.co.kr (평일 10:00 ~ 17:30)</p>
+          <p class="copyright">CopyrightⓒResume9. All rights reserved.</p>
+        </div>
+        <div class="footer-desc right">
+          <ul class="wrap-info">
+            <li><a href="">이용약관</a></li>
+            <li><a href="">개인정보보호정책</a></li>
+            <li><a href="">이메일무단수집거부</a></li>
+            <li><a href="">제휴문의</a></li>
+            <li><a href="">고객센터</a></li>
+          </ul>
+          <div class="precautions">RESUME9(레쥬메나인)의 사전 서면동의 없이 일체의 정보, 콘텐츠, 로고 및 UI 등을 상업적 목적으로 무단전재, 전송 및 스크래핑 등을 할 수 없습니다.</div>
+          <div class="app-download">
+            <a href="">
+              <img src="../assets/images/icon-google-store.svg" alt="" />
+            </a>
+            <a href="">
+              <img src="../assets/images/icon-app-store.svg" alt="" />
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

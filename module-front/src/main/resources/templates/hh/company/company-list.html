@@ -1,0 +1,137 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security" layout:decorate="~{layouts/hh/mainLayout}">
+<body>
+	<div id="container-block" layout:fragment="contents" th:remove="tag">
+		<div class="container">
+			<div class="sub-content">
+				<h3 class="subtitle">내 고객사 관리</h3>
+				<div class="title-line mt-4 mb-5"></div>
+				<div class="tbl-head">
+					<p class="tbl-head-cnt text-danger">※ 내 고객사 리스트는 외부에 공개 되지 않으며 등록한 당사자만 조회할 수 있습니다.</p>
+					<div class="d-flex align-items-center gap-10">
+						<button type="button" class="btn btn-outline-primary" data-role="delete">삭제</button>
+						<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal-customer-registration">+ 신규등록</button>
+					</div>
+				</div>
+				<table class="table m-t-15 border-top-1">
+					<colgroup>
+						<col width="10%" />
+						<col width="10%" />
+						<col width="10%" />
+						<col width="10%" />
+						<col width="40%" />
+						<col width="10%" />
+						<col width="10%" />
+					</colgroup>
+					<thead>
+						<tr>
+							<th class="text-center">
+								<div class="form-check p-0">
+									<input class="form-check-input" type="checkbox" value="" name="checkAll" />
+								</div>
+							</th>
+							<th class="text-center">고객사</th>
+							<th class="text-center">등록일</th>
+							<th class="text-center">인사담당자</th>
+							<th class="text-center">최종포지션</th>
+							<th class="text-center">마감/종료일</th>
+							<th class="text-center">포지션 결과</th>
+						</tr>
+					</thead>
+					<tbody>
+						<th:block th:if="${#lists.isEmpty(companyList)}">
+							<tr>
+								<td colspan="8" class="text-center">내 고객사가 없습니다.</td>
+							</tr>
+						</th:block>
+						<tr th:each="list : ${companyList}">
+							<td class="text-center">
+								<div class="form-check p-0">
+									<input class="form-check-input" type="checkbox" th:value="${list.id}" name="checkCompany" />
+								</div>
+							</td>
+							<td class="text-center"><a th:href="'/hh/company/headhunter-customer-detail?id='+${list.id}" class="text-primary text-underline"
+								th:text="${list.companyName}"></a></td>
+							<td class="text-center" th:text="${list.createdAt}">
+								<p>2022-09-21</p>
+							</td>
+							<td class="text-center" th:text="${list.name}">
+								<p>-</p>
+							</td>
+							<td class=""><a th:href="'/hh/company/headhunter-view?positionId='+${list.positionId}+'&companyId='+${list.id}"
+								class="text-primary text-underline" th:text="${list.title}">테스트 포지션 등록</a></td>
+							<td class="text-center" th:text="${list.endDate}">
+								<p>2022-10-30</p>
+							</td>
+							<td class="text-center" th:text="${list.status}">
+								<p>진행중</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				<!-- 고객사 등록 -->
+				<div class="modal fade" id="modal-customer-registration" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+					<div class="modal-dialog modal-write modal-dialog-centered">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title" id="exampleModalLabel">고객사 등록</h5>
+								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+							</div>
+							<div class="modal-body">
+								<p class="tbl-head-cnt text-danger">내 고객사 리스트는 외부에 절대 공개되지 않습니다.</p>
+
+								<p class="table-title m-t-30">기업정보</p>
+								<table class="table border-top-1">
+									<colgroup>
+										<col width="25%" />
+									</colgroup>
+									<tbody>
+										<tr>
+											<th class="">기업명</th>
+											<td class=""><input type="text" class="form-control form-lg" value="" name="companyName" placeholder="기업명 또는 사업자등록번호로 검색" /></td>
+										</tr>
+										<tr>
+											<th class="">사업자등록번호</th>
+											<td class=""><input type="text" class="form-control form-lg" value="" name="licenseNumber" placeholder="" maxlength="10" /></td>
+										</tr>
+										<tr>
+											<th class="">소재지</th>
+											<td class=""><input type="text" class="form-control form-lg" name="location" value="" placeholder="" /></td>
+										</tr>
+									</tbody>
+								</table>
+								<p class="table-title m-t-30">인사담당자 정보</p>
+								<table class="table border-top-1">
+									<colgroup>
+										<col width="25%" />
+									</colgroup>
+									<tbody>
+										<tr>
+											<th class="">이름</th>
+											<td class=""><input type="text" class="form-control form-lg" value="" name="name" placeholder="이름" /></td>
+										</tr>
+										<tr>
+											<th class="">이메일주소</th>
+											<td class=""><input type="text" class="form-control form-lg" value="" name="email" placeholder="email@example.com" /></td>
+										</tr>
+										<tr>
+											<th class="">유선연락처</th>
+											<td class=""><input type="text" class="form-control form-lg" value="" name="phone" placeholder="(-)를 제외하고 입력" /></td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">취소</button>
+								<button type="button" class="btn btn-primary" data-role="insert">등록</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

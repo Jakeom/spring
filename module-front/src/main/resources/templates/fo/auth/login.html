@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layouts/loginLayout">
+<body>
+    <div layout:fragment="contents" th:remove="tag">
+        <style>
+            .g_id_signin > div {
+                opacity: 0 !important;
+            }
+        </style>
+        <div id="container-block">
+            <div id="container">
+                <div class="container">
+                    <div class="content-bg">
+                        <h2 class="center-title">로그인</h2>
+                        <ul class="nav nav-tabs" id="myTab" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <a href="/fo/auth/login" class="nav-link active">개인회원</a>
+                                <input type="hidden" name="ReturnURL" id="returnURL" th:value="${@environment.getProperty('service.web_domain')}">
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <a href="/hh/auth/login" class="nav-link">헤드헌터회원</a>
+                            </li>
+                        </ul>
+                        <div class="tab-content" id="myTabContent">
+                            <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+                                <form action="" name="login">
+                                    <fieldset>
+                                        <input type="hidden" name="dType" value="AP" />
+                                        <legend>로그인</legend>
+                                        <div class="form-group">
+                                            <label for="loginId">이메일</label>
+                                            <input type="text" class="form-control form-control-xl bg-light" name="loginId" id="loginId" placeholder="resume9@resume9.com"/>
+                                        </div>
+                                        <div class="form-group m-t-25">
+                                            <label for="password">비밀번호</label>
+                                            <input type="password" class="form-control form-control-xl bg-light" name="password" id="password" placeholder="비밀번호 입력" autocomplete="off"/>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="row justify-content-between align-items-center">
+                                                <div class="col-auto">
+                                                    <div class="form-check">
+                                                        <input type="hidden" name="autoLogin" value="">
+                                                        <input class="form-check-input" data-role="autoLoginCheck" type="checkbox" value="Y" id="autoLogin" />
+                                                        <label class="form-check-label" for="autoLogin">로그인 상태 유지</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-auto hidden-flex-mobile">
+                                                    <a href="/fo/auth/find-id" class="pw-reset">이메일찾기</a>
+                                                    <a href="/fo/auth/pw-reset" class="pw-reset">비밀번호 재설정</a>
+                                                    <a href="/fo/auth/signup" class="pw-reset">회원가입</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="btn btn-xl btn-primary w-100 login-btn" data-role="login">로그인
+                                        </button>
+                                        <div class="col-auto hidden-flex-desktop justify-content-center m-t-30">
+                                            <a href="/fo/auth/find-id" class="pw-reset">아이디찾기</a>
+                                            <a href="/fo/auth/pw-reset" class="pw-reset">비밀번호 재설정</a>
+                                            <a href="/fo/auth/signup" class="pw-reset">회원가입</a>
+                                        </div>
+                                    </fieldset>
+                                </form>
+
+                                <!--임시회원-->
+                                <form action="/fo/auth/signup-temp" name="tempMember"  method="post">
+                                    <input type="hidden" name="memberId" value="" />
+                                </form>
+                                <!--임시회원-->
+
+                                <div class="login-sns">
+                                    <p class="login-sns__title">소셜로 간편하게 로그인하세요</p>
+                                    <div class="login-sns__wrap">
+                                        <a href="javascript:void(0)"id="naver_id_login" style="display: none;">
+                                            <div class="icon-naver" ></div>
+                                        </a>
+                                        <a href="javascript:void(0)">
+                                            <div class="icon-naver" id="naver_login"></div>
+                                        </a>
+                                        <a href="javascript:void(0)">
+                                            <div class="icon-kakao" onclick="kakaoLogin();"></div>
+                                        </a>
+                                        <a href="javascript:void(0)">
+                                            <div id="facebook_id" class="icon-facebook"></div>
+                                        </a>
+                                        <input type="hidden" id="g_id_onload"
+                                             data-client_id="476582313019-grue92go9crgvthb59scm64bnd7h7v69.apps.googleusercontent.com"
+                                             data-callback="handleCredentialResponse">
+                                        <div class="g_id_signin icon-google" data-type="icon"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <form style="display: none" action="/fo/auth/signup" method="GET" id="simpleLoginInfo">
+                                <input type="hidden" name="simpleAuthCd" value=""/>
+                                <input type="hidden" name="simpleAuthVal" value=""/>
+                                <input type="hidden" name="email" value=""/>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

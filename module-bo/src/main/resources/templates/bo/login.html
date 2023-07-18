@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/login}">
+<div layout:fragment="contents" th:remove="tag">
+	<!-- <h2 class="title">로그인</h2>
+		<form >
+			<div id="in_form">
+				<p>ID : <input type="text" name="adminId" value="test" /></p>
+				<p>PW : <input type="password" name="adminPassword" value="1234" /></p>
+			</div>
+			<button type="submit" class="btn btn-primary">로그인</button>
+		</form> -->
+	<div class="login" style="height: 100vh">
+		<div class="container h-100 d-flex align-items-center">
+			<div class="inner">
+				<h1 class="text-center mb-6">
+					<img src="/static/images/logo.svg" alt="Resume9"/>
+				</h1>
+				<form action="/bo/login/process" method="post">
+					<div class="form-group">
+						<input type="text" name="adminId" value="test" placeholder="아이디" class="form-control form-control-lg">
+					</div>
+					<div class="form-group">
+						<input type="password" name="adminPassword" value="1234" placeholder="비밀번호" class="form-control form-control-lg">
+					</div>
+					<div class="form-group">
+						<div class="custom-control custom-checkbox">
+							<input type="checkbox" class="custom-control-input" id="idSave"> <label class="custom-control-label" for="idSave">아이디 저장</label>
+						</div>
+					</div>
+					<button type="submit" class="btn btn-lg btn-dark btn-block">로그인</button>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+</html>

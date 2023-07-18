@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:fragment="common">
+    <style>
+        .sidebar {
+            height: calc(100vh - 65px)!important;
+            overflow-y: scroll;
+        }
+    </style>
+    <header id="header">
+        <div class="row">
+            <div class="col-auto">
+                <div class="left">
+                    <a href="#" class="logo">
+                        <span>관리자</span>
+                    </a>
+                </div>
+            </div>
+            <div class="col">
+                <nav class="gnb">
+                </nav>
+            </div>
+            <div class="col-auto">
+                <div class="right">
+                    <button type="button" class="btn-logout" onclick="document.location.href='/bo/logout'"><i class="material-icons">logout</i></button>
+                </div>
+            </div>
+        </div>
+    </header>
+</div>
+</html>

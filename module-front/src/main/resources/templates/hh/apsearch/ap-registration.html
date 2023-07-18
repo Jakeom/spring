@@ -1,0 +1,2335 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layouts/hh/mainLayout}">
+<body>
+<div id="container-block" layout:fragment="contents" th:remove="tag">
+      <div class="container">
+        <div class="sub-content">
+          <h3 class="subtitle poppins">인재 등록</h3>
+          <div class="title-line mt-4 mb-5"></div>
+          <div>
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">이력서 로봇 프로젝트</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false" tabindex="-1">이력서 직접입력</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact" type="button" role="tab" aria-controls="contact" aria-selected="false">이력서 등록신청</button>
+              </li>
+            </ul>
+            <div class="tab-content" id="myTabContent">
+              <div class="tab-pane fade active show" id="home" role="tabpanel" aria-labelledby="home-tab">
+                <div class="auto-project">
+                  <p class="title">
+                    이력서 로봇(RPA)은 현재 개발중인 프로젝트로 기능 향상을 위한 테스트로 제공 중입니다.<br />
+                    양식 형태와 문구에 따라 판독오류가 발생할 수 있으며, 현재는 docx, doc, pdf 파일만 등록할 수 있습니다.
+                  </p>
+                  <p class="notice">※ 표나 그림이 삽입된 이력서는 판독이 제한됩니다.</p>
+                  <div class="form-upload">
+                    <input type="file" class="" id="form-file" />
+                    <label for="form-file"><i class="icon-input-add"></i></label>
+                  </div>
+                  <div class="d-flex align-items-center justify-content-between m-t-20">
+                    <p>로봇이 읽을 수 있는 이력서는? <a href="javascript:void(0)" download="">RESUME9 이력서 양식 다운로드</a></p>
+                    <a href="/hh/service/faq-individual" class="btn btn-outline-dark btn-sm">이력서 로봇FAQ</a>
+                  </div>
+                </div>
+                <div class="agreement-content d-flex align-items-center justify-content-between m-t-20">
+                  <p>동의서를 추가해 주세요. <span>(이력서 파일을 먼저 첨부 후 동의서 추가가 가능합니다.)</span></p>
+                  <div class="form-upload">
+                    <input type="file" class="" id="form-file" />
+                    <label for="form-file"><i class="icon-input-add"></i></label>
+                  </div>
+                </div>
+                <div class="coworker-wrap resume m-r-15">
+                  <div class="coworker-list">
+                    <div class="btn btn-sm btn-outline-gray round d-flex justify-content-around">
+                      <span class="name">김남극</span>
+                      <button type="button" class="close"><i class="icon-b-close"></i></button>
+                    </div>
+                  </div>
+                </div>
+                <div class="apply-wrap-body write m-t-30">
+                  <!-- 인적사항 -->
+                  <div class="content">
+                    <h4 class="table-subtitle mb-3">인적사항<span class="text-danger">(필수)</span></h4>
+                    <div class="desc">
+                      <div class="apply-wrap-head">
+                        <div class="img-upload">
+                          <input type="file" id="img-upload" />
+                          <label for="img-upload" class="img-upload-label">
+                            <i class="icon-img-add"></i>
+                            <span>이미지 올리기</span>
+                            <em>png, jpg 형식, 2MB 미만, <br />360*360 사이즈 권장</em>
+                          </label>
+                        </div>
+                        <div class="resume-info">
+                          <div class="row">
+                            <div class="col-md-3 col-6 col m-b-10">
+                              <input type="text" class="form-control form-lg inp-name" value="박근수" readonly />
+                            </div>
+                            <div class="col-md-3 col-6 col m-b-10">
+                              <input type="text" class="form-control form-lg inp-birth" value="" placeholder="생년월일(8자리)" />
+                            </div>
+                            <div class="col-md-3 col-6 col m-b-10">
+                              <select class="select-design select-lg" style="width: 100%">
+                                <option value="1">성별</option>
+                                <option value="2">남자</option>
+                                <option value="3">여자</option>
+                                <option value="4">비공개</option>
+                              </select>
+                            </div>
+                            <div class="col-md-3 col-6 col m-b-10">
+                              <select class="select-design select-lg" style="width: 100%">
+                                <option value="1" selected>취업상태</option>
+                                <option value="2">재직중</option>
+                                <option value="3">구직중</option>
+                              </select>
+                            </div>
+                          </div>
+                          <div class="row">
+                            <div class="col-md-6 col-12 col m-b-10">
+                              <input type="number" class="form-control form-lg inp-phone" value="010-1234-5678" readonly />
+                            </div>
+                            <div class="col-md-6 col-12 col m-b-10">
+                              <input type="text" class="form-control form-lg inp-email" placeholder="" value="abcd123@naver.com" readonly />
+                            </div>
+                          </div>
+                          <div class="row">
+                            <div class="col-12 col">
+                              <input type="text" class="form-control form-lg inp-address" value="서울특별시 강남구" readonly />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- end -->
+
+                  <!-- 핵심역량 -->
+                  <div class="content">
+                    <h4 class="table-subtitle mb-3">핵심역량<span class="text-danger">(필수)</span></h4>
+                    <div class="desc">
+                      <div class="row align-items-center m-b-10">
+                        <div class="col-md-1 col-2 col">
+                          <p class="num-box text-center">Main</p>
+                        </div>
+                        <div class="col-md-11 col-10 col">
+                          <input type="text" class="form-control form-lg" placeholder="인사, 회계, 기획, 설계, 영업, 관리, 개발, 용접 등" />
+                        </div>
+                      </div>
+                      <div class="row align-items-center m-b-10">
+                        <div class="col-md-1 col-2 col">
+                          <p class="num-box text-center">상세</p>
+                        </div>
+                        <div class="col-md-11 col-10 col">
+                          <input type="text" class="form-control form-lg" placeholder="인사기획, 평가보상, 내부회계, IT기획, 전략기획, 마케팅기획, 홍보, IR, 투자 등" />
+                        </div>
+                      </div>
+                      <div class="row align-items-center m-b-10">
+                        <div class="col-md-1 col-2 col">
+                          <p class="num-box text-center">기타</p>
+                        </div>
+                        <div class="col-md-11 col-10 col">
+                          <input type="text" class="form-control form-lg" placeholder="자격증(의사, 변호사, 회계사 등), 주요실적, 주재원, 어학 등" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- end -->
+
+                  <!-- 학력 -->
+                  <div class="content">
+                    <h4 class="table-subtitle mb-3">학력<span class="text-danger">(필수)</span></h4>
+                    <div class="desc">
+                      <div class="row align-items-center">
+                        <div class="col-md-2 col-6 col m-b-10">
+                          <input type="text" class="form-control form-lg" value="고등학교" readonly />
+                        </div>
+                        <div class="col-md-2 col-6 col m-b-10">
+                          <div class="search-box search-lg">
+                            <input type="text" class="" placeholder="학교명" />
+                            <button type="button" class="search-btn"><i class="icon-search-dark"></i></button>
+                          </div>
+                          <div class="search-result-list">
+                            <ul>
+                              <li class="active">
+                                <div class="result-company">
+                                  <a href="">
+                                    <p class="company-name">서울고등학교</p>
+                                  </a>
+                                </div>
+                              </li>
+                              <li>
+                                <div class="result-company">
+                                  <a href="">
+                                    <p class="company-name">연세고등학교</p>
+                                  </a>
+                                </div>
+                              </li>
+                            </ul>
+                          </div>
+                        </div>
+                        <div class="col-md-2 col-6 col m-b-10">
+                          <input type="text" class="form-control form-lg" value="소재지" readonly />
+                        </div>
+                        <div class="col-md-2 col-6 col m-b-10">
+                          <input type="text" class="form-control form-lg" placeholder="졸업년도" />
+                        </div>
+                        <div class="col-md-2 col-6 col m-b-10">
+                          <select class="select-design select-lg" style="width: 100%">
+                            <option value="1">졸업상태</option>
+                            <option value="2">졸업</option>
+                            <option value="3">대입검정고시</option>
+                          </select>
+                        </div>
+                        <div class="col-md-2 col-6 col m-b-10">
+                          <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="multipleCheck" />
+                            <label class="form-check-label" for="multipleCheck">해외</label>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="row add-education">
+                        <div class="col-md-2 col-12 col m-b-10">
+                          <select class="select-design select-lg" style="width: 100%">
+                            <option value="1">대학(2/3년)</option>
+                            <option value="2">대학교(4년)</option>
+                            <option value="3">석사</option>
+                            <option value="4">박사</option>
+                          </select>
+                        </div>
+                        <div class="col-md-10 col-12 col">
+                          <div class="row align-items-center">
+                            <div class="col-md-3 col-12 col m-b-10">
+                              <div class="search-box search-lg">
+                                <input type="text" class="" placeholder="학교명" />
+                                <button type="button" class="search-btn"><i class="icon-search-dark"></i></button>
+                              </div>
+                              <div class="search-result-list">
+                                <ul>
+                                  <li class="active">
+                                    <div class="result-company">
+                                      <a href="">
+                                        <p class="company-name">서울대학교</p>
+                                      </a>
+                                    </div>
+                                  </li>
+                                  <li>
+                                    <div class="result-company">
+                                      <a href="">
+                                        <p class="company-name">연세대학교</p>
+                                      </a>
+                                    </div>
+                                  </li>
+                                </ul>
+                              </div>
+                            </div>
+                            <div class="col-md-3 col-6 col m-b-10">
+                              <input type="text" class="form-control form-lg" value="소재지" readonly />
+                            </div>
+                            <div class="col-md-3 col-6 col m-b-10">
+                              <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="" id="multipleCheck" />
+                                <label class="form-check-label" for="multipleCheck">해외</label>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="row align-items-center">
+                            <div class="col-md-3 col-6 col m-b-10">
+                              <input type="text" class="form-control form-lg" value="" placeholder="입학년월" />
+                            </div>
+                            <div class="col-md-3 col-6 col m-b-10">
+                              <select class="select-design select-lg" style="width: 100%">
+                                <option value="1">입학상태</option>
+                                <option value="2">입학</option>
+                                <option value="3">편입</option>
+                              </select>
+                            </div>
+                            <div class="col-md-3 col-6 col m-b-10">
+                              <input type="text" class="form-control form-lg" value="" placeholder="졸업년월" />
+                            </div>
+                            <div class="col-md-3 col-6 col m-b-10">
+                              <select class="select-design select-lg" style="width: 100%">
+                                <option value="1">졸업상태</option>
+                                <option value="2">졸업</option>
+                                <option value="3">졸업예정</option>
+                                <option value="4">재학중</option>
+                                <option value="5">휴학중</option>
+                                <option value="6">중퇴</option>
+                                <option value="7">수료</option>
+                              </select>
+                            </div>
+                          </div>
+                          <div class="row align-items-center">
+                            <div class="col-md-3 col-6 col m-b-10">
+                              <input type="text" class="form-control form-lg" value="" placeholder="주 전공명" />
+                            </div>
+                            <div class="col-md-3 col-6 col m-b-10">
+                              <input type="text" class="form-control form-lg" value="" placeholder="학점" />
+                            </div>
+                            <div class="col-md-3 col-6 col m-b-10">
+                              <input type="text" class="form-control form-lg" value="" placeholder="부 전공명" />
+                            </div>
+                            <div class="col-md-3 col-6 col m-b-10">
+                              <input type="text" class="form-control form-lg" value="" placeholder="학점" />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="btn-group d-flex justify-content-center m-t-20">
+                        <button type="button" class="btn btn-outline-dark btn-lg">항목추가 <i class="icon-row-add"></i></button>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- end -->
+
+                  <!-- 경력사항 -->
+                  <div class="content">
+                    <h4 class="table-subtitle mb-3">경력사항<span class="text-danger">(필수)</span></h4>
+                    <div class="desc">
+                      <div class="row align-items-center">
+                        <div class="col-md-4 col-6 col m-b-10">
+                          <div class="search-box search-lg">
+                            <input type="text" class="" placeholder="회사 이름을 입력하세요" />
+                            <button type="button" class="search-btn"><i class="icon-search-dark"></i></button>
+                          </div>
+                          <div class="search-result-list">
+                            <ul>
+                              <li class="active">
+                                <div class="result-company">
+                                  <a href="">
+                                    <p class="company-name">(주)삼성전자</p>
+                                    <p class="company-obj">중소기업 | 시스템소프트웨어 | 중공업</p>
+                                  </a>
+                                </div>
+                              </li>
+                              <li>
+                                <div class="result-company">
+                                  <a href="">
+                                    <p class="company-name">(주)삼성전자</p>
+                                    <p class="company-obj">중소기업 | 시스템소프트웨어 | 중공업</p>
+                                  </a>
+                                </div>
+                              </li>
+                            </ul>
+                          </div>
+                        </div>
+                        <div class="col-md-2 col-6 col m-b-10">
+                          <div class="department">
+                            <input type="text" class="form-control form-lg" placeholder="부서명" />
+                          </div>
+                        </div>
+                        <div class="col-md-2 col-4 col m-b-10">
+                          <input type="text" class="form-control form-lg" placeholder="입사년월" />
+                        </div>
+                        <div class="col-md-2 col-4 col m-b-10">
+                          <input type="text" class="form-control form-lg" placeholder="퇴사년월" />
+                        </div>
+                        <div class="col-md-2 col-4 col m-b-10">
+                          <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="multipleCheck" />
+                            <label class="form-check-label" for="multipleCheck">재직중</label>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="row align-items-center">
+                        <div class="col-md-2 col-6 col m-b-10">
+                          <input type="text" class="form-control form-lg" placeholder="직급" />
+                        </div>
+                        <div class="col-md-2 col-6 col m-b-10">
+                          <input type="text" class="form-control form-lg" placeholder="직책" />
+                        </div>
+                        <div class="col-md-3 col-12 col m-b-10">
+                          <div class="d-flex align-items-center">
+                            <input type="text" class="form-control form-lg" placeholder="최종연봉" />
+                            <p class="w-50px m-l-10">만원</p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="row align-items-center">
+                        <div class="col-12 col m-b-10">
+                          <div class="form-textarea m-0">
+                            <textarea name="" id="" cols="30" rows="10" placeholder="담당업무" class=""></textarea>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="btn-group d-flex justify-content-center m-t-10">
+                        <button type="button" class="btn btn-outline-dark m-r-10" data-bs-toggle="modal" data-bs-target="#modal-nice-certification">경력인증</button>
+                        <button type="button" class="btn btn-outline-primary" data-bs-target="#modal-career-certification" data-bs-toggle="modal">저장</button>
+                      </div>
+                      <div class="row align-items-center">
+                        <div class="col-12 col">
+                          <div class="desc result m-t-30">
+                            <div class="row row-line">
+                              <div class="m-b-10">
+                                <span class="text-primary">총 경력 10년 3개월</span>
+                              </div>
+                              <ul class="detail-list mt-0">
+                                <li>
+                                  <p class="company text-dark font-bold">삼성전자</p>
+                                </li>
+                                <li>
+                                  <span class="key text-dark font-bold">부서명</span>
+                                  <span class="value">전략마케팅팀</span>
+                                </li>
+                                <li>
+                                  <span class="key text-dark font-bold">직급</span>
+                                  <span class="value">차장</span>
+                                </li>
+                                <li>
+                                  <span class="key text-dark font-bold">직책</span>
+                                  <span class="value">파트장</span>
+                                </li>
+                                <li>
+                                  <span class="key text-dark font-bold">최종연봉</span>
+                                  <span class="value">10,000만원</span>
+                                </li>
+                              </ul>
+                              <div class="career-txt">
+                                <p class="font-bold m-b-5">[담당업무]</p>
+                                한국예탁결제원 펀드회계 및 더존 금융회계<br />
+                                고객 운용보고서 작성(분기,반기,연) 및 주문대리<br />
+                                공모주 펀드 IPO 관리 및 투자진행<br />
+                                Research Assistant(R.A) 업무로써 자료 분석 및 조사 <br />
+                                &lt;상세업무/프로젝트&gt; Daily position 파일 작성 및 보고<br />
+                                - 매일 아침 전 영업일 기준 고객 및 고유 자산 포트폴리오 작성 및 보고<br />
+                                고유 회계
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="btn-group d-flex justify-content-end m-t-10">
+                        <button type="button" class="btn btn-outline-gray btn-sm m-r-10">수정</button>
+                        <button type="button" class="btn btn-outline-danger btn-sm">삭제</button>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- end -->
+
+                  <!-- 희망근무조건 -->
+                  <div class="content">
+                    <h4 class="table-subtitle mb-3">희망근무조건</h4>
+                    <div class="desc">
+                      <div class="row align-items-center">
+                        <div class="col-md-2 col-6 col m-b-10">
+                          <select class="select-design select-lg" style="width: 100%">
+                            <option value="1">고용형태</option>
+                            <option value="2">정규직</option>
+                            <option value="3">계약직</option>
+                            <option value="4">인턴</option>
+                            <option value="5">파견직</option>
+                            <option value="6">프리랜서</option>
+                            <option value="7">병역특례</option>
+                          </select>
+                        </div>
+                        <div class="col-md-2 col-6 col m-b-10">
+                          <select class="select-design select-lg" style="width: 100%">
+                            <option value="1">희망근무지</option>
+                            <option value="2">서울</option>
+                            <option value="3">수도권</option>
+                            <option value="4">전국</option>
+                          </select>
+                        </div>
+                        <div class="col-md-2 col-6 col m-b-10">
+                          <select class="select-design select-lg" style="width: 100%">
+                            <option value="1">입사가능시기</option>
+                            <option value="2">채용후즉시</option>
+                            <option value="3">2주이내</option>
+                            <option value="4">한달이내</option>
+                            <option value="5">협의후결정</option>
+                          </select>
+                        </div>
+                        <div class="col-md-2 col-6 col m-b-10">
+                          <input type="text" class="form-control form-lg" value="" placeholder="희망직급" />
+                        </div>
+                        <div class="col-md-4 col-12 col m-b-10">
+                          <div class="row align-items-center">
+                            <div class="col-6"><input type="text" class="form-control form-lg" value="" placeholder="희망연봉" /></div>
+                            <div class="col-6">
+                              <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="" id="multipleCheck" />
+                                <label class="form-check-label" for="multipleCheck">내규에 따름</label>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="row align-items-center">
+                        <div class="col-md-2 col-6 col m-b-10">
+                          <input type="text" class="form-control form-lg" value="" placeholder="희망산업" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- end -->
+
+                  <!-- 채용우대자격 -->
+                  <div class="content">
+                    <h4 class="table-subtitle mb-3">채용우대자격<span class="text-danger">(필수)</span></h4>
+                    <div class="desc">
+                      <div class="row align-items-center">
+                        <div class="col-4 col">
+                          <select class="select-design select-lg" style="width: 100%">
+                            <option value="1">보훈대상</option>
+                            <option value="1">대상</option>
+                            <option value="2">비대상</option>
+                          </select>
+                        </div>
+                        <div class="col-4 col">
+                          <select class="select-design select-lg" style="width: 100%">
+                            <option value="1">장애</option>
+                            <option value="1">대상</option>
+                            <option value="2">비대상</option>
+                          </select>
+                        </div>
+                        <div class="col-4 col">
+                          <select class="select-design select-lg" style="width: 100%">
+                            <option value="1">병역</option>
+                            <option value="1">군필</option>
+                            <option value="2">미필</option>
+                            <option value="3">복무중</option>
+                            <option value="3">해당없음</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- end -->
+
+                  <!--맞춤기업알림  -->
+                  <!-- <div class="content">
+                    <h4 class="table-subtitle mb-3">맞춤기업알림</h4>
+                    <div class="desc">
+                      <p class="m-b-10">희망 기업 정보 등록시 앱으로 해당 기업 포지션 정보를 알려드립니다.</p>
+                      <div class="row align-items-center m-b-10">
+                        <div class="col-12">
+                          <div class="search-box search-lg">
+                            <input type="text" class="" placeholder="회사 이름을 입력하세요" />
+                            <button type="button" class="search-btn"><i class="icon-search-dark"></i></button>
+                          </div>
+                          <div class="search-result-list">
+                            <ul>
+                              <li class="active">
+                                <div class="result-company">
+                                  <a href="">
+                                    <p class="company-name">(주)삼성전자</p>
+                                    <p class="company-obj">중소기업 | 시스템소프트웨어 | 중공업</p>
+                                  </a>
+                                </div>
+                              </li>
+                              <li>
+                                <div class="result-company">
+                                  <a href="">
+                                    <p class="company-name">(주)삼성전자</p>
+                                    <p class="company-obj">중소기업 | 시스템소프트웨어 | 중공업</p>
+                                  </a>
+                                </div>
+                              </li>
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-11">
+                          <input type="text" class="form-control form-lg" value="기업명" readonly />
+                        </div>
+                        <div class="col-1">
+                          <button type="button" class="btn btn-danger btn-lg min-width-auto">삭제</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div> -->
+                  <!-- end -->
+
+                  <!-- 어학 -->
+                  <div class="content">
+                    <h4 class="table-subtitle mb-3">어학(선택)</h4>
+                    <div class="desc">
+                      <div class="form-textarea textarea-sm m-0">
+                        <textarea name="" id="" cols="30" rows="10" placeholder="공인시험 점수, 회화수준 등" class=""></textarea>
+                      </div>
+                      <div class="btn-group d-flex justify-content-center m-t-20">
+                        <button type="button" class="btn btn-outline-dark btn-lg">항목추가 <i class="icon-row-add"></i></button>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- end -->
+
+                  <!-- 자격증 -->
+                  <div class="content">
+                    <h4 class="table-subtitle mb-3">자격증(선택)</h4>
+                    <div class="desc">
+                      <div class="form-textarea textarea-sm m-0">
+                        <textarea name="" id="" cols="30" rows="10" placeholder="자격증명, 취득기관, 취득년월 등" class=""></textarea>
+                      </div>
+                      <div class="btn-group d-flex justify-content-center m-t-20">
+                        <button type="button" class="btn btn-outline-dark btn-lg">항목추가 <i class="icon-row-add"></i></button>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- end -->
+
+                  <!-- 수상 -->
+                  <div class="content">
+                    <h4 class="table-subtitle mb-3">수상(선택)</h4>
+                    <div class="desc">
+                      <div class="form-textarea textarea-sm m-0">
+                        <textarea name="" id="" cols="30" rows="10" placeholder="수상명, 수여기관, 취득년월 등" class=""></textarea>
+                      </div>
+                      <div class="btn-group d-flex justify-content-center m-t-20">
+                        <button type="button" class="btn btn-outline-dark btn-lg">항목추가 <i class="icon-row-add"></i></button>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- end -->
+                  <!-- 대외활동 -->
+                  <div class="content">
+                    <h4 class="table-subtitle mb-3">대외활동(선택)</h4>
+                    <div class="desc">
+                      <div class="form-textarea textarea-sm m-0">
+                        <textarea name="" id="" cols="30" rows="10" placeholder="대외활동내용" class=""></textarea>
+                      </div>
+                      <div class="btn-group d-flex justify-content-center m-t-20">
+                        <button type="button" class="btn btn-outline-dark btn-lg">항목추가 <i class="icon-row-add"></i></button>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- end -->
+                  <!-- 포트폴리오 -->
+                  <div class="content">
+                    <h4 class="table-subtitle mb-3">포트폴리오</h4>
+                    <div class="desc">
+                      <div class="row align-items-center">
+                        <div class="col-md-2 col-6 col m-b-10">
+                          <select class="select-design select-lg" style="width: 100%">
+                            <option value="1">선택</option>
+                            <option value="2">URL</option>
+                            <option value="3">파일첨부</option>
+                          </select>
+                        </div>
+                        <div class="col-md-10 col-12 col m-b-10">
+                          <input type="text" class="form-control form-lg" value="" placeholder="http://" />
+                          <div class="form-upload">
+                            <input type="file" class="" id="form-file" />
+                            <!-- select 박스에 따라서 -->
+                            <label for="form-file"><i class="icon-input-add"></i></label>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="btn-group d-flex justify-content-center m-t-20">
+                        <button type="button" class="btn btn-outline-dark btn-lg">항목추가 <i class="icon-row-add"></i></button>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- end -->
+                  <!-- 영문이력서 -->
+                  <div class="content">
+                    <h4 class="table-subtitle mb-3">영문이력서</h4>
+                    <div class="desc">
+                      <div class="row align-items-center">
+                        <div class="col-md-2 col-6 col m-b-10">
+                          <select class="select-design select-lg" style="width: 100%">
+                            <option value="3">파일첨부</option>
+                          </select>
+                        </div>
+                        <div class="col-md-10 col-12 col m-b-10">
+                          <div class="form-upload">
+                            <input type="file" class="" id="form-file" />
+                            <label for="form-file"><i class="icon-input-add"></i></label>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="btn-group d-flex justify-content-center m-t-20">
+                        <button type="button" class="btn btn-outline-dark btn-lg">항목추가 <i class="icon-row-add"></i></button>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- end -->
+                  <!-- 자기소개서 -->
+                  <div class="content">
+                    <div class="d-flex align-items-center justify-content-between">
+                      <h4 class="table-subtitle mb-3">자기소개서</h4>
+                      <div class="d-flex align-items-center m-b-15">
+                        <button type="button" class="btn btn-outline-dark btn-sm m-r-10">맞춤법 검사</button>
+                        <p class="">총 글자수 <span class="text-danger">123</span>자</p>
+                      </div>
+                    </div>
+                    <div class="desc">
+                      <div class="row align-items-center">
+                        <div class="col-12">
+                          <div class="form-textarea m-0">
+                            <textarea name="" id="" cols="30" rows="30" placeholder="내용을 입력하세요" class=""></textarea>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="spell-check-wrap">
+                      <div class="spell-check-head">
+                        <p>맞춤법에 어긋난 단어가 <span class="text-danger">16개</span> 있습니다.</p>
+                        <div>
+                          <button type="button" class="btn btn-outline-dark btn-sm m-r-10">맞춤법 재검사</button>
+                          <button type="button" class="btn btn-dark btn-sm">검사 종료</button>
+                        </div>
+                      </div>
+                      <div class="spell-document-content">
+                        기계 번역은 인간이 사용하는 자연 언어를 컴퓨터를 사용하여 다른 언어로 번역하는 일을 말한다. '자동 번역'이라고도 <button type="button" class="spell-btn">핸다.</button> 일관성과 통일성이 있게 번역되는 장점이 있으나 기계 번역은 현재로서는 자연스러운 번역을 보장할 수 없으며,
+                        문장이 부자연스러운 어투로 나오는 경우가 잦다. <br /><br />
+                        이것은 <button type="button" class="spell-btn">명백히 주작이다</button>
+
+                        <div class="popup">
+                          <button type="button" class="btn-close"></button>
+                          <div class="row m-0">
+                            <div class="col-md-6 col-12 recommendation">
+                              <div class="recommendation-head">
+                                <input type="text" class="recommendation-head-inp" value="핸다." />
+                              </div>
+                              <div class="recommendation-content">
+                                <div class="key">추천</div>
+                                <ul class="list">
+                                  <li><button type="button">한다.</button></li>
+                                  <li><button type="button">해야한다.</button></li>
+                                </ul>
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-12 help">
+                              <p class="title">도움말</p>
+                              <div class="description">
+                                한국어 동사 어간 '하-'에 현재 시제를 나타내는<br />
+                                선어말 어미인 '-ㄴ-', 어말 어미 중 평서형 종결 어미 '-다'가 차례로 결합하여 만들어진 단어.
+                                <br />
+                                <br />
+                                한국어 동사 어간 '하-'에 현재 시제를 나타내는<br />
+                                선어말 어미인 '-ㄴ-', 어말 어미 중 평서형 종결 어미 '-다'가 차례로 결합하여 만들어진 단어.
+                              </div>
+                            </div>
+                          </div>
+                          <div class="popup-footer">
+                            <div class="buttons">
+                              <button type="button" class="btn btn-sm btn-primary"><span>수정</span></button>
+                              <button type="button" class="btn btn-sm btn-outline-primary"><span>모두 수정</span></button>
+                            </div>
+                            <div class="page d-flex align-items-center">
+                              <div class="pager m-r-10"><strong class="text-danger">2</strong><i class="icon">/</i><span class="total">10</span></div>
+                              <button type="button" class="btn btn-sm btn-outline-gray m-r-5"><span>이전</span></button>
+                              <button type="button" class="btn btn-sm btn-outline-gray"><span>다음</span></button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- end -->
+                </div>
+                <div>
+                  <div class="agreement-content d-flex align-items-center justify-content-start m-t-20">
+                    <p>이력서 공개 여부</p>
+                    <div class="d-flex m-l-20">
+                      <div class="form-check">
+                        <input class="form-check-input" type="radio" value="" id="multipleCheck1" name="multipleCheck" checked="" />
+                        <label class="form-check-label" for="multipleCheck1"> 남 </label>
+                      </div>
+                      <div class="form-check">
+                        <input class="form-check-input" type="radio" value="" id="multipleCheck2" name="multipleCheck" />
+                        <label class="form-check-label" for="multipleCheck2"> 여 </label>
+                      </div>
+                    </div>
+                  </div>
+                  <p class="text-danger m-t-15">※ 공개로 등록을 할 경우 이력서 등록 1회 당 10건의 열람권이 지급됩니다.</p>
+                  <p class="text-danger m-t-5">※ 이력서를 비공개로 등록해도 인재에게는 등록확인메일이 발송되며, 해당 회원이 가입 후 직접 비공개를 공개로 전환할 경우에는 등록헤드헌터에게 열람권이 지급되지 않습니다.</p>
+                </div>
+              </div>
+              <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+                <div class="agreement-content d-flex align-items-center justify-content-between m-t-20">
+                  <p>동의서를 추가해 주세요. <span>(이력서 파일을 먼저 첨부 후 동의서 추가가 가능합니다.)</span></p>
+                  <div class="form-upload">
+                    <input type="file" class="" id="form-file" />
+                    <label for="form-file"><i class="icon-input-add"></i></label>
+                  </div>
+                </div>
+                <div class="coworker-wrap resume m-r-15">
+                  <div class="coworker-list">
+                    <div class="btn btn-sm btn-outline-gray round d-flex justify-content-around">
+                      <span class="name">김남극</span>
+                      <button type="button" class="close"><i class="icon-b-close"></i></button>
+                    </div>
+                  </div>
+                </div>
+                <div class="apply-wrap-body write m-t-30">
+                  <!-- 인적사항 -->
+                  <div class="content">
+                    <h4 class="table-subtitle mb-3">인적사항<span class="text-danger">(필수)</span></h4>
+                    <div class="desc">
+                      <div class="apply-wrap-head">
+                        <div class="img-upload">
+                          <input type="file" id="img-upload" />
+                          <label for="img-upload" class="img-upload-label">
+                            <i class="icon-img-add"></i>
+                            <span>이미지 올리기</span>
+                            <em>png, jpg 형식, 2MB 미만, <br />360*360 사이즈 권장</em>
+                          </label>
+                        </div>
+                        <div class="resume-info">
+                          <div class="row">
+                            <div class="col-md-3 col-6 col m-b-10">
+                              <input type="text" class="form-control form-lg inp-name" value="박근수" readonly />
+                            </div>
+                            <div class="col-md-3 col-6 col m-b-10">
+                              <input type="text" class="form-control form-lg inp-birth" value="" placeholder="생년월일(8자리)" />
+                            </div>
+                            <div class="col-md-3 col-6 col m-b-10">
+                              <select class="select-design select-lg" style="width: 100%">
+                                <option value="1">성별</option>
+                                <option value="2">남자</option>
+                                <option value="3">여자</option>
+                                <option value="4">비공개</option>
+                              </select>
+                            </div>
+                            <div class="col-md-3 col-6 col m-b-10">
+                              <select class="select-design select-lg" style="width: 100%">
+                                <option value="1" selected>취업상태</option>
+                                <option value="2">재직중</option>
+                                <option value="3">구직중</option>
+                              </select>
+                            </div>
+                          </div>
+                          <div class="row">
+                            <div class="col-md-6 col-12 col m-b-10">
+                              <input type="number" class="form-control form-lg inp-phone" value="010-1234-5678" readonly />
+                            </div>
+                            <div class="col-md-6 col-12 col m-b-10">
+                              <input type="text" class="form-control form-lg inp-email" placeholder="" value="abcd123@naver.com" readonly />
+                            </div>
+                          </div>
+                          <div class="row">
+                            <div class="col-12 col">
+                              <input type="text" class="form-control form-lg inp-address" value="서울특별시 강남구" readonly />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- end -->
+
+                  <!-- 핵심역량 -->
+                  <div class="content">
+                    <h4 class="table-subtitle mb-3">핵심역량<span class="text-danger">(필수)</span></h4>
+                    <div class="desc">
+                      <div class="row align-items-center m-b-10">
+                        <div class="col-md-1 col-2 col">
+                          <p class="num-box text-center">Main</p>
+                        </div>
+                        <div class="col-md-11 col-10 col">
+                          <input type="text" class="form-control form-lg" placeholder="인사, 회계, 기획, 설계, 영업, 관리, 개발, 용접 등" />
+                        </div>
+                      </div>
+                      <div class="row align-items-center m-b-10">
+                        <div class="col-md-1 col-2 col">
+                          <p class="num-box text-center">상세</p>
+                        </div>
+                        <div class="col-md-11 col-10 col">
+                          <input type="text" class="form-control form-lg" placeholder="인사기획, 평가보상, 내부회계, IT기획, 전략기획, 마케팅기획, 홍보, IR, 투자 등" />
+                        </div>
+                      </div>
+                      <div class="row align-items-center m-b-10">
+                        <div class="col-md-1 col-2 col">
+                          <p class="num-box text-center">기타</p>
+                        </div>
+                        <div class="col-md-11 col-10 col">
+                          <input type="text" class="form-control form-lg" placeholder="자격증(의사, 변호사, 회계사 등), 주요실적, 주재원, 어학 등" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- end -->
+
+                  <!-- 학력 -->
+                  <div class="content">
+                    <h4 class="table-subtitle mb-3">학력<span class="text-danger">(필수)</span></h4>
+                    <div class="desc">
+                      <div class="row align-items-center">
+                        <div class="col-md-2 col-6 col m-b-10">
+                          <input type="text" class="form-control form-lg" value="고등학교" readonly />
+                        </div>
+                        <div class="col-md-2 col-6 col m-b-10">
+                          <div class="search-box search-lg">
+                            <input type="text" class="" placeholder="학교명" />
+                            <button type="button" class="search-btn"><i class="icon-search-dark"></i></button>
+                          </div>
+                          <div class="search-result-list">
+                            <ul>
+                              <li class="active">
+                                <div class="result-company">
+                                  <a href="">
+                                    <p class="company-name">서울고등학교</p>
+                                  </a>
+                                </div>
+                              </li>
+                              <li>
+                                <div class="result-company">
+                                  <a href="">
+                                    <p class="company-name">연세고등학교</p>
+                                  </a>
+                                </div>
+                              </li>
+                            </ul>
+                          </div>
+                        </div>
+                        <div class="col-md-2 col-6 col m-b-10">
+                          <input type="text" class="form-control form-lg" value="소재지" readonly />
+                        </div>
+                        <div class="col-md-2 col-6 col m-b-10">
+                          <input type="text" class="form-control form-lg" placeholder="졸업년도" />
+                        </div>
+                        <div class="col-md-2 col-6 col m-b-10">
+                          <select class="select-design select-lg" style="width: 100%">
+                            <option value="1">졸업상태</option>
+                            <option value="2">졸업</option>
+                            <option value="3">대입검정고시</option>
+                          </select>
+                        </div>
+                        <div class="col-md-2 col-6 col m-b-10">
+                          <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="multipleCheck" />
+                            <label class="form-check-label" for="multipleCheck">해외</label>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="row add-education">
+                        <div class="col-md-2 col-12 col m-b-10">
+                          <select class="select-design select-lg" style="width: 100%">
+                            <option value="1">대학(2/3년)</option>
+                            <option value="2">대학교(4년)</option>
+                            <option value="3">석사</option>
+                            <option value="4">박사</option>
+                          </select>
+                        </div>
+                        <div class="col-md-10 col-12 col">
+                          <div class="row align-items-center">
+                            <div class="col-md-3 col-12 col m-b-10">
+                              <div class="search-box search-lg">
+                                <input type="text" class="" placeholder="학교명" />
+                                <button type="button" class="search-btn"><i class="icon-search-dark"></i></button>
+                              </div>
+                              <div class="search-result-list">
+                                <ul>
+                                  <li class="active">
+                                    <div class="result-company">
+                                      <a href="">
+                                        <p class="company-name">서울대학교</p>
+                                      </a>
+                                    </div>
+                                  </li>
+                                  <li>
+                                    <div class="result-company">
+                                      <a href="">
+                                        <p class="company-name">연세대학교</p>
+                                      </a>
+                                    </div>
+                                  </li>
+                                </ul>
+                              </div>
+                            </div>
+                            <div class="col-md-3 col-6 col m-b-10">
+                              <input type="text" class="form-control form-lg" value="소재지" readonly />
+                            </div>
+                            <div class="col-md-3 col-6 col m-b-10">
+                              <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="" id="multipleCheck" />
+                                <label class="form-check-label" for="multipleCheck">해외</label>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="row align-items-center">
+                            <div class="col-md-3 col-6 col m-b-10">
+                              <input type="text" class="form-control form-lg" value="" placeholder="입학년월" />
+                            </div>
+                            <div class="col-md-3 col-6 col m-b-10">
+                              <select class="select-design select-lg" style="width: 100%">
+                                <option value="1">입학상태</option>
+                                <option value="2">입학</option>
+                                <option value="3">편입</option>
+                              </select>
+                            </div>
+                            <div class="col-md-3 col-6 col m-b-10">
+                              <input type="text" class="form-control form-lg" value="" placeholder="졸업년월" />
+                            </div>
+                            <div class="col-md-3 col-6 col m-b-10">
+                              <select class="select-design select-lg" style="width: 100%">
+                                <option value="1">졸업상태</option>
+                                <option value="2">졸업</option>
+                                <option value="3">졸업예정</option>
+                                <option value="4">재학중</option>
+                                <option value="5">휴학중</option>
+                                <option value="6">중퇴</option>
+                                <option value="7">수료</option>
+                              </select>
+                            </div>
+                          </div>
+                          <div class="row align-items-center">
+                            <div class="col-md-3 col-6 col m-b-10">
+                              <input type="text" class="form-control form-lg" value="" placeholder="주 전공명" />
+                            </div>
+                            <div class="col-md-3 col-6 col m-b-10">
+                              <input type="text" class="form-control form-lg" value="" placeholder="학점" />
+                            </div>
+                            <div class="col-md-3 col-6 col m-b-10">
+                              <input type="text" class="form-control form-lg" value="" placeholder="부 전공명" />
+                            </div>
+                            <div class="col-md-3 col-6 col m-b-10">
+                              <input type="text" class="form-control form-lg" value="" placeholder="학점" />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="btn-group d-flex justify-content-center m-t-20">
+                        <button type="button" class="btn btn-outline-dark btn-lg">항목추가 <i class="icon-row-add"></i></button>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- end -->
+
+                  <!-- 경력사항 -->
+                  <div class="content">
+                    <h4 class="table-subtitle mb-3">경력사항<span class="text-danger">(필수)</span></h4>
+                    <div class="desc">
+                      <div class="row align-items-center">
+                        <div class="col-md-4 col-6 col m-b-10">
+                          <div class="search-box search-lg">
+                            <input type="text" class="" placeholder="회사 이름을 입력하세요" />
+                            <button type="button" class="search-btn"><i class="icon-search-dark"></i></button>
+                          </div>
+                          <div class="search-result-list">
+                            <ul>
+                              <li class="active">
+                                <div class="result-company">
+                                  <a href="">
+                                    <p class="company-name">(주)삼성전자</p>
+                                    <p class="company-obj">중소기업 | 시스템소프트웨어 | 중공업</p>
+                                  </a>
+                                </div>
+                              </li>
+                              <li>
+                                <div class="result-company">
+                                  <a href="">
+                                    <p class="company-name">(주)삼성전자</p>
+                                    <p class="company-obj">중소기업 | 시스템소프트웨어 | 중공업</p>
+                                  </a>
+                                </div>
+                              </li>
+                            </ul>
+                          </div>
+                        </div>
+                        <div class="col-md-2 col-6 col m-b-10">
+                          <div class="department">
+                            <input type="text" class="form-control form-lg" placeholder="부서명" />
+                          </div>
+                        </div>
+                        <div class="col-md-2 col-4 col m-b-10">
+                          <input type="text" class="form-control form-lg" placeholder="입사년월" />
+                        </div>
+                        <div class="col-md-2 col-4 col m-b-10">
+                          <input type="text" class="form-control form-lg" placeholder="퇴사년월" />
+                        </div>
+                        <div class="col-md-2 col-4 col m-b-10">
+                          <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="multipleCheck" />
+                            <label class="form-check-label" for="multipleCheck">재직중</label>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="row align-items-center">
+                        <div class="col-md-2 col-6 col m-b-10">
+                          <input type="text" class="form-control form-lg" placeholder="직급" />
+                        </div>
+                        <div class="col-md-2 col-6 col m-b-10">
+                          <input type="text" class="form-control form-lg" placeholder="직책" />
+                        </div>
+                        <div class="col-md-3 col-12 col m-b-10">
+                          <div class="d-flex align-items-center">
+                            <input type="text" class="form-control form-lg" placeholder="최종연봉" />
+                            <p class="w-50px m-l-10">만원</p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="row align-items-center">
+                        <div class="col-12 col m-b-10">
+                          <div class="form-textarea m-0">
+                            <textarea name="" id="" cols="30" rows="10" placeholder="담당업무" class=""></textarea>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="btn-group d-flex justify-content-center m-t-10">
+                        <button type="button" class="btn btn-outline-dark m-r-10" data-bs-toggle="modal" data-bs-target="#modal-nice-certification">경력인증</button>
+                        <button type="button" class="btn btn-outline-primary" data-bs-target="#modal-career-certification" data-bs-toggle="modal">저장</button>
+                      </div>
+                      <div class="row align-items-center">
+                        <div class="col-12 col">
+                          <div class="desc result m-t-30">
+                            <div class="row row-line">
+                              <div class="m-b-10">
+                                <span class="text-primary">총 경력 10년 3개월</span>
+                              </div>
+                              <ul class="detail-list mt-0">
+                                <li>
+                                  <p class="company text-dark font-bold">삼성전자</p>
+                                </li>
+                                <li>
+                                  <span class="key text-dark font-bold">부서명</span>
+                                  <span class="value">전략마케팅팀</span>
+                                </li>
+                                <li>
+                                  <span class="key text-dark font-bold">직급</span>
+                                  <span class="value">차장</span>
+                                </li>
+                                <li>
+                                  <span class="key text-dark font-bold">직책</span>
+                                  <span class="value">파트장</span>
+                                </li>
+                                <li>
+                                  <span class="key text-dark font-bold">최종연봉</span>
+                                  <span class="value">10,000만원</span>
+                                </li>
+                              </ul>
+                              <div class="career-txt">
+                                <p class="font-bold m-b-5">[담당업무]</p>
+                                한국예탁결제원 펀드회계 및 더존 금융회계<br />
+                                고객 운용보고서 작성(분기,반기,연) 및 주문대리<br />
+                                공모주 펀드 IPO 관리 및 투자진행<br />
+                                Research Assistant(R.A) 업무로써 자료 분석 및 조사 <br />
+                                &lt;상세업무/프로젝트&gt; Daily position 파일 작성 및 보고<br />
+                                - 매일 아침 전 영업일 기준 고객 및 고유 자산 포트폴리오 작성 및 보고<br />
+                                고유 회계
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="btn-group d-flex justify-content-end m-t-10">
+                        <button type="button" class="btn btn-outline-gray btn-sm m-r-10">수정</button>
+                        <button type="button" class="btn btn-outline-danger btn-sm">삭제</button>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- end -->
+
+                  <!-- 희망근무조건 -->
+                  <div class="content">
+                    <h4 class="table-subtitle mb-3">희망근무조건</h4>
+                    <div class="desc">
+                      <div class="row align-items-center">
+                        <div class="col-md-2 col-6 col m-b-10">
+                          <select class="select-design select-lg" style="width: 100%">
+                            <option value="1">고용형태</option>
+                            <option value="2">정규직</option>
+                            <option value="3">계약직</option>
+                            <option value="4">인턴</option>
+                            <option value="5">파견직</option>
+                            <option value="6">프리랜서</option>
+                            <option value="7">병역특례</option>
+                          </select>
+                        </div>
+                        <div class="col-md-2 col-6 col m-b-10">
+                          <select class="select-design select-lg" style="width: 100%">
+                            <option value="1">희망근무지</option>
+                            <option value="2">서울</option>
+                            <option value="3">수도권</option>
+                            <option value="4">전국</option>
+                          </select>
+                        </div>
+                        <div class="col-md-2 col-6 col m-b-10">
+                          <select class="select-design select-lg" style="width: 100%">
+                            <option value="1">입사가능시기</option>
+                            <option value="2">채용후즉시</option>
+                            <option value="3">2주이내</option>
+                            <option value="4">한달이내</option>
+                            <option value="5">협의후결정</option>
+                          </select>
+                        </div>
+                        <div class="col-md-2 col-6 col m-b-10">
+                          <input type="text" class="form-control form-lg" value="" placeholder="희망직급" />
+                        </div>
+                        <div class="col-md-4 col-12 col m-b-10">
+                          <div class="row align-items-center">
+                            <div class="col-6"><input type="text" class="form-control form-lg" value="" placeholder="희망연봉" /></div>
+                            <div class="col-6">
+                              <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="" id="multipleCheck" />
+                                <label class="form-check-label" for="multipleCheck">내규에 따름</label>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="row align-items-center">
+                        <div class="col-md-2 col-6 col m-b-10">
+                          <input type="text" class="form-control form-lg" value="" placeholder="희망산업" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- end -->
+
+                  <!-- 채용우대자격 -->
+                  <div class="content">
+                    <h4 class="table-subtitle mb-3">채용우대자격<span class="text-danger">(필수)</span></h4>
+                    <div class="desc">
+                      <div class="row align-items-center">
+                        <div class="col-4 col">
+                          <select class="select-design select-lg" style="width: 100%">
+                            <option value="1">보훈대상</option>
+                            <option value="1">대상</option>
+                            <option value="2">비대상</option>
+                          </select>
+                        </div>
+                        <div class="col-4 col">
+                          <select class="select-design select-lg" style="width: 100%">
+                            <option value="1">장애</option>
+                            <option value="1">대상</option>
+                            <option value="2">비대상</option>
+                          </select>
+                        </div>
+                        <div class="col-4 col">
+                          <select class="select-design select-lg" style="width: 100%">
+                            <option value="1">병역</option>
+                            <option value="1">군필</option>
+                            <option value="2">미필</option>
+                            <option value="3">복무중</option>
+                            <option value="3">해당없음</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- end -->
+
+                  <!--맞춤기업알림  -->
+                  <!-- <div class="content">
+                    <h4 class="table-subtitle mb-3">맞춤기업알림</h4>
+                    <div class="desc">
+                      <p class="m-b-10">희망 기업 정보 등록시 앱으로 해당 기업 포지션 정보를 알려드립니다.</p>
+                      <div class="row align-items-center m-b-10">
+                        <div class="col-12">
+                          <div class="search-box search-lg">
+                            <input type="text" class="" placeholder="회사 이름을 입력하세요" />
+                            <button type="button" class="search-btn"><i class="icon-search-dark"></i></button>
+                          </div>
+                          <div class="search-result-list">
+                            <ul>
+                              <li class="active">
+                                <div class="result-company">
+                                  <a href="">
+                                    <p class="company-name">(주)삼성전자</p>
+                                    <p class="company-obj">중소기업 | 시스템소프트웨어 | 중공업</p>
+                                  </a>
+                                </div>
+                              </li>
+                              <li>
+                                <div class="result-company">
+                                  <a href="">
+                                    <p class="company-name">(주)삼성전자</p>
+                                    <p class="company-obj">중소기업 | 시스템소프트웨어 | 중공업</p>
+                                  </a>
+                                </div>
+                              </li>
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-11">
+                          <input type="text" class="form-control form-lg" value="기업명" readonly />
+                        </div>
+                        <div class="col-1">
+                          <button type="button" class="btn btn-danger btn-lg min-width-auto">삭제</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div> -->
+                  <!-- end -->
+
+                  <!-- 어학 -->
+                  <div class="content">
+                    <h4 class="table-subtitle mb-3">어학(선택)</h4>
+                    <div class="desc">
+                      <div class="form-textarea textarea-sm m-0">
+                        <textarea name="" id="" cols="30" rows="10" placeholder="공인시험 점수, 회화수준 등" class=""></textarea>
+                      </div>
+                      <div class="btn-group d-flex justify-content-center m-t-20">
+                        <button type="button" class="btn btn-outline-dark btn-lg">항목추가 <i class="icon-row-add"></i></button>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- end -->
+
+                  <!-- 자격증 -->
+                  <div class="content">
+                    <h4 class="table-subtitle mb-3">자격증(선택)</h4>
+                    <div class="desc">
+                      <div class="form-textarea textarea-sm m-0">
+                        <textarea name="" id="" cols="30" rows="10" placeholder="자격증명, 취득기관, 취득년월 등" class=""></textarea>
+                      </div>
+                      <div class="btn-group d-flex justify-content-center m-t-20">
+                        <button type="button" class="btn btn-outline-dark btn-lg">항목추가 <i class="icon-row-add"></i></button>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- end -->
+
+                  <!-- 수상 -->
+                  <div class="content">
+                    <h4 class="table-subtitle mb-3">수상(선택)</h4>
+                    <div class="desc">
+                      <div class="form-textarea textarea-sm m-0">
+                        <textarea name="" id="" cols="30" rows="10" placeholder="수상명, 수여기관, 취득년월 등" class=""></textarea>
+                      </div>
+                      <div class="btn-group d-flex justify-content-center m-t-20">
+                        <button type="button" class="btn btn-outline-dark btn-lg">항목추가 <i class="icon-row-add"></i></button>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- end -->
+                  <!-- 대외활동 -->
+                  <div class="content">
+                    <h4 class="table-subtitle mb-3">대외활동(선택)</h4>
+                    <div class="desc">
+                      <div class="form-textarea textarea-sm m-0">
+                        <textarea name="" id="" cols="30" rows="10" placeholder="대외활동내용" class=""></textarea>
+                      </div>
+                      <div class="btn-group d-flex justify-content-center m-t-20">
+                        <button type="button" class="btn btn-outline-dark btn-lg">항목추가 <i class="icon-row-add"></i></button>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- end -->
+                  <!-- 포트폴리오 -->
+                  <div class="content">
+                    <h4 class="table-subtitle mb-3">포트폴리오</h4>
+                    <div class="desc">
+                      <div class="row align-items-center">
+                        <div class="col-md-2 col-6 col m-b-10">
+                          <select class="select-design select-lg" style="width: 100%">
+                            <option value="1">선택</option>
+                            <option value="2">URL</option>
+                            <option value="3">파일첨부</option>
+                          </select>
+                        </div>
+                        <div class="col-md-10 col-12 col m-b-10">
+                          <input type="text" class="form-control form-lg" value="" placeholder="http://" />
+                          <div class="form-upload">
+                            <input type="file" class="" id="form-file" />
+                            <!-- select 박스에 따라서 -->
+                            <label for="form-file"><i class="icon-input-add"></i></label>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="btn-group d-flex justify-content-center m-t-20">
+                        <button type="button" class="btn btn-outline-dark btn-lg">항목추가 <i class="icon-row-add"></i></button>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- end -->
+                  <!-- 영문이력서 -->
+                  <div class="content">
+                    <h4 class="table-subtitle mb-3">영문이력서</h4>
+                    <div class="desc">
+                      <div class="row align-items-center">
+                        <div class="col-md-2 col-6 col m-b-10">
+                          <select class="select-design select-lg" style="width: 100%">
+                            <option value="3">파일첨부</option>
+                          </select>
+                        </div>
+                        <div class="col-md-10 col-12 col m-b-10">
+                          <div class="form-upload">
+                            <input type="file" class="" id="form-file" />
+                            <label for="form-file"><i class="icon-input-add"></i></label>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="btn-group d-flex justify-content-center m-t-20">
+                        <button type="button" class="btn btn-outline-dark btn-lg">항목추가 <i class="icon-row-add"></i></button>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- end -->
+                  <!-- 자기소개서 -->
+                  <div class="content">
+                    <div class="d-flex align-items-center justify-content-between">
+                      <h4 class="table-subtitle mb-3">자기소개서</h4>
+                      <div class="d-flex align-items-center m-b-15">
+                        <button type="button" class="btn btn-outline-dark btn-sm m-r-10">맞춤법 검사</button>
+                        <p class="">총 글자수 <span class="text-danger">123</span>자</p>
+                      </div>
+                    </div>
+                    <div class="desc">
+                      <div class="row align-items-center">
+                        <div class="col-12">
+                          <div class="form-textarea m-0">
+                            <textarea name="" id="" cols="30" rows="30" placeholder="내용을 입력하세요" class=""></textarea>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="spell-check-wrap">
+                      <div class="spell-check-head">
+                        <p>맞춤법에 어긋난 단어가 <span class="text-danger">16개</span> 있습니다.</p>
+                        <div>
+                          <button type="button" class="btn btn-outline-dark btn-sm m-r-10">맞춤법 재검사</button>
+                          <button type="button" class="btn btn-dark btn-sm">검사 종료</button>
+                        </div>
+                      </div>
+                      <div class="spell-document-content">
+                        기계 번역은 인간이 사용하는 자연 언어를 컴퓨터를 사용하여 다른 언어로 번역하는 일을 말한다. '자동 번역'이라고도 <button type="button" class="spell-btn">핸다.</button> 일관성과 통일성이 있게 번역되는 장점이 있으나 기계 번역은 현재로서는 자연스러운 번역을 보장할 수 없으며,
+                        문장이 부자연스러운 어투로 나오는 경우가 잦다. <br /><br />
+                        이것은 <button type="button" class="spell-btn">명백히 주작이다</button>
+
+                        <div class="popup">
+                          <button type="button" class="btn-close"></button>
+                          <div class="row m-0">
+                            <div class="col-md-6 col-12 recommendation">
+                              <div class="recommendation-head">
+                                <input type="text" class="recommendation-head-inp" value="핸다." />
+                              </div>
+                              <div class="recommendation-content">
+                                <div class="key">추천</div>
+                                <ul class="list">
+                                  <li><button type="button">한다.</button></li>
+                                  <li><button type="button">해야한다.</button></li>
+                                </ul>
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-12 help">
+                              <p class="title">도움말</p>
+                              <div class="description">
+                                한국어 동사 어간 '하-'에 현재 시제를 나타내는<br />
+                                선어말 어미인 '-ㄴ-', 어말 어미 중 평서형 종결 어미 '-다'가 차례로 결합하여 만들어진 단어.
+                                <br />
+                                <br />
+                                한국어 동사 어간 '하-'에 현재 시제를 나타내는<br />
+                                선어말 어미인 '-ㄴ-', 어말 어미 중 평서형 종결 어미 '-다'가 차례로 결합하여 만들어진 단어.
+                              </div>
+                            </div>
+                          </div>
+                          <div class="popup-footer">
+                            <div class="buttons">
+                              <button type="button" class="btn btn-sm btn-primary"><span>수정</span></button>
+                              <button type="button" class="btn btn-sm btn-outline-primary"><span>모두 수정</span></button>
+                            </div>
+                            <div class="page d-flex align-items-center">
+                              <div class="pager m-r-10"><strong class="text-danger">2</strong><i class="icon">/</i><span class="total">10</span></div>
+                              <button type="button" class="btn btn-sm btn-outline-gray m-r-5"><span>이전</span></button>
+                              <button type="button" class="btn btn-sm btn-outline-gray"><span>다음</span></button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- end -->
+                </div>
+                <div>
+                  <div class="agreement-content d-flex align-items-center justify-content-start m-t-20">
+                    <p>이력서 공개 여부</p>
+                    <div class="d-flex m-l-20">
+                      <div class="form-check">
+                        <input class="form-check-input" type="radio" value="" id="multipleCheck1" name="multipleCheck" checked="" />
+                        <label class="form-check-label" for="multipleCheck1"> 남 </label>
+                      </div>
+                      <div class="form-check">
+                        <input class="form-check-input" type="radio" value="" id="multipleCheck2" name="multipleCheck" />
+                        <label class="form-check-label" for="multipleCheck2"> 여 </label>
+                      </div>
+                    </div>
+                  </div>
+                  <p class="text-danger m-t-15">※ 공개로 등록을 할 경우 이력서 등록 1회 당 10건의 열람권이 지급됩니다.</p>
+                  <p class="text-danger m-t-5">※ 이력서를 비공개로 등록해도 인재에게는 등록확인메일이 발송되며, 해당 회원이 가입 후 직접 비공개를 공개로 전환할 경우에는 등록헤드헌터에게 열람권이 지급되지 않습니다.</p>
+                </div>
+              </div>
+              <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
+                <div class="auto-project">
+                  <div class="example-form p-0 m-0">
+                    <ul>
+                      <li>이력서 로봇을 통해 등록이 안되는 이력서 양식인 경우, 이력서 등록을 신청할 수 있습니다.</li>
+                      <li><span class="text-primary">정보제공 동의서가 필수로 포함</span>되어야 등록할 수 있습니다. (미첨부 시 등록불가) <a href="" class="text-primary text-underline">정보제공동의서 예제양식</a></li>
+                      <li>신청순으로 처리하므로 <span class="text-danger">신청 후 최대 2영업일이 소요</span>되니 급한 이력서는 직접 등록하시기 바랍니다.</li>
+                      <li>신청한 이력서 등록이 완료되면 후보자에게 등록완료 메일이 발송됩니다.</li>
+                    </ul>
+                  </div>
+                  <div class="form-upload">
+                    <input type="file" class="" id="form-file" />
+                    <label for="form-file"><i class="icon-input-add"></i></label>
+                  </div>
+                  <div class="form-upload">
+                    <input type="file" class="" id="form-file" />
+                    <label for="form-file"><i class="icon-input-add"></i></label>
+                  </div>
+                  <div class="d-flex align-items-center justify-content-center m-t-30">
+                    <button type="button" class="btn btn-primary m-r-10">신청하기</button>
+                    <button type="button" class="btn btn-outline-dark">취소</button>
+                  </div>
+                </div>
+                <div class="tbl-head">
+                  <p class="tbl-head-cnt font-size-18 font-bold">이력서 등록신청 내역</p>
+                  <div class="d-flex">
+                    <select class="select-design" style="width: 100%">
+                      <option value="1">파일명</option>
+                    </select>
+                    <input type="text" class="form-control white form-md m-l-5 m-r-5" />
+                    <button type="button" class="btn btn-outline-gray btn-md">검색</button>
+                  </div>
+                </div>
+                <table class="table m-t-15 border-top-1">
+                  <colgroup>
+                    <col width="25%" />
+                    <col width="25%" />
+                    <col width="25%" />
+                    <col width="25%" />
+                  </colgroup>
+                  <thead>
+                    <tr>
+                      <th class="text-center">신청일시</th>
+                      <th class="text-center">신청파일명</th>
+                      <th class="text-center">진행 상태</th>
+                      <th class="text-center">비고</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td class="text-center">
+                        <a href="" class="text-primary text-underline">2022-09-23 09:13</a>
+                      </td>
+                      <td class="text-center">
+                        <p>이주혜 최종.docx</p>
+                      </td>
+                      <td class="text-center">
+                        <p>등록 불가</p>
+                      </td>
+                      <td class="text-center">
+                        <p>테스트 신청</p>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- 게시물 쓰기 -->
+      <div class="modal fade" id="modal-write" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-write modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">게시글 쓰기</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="select-form">
+                <select class="select-design" style="width: 100%">
+                  <option value="1">직장인의 고민</option>
+                  <option value="3">Wyoming</option>
+                  <option value="3">Wyoming</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <input type="text" class="form-control form-md" placeholder="제목을 입력하세요" />
+              </div>
+              <div class="form-textarea">
+                <textarea name="" id="" cols="30" rows="10" placeholder="내용을 입력하세요" class=""></textarea>
+              </div>
+              <div class="form-upload">
+                <input type="file" class="" id="form-file" />
+                <label for="form-file"><i class="icon-input-add"></i></label>
+              </div>
+              <div class="preview-image-wrap">
+                <div class="preview-image" style="background-image: url('../assets/images/about-01.png')">
+                  <div class="hover-close">
+                    <button type="button"><i class="icon-del"></i></button>
+                  </div>
+                </div>
+                <div class="preview-image" style="background-image: url('../assets/images/about-01.png')"></div>
+                <div class="preview-image" style="background-image: url('../assets/images/about-01.png')"></div>
+                <div class="preview-image" style="background-image: url('../assets/images/about-01.png')"></div>
+                <div class="preview-image" style="background-image: url('../assets/images/about-01.png')"></div>
+                <div class="preview-image" style="background-image: url('../assets/images/about-01.png')"></div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">닫기</button>
+              <button type="button" class="btn btn-primary">등록</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 게시물 쓰기 (회사검색) -->
+      <div class="modal fade" id="modal-write-company-search" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-write modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">게시글 쓰기</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="select-form">
+                <select class="form-select form-md">
+                  <option value="">직장인 고민</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <input type="text" class="form-control form-md" placeholder="제목을 입력하세요" />
+              </div>
+              <div class="form-group position-relative">
+                <div class="search-box">
+                  <input type="text" class="" placeholder="회사 이름을 입력하세요" />
+                  <button type="button" class="search-btn"><i class="icon-search-dark"></i></button>
+                </div>
+                <div class="search-result-list">
+                  <ul>
+                    <li class="active">
+                      <div class="result-company">
+                        <a href="">
+                          <p class="company-name">(주)삼성전자</p>
+                          <p class="company-obj">중소기업 | 시스템소프트웨어 | 중공업</p>
+                        </a>
+                      </div>
+                    </li>
+                    <li>
+                      <div class="result-company">
+                        <a href="">
+                          <p class="company-name">(주)삼성전자</p>
+                          <p class="company-obj">중소기업 | 시스템소프트웨어 | 중공업</p>
+                        </a>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              <div class="form-textarea">
+                <textarea name="" id="" cols="30" rows="10" placeholder="내용을 입력하세요" class=""></textarea>
+              </div>
+              <div class="form-upload">
+                <input type="file" class="" id="form-file" />
+                <label for="form-file"><i class="icon-input-add"></i></label>
+              </div>
+              <div class="preview-image-wrap">
+                <div class="preview-image" style="background-image: url('../assets/images/about-01.png')">
+                  <div class="hover-close">
+                    <button type="button"><i class="icon-del"></i></button>
+                  </div>
+                </div>
+                <div class="preview-image" style="background-image: url('../assets/images/about-01.png')"></div>
+                <div class="preview-image" style="background-image: url('../assets/images/about-01.png')"></div>
+                <div class="preview-image" style="background-image: url('../assets/images/about-01.png')"></div>
+                <div class="preview-image" style="background-image: url('../assets/images/about-01.png')"></div>
+                <div class="preview-image" style="background-image: url('../assets/images/about-01.png')"></div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">닫기</button>
+              <button type="button" class="btn btn-primary">등록</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 게시물 쓰기 + 비밀글 설정 (회사검색) -->
+      <div class="modal fade" id="modal-write-secret-search" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-write modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">게시글 쓰기</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="select-form">
+                <select class="form-select form-md">
+                  <option value="">직장인 고민</option>
+                </select>
+              </div>
+              <div class="form-check justify-content-start">
+                <input class="form-check-input" type="checkbox" value="" id="multipleCheck" />
+                <label class="form-check-label" for="multipleCheck"> 비밀글 설정 (체크시 해당 기업 헤드헌터와 작성자만 볼 수 있습니다.) </label>
+              </div>
+              <div class="form-group">
+                <input type="text" class="form-control form-md" placeholder="제목을 입력하세요" />
+              </div>
+              <div class="form-group position-relative">
+                <div class="search-box">
+                  <input type="text" class="" placeholder="회사 이름을 입력하세요" />
+                  <button type="button" class="search-btn"><i class="icon-search-dark"></i></button>
+                </div>
+                <div class="search-result-list">
+                  <ul>
+                    <li class="active">
+                      <div class="result-company">
+                        <a href="">
+                          <p class="company-name">(주)삼성전자</p>
+                          <p class="company-obj">중소기업 | 시스템소프트웨어 | 중공업</p>
+                        </a>
+                      </div>
+                    </li>
+                    <li>
+                      <div class="result-company">
+                        <a href="">
+                          <p class="company-name">(주)삼성전자</p>
+                          <p class="company-obj">중소기업 | 시스템소프트웨어 | 중공업</p>
+                        </a>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              <div class="form-textarea">
+                <textarea name="" id="" cols="30" rows="10" placeholder="내용을 입력하세요" class=""></textarea>
+              </div>
+              <div class="form-upload">
+                <input type="file" class="" id="form-file" />
+                <label for="form-file"><i class="icon-input-add"></i></label>
+              </div>
+              <div class="preview-image-wrap">
+                <div class="preview-image" style="background-image: url('../assets/images/about-01.png')">
+                  <div class="hover-close">
+                    <button type="button"><i class="icon-del"></i></button>
+                  </div>
+                </div>
+                <div class="preview-image" style="background-image: url('../assets/images/about-01.png')"></div>
+                <div class="preview-image" style="background-image: url('../assets/images/about-01.png')"></div>
+                <div class="preview-image" style="background-image: url('../assets/images/about-01.png')"></div>
+                <div class="preview-image" style="background-image: url('../assets/images/about-01.png')"></div>
+                <div class="preview-image" style="background-image: url('../assets/images/about-01.png')"></div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">닫기</button>
+              <button type="button" class="btn btn-primary">등록</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 일반 팝업 취소 -->
+      <div class="modal fade" id="modal-cancel" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-cancel modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="text-form">지원을 취소하시겠습니까?</div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">취소</button>
+                <button type="button" class="btn btn-primary">확인</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 경력인증 -->
+      <div class="modal fade" id="modal-certification" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-default modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="text-form">(주)소프트퍼즐</div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-primary m-r-5">경력인증 받기</button>
+                <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">닫기</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- 경력 나이스 확인불가 -->
+      <div class="modal fade" id="modal-nice-certification" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-default modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-body">
+              <div class="text-form qna">
+                <span class="m-r-15">사업자등록번호</span>
+                <input type="text" class="form-control" placeholder="숫자만입력" />
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-primary m-r-5">경력인증 받기</button>
+                <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">닫기</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 인증 완료/실패 -->
+      <div class="modal fade" id="modal-certification-result" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-default modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="btn-close" data-bs-sdismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="text-form">인증되었습니다</div>
+              <div class="text-form">인증에 실패하였습니다.</div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">확인</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 헤드헌터 상세 -->
+      <div class="modal fade" id="modal-headhunter" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-headhunter modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body pt-0">
+              <div class="headhunter-profile-content">
+                <div class="headhunter-profile">
+                  <div class="headhunter-left">
+                    <div class="headhunter-profile-img" data-bs-toggle="modal" data-bs-target="#modal-headhunter"></div>
+                    <button type="button" class="btn btn-outline-dark btn-sm">블랙리스트 추가</button>
+                  </div>
+                  <div class="headhunter-profile-info">
+                    <div>
+                      <p class="company">맨쉬컨설팅(주)</p>
+                      <p class="name">
+                        <span>홍길동</span>
+                        <span class="rank">전무</span>
+                        <span class="txt">연세대학교 금속공학과</span>
+                      </p>
+                    </div>
+                    <div>
+                      <div class="phone">
+                        <p>
+                          <span>연락처</span>
+                          <span class="phone-number">***-****-****</span>
+                        </p>
+                        <button type="button" class="btn btn-outline-dark btn-sm">연락처 보기</button>
+                      </div>
+                    </div>
+                    <ul class="info-list">
+                      <li>
+                        <p>이메일</p>
+                        <a href="">asdqwe1234@naver.com</a>
+                      </li>
+                      <li>
+                        <p>최근로그인</p>
+                        <p>2022-10-11</p>
+                      </li>
+                      <li>
+                        <p>진행중공고</p>
+                        <p><a href="../resume/headhunter.html" class="text-danger">3</a>건</p>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="apply-wrap">
+                <div class="apply-wrap-body">
+                  <div class="content">
+                    <h4 class="table-subtitle mb-3">인사말</h4>
+                    <div class="desc">
+                      <p class="introduce-text">저는 해외 영업직에 20년 이상 근무하면서 철강 금속, 기계 부품 및 생활 용품 등의 수출입을 담당 및 총괄하였으며, 현재는 써치펌 맨쉬컨설팅에서 ...</p>
+                    </div>
+                  </div>
+                  <div class="content">
+                    <h4 class="table-subtitle mb-3">주요이력</h4>
+                    <div class="desc">
+                      <ul class="history">
+                        <li>2007 ~ 2013 Flowserve KSM Project OEM Team 팀장/이사</li>
+                        <li>2005 ~ 2007 농원금속(주) 해외영업팀장</li>
+                        <li>2003 ~ 2005 피죤(주) 해외영업팀장</li>
+                      </ul>
+                    </div>
+                  </div>
+                  <div class="content">
+                    <h4 class="table-subtitle mb-3">전문분야</h4>
+                    <div class="desc">
+                      <div class="badge-box">
+                        <span class="tag tag-lg tag-outline-primary none-border m-0">
+                          <em>건설/건축</em>
+                        </span>
+                        <span class="tag tag-lg tag-outline-primary none-border m-0">
+                          <em>IT/인터넷</em>
+                        </span>
+                        <span class="tag tag-lg tag-outline-primary none-border m-0">
+                          <em>제조/생산/화학</em>
+                        </span>
+                        <span class="tag tag-lg tag-outline-primary none-border m-0">
+                          <em>의료/제약</em>
+                        </span>
+                        <span class="tag tag-lg tag-outline-primary none-border m-0">
+                          <em>유통/판매</em>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 지원하기 -->
+      <div class="modal fade" id="modal-apply" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-comment modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header justify-content-end">
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="text-title">지원이 완료되었습니다.</div>
+              <div class="text-form">
+                채용기업의 규격에 맞게 이력서 변경이 필요한 경우<br />
+                본 채용공고 담당 헤드헌터가 지원이력서를 수정할 수 있는<br />
+                권한을 주시겠습니까?<br />
+                이력서 수정 권한을 주지 않는 경우 전형에 불이익이 있을 수 있습니다.
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-primary m-r-10" data-bs-toggle="modal" data-bs-target="#modal-apply-success" data-bs-dismiss="modal">동의</button>
+                <button type="button" class="btn btn-outline-primary m-r-5" data-bs-toggle="modal" data-bs-target="#modal-apply-success" data-bs-dismiss="modal">미동의</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- 지원 완료 -->
+      <div class="modal fade" id="modal-apply-success" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-comment modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header justify-content-end">
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="text-title">지원이 완료되었습니다.</div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- 경력인증 팝업 -->
+      <div class="modal fade" id="modal-career-certification" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-comment modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header justify-content-end">
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="text-form">
+                경력 인증을 받지 않으셨습니다.<br />
+                인증 받지 않은 경력 사항을 저장하시겠습니까?
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-primary m-r-10">확인</button>
+                <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">취소</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- data-bs-backdrop="static" 배경 클릭해도 안 꺼지는 속성 -->
+      <!-- 회원가입 -->
+      <div class="modal fade" id="modal-signup-agree" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel">
+        <div class="modal-dialog modal-comment modal-dialog-centered modal-dialog-scrollable">
+          <div class="modal-content">
+            <div class="modal-header justify-content-end">
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="text-form">
+                후보자의 정보주도권을 인정하는 국내 유일의 Platform ! <br />
+                <br />
+                RESUME9은 후보자의 정보주도권을 인정하는 국내 유일한 Platform입니다.<br />
+                <br />
+                국내의 수많은 Platform에서 회원의 개인정보 (이름, 연락처 및 검색내역 등)를 기업이나 개인에게 해당 정보를 상업적으로 판매하면서, 어떤 Platform도 실제 그 정보의 주인인 회원에게는 단 1원도 보상을 하지 않는 것이 현실입니다.<br />
+                <br />
+                특히, 채용 Platform의 경우는 구직자(후보자)회원이 “을”이라는 점을 악용하여 해당 후보자의 직접적인 개인정보(이름, 전화번호, 이메일주소)를 구인회사와 헤드헌터에게 일정 금액을 받고 판매하고 있습니다.<br />
+                <br />
+                그러나, 어떤 Platform에서도 그 판매금액의 1%도 정보의 주인에게 보상하지 않고 있습니다. <br />
+                <br />
+                RESUME9은 구청에 등록된 실명확인 된 헤드헌터에 한하여<br /><br />
+                그리고 해당 헤드헌터가 의뢰 받은 구인 오더를 등록한 경우에 한하여 후보자 회원의 개인정보를 건당 2,000원을 받고 상업적으로 판매하고 있으며, (단, 경력사항 중 50% 이상의 경력에 대한 고용보험 확인을 인증 받은 이력서에 한하여)<br /><br />
+                이 중 50%인 1,000원을 정보의 주인인 후보자 회원에게 돌려드리고 있습니다.(국내유일, 특허출원)<br /><br />
+                RESUME9은 앞으로도 지속적으로 정보의 주인인 후보자 회원의 정보주도권(정보민주화)를 지키는데 최선을 다할 것입니다.
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 기본 공용 모달 링크이동 -->
+      <div class="modal fade" id="modal-default-link" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-comment modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header justify-content-end">
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="text-form text-center">
+                보유하신 포인트가 없습니다.<br />
+                포인트를 충전하시겠습니까?
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">취소</button>
+                <a href="마이페이지 충전" class="btn btn-primary m-r-10">확인</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- 기본 공용 모달 -->
+      <div class="modal fade" id="modal-default" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-comment modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header justify-content-end">
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="text-form text-center">
+                내 인재에서 삭제할 경우,<br />
+                인재검색 등에서 인재정보를 열람하기 위해서는 열람권을 다시 사용해야 합니다. 삭제 하시겠습니까?
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">취소</button>
+                <button type="button" class="btn btn-primary">확인</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- 포지션 선택-->
+      <div class="modal fade" id="modal-select-position" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-write modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">관심인재 추가 > 포지션 추천</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <p class="font-bold m-b-25 font-size-18">포지션 선택</p>
+              <p class="m-b-25">추가한 인재의 이력서는 선택한 포지션의 컨택리스트 목록으로 추가됩니다.</p>
+              <div class="select-form">
+                <select class="select-design" style="width: 100%">
+                  <option value="1">포지션을 선택해주세요.</option>
+                  <option value="3">-</option>
+                </select>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">취소</button>
+              <button type="button" class="btn btn-primary">추가</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- 포지션 상세 - 컨택리스트 상태 적합/부적합 선택 -->
+      <div class="modal fade" id="modal-position-state" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-comment modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header justify-content-end">
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="text-form text-center">
+                직접지원한 인재의 경우 이력서를 확인 후<br />
+                적합, 부적합 여부를 선택해주세요.
+              </div>
+              <div class="d-flex justify-content-center m-b-25">
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" value="" id="multipleCheck1" />
+                  <label class="form-check-label" for="multipleCheck1"> 적합 </label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" value="" id="multipleCheck1" />
+                  <label class="form-check-label" for="multipleCheck1"> 부적합 </label>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">취소</button>
+                <button type="button" class="btn btn-primary">확인</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 이메일 제안 -->
+      <div class="modal fade" id="modal-suggest-email" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-comment modal-dialog-centered" style="max-width: 900px">
+          <div class="modal-content">
+            <div class="modal-header justify-content-end">
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <ul class="nav nav-tabs" id="myTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">SMS/MMS</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false" tabindex="-1">이메일</button>
+                </li>
+              </ul>
+              <div class="tab-content" id="myTabContent">
+                <div class="tab-pane fade active show" id="home" role="tabpanel" aria-labelledby="home-tab">
+                  <div class="row email-wrap m-0">
+                    <div class="col-12 m-t-20">
+                      <div class="d-flex justify-content-between">
+                        <div class="d-flex">
+                          <div class="form-check">
+                            <input class="form-check-input" type="radio" value="" id="multipleCheck5" />
+                            <label class="form-check-label" for="multipleCheck5">직접 작성</label>
+                          </div>
+                          <div class="form-check">
+                            <input class="form-check-input" type="radio" value="" id="multipleCheck5" />
+                            <label class="form-check-label" for="multipleCheck5">자주쓰는 메일</label>
+                          </div>
+                        </div>
+                        <div class="d-flex gap-10">
+                          <select class="select-design" style="width: 200px">
+                            <option value="1">제안 메일 (기본 그룹)</option>
+                          </select>
+                          <select class="select-design" style="width: 250px">
+                            <option value="1">불러올 메일 선택</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <table class="table border-top-1 m-t-30">
+                    <colgroup>
+                      <col width="15%" />
+                    </colgroup>
+                    <tbody>
+                      <tr>
+                        <th class="">관련 포지션</th>
+                        <td class="">
+                          <select class="select-design" style="width: 100%">
+                            <option value="1">테스트 포지션등록 (지원하지 마세요)</option>
+                          </select>
+                        </td>
+                      </tr>
+                      <tr>
+                        <th class="">받는 사람</th>
+                        <td class="">
+                          <div class="d-flex align-items-center justify-content-between">
+                            <div class="coworker-wrap m-r-15 bg-white">
+                              <div class="coworker-list">
+                                <div class="btn btn-sm btn-outline-gray round d-flex justify-content-around">
+                                  <span class="name">김남극</span>
+                                  <button type="button" class="close"><i class="icon-b-close"></i></button>
+                                </div>
+                              </div>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-primary round">+ 직접추가</button>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <th class="">제목</th>
+                        <td class="">
+                          <input type="text" class="form-control form-lg" value="" placeholder="제목을 입력해주세요." />
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">...</div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">취소</button>
+                <button type="button" class="btn btn-primary">확인</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- 목록추가(수동) -->
+      <div class="modal fade" id="modal-position-list" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-write modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">목록추가(수동)</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <p class="m-b-25">기본정보를 알고있는 후보자의 경우 컨택리스트에 추가 후, 포지션 제안을 할 수 있습니다.</p>
+              <table class="table border-top-1 m-t-30">
+                <colgroup>
+                  <col width="25%" />
+                </colgroup>
+                <tbody>
+                  <tr>
+                    <th class="">이름</th>
+                    <td class="">
+                      <input type="text" class="form-control form-lg" value="" placeholder="이름" />
+                    </td>
+                  </tr>
+                  <tr>
+                    <th class="">휴대폰번호</th>
+                    <td class="">
+                      <input type="text" class="form-control form-lg" value="" placeholder="(-)를 제외하고 입력" />
+                    </td>
+                  </tr>
+                  <tr>
+                    <th class="">이메일주소</th>
+                    <td class="">
+                      <input type="text" class="form-control form-lg" value="" placeholder="email@example.com" />
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">취소</button>
+              <button type="button" class="btn btn-primary">확인</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 고객사 등록 -->
+      <div class="modal fade" id="modal-customer-registration" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-write modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">고객사 등록</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <p class="tbl-head-cnt text-danger">내 고객사 리스트는 외부에 절대 공개되지 않습니다.</p>
+
+              <p class="table-title m-t-30">기업정보</p>
+              <table class="table border-top-1">
+                <colgroup>
+                  <col width="25%" />
+                </colgroup>
+                <tbody>
+                  <tr>
+                    <th class="">기업명</th>
+                    <td class="">
+                      <input type="text" class="form-control form-lg" value="" placeholder="기업명 또는 사업자등록번호로 검색" />
+                    </td>
+                  </tr>
+                  <tr>
+                    <th class="">사업자등록번호</th>
+                    <td class="">
+                      <input type="text" class="form-control form-lg" value="" placeholder="" />
+                    </td>
+                  </tr>
+                  <tr>
+                    <th class="">소재지</th>
+                    <td class="">
+                      <input type="text" class="form-control form-lg" value="" placeholder="" />
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <p class="table-title m-t-30">인사담당자 정보</p>
+              <table class="table border-top-1">
+                <colgroup>
+                  <col width="25%" />
+                </colgroup>
+                <tbody>
+                  <tr>
+                    <th class="">이름</th>
+                    <td class="">
+                      <input type="text" class="form-control form-lg" value="" placeholder="이름" />
+                    </td>
+                  </tr>
+                  <tr>
+                    <th class="">이메일주소</th>
+                    <td class="">
+                      <input type="text" class="form-control form-lg" value="" placeholder="email@example.com" />
+                    </td>
+                  </tr>
+                  <tr>
+                    <th class="">유선연락처</th>
+                    <td class="">
+                      <input type="text" class="form-control form-lg" value="" placeholder="(-)를 제외하고 입력" />
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">취소</button>
+              <button type="button" class="btn btn-primary">등록</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 새 연락처 추가 -->
+      <div class="modal fade" id="modal-add-address" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-write modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">새 연락처 추가</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <select class="select-design" style="width: 100%">
+                <option value="1">그룹을 선택하세요</option>
+                <option value="1">기본그룹</option>
+                <option value="1">테스트</option>
+              </select>
+              <table class="table border-top-1 m-t-30">
+                <colgroup>
+                  <col width="25%" />
+                </colgroup>
+                <tbody>
+                  <tr>
+                    <th class="">이름</th>
+                    <td class="">
+                      <input type="text" class="form-control form-lg" value="" placeholder="이름" />
+                    </td>
+                  </tr>
+                  <tr>
+                    <th class="">휴대폰번호</th>
+                    <td class="">
+                      <input type="text" class="form-control form-lg" value="" placeholder="(-)를 제외하고 입력" />
+                    </td>
+                  </tr>
+                  <tr>
+                    <th class="">이메일주소</th>
+                    <td class="">
+                      <input type="text" class="form-control form-lg" value="" placeholder="email@example.com" />
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <div class="memo-content">
+                <p class="text-start">메모<span class="font-size-14 text-gray">(100자 이내)</span></p>
+                <div class="memo-form m-t-10">
+                  <textarea name="" id="" cols="30" rows="10"></textarea>
+                </div>
+              </div>
+              <p>내 주소록에서 후보자에게 제안 이후에 연락처를 수정하게 되면 시스템의 정보의 불일치가 발생하여 수정을 금지하고 있습니다.</p>
+              <p class="text-danger m-t-5">불가피하게 제안 전 수정이 필요한 경우 삭제후 다시 연락처를 추가해 주시기 바랍니다.</p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">취소</button>
+              <button type="button" class="btn btn-primary">확인</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

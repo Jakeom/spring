@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/default}">
+<body>
+	<div layout:fragment="contents" th:remove="tag">
+		<input type="hidden" id="memberDetailId" name="memberDetailId" th:value="${detail.id}" />
+		<input type="hidden" id="memberDetailDtype" name="memberDetailDtype"th:value="${detail.DTYPE}" />
+		<input type="hidden" id="memberDetailIsStop" name="memberDetailIsStop" th:value="${detail.isStop}" />
+		<input type="hidden" id="memberDetailIsTemp" name="memberDetailIsTemp" th:value="${detail.isTemp}" />
+		<input type="hidden" id="memberDetailDeleted" name="memberDetailDeleted"th:value="${detail.deleted}" />
+		<main id="content" role="main">
+			<h2 class="title">회원조회 및 관리 > [[${detail.DTYPE}]]</h2>
+			<div class="row p-3">
+				<div class="col-12">
+					<table class="table table-bordered" id="mainDatatable">
+						<colgroup>
+							<col style="width:5%" />
+							<col style="width:20%" />
+							<col style="width:5%" />
+							<col style="width:20%" />
+							<col style="width:5%" />
+							<col style="width:20%" />
+							<col style="width:5%" />
+							<col style="width:20%" />
+						</colgroup>
+						<tbody>
+							<tr>
+								<th class="text-center">구분</th>
+								<td class="text-center">[[${detail.DTYPE}]]</td>
+								<th class="text-center">이름</th>
+								<td class="text-center">[[${detail.name}]]</td>
+								<th class="text-center">이메일 주소</th>
+								<td class="text-center">[[${detail.email}]]</td>
+								<th class="text-center">휴대폰번호</th>
+								<td class="text-center">[[${detail.phone}]]</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="row p-3" name="dtypeDiv" id="dtypeDiv"></div>
+		</main>
+	</div>
+</body>
+</html>

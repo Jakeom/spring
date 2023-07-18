@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.bo.BoPopupMapper">
+
+    <!-- 팝업 리스트 조회 -->
+    <select id="selectPopupList" parameterType="BoPopupDTO" resultType="BoPopupDTO">
+        /* com.fw.core.mapper.db1.bo.PopupMapper.selectPopupList, 팝업 리스트 조회, 22.09.07, yjw , PopupMapper.xml */
+        SELECT popup_seq
+             , title
+             , content
+             , popup_order
+             , use_flag
+             , date_format(popup_start_dt, '%Y-%m-%d')  as popup_start_dt
+             , date_format(popup_end_dt, '%Y-%m-%d')    as popup_end_dt
+             , link_url
+             , offset_x
+             , offset_y
+             , create_seq
+             , date_format(create_dt, '%Y-%m-%d %H:%i') as create_dt
+             , update_seq
+             , date_format(update_dt, '%Y-%m-%d %H:%i') as update_dt
+        FROM tb_popup
+        WHERE del_flag = 'N'
+        ORDER BY popup_seq
+    </select>
+
+    <!-- 팝업 상세 조회 -->
+    <select id="selectPopupDetail" parameterType="BoPopupDTO" resultType="BoPopupDTO">
+        /* com.fw.core.mapper.db1.bo.PopupMapper.selectPopupDetail, 팝업 상세 조회, 22.09.07, yjw , PopupMapper.xml */
+        SELECT popup_seq
+             , title
+             , content
+             , popup_order
+             , use_flag
+             , date_format(popup_start_dt, '%Y-%m-%d')  as popup_start_dt
+             , date_format(popup_end_dt, '%Y-%m-%d')    as popup_end_dt
+             , link_url
+             , offset_x
+             , offset_y
+             , date_format(create_dt, '%Y-%m-%d %H:%i') as create_dt
+             , date_format(update_dt, '%Y-%m-%d %H:%i') as update_dt
+        FROM tb_popup
+        WHERE popup_seq = #{popupSeq}
+    </select>
+
+    <!-- 팝업 등록-->
+    <insert id="insertPopup" parameterType="BoPopupDTO">
+        /* com.fw.core.mapper.db1.bo.PopupMapper.popupInsert, 팝업등록, 22.09.07, yjw , PopupMapper.xml */
+        INSERT INTO tb_popup ( title
+                             , content
+                             , popup_order
+                             , use_flag
+                             , popup_start_dt
+                             , popup_end_dt
+                             , link_url
+                             , offset_x
+                             , offset_y
+                             , create_seq
+                             , create_dt)
+        VALUES ( #{title}
+               , #{content}
+               , #{popupOrder}
+               , #{useFlag}
+               , #{popupStartDt}
+               , #{popupEndDt}
+               , #{linkUrl}
+               , #{offsetX}
+               , #{offsetY}
+               , #{adminSession.adminSeq}
+               , NOW())
+    </insert>
+
+    <!-- 팝업 수정-->
+    <update id="updatePopup" parameterType="BoPopupDTO">
+        /* com.fw.core.mapper.db1.bo.PopupMapper.popupUpdate, 팝업수정, 22.09.13, yjw , PopupMapper.xml */
+        UPDATE tb_popup
+        SET title          = #{title}
+          , content        = #{content}
+          , popup_order    = #{popupOrder}
+          , use_flag       = #{useFlag}
+          , popup_start_dt = #{popupStartDt}
+          , popup_end_dt   = #{popupEndDt}
+          , link_url       = #{linkUrl}
+          , offset_x       = #{offsetX}
+          , offset_y       = #{offsetY}
+          , update_seq     = #{adminSession.adminSeq}
+          , update_dt      = NOW()
+        WHERE popup_seq = #{popupSeq}
+    </update>
+
+    <!-- 팝업 삭제 -->
+    <delete id="deletePopup" parameterType="BoPopupDTO">
+        /* com.fw.core.mapper.db1.bo.PopupMapper.popupDelete, 팝업삭제, 22.09.13, yjw , PopupMapper.xml */
+        UPDATE tb_popup
+        SET del_flag = 'Y'
+        WHERE popup_seq = #{popupSeq}
+    </delete>
+
+</mapper>

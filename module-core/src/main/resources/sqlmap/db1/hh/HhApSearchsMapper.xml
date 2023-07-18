@@ -1,0 +1,597 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.hh.HhApSearchsMapper">
+
+   <select id="selectHhApListCount" resultType="int">
+        /* com.fw.core.mapper.db1.hh.HhMyApMapper.selectHhApListCount, 내 인재검색 -  내 인재검색 카운트, yhEom, HhApSearchsMapper.xml */
+        SELECT
+            COUNT(1)
+        FROM resume r
+        LEFT JOIN hh_resume_reading_history hrrh ON r.id = hrrh.resume_id AND hrrh.delFlag = 'N' AND hrrh.member_id = 23
+        LEFT JOIN tb_common_cd t2 ON t2.group_cd = 'GENDER' AND r.genderCd = t2.cd AND t2.del_flag = 'N'
+        LEFT JOIN member m ON r.member_id = m.id
+        LEFT JOIN applicant a ON a.member_id = m.id
+       <if test="company != null and company != ''">
+           -- 출신회사 검색의 경우
+           INNER JOIN (
+           SELECT resume_id FROM resume_career
+           WHERE delFlag = 'N' AND certFlag = 'Y' AND companyName LIKE CONCAT('%',#{company},'%')
+           GROUP BY resume_id
+           ) company ON r.id = company.resume_id
+       </if>
+        <if test="edu1 != null and edu1 != ''">
+        -- 학력 검색의 경우
+        INNER JOIN (
+            SELECT resume_id FROM resume_academic_background
+            WHERE delFlag = 'N' AND graduationStatusCd = 'GRADUATION' AND degreeCd = #{edu1}
+        GROUP BY resume_id
+        ) rabb ON r.id = rabb.resume_id
+        </if>
+        <if test="edu2 != null and edu2 != ''">
+        -- 학력2 검색의 경우
+        INNER JOIN (
+            SELECT resume_id FROM resume_filtering
+            WHERE delFlag = 'N'
+            AND (
+                <foreach item="item" index="index" collection="edu2Arr" open="" separator="OR" close="">
+                filterCd =#{item}
+                </foreach>
+                )
+        GROUP BY resume_id
+        ) rf ON r.id = rf.resume_id
+        </if>
+
+        <if test="workplace != null and workplace != ''">
+        -- 희망근무지 검색의 경우
+        INNER JOIN (
+        SELECT resume_id FROM resume_location
+        WHERE delFlag = 'N'
+        AND location_cd IN (
+          <foreach item="item" index="index" collection="workplaceArr" open="" separator="," close="">
+            #{item}
+          </foreach>
+        )
+        GROUP BY resume_id
+        ) rl ON r.id = rl.resume_id
+        </if>
+
+        <if test="language != null and language != ''">
+        -- 외국어 검색의 경우
+        INNER JOIN (
+        SELECT resume_id FROM resume_language
+        WHERE delFlag = 'N'
+        AND  languageInput LIKE CONCAT('%',#{language},'%')
+        GROUP BY resume_id
+        ) rlan ON r.id = rlan.resume_id
+        </if>
+
+        <if test="license != null and license != ''">
+        -- 자격증 검색의 경우
+        INNER JOIN (
+        SELECT resume_id FROM resume_license
+        WHERE  delFlag = 'N'
+        AND name LIKE CONCAT('%',#{license},'%')
+        GROUP BY resume_id
+        ) rlic ON r.id = rlic.resume_id
+        </if>
+        WHERE r.representation = 1 AND r.delflag= 'N' AND r.opened = 1 AND a.resumeRestricted = 0
+        <if test="ageSt != null and ageSt != ''">
+            AND LEFT(DATE_FORMAT(NOW(), '%Y%m%d') - r.birth, 2) >= #{ageSt}
+          </if>
+          <if test="ageEn != null and ageEn != ''">
+            AND #{ageEn} >= LEFT(DATE_FORMAT(NOW(), '%Y%m%d') - r.birth, 2)
+          </if>
+        <if test="salarySt != null and salarySt != ''">
+        -- 희망연봉 검색의 경우
+            AND last_salary >= #{salarySt}
+        </if>
+        <if test="salaryEn != null and salaryEn != ''">
+            AND #{salaryEn} >= last_salary
+        </if>
+        <if test="careerSt != null and careerSt != ''">
+            AND totalCareer >= (#{careerSt} * 12)
+        </if>
+        <if test="careerEn != null and careerEn != ''">
+            AND (#{careerEn} * 12) >= totalCareer
+        </if>
+        <if test="keyword != null and keyword != ''">
+            AND (
+                    selfIntroduction LIKE CONCAT('%', #{keyword}, '%')
+                OR
+                    careerDescription LIKE CONCAT('%', #{keyword}, '%')
+                OR
+                (
+                     SELECT GROUP_CONCAT(CONCAT(RABM.majorName, '|', rab.name), '|')
+                       FROM resume_academic_background_major RABM
+                 INNER JOIN resume_academic_background rab on RABM.academic_background_id = rab.id
+                      WHERE r.id = rab.resume_id
+                )  LIKE CONCAT('%', #{keyword}, '%')
+                OR
+                (
+                     SELECT GROUP_CONCAT(CONCAT(RC.departmentName, '|', RC.task), '|')
+                       FROM resume_career RC
+                      WHERE r.id = RC.resume_id
+                )  LIKE CONCAT('%', #{keyword}, '%')
+            )
+        </if>
+   </select>
+
+   <select id="selectHhApList" resultType="HhMyapListDTO">
+        /* com.fw.core.mapper.db1.hh.HhMyApMapper.selectHhApList, 내 인재검색 -  내 인재검색 , yhEom, HhApSearchsMapper.xml */
+        SELECT
+            r.id AS resumeId
+            ,hrrh.id
+            ,CASE
+                WHEN hrrh.id IS NOT NULL THEN r.name
+                WHEN CHAR_LENGTH(r.name) > 2 THEN
+                    CONCAT(
+                        SUBSTRING(r.name, 1, 1)
+                        ,LPAD('*', CHAR_LENGTH(r.name) - 2, '*')
+                        ,SUBSTRING(r.name, CHAR_LENGTH(r.name), CHAR_LENGTH(r.name))
+                    )
+                    ELSE CONCAT(
+                        SUBSTRING(r.name, 1, 1)
+                        ,LPAD('*', CHAR_LENGTH(r.name) - 1, '*')
+                    )
+                END AS name
+            ,DATE_FORMAT(m.updatedAt,'%Y-%m-%d') AS lastLoginAt
+            ,CONCAT(SUBSTRING(r.birth,1,4),' (', LEFT(DATE_FORMAT(NOW(), '%Y%m%d') - r.birth, 2), '), ',SUBSTRING(t2.cd_nm,1,1)) AS birth_nm
+            ,CONCAT ((r.totalCareer DIV 12),'년',MOD(r.totalCareer,12),'개월') AS totalCareerNm
+            , (SELECT IF(COUNT(1) = 0, 0, COUNT(1) - 1) from resume_career WHERE resume_id = r.id and delFlag = 'N') AS turnover_cnt
+            ,(SELECT GROUP_CONCAT(spec SEPARATOR '|') FROM resume_spec WHERE resume_id = r.id AND delFlag = 'N' group by resume_id) AS coreAbility
+            ,(SELECT companyName FROM resume_career WHERE delFlag='N' AND resume_id = r.id ORDER BY holdOffice DESC, resignationYm DESC LIMIT 1) AS finalCompany
+            ,(SELECT companyName FROM resume_career WHERE delFlag='N' AND resume_id = r.id ORDER BY (IF(holdOffice = 1, DATE_FORMAT(NOW(),'%Y%m'), resignationYm) - entranceYm) DESC LIMIT 1) AS longestCompany
+            ,(SELECT CONCAT('<![CDATA[<p>]]>',name,'<![CDATA[</p><p>]]>(',locationCd,')<![CDATA[</p>]]>') FROM resume_academic_background WHERE resume_id = r.id AND resume_academic_background.delFlag = 'N' ORDER BY entranceYm DESC LIMIT 1) AS finalSchool
+        FROM resume r
+        LEFT JOIN hh_resume_reading_history hrrh ON r.id = hrrh.resume_id AND hrrh.delFlag = 'N' AND hrrh.member_id = #{frontSession.id}
+        LEFT JOIN tb_common_cd t2 ON t2.group_cd = 'GENDER' AND r.genderCd = t2.cd AND t2.del_flag = 'N'
+        LEFT JOIN member m ON r.member_id = m.id
+        LEFT JOIN applicant a ON a.member_id = m.id
+        <if test="company != null and company != ''">
+        -- 출신회사 검색의 경우
+        INNER JOIN (
+            SELECT resume_id FROM resume_career
+            WHERE delFlag = 'N' AND certFlag = 'Y' AND companyName LIKE CONCAT('%',#{company},'%')
+            GROUP BY resume_id
+        ) company ON r.id = company.resume_id
+        </if>
+        <if test="edu1 != null and edu1 != ''">
+        -- 학력 검색의 경우
+        INNER JOIN (
+            SELECT resume_id FROM resume_academic_background
+            WHERE delFlag = 'N' AND graduationStatusCd = 'GRADUATION' AND degreeCd = #{edu1}
+        GROUP BY resume_id
+        ) rabb ON r.id = rabb.resume_id
+        </if>
+        <if test="edu2 != null and edu2 != ''">
+        -- 학력2 검색의 경우
+        INNER JOIN (
+            SELECT resume_id FROM resume_filtering
+            WHERE delFlag = 'N'
+            AND (
+                <foreach item="item" index="index" collection="edu2Arr" open="" separator="OR" close="">
+                filterCd =#{item}
+                </foreach>
+                )
+        GROUP BY resume_id
+        ) rf ON r.id = rf.resume_id
+        </if>
+
+        <if test="workplace != null and workplace != ''">
+        -- 희망근무지 검색의 경우
+        INNER JOIN (
+        SELECT resume_id FROM resume_location
+        WHERE delFlag = 'N'
+        AND location_cd IN (
+          <foreach item="item" index="index" collection="workplaceArr" open="" separator="," close="">
+            #{item}
+          </foreach>
+        )
+        GROUP BY resume_id
+        ) rl ON r.id = rl.resume_id
+        </if>
+
+        <if test="language != null and language != ''">
+        -- 외국어 검색의 경우
+        INNER JOIN (
+        SELECT resume_id FROM resume_language
+        WHERE delFlag = 'N'
+        AND  languageInput LIKE CONCAT('%',#{language},'%')
+        GROUP BY resume_id
+        ) rlan ON r.id = rlan.resume_id
+        </if>
+
+        <if test="license != null and license != ''">
+        -- 자격증 검색의 경우
+        INNER JOIN (
+        SELECT resume_id FROM resume_license
+        WHERE  delFlag = 'N'
+        AND name LIKE CONCAT('%',#{license},'%')
+        GROUP BY resume_id
+        ) rlic ON r.id = rlic.resume_id
+        </if>
+        WHERE r.representation = 1 AND r.delflag= 'N' AND r.opened = 1 AND a.resumeRestricted = 0
+        <if test="ageSt != null and ageSt != ''">
+            AND LEFT(DATE_FORMAT(NOW(), '%Y%m%d') - r.birth, 2) >= #{ageSt}
+        </if>
+        <if test="ageEn != null and ageEn != ''">
+            AND #{ageEn} >= LEFT(DATE_FORMAT(NOW(), '%Y%m%d') - r.birth, 2)
+        </if>
+        <if test="salarySt != null and salarySt != ''">
+        -- 희망연봉 검색의 경우
+            AND last_salary >= #{salarySt}
+        </if>
+        <if test="salaryEn != null and salaryEn != ''">
+            AND #{salaryEn} >= last_salary
+        </if>
+        <if test="careerSt != null and careerSt != ''">
+            AND totalCareer >= (#{careerSt} * 12)
+        </if>
+        <if test="careerEn != null and careerEn != ''">
+            AND (#{careerEn} * 12) >= totalCareer
+        </if>
+        <if test="keyword != null and keyword != ''">
+            AND (
+                    selfIntroduction LIKE CONCAT('%', #{keyword}, '%')
+                OR
+                    careerDescription LIKE CONCAT('%', #{keyword}, '%')
+                OR
+                (
+                     SELECT GROUP_CONCAT(CONCAT(RABM.majorName, '|', rab.name), '|')
+                       FROM resume_academic_background_major RABM
+                 INNER JOIN resume_academic_background rab on RABM.academic_background_id = rab.id
+                      WHERE r.id = rab.resume_id
+                )  LIKE CONCAT('%', #{keyword}, '%')
+                OR
+                (
+                     SELECT GROUP_CONCAT(CONCAT(RC.departmentName, '|', RC.task), '|')
+                       FROM resume_career RC
+                      WHERE r.id = RC.resume_id
+                )  LIKE CONCAT('%', #{keyword}, '%')
+            )
+        </if>
+        <include refid="common.paging" />
+   </select>
+
+    <select id="selectHhApListByBatch" resultType="HhMyapListDTO">
+        /* com.fw.core.mapper.db1.hh.HhMyApMapper.selectHhApListByBatch, 내 인재검색 -  내 인재검색 , yhEom, HhApSearchsMapper.xml */
+        SELECT
+            r.id AS resumeId
+            ,hrrh.id
+            ,CASE
+                WHEN hrrh.id IS NOT NULL THEN r.name
+                WHEN CHAR_LENGTH(r.name) > 2 THEN
+                    CONCAT(
+                        SUBSTRING(r.name, 1, 1)
+                        ,LPAD('*', CHAR_LENGTH(r.name) - 2, '*')
+                        ,SUBSTRING(r.name, CHAR_LENGTH(r.name), CHAR_LENGTH(r.name))
+                    )
+                    ELSE CONCAT(
+                        SUBSTRING(r.name, 1, 1)
+                        ,LPAD('*', CHAR_LENGTH(r.name) - 1, '*')
+                    )
+                END AS name
+            ,DATE_FORMAT(m.updatedAt,'%Y-%m-%d') AS lastLoginAt
+            ,CONCAT(SUBSTRING(r.birth,1,4),' (', LEFT(DATE_FORMAT(NOW(), '%Y%m%d') - r.birth, 2), '), ',SUBSTRING(t2.cd_nm,1,1)) AS birth_nm
+            ,CONCAT ((r.totalCareer DIV 12),'년',MOD(r.totalCareer,12),'개월') AS totalCareerNm
+            , (SELECT IF(COUNT(1) = 0, 0, COUNT(1) - 1) from resume_career WHERE resume_id = r.id and delFlag = 'N') AS turnover_cnt
+            ,(SELECT GROUP_CONCAT(spec SEPARATOR '|') FROM resume_spec WHERE resume_id = r.id AND delFlag = 'N' group by resume_id) AS coreAbility
+            ,(SELECT companyName FROM resume_career WHERE delFlag='N' AND resume_id = r.id ORDER BY holdOffice DESC, resignationYm DESC LIMIT 1) AS finalCompany
+            ,(SELECT companyName FROM resume_career WHERE delFlag='N' AND resume_id = r.id ORDER BY (IF(holdOffice = 1, DATE_FORMAT(NOW(),'%Y%m'), resignationYm) - entranceYm) DESC LIMIT 1) AS longestCompany
+            ,(SELECT CONCAT('<![CDATA[<p>]]>',name,'<![CDATA[</p><p>]]>(',locationCd,')<![CDATA[</p>]]>') FROM resume_academic_background WHERE resume_id = r.id AND resume_academic_background.delFlag = 'N' ORDER BY entranceYm DESC LIMIT 1) AS finalSchool
+        FROM resume r
+        LEFT JOIN hh_resume_reading_history hrrh ON r.id = hrrh.resume_id AND hrrh.delFlag = 'N' AND hrrh.member_id = #{frontSession.id}
+        LEFT JOIN tb_common_cd t2 ON t2.group_cd = 'GENDER' AND r.genderCd = t2.cd AND t2.del_flag = 'N'
+        LEFT JOIN member m ON r.member_id = m.id
+        <if test="company != null and company != ''">
+        -- 출신회사 검색의 경우
+        INNER JOIN (
+            SELECT resume_id FROM resume_career
+            WHERE delFlag = 'N' AND certFlag = 'Y' AND companyName LIKE CONCAT('%',#{company},'%')
+            GROUP BY resume_id
+        ) company ON r.id = company.resume_id
+        </if>
+        <if test="edu1 != null and edu1 != ''">
+        -- 학력 검색의 경우
+        INNER JOIN (
+            SELECT resume_id FROM resume_academic_background
+            WHERE delFlag = 'N' AND graduationStatusCd = 'GRADUATION' AND degreeCd = #{edu1}
+        GROUP BY resume_id
+        ) rabb ON r.id = rabb.resume_id
+        </if>
+        <if test="edu2 != null and edu2 != ''">
+        -- 학력2 검색의 경우
+        INNER JOIN (
+            SELECT resume_id FROM resume_filtering
+            WHERE delFlag = 'N'
+            AND (
+                <foreach item="item" index="index" collection="edu2Arr" open="" separator="OR" close="">
+                filterCd =#{item}
+                </foreach>
+                )
+        GROUP BY resume_id
+        ) rf ON r.id = rf.resume_id
+        </if>
+
+        <if test="workplace != null and workplace != ''">
+        -- 희망근무지 검색의 경우
+        INNER JOIN (
+        SELECT resume_id FROM resume_location
+        WHERE delFlag = 'N'
+        AND location_cd IN (
+          <foreach item="item" index="index" collection="workplaceArr" open="" separator="," close="">
+            #{item}
+          </foreach>
+        )
+        GROUP BY resume_id
+        ) rl ON r.id = rl.resume_id
+        </if>
+
+        <if test="language != null and language != ''">
+        -- 외국어 검색의 경우
+        INNER JOIN (
+        SELECT resume_id FROM resume_language
+        WHERE delFlag = 'N'
+        AND  languageInput LIKE CONCAT('%',#{language},'%')
+        GROUP BY resume_id
+        ) rlan ON r.id = rlan.resume_id
+        </if>
+
+        <if test="license != null and license != ''">
+        -- 자격증 검색의 경우
+        INNER JOIN (
+        SELECT resume_id FROM resume_license
+        WHERE  delFlag = 'N'
+        AND name LIKE CONCAT('%',#{license},'%')
+        GROUP BY resume_id
+        ) rlic ON r.id = rlic.resume_id
+        </if>
+        <if test="keyword != null and keyword != ''">
+        -- 키워드 검색의 경우
+        INNER JOIN (
+        SELECT resume_id FROM resume_spec
+        WHERE  delFlag = 'N'
+        AND (
+          <foreach item="item" index="index" collection="keywordArr" open="" separator="or" close="">
+                spec  LIKE CONCAT('%',#{item},'%')
+          </foreach>
+        )
+        GROUP BY resume_id
+        ) rs ON r.id = rs.resume_id
+        </if>
+        WHERE r.representation = 1 AND r.delflag= 'N' AND r.opened = 1
+            -- 1시간 이내 등록된 이력서
+           AND r.createdAt > DATE_FORMAT( DATE_SUB(NOW(), INTERVAL 1 hour),'%Y-%m-%d %H:00:00')
+        <if test="ageSt != null and ageSt != ''">
+            AND LEFT(DATE_FORMAT(NOW(), '%Y%m%d') - r.birth, 2) >= #{ageSt}
+        </if>
+        <if test="ageEn != null and ageEn != ''">
+            AND #{ageEn} >= LEFT(DATE_FORMAT(NOW(), '%Y%m%d') - r.birth, 2)
+        </if>
+        <if test="salarySt != null and salarySt != ''">
+        -- 희망연봉 검색의 경우
+            AND last_salary >= #{salarySt}
+        </if>
+        <if test="salaryEn != null and salaryEn != ''">
+            AND #{salaryEn} >= last_salary
+        </if>
+        <if test="careerSt != null and careerSt != ''">
+            AND totalCareer >= (#{careerSt} * 12)
+        </if>
+        <if test="careerEn != null and careerEn != ''">
+            AND (#{careerEn} * 12) >= totalCareer
+        </if>
+   </select>
+
+   <select id="selectHhSearchApCondition" resultType="HhSearchApDTO">
+        /* com.fw.core.mapper.db1.hh.HhMyApMapper.selectHhSearchApCondition, 내 인재검색 -  저장 조건 검색 , yhEom, HhApSearchsMapper.xml */
+        SELECT tsa.*
+        ,industry AS keyword
+        ,certificate AS license
+        ,hp1 AS edu1
+        ,(SELECT GROUP_CONCAT(hp2) FROM tb_search_ap_hp WHERE tsa.ap_alert_seq = ap_alert_seq) AS hp2
+        ,(SELECT GROUP_CONCAT(loc) FROM tb_search_ap_loc WHERE tsa.ap_alert_seq = ap_alert_seq) AS workplace
+        from tb_search_ap tsa
+        where  tsa.del_flag = 'N' AND tsa.member_id = #{id}
+   </select>
+   <insert id="insertHhSearchApConditionHp">
+        /* com.fw.core.mapper.db1.hh.HhMyApMapper.insertHhSearchApConditionHp, 내 인재검색 -  저장 조건 학력2 등록 , yhEom, HhApSearchsMapper.xml */
+        INSERT INTO tb_search_ap_hp
+        (ap_alert_seq,hp2,del_flag,reg_date)
+        VALUES
+        <foreach item="item" index="index" collection="edu2Arr" open="" separator="," close="">
+            (
+                #{apAlertSeq}
+                ,#{item}
+                ,'N'
+                ,NOW()
+            )
+        </foreach>
+   </insert>
+   <insert id="insertHhSearchApConditionLoc">
+        /* com.fw.core.mapper.db1.hh.HhMyApMapper.insertHhSearchApConditionLoc, 내 인재검색 -  저장 조건 희망근무지 등록 , yhEom, HhApSearchsMapper.xml */
+        INSERT INTO tb_search_ap_loc
+        (ap_alert_seq,loc,del_flag,reg_date)
+        VALUES
+        <foreach item="item" index="index" collection="workplaceArr" open="" separator="," close="">
+            (
+                #{apAlertSeq}
+                ,#{item}
+                ,'N'
+                ,NOW()
+            )
+        </foreach>
+   </insert>
+   <insert id="insertHhSearchApCondition">
+        /* com.fw.core.mapper.db1.hh.HhMyApMapper.insertHhSearchApCondition, 내 인재검색 -  저장 조건  등록 , yhEom, HhApSearchsMapper.xml */
+        INSERT INTO tb_search_ap
+        (
+            member_id
+            ,industry
+            ,career_st
+            ,career_en
+            ,age_st
+            ,age_en
+            ,salary_st
+            ,salary_en
+            ,hp1
+            ,company
+            ,foreign_lang
+            ,certificate
+            ,reg_date
+            ,del_flag
+        ) VALUES(
+            #{frontSession.id}
+            ,#{keyword}
+            ,#{careerSt}
+            ,#{careerEn}
+            ,#{ageSt}
+            ,#{ageEn}
+            ,#{salarySt}
+            ,#{salaryEn}
+            ,#{edu1}
+            ,#{company}
+            ,#{language}
+            ,#{license}
+            ,NOW()
+            ,'N'
+        )
+        <selectKey order="AFTER" keyProperty="apAlertSeq" resultType="String">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+   </insert>
+   <update id="deleteHhSearchApCondition">
+        /* com.fw.core.mapper.db1.hh.HhMyApMapper.deleteHhSearchApCondition, 내 인재검색 -  저장 조건 삭제 , yhEom, HhApSearchsMapper.xml */
+        update tb_search_ap set del_flag = 'Y' where member_id = #{frontSession.id}
+   </update>
+
+   <select id="selectHhApAlertList" resultType="HhMyapListDTO">
+        /* com.fw.core.mapper.db1.hh.HhMyApMapper.selectHhApAlert, 내 인재검색 -  헤드헌터에게 알람 보낼 대상 취득 , yhEom, HhApSearchsMapper.xml */
+        SELECT taa.ap_alert_seq
+            ,taa.member_id
+            , taa.industry AS keyword
+            , taa.career_st
+            , taa.career_en
+            , taa.age_st
+            , taa.age_en
+            , taa.salary_st
+            , taa.salary_en
+            , taa.hp1 AS edu1
+            , (SELECT GROUP_CONCAT(hp2) FROM tb_ap_hp WHERE taa.ap_alert_seq = ap_alert_seq) AS edu2
+            , taa.company
+            , taa.foreign_lang AS language
+            , taa.certificate AS license
+            , (SELECT GROUP_CONCAT(loc) FROM tb_ap_loc WHERE taa.ap_alert_seq = ap_alert_seq) AS workplace
+            , m.pushToken
+            , m.phoneType as phoneType
+        FROM tb_ap_alert AS taa
+        LEFT JOIN member AS m ON taa.member_id = m.id AND m.DTYPE = 'HH'
+        WHERE taa.del_flag = 'N' AND m.hh_ap_flag = 'Y'
+   </select>
+
+   <select id="selectHhResumeFormCount" resultType="int">
+        /*com.fw.core.mapper.db1.hh.HhApSearchsMapper.selectHhResumeFormList,  이력서 등록요청 카운트 , 2022.11 , yhEom, HhApSearchsMapper.xml*/
+        SELECT COUNT(1)  FROM parsing_error_accept pea
+        LEFT JOIN tb_common_cd b ON group_cd ='RESUME_ACCEPTSTATUS' and pea.acceptStatus = b.cd
+        WHERE pea.pageUrl ='REGIST_APPLICANT'
+        AND pea.member_id = #{frontSession.id}
+        AND delFlag = 'N'
+        <if test="name != null and name != ''">
+            AND name LIKE CONCAT('%',#{name},'%')
+        </if>
+
+   </select>
+
+   <select id="selectHhResumeFormList" resultType="HhResumeFormDTO">
+        /*com.fw.core.mapper.db1.hh.HhApSearchsMapper.selectHhResumeFormList,  이력서 등록요청 리스트 , 2022.11 , yhEom, HhApSearchsMapper.xml*/
+        SELECT pea.id
+             , DATE_FORMAT(pea.createdAt,'%Y-%m-%d %H:%i') AS createdAt
+             , pea.etc
+             , pea.resume_file_id
+             , pea.agree_file_id agreeFileid
+             , b.cd_nm statusNm
+        FROM parsing_error_accept pea
+        LEFT JOIN tb_common_cd b ON group_cd ='RESUME_ACCEPTSTATUS' and pea.acceptStatus = b.cd
+        WHERE pea.pageUrl ='REGIST_APPLICANT'
+        AND pea.member_id = #{frontSession.id}
+        AND delFlag = 'N'
+        <if test="name != null and name != ''">
+            AND name LIKE CONCAT('%',#{name},'%')
+        </if>
+        <include refid="common.paging" />
+   </select>
+
+   <insert id="insertHhResumeForm">
+        /*com.fw.core.mapper.db1.hh.HhApSearchsMapper.insertHhResumeForm,  이력서 등록요청 , 2022.11 , yhEom, HhApSearchsMapper.xml*/
+        INSERT INTO parsing_error_accept
+        (createdAt, updatedAt, pageUrl, acceptStatus, resume_file_id, agree_file_id, member_id)
+        VALUES
+        (NOW(), NOW(), 'REGIST_APPLICANT', 'ACCEPT_COMPLETE', #{resumeFileId}, #{agreeFileId}, #{frontSession.id})
+   </insert>
+
+    <!-- 이력서 저장-->
+    <insert id="insertResume">
+        /*com.fw.core.mapper.db1.hh.HhApSearchsMapper.insertResume,  이력서 저장 , 2023.01 , yhEom, HhApSearchsMapper.xml*/
+        INSERT INTO resume (
+               address
+             , name
+             , birth
+             , genderCd
+             , bylaws /*not null*/
+             , desiredPosition
+             , desiredSalary
+             , disability /*not null*/
+             , militaryServiceCd
+             , isVeterans /*not null*/
+             , employmentStatusCd
+             , selfIntroduction
+             , deleted /*not null*/
+             , existTemp /*not null*/
+             , opened /*not null*/
+             , representation /*not null*/
+             , firstOpenChanged /*not null*/
+             , create_member_id /*not null*/
+             , member_id /*not null*/
+             , createdAt
+             , updatedAt
+             , careerDescription
+             , joinDateCd
+             , totalCareer
+             , picture_file_id
+             , last_salary
+             , desiredHire
+        ) VALUES (
+               #{address}
+             , #{name}
+             , #{birth}
+             , #{genderCd}
+             , #{bylaws}
+             , #{desiredPosition}
+             , #{desiredSalary}
+             , #{disability}
+             , #{militaryServiceCd}
+             , #{isVeterans}
+             , #{employmentStatusCd}
+             , #{selfIntroduction}
+             , 0
+             , 0
+             , #{opened}
+             , #{representation}
+             , 0
+             , #{frontSession.id}
+             , #{memberId}
+             , NOW()
+             , NOW()
+             , #{careerDescription}
+             , #{joinDateCd}
+             , #{totalCareer}
+             , #{pictureFileId}
+             , #{lastSalary}
+             , #{desiredHire}
+        )
+        <selectKey order="AFTER" keyProperty="id" resultType="String">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+</mapper>

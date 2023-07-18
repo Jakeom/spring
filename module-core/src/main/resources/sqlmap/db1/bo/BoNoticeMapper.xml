@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.bo.BoNoticeMapper">
+
+    <!--공지사항 리스트 조회-->
+    <select id="selectNoticeList" resultType="BoNoticeDTO">
+        /* com.fw.core.mapper.db1.bo.BoNoticeMapper.selectNoticeList, selectNoticeList, 22.09.29, skayhlj@gmail.com, BoNoticeMapper.xml */
+        SELECT t.notice_seq
+        , t.notice_type_cd
+        , t.title
+        , t.content
+        , t.file_seq
+        , t.hit
+        , t.del_flag
+        , t.create_seq
+        , date_format(t.create_dt, '%Y-%m-%d %H:%i') as create_dt
+        , t.update_seq
+        , date_format(t.update_dt, '%Y-%m-%d %H:%i') as update_dt
+        , a.admin_nm As writer
+        , aa.admin_nm As editor
+        , t.display_order AS displayOrder
+        FROM tb_notice AS t
+        LEFT OUTER JOIN tb_admin a on a.admin_seq= t.create_seq
+        LEFT JOIN tb_admin aa ON t.update_seq = aa.admin_seq
+        WHERE t.del_flag = 'N'
+        <if test="noticeTypeCd != null and noticeTypeCd != '' ">
+            AND t.notice_type_cd = #{noticeTypeCd}
+        </if>
+    </select>
+
+    <!--공지사항 Display 리스트 조회-->
+    <select id="selectNoticeDisplayList" resultType="BoNoticeDTO">
+        /* com.fw.core.mapper.db1.bo.BoNoticeMapper.selectNoticeDisplayList, selectNoticeDisplayList, 22.09.29, skayhlj@gmail.com, BoNoticeMapper.xml */
+        SELECT
+              t.notice_seq
+            , t.notice_type_cd
+            , t.title
+            , t.content
+            , t.file_seq
+            , t.hit
+            , t.del_flag
+            , t.create_seq AS createSeq
+            , date_format(t.create_dt, '%Y-%m-%d %H:%i') as createDt
+            , t.update_seq
+            , date_format(t.update_dt, '%Y-%m-%d %H:%i') as updateDt
+            , a.admin_nm As writer
+            , aa.admin_nm As editor
+            , t.display_order AS displayOrder
+        FROM tb_notice AS t
+        LEFT OUTER JOIN tb_admin a on a.admin_seq= t.create_seq
+        LEFT JOIN tb_admin aa ON t.update_seq = aa.admin_seq
+        WHERE t.del_flag = 'N'
+        AND t.display_order is not null
+        <if test="noticeTypeCd != null and noticeTypeCd != '' ">
+            AND t.notice_type_cd = #{noticeTypeCd}
+        </if>
+    </select>
+
+    <!--공지사항 검색-->
+    <select id="searchNoticeList" resultType="BoNoticeDTO">
+        /* com.fw.core.mapper.db1.bo.BoNoticeMapper.searchNoticeList, searchNoticeList, 22.10.05, 가잘, BoNoticeMapper.xml */
+        SELECT t.notice_seq
+             , t.notice_type_cd
+             , t.title
+             , t.content
+             , t.file_seq
+             , t.hit
+             , t.del_flag
+             , t.create_seq
+             , date_format(t.create_dt, '%Y-%m-%d %H:%i') as create_dt
+             , t.update_seq
+             , date_format(t.update_dt, '%Y-%m-%d %H:%i') as update_dt
+             , a.admin_nm As writer
+             , aa.admin_nm As editor
+             , t.display_order AS displayOrder
+        FROM tb_notice AS t
+                 LEFT OUTER JOIN tb_admin a on a.admin_seq= t.create_seq
+                 LEFT JOIN tb_admin aa ON t.update_seq = aa.admin_seq
+        WHERE t.del_flag = 'N'
+        AND
+            date_format(t.create_dt, '%Y-%m-%d') BETWEEN #{searchStart} AND #{searchEnd}
+    </select>
+
+    <!--공지사항 상세조회-->
+    <select id="selectNoticeDetail" parameterType="BoNoticeDTO" resultType="BoNoticeDTO">
+        /* com.fw.core.mapper.db1.bo.BoNoticeMapper.selectNoticeDetail, selectNoticeDetail, 22.09.29, skayhlj@gmail.com, BoNoticeMapper.xml */
+        SELECT notice_seq
+             , notice_type_cd
+             , title
+             , (select fn_get_common_cd(notice_type_cd, 'BOARD_TYPE', 1))  AS noticeCd
+             , content
+             , file_seq
+             , hit
+             , del_flag
+             , create_seq
+             , date_format(create_dt, '%Y-%m-%d %H:%i') as create_dt
+             , update_seq
+             , date_format(update_dt, '%Y-%m-%d %H:%i') as update_dt
+        FROM tb_notice
+        WHERE del_flag = 'N'
+          AND notice_seq = #{noticeSeq}
+    </select>
+
+    <!-- 공지사항 상세 modify -->
+    <select id="selectNoticeModify" parameterType="BoNoticeDTO" resultType="BoNoticeDTO">
+        /* com.fw.core.mapper.db1.bo.NoticeMapper.selectNoticerModify, 공지사항 상세 조회, 22.09.29, 가잘 , NoticeMapper.xml */
+        SELECT notice_seq
+             , notice_type_cd
+             , title
+             , content
+             , file_seq
+             , hit
+             , del_flag
+             , create_seq
+             , date_format(create_dt, '%Y-%m-%d %H:%i') as create_dt
+             , update_seq
+             , date_format(update_dt, '%Y-%m-%d %H:%i') as update_dt
+        FROM tb_notice
+        WHERE notice_seq = #{noticeSeq}
+    </select>
+
+    <!-- 공지사항 등록-->
+    <insert id="insertNotice" parameterType="BoNoticeDTO">
+        /* com.fw.core.mapper.db1.bo.NoticeMapper.insertNotice, 공지사항등록, 22.09.29, 가잘 , NoticeMapper.xml */
+        INSERT INTO tb_notice (
+                                notice_type_cd
+                              , title
+                              , content
+                              , file_seq
+                              , hit
+                              , del_flag
+                              , create_seq
+                              , create_dt
+                              , display_order
+
+        ) VALUES (
+                     #{noticeTypeCd}
+                 , #{title}
+                 , #{content}
+                 , #{fileSeq}
+                 , 0
+                 , 'N'
+                 , #{adminSession.adminSeq}
+                 , NOW()
+                 , null
+                 )
+    </insert>
+
+    <!-- 공지사항 수정-->
+    <update id="updateNotice" parameterType="BoNoticeDTO">
+        /* com.fw.core.mapper.db1.bo.NoticeMapper.updateNotice, 공지사항수정, 22.09.29, 가잘  , NoticeMapper.xml */
+        UPDATE tb_notice
+        SET notice_type_cd = #{noticeTypeCd}
+          , title = #{title}
+          , content= #{content}
+          , update_seq = #{adminSession.adminSeq}
+          , update_dt = NOW()
+        <if test="fileSeq != '' and fileSeq != null">
+          , file_seq = #{fileSeq}
+        </if>
+        WHERE notice_seq = #{noticeSeq}
+    </update>
+
+    <!-- 공지사항 Display에서 삭제-->
+    <update id="deleteDisplayOrder" parameterType="BoNoticeDTO">
+        /* com.fw.core.mapper.db1.bo.NoticeMapper.turnToNotDisplay, 공지사항, 22.09.29, 가잘  , NoticeMapper.xml */
+        UPDATE tb_notice
+        SET display_order = null
+          , update_seq = #{adminSession.adminSeq}
+        WHERE notice_seq = #{noticeSeq}
+    </update>
+
+    <!-- 공지사항 Display-->
+    <update id="updateDisplayOrder" parameterType="BoNoticeDTO">
+        /* com.fw.core.mapper.db1.bo.NoticeMapper.turnToDisplay, 공지사항, 22.09.29, 가잘  , NoticeMapper.xml */
+        UPDATE tb_notice
+        SET display_order = #{displayOrder}
+        , update_dt = NOW()
+        , update_seq = #{adminSession.adminSeq}
+        WHERE notice_seq = #{noticeSeq}
+    </update>
+
+    <!-- 공지사항 삭제 -->
+    <delete id="deleteNotice" parameterType="BoNoticeDTO">
+        /* com.fw.core.mapper.db1.bo.NoticeMapper.deleteNotice, 공지사항삭제, 22.09.29, 가잘 , NoticeMapper.xml */
+        UPDATE tb_notice
+        SET del_flag = 'Y'
+        WHERE notice_seq = #{noticeSeq}
+    </delete>
+
+</mapper>

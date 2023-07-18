@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+	 xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+	 layout:decorate="~{layouts/default}">
+<body>
+<div layout:fragment="contents" th:remove="tag">
+	<div id="container-block">
+		<main id="content" role="main">
+			<h2 class="title">공통 코드 관리</h2>
+			<div class="p-3">
+				<div class="row">
+					<div class="col col-6">
+						<div class="row">
+							<div class="col col-12 text-right mb-2">
+								<button type="button" class="btn btn-dark" data-toggle="modal" data-target="#groupCdModal">공통 코드 등록</button>
+							</div>
+						</div>
+						<table class="table table-bordered table-center">
+							<thead>
+								<tr>
+									<th>그룹 코드</th>
+									<th>그룹 이름</th>
+									<th>사용 여부</th>
+									<th>수정</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="list : ${commonCdList}" style="cursor:pointer" th:data-group-cd="${list.groupCd}" th:data-group-nm="${list.groupNm}" data-role="detailList">
+									<td th:text="${list.groupCd}"></td>
+									<td th:text="${list.groupNm}"></td>
+									<td th:text="${list.useFlag}"></td>
+									<td><button class="btn btn-outline-dark" th:data-group-cd="${list.groupCd}" data-role="groupCdModify">수정</button></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div class="col-6 detail-form" style="display:none;">
+						<div class="row">
+							<div class="col col-12 text-right mb-2">
+								<button type="button" class="btn btn-dark" data-role="cdModal" data-toggle="modal" data-target="#cdModal">공통 코드 상세 등록</button>
+							</div>
+						</div>
+						<table class="table table-bordered table-center">
+							<thead>
+								<tr class="common-code-detail">
+									<th>코드</th>
+									<th>코드명</th>
+									<th>사용 여부</th>
+									<th>수정</th>
+								</tr>
+							</thead>
+							<tbody id="commonCodeDetailForm">
+								<tr class="common-code-detail-detach">
+									<td></td>
+									<td></td>
+									<td></td>
+									<td><button class="btn btn-outline-dark" data-role="cdModify">수정</button></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</main>
+	</div>
+	<!-- 공통 코드 등록 modal (cd_level=1) -->
+	<div layout:fragment="modal" th:remove="tag">
+		<div class="modal fade" id="groupCdModal" role="dialog" aria-labelledby="groupCd-Modal">
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content">
+					<div class="modal-header">
+   						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">x</span></button>
+     	 					<h4 class="modal-title">공통 코드 등록</h4>
+       				</div>
+					<div class="modal-body">
+						<form name="insertgroupCdForm">
+							<fieldset>
+								<div class="row">
+									<div class="col-xs-12 col-sm-12 col-md-12">
+										<div class="form-group">
+											<label for="insertgroupCdFormGroupCd">그룹 코드</label>
+											<input type="text" class="form-control" id="insertgroupCdFormGroupCd" name="groupCd" placeholder="그룹 코드를 입력하세요">
+										</div>
+									</div>
+									<div class="col-xs-12 col-sm-12 col-md-12">
+										<div class="form-group">
+											<label for="insertgroupCdFormGroupNm">그룹 이름</label>
+											<input type="text" class="form-control" id="insertgroupCdFormGroupNm" name="groupNm" placeholder="그룹 이름을 입력하세요">
+										</div>
+									</div>
+									<div class="col-xs-12 col-sm-12 col-md-12">
+										<div class="form-group">
+											<label for="insertgroupCdFormCdNm">코드 이름</label>
+											<input type="text" class="form-control" id="insertgroupCdFormCdNm" name="cdNm" placeholder="코드 이름을 입력하세요">
+										</div>
+									</div>
+									<div class="col-xs-12 col-sm-12 col-md-12">
+										<div class="form-group">
+											<label for="insertgroupCdFormCdOrder">코드 순서</label>
+											<input type="text" class="form-control" id="insertgroupCdFormCdOrder" name="cdOrder" placeholder="코드 순서를 입력하세요">
+										</div>
+									</div>
+									<div class="col-xs-12 col-sm-12 col-md-12">
+										<div class="form-group">
+											<label for="insertgroupCdFormCdLevel">코드 레벨</label>
+											<input type="text" class="form-control" id="insertgroupCdFormCdLevel" name="cdLevel" value="1" readonly >
+										</div>
+									</div>
+									<div class="col-xs-12 col-sm-12 col-md-12">
+										<div class="form-group">
+											<label>사용 여부</label>
+											<input type="radio" id="insertgroupCdFormUseFlagY" name="useFlag" value="Y" checked />
+											<label for="insertgroupCdFormUseFlagY">사용</label>
+											<input type="radio" id="insertgroupCdFormUseFlagN" name="useFlag" value="N" />
+											<label for="insertgroupCdFormUseFlagN">미사용</label>
+										</div>
+									</div>
+									<div class="modal-footer">
+										<button type="button" class="btn btn-dark" data-role="groupCdSave">등록</button>
+									</div>
+								</div>
+							</fieldset>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- 공통 코드 상세 등록 modal (cd_level=2) -->
+		<div class="modal fade" id="cdModal" role="dialog" aria-labelledby="cd-Modal">
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content">
+					<div class="modal-header">
+   						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">x</span></button>
+     	 					<h4 class="modal-title">공통 코드 상세 등록</h4>
+       				</div>
+					<div class="modal-body">
+						<form name="insertCdForm">
+							<fieldset>
+								<div class="row">
+									<div class="col-xs-12 col-sm-12 col-md-12">
+										<div class="form-group">
+											<label for="insertCdFormGroupCd">그룹 코드</label>
+											<input type="text" class="form-control" th:value="${groupCd}" id="insertCdFormGroupCd" name="groupCd" disabled>
+										</div>
+									</div>
+									<div class="col-xs-12 col-sm-12 col-md-12">
+										<div class="form-group">
+											<label for="insertCdFormGroupNm">그룹 이름</label>
+											<input type="text" class="form-control" th:value="${groupNm}" id="insertCdFormGroupNm" name="groupNm" disabled>
+										</div>
+									</div>
+									<div class="col-xs-12 col-sm-12 col-md-12">
+										<div class="form-group">
+											<label for="insertCdFormCd">코드</label>
+											<input type="text" class="form-control" id="insertCdFormCd" name="cd" placeholder="코드를 입력하세요">
+										</div>
+									</div>
+									<div class="col-xs-12 col-sm-12 col-md-12">
+										<div class="form-group">
+											<label for="insertCdFormCdNm">코드 이름</label>
+											<input type="text" class="form-control" id="insertCdFormCdNm" name="cdNm" placeholder="코드 이름을 입력하세요">
+										</div>
+									</div>
+									<div class="col-xs-12 col-sm-12 col-md-12">
+										<div class="form-group">
+											<label for="insertCdFormCdOrder">코드 순서</label>
+											<input type="text" class="form-control" id="insertCdFormCdOrder" name="cdOrder" placeholder="코드 순서를 입력하세요">
+										</div>
+									</div>
+									<div class="col-xs-12 col-sm-12 col-md-12">
+										<div class="form-group">
+											<label for="insertCdFormCdLevel">코드 레벨</label>
+											<input type="text" class="form-control" id="insertCdFormCdLevel" name="cdLevel" value="2" disabled>
+										</div>
+									</div>
+									<div class="col-xs-12 col-sm-12 col-md-12">
+										<div class="form-group">
+											<label>사용 여부</label>
+											<input type="radio" id="insertCdFormUseFlagY" name="useFlag" value="Y" checked />
+											<label for="insertCdFormUseFlagY">사용</label>
+											<input type="radio" id="insertCdFormUseFlagN" name="useFlag" value="N" />
+											<label for="insertCdFormUseFlagN">미사용</label>
+										</div>
+									</div>
+									<div class="col-xs-12 col-sm-12 col-md-12">
+										<div class="form-group">
+											<label for="insertCdFormCdReplace1">대체 코드1</label>
+											<input type="text" class="form-control" id="insertCdFormCdReplace1" name="cdReplace1" placeholder="대체코드1을 입력하세요">
+										</div>
+									</div>
+									<div class="col-xs-12 col-sm-12 col-md-12">
+										<div class="form-group">
+											<label for="insertCdFormCdReplace2">대체 코드2</label>
+											<input type="text" class="form-control" id="insertCdFormCdReplace2" name="cdReplace2" placeholder="대체코드2를 입력하세요">
+										</div>
+									</div>
+									<div class="modal-footer">
+										<button type="button" class="btn btn-dark" data-role="cdSave">등록</button>
+									</div>
+								</div>
+							</fieldset>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- 공통 코드 관리 수정 modal(cd_level=1) -->
+		<div class="modal fade" id="groupCdDetailModal" role="dialog" aria-labelledby="groupCd-detail-Modal">
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content">
+					<div class="modal-header">
+   						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">x</span></button>
+     	 					<h4 class="modal-title">그룹 코드 상세</h4>
+       				</div>
+					<div class="modal-body">
+						<form name="updateGroupCdForm" >
+							<fieldset>
+								<div class="row">
+									<div class="col-xs-12 col-sm-12 col-md-12">
+										<div class="form-group">
+											<label for="updateGroupCdFormGroupCd">그룹 코드</label>
+											<input type="text" class="form-control" id="updateGroupCdFormGroupCd" name="groupCd" disabled>
+										</div>
+									</div>
+									<div class="col-xs-12 col-sm-12 col-md-12">
+										<div class="form-group">
+											<label for="updateGroupCdFormGroupNm">그룹 이름</label>
+											<input type="text" class="form-control" id="updateGroupCdFormGroupNm" name="groupNm">
+										</div>
+									</div>
+									<div class="col-xs-12 col-sm-12 col-md-12">
+										<div class="form-group">
+											<label for="updateGroupCdFormCdNm">코드 이름</label>
+											<input type="text" class="form-control" id="updateGroupCdFormCdNm" name="cdNm" disabled>
+										</div>
+									</div>
+									<div class="col-xs-12 col-sm-12 col-md-12">
+										<div class="form-group">
+											<label for="updateGroupCdFormCdOrder">코드 순서</label>
+											<input type="text" class="form-control" id="updateGroupCdFormCdOrder" name="cdOrder">
+										</div>
+									</div>
+									<div class="col-xs-12 col-sm-12 col-md-12">
+										<div class="form-group">
+											<label for="updateGroupCdFormCdLevel">코드 레벨</label>
+											<input type="text" class="form-control" id="updateGroupCdFormCdLevel" name="cdLevel" disabled>
+										</div>
+									</div>
+									<div class="col-xs-12 col-sm-12 col-md-12">
+										<div class="form-group">
+											<label>사용 여부</label>
+											<input type="radio" id="updateGroupCdFormUseY" name="groupCdUseFlag" value="Y" />
+											<label for="updateGroupCdFormUseY">사용</label>
+											<input type="radio" id="updateGroupCdFormUseN" name="groupCdUseFlag" value="N" />
+											<label for="updateGroupCdFormUseN">미사용</label>
+										</div>
+									</div>
+									<div class="modal-footer">
+										<button type="button" class="btn btn-dark" data-role="groupCdUpdate">저장</button>
+										<button type="button" class="btn btn-danger" data-role="groupCdDelete">삭제</button>
+									</div>
+								</div>
+							</fieldset>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- 공통 코드 상세 수정 modal(cd_level=2) -->
+		<div class="modal fade" id="cdDetailModal" role="dialog" aria-labelledby="cd-detail-Modal">
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content">
+					<div class="modal-header">
+   						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">x</span></button>
+     	 					<h4 class="modal-title">코드 상세</h4>
+       				</div>
+					<div class="modal-body">
+						<form name="updateCdForm">
+							<fieldset>
+								<div class="row">
+									<div class="col-xs-12 col-sm-12 col-md-12">
+										<div class="form-group">
+											<label for="updateCdFormGroupCd">그룹 코드</label>
+											<input type="text" class="form-control" id="updateCdFormGroupCd" name="groupCd" disabled>
+										</div>
+									</div>
+									<div class="col-xs-12 col-sm-12 col-md-12">
+										<div class="form-group">
+											<label for="updateCdFormGroupNm">그룹 이름</label>
+											<input type="text" class="form-control" id="updateCdFormGroupNm" name="groupNm" disabled>
+										</div>
+									</div>
+									<div class="col-xs-12 col-sm-12 col-md-12">
+										<div class="form-group">
+											<label for="updateCdFormCd">코드</label>
+											<input type="text" class="form-control" id="updateCdFormCd" name="cd" >
+										</div>
+									</div>
+									<div class="col-xs-12 col-sm-12 col-md-12">
+										<div class="form-group">
+											<label for="updateCdFormCdNm">코드 이름</label>
+											<input type="text" class="form-control" id="updateCdFormCdNm" name="cdNm" >
+										</div>
+									</div>
+									<div class="col-xs-12 col-sm-12 col-md-12">
+										<div class="form-group">
+											<label for="updateCdFormCdOrder">코드 순서</label>
+											<input type="text" class="form-control" id="updateCdFormCdOrder" name="cdOrder" >
+										</div>
+									</div>
+									<div class="col-xs-12 col-sm-12 col-md-12">
+										<div class="form-group">
+											<label for="updateCdFormCdLevel">코드 레벨</label>
+											<input type="text" class="form-control" id="updateCdFormCdLevel" name="cdLevel" disabled>
+										</div>
+									</div>
+									<div class="col-xs-12 col-sm-12 col-md-12">
+										<div class="form-group">
+											<label>사용 여부</label>
+											<input type="radio" id="updateCdFormUseFlagY" name="cdUseFlag" value="Y" />
+											<label for="updateCdFormUseFlagY">사용</label>
+											<input type="radio" id="updateCdFormUseFlagN" name="cdUseFlag" value="N" />
+											<label for="updateCdFormUseFlagN">미사용</label>
+										</div>
+									</div>
+									<div class="col-xs-12 col-sm-12 col-md-12">
+										<div class="form-group">
+											<label for="updateCdFormCdReplace1">대체코드1</label>
+											<input type="text" class="form-control" id="updateCdFormCdReplace1" name="cdReplace1" >
+										</div>
+									</div>
+									<div class="col-xs-12 col-sm-12 col-md-12">
+										<div class="form-group">
+											<label for="updateCdFormCdReplace2">대체코드2</label>
+											<input type="text" class="form-control" id="updateCdFormCdReplace2" name="cdReplace2" >
+										</div>
+									</div>
+									<div class="modal-footer">
+										<button type="button" class="btn btn-dark" data-role="cdUpdate">저장</button>
+										<button type="button" class="btn btn-danger" data-role="cdDelete">삭제</button>
+									</div>
+								</div>
+							</fieldset>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</body>
+</html>

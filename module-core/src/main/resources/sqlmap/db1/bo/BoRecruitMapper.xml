@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.bo.BoRecruitMapper">
+
+    <!--리스트 조회-->
+    <select id="selectRecruitList" resultType="BoRecruitDTO">
+        /* com.fw.core.mapper.db1.bo.BoRecruitMapper.selectRecruitList, selectRecruitList, 2022.10.13, Ghazal, BoRecruitMapper.xml */
+        SELECT p.id
+             , date_format(p.createdAt, '%Y-%m-%d') as createdAt
+             , date_format(p.updatedAt, '%Y-%m-%d') as updatedAt
+             , p.deleted
+             , date_format(p.endDate, '%Y-%m-%d') as endDate
+             , p.etc
+             , p.feeInfo
+             , p.industry
+             , p.isCowork
+             , p.isPrivate
+             , p.jopDescription
+             , p.pmComment
+             , p.status
+             , p.stopReason
+             , p.title
+             , p.hr_company_id
+             , p.member_id
+             , p.warrantyTerm
+             , p.keywords
+             , p.delFlag
+             , m.name
+             , h.companyName
+        FROM position p JOIN member m ON p.member_id = m.id JOIN hr_company h ON p.hr_company_id = h.id
+    </select>
+
+    <!--검색-->
+    <select id="searchRecruitList" resultType="BoRecruitDTO">
+        /* com.fw.core.mapper.db1.bo.BoRecruitMapper.searchRecruitList, searchRecruitList, 2022.10.13, Ghazal,
+        BoRecruitMapper.xml */
+        SELECT p.id
+        , date_format(p.createdAt, '%Y-%m-%d') as createdAt
+        , date_format(p.updatedAt, '%Y-%m-%d') as updatedAt
+        , p.deleted
+        , date_format(p.endDate, '%Y-%m-%d') as endDate
+        , p.etc
+        , p.feeInfo
+        , p.industry
+        , p.isCowork
+        , p.isPrivate
+        , p.jopDescription
+        , p.pmComment
+        , p.status
+        , p.stopReason
+        , p.title
+        , p.hr_company_id
+        , p.member_id
+        , p.warrantyTerm
+        , p.keywords
+        , p.delFlag
+        , m.name
+        , h.companyName
+        FROM position p JOIN member m ON p.member_id = m.id JOIN hr_company h ON p.hr_company_id = h.id
+        <where>
+            <if test="recruitStartDt != '' and recruitStartDt!=null and recruitEndDt !='' and recruitEndDt!=null">
+                AND date_format(p.createdAt, '%Y-%m-%d') BETWEEN #{recruitStartDt} AND #{recruitEndDt}
+            </if>
+            <if test="inlineRadioOptions != null and inlineRadioOptions != ''">
+                <if test="inlineRadioOptions == 'DOING' or inlineRadioOptions == 'CLOSE'">
+                    AND p.status = #{inlineRadioOptions}
+                </if>
+                <if test="inlineRadioOptions == 'DEL'">
+                    And  p.delFlag = 'Y'
+                </if>
+            </if>
+            <if test="keywords != null and keywords != ''">
+                AND (p.keywords LIKE CONCAT('%', '${keywords}', '%')
+                OR p.jobDescription LIKE CONCAT('%', '${keywords}', '%')
+                OR p.title LIKE CONCAT('%', '${keywords}', '%'))
+            </if>
+            <if test='inputSelect != null and inputSelect !=""'>
+                <if test='personalInfo == "name"'>
+                    AND m.name LIKE CONCAT('%',#{inputSelect},'%')
+                </if>
+                <if test='personalInfo == "email"'>
+                    AND m.email LIKE CONCAT('%',#{inputSelect},'%')
+                </if>
+                <if test='personalInfo == "phone"'>
+                    AND m.phone LIKE CONCAT('%',#{inputSelect},'%')
+                </if>
+            </if>
+            <if test="companyName != null and companyName != ''">
+                AND h.companyName LIKE CONCAT('%', '${companyName}', '%')
+            </if>
+            <if test="isCowork != null and isCowork != ''">
+                AND isCowork = #{isCowork}
+            </if>
+            <if test="closeCheck != null and closeCheck != ''">
+                AND p.status IN ('CLOSE', 'END')
+            </if>
+        </where>
+        order by createdAt desc
+        <include refid="common.paging" />
+    </select>
+
+    <!--검색-->
+    <select id="searchRecruitListCnt" resultType="int">
+        /* com.fw.core.mapper.db1.bo.BoRecruitMapper.searchRecruitList, searchRecruitListCnt, 2023.1.26, dongl, BoRecruitMapper.xml */
+        SELECT COUNT(1)
+        FROM position p JOIN member m ON p.member_id = m.id JOIN hr_company h ON p.hr_company_id = h.id
+        <where>
+            <if test="recruitStartDt != '' and recruitStartDt!=null and recruitEndDt !='' and recruitEndDt!=null">
+                AND date_format(p.createdAt, '%Y-%m-%d') BETWEEN #{recruitStartDt} AND #{recruitEndDt}
+            </if>
+            <if test="inlineRadioOptions != null and inlineRadioOptions != ''">
+                <if test="inlineRadioOptions == 'DOING' or inlineRadioOptions == 'CLOSE'">
+                    AND p.status = #{inlineRadioOptions}
+                </if>
+                <if test="inlineRadioOptions == 'DEL'">
+                    And  p.delFlag = 'Y'
+                </if>
+            </if>
+            <if test="keywords != null and keywords != ''">
+                AND (p.keywords LIKE CONCAT('%', '${keywords}', '%')
+                OR p.jobDescription LIKE CONCAT('%', '${keywords}', '%')
+                OR p.title LIKE CONCAT('%', '${keywords}', '%'))
+            </if>
+            <if test='inputSelect != null and inputSelect !=""'>
+                <if test='personalInfo == "name"'>
+                    AND m.name LIKE CONCAT('%',#{inputSelect},'%')
+                </if>
+                <if test='personalInfo == "email"'>
+                    AND m.email LIKE CONCAT('%',#{inputSelect},'%')
+                </if>
+                <if test='personalInfo == "phone"'>
+                    AND m.phone LIKE CONCAT('%',#{inputSelect},'%')
+                </if>
+            </if>
+            <if test="companyName != null and companyName != ''">
+                AND h.companyName LIKE CONCAT('%', '${companyName}', '%')
+            </if>
+            <if test="isCowork != null and isCowork != ''">
+                AND isCowork = #{isCowork}
+            </if>
+            <if test="closeCheck != null and closeCheck != ''">
+                AND p.status IN ('CLOSE', 'END')
+            </if>
+        </where>
+    </select>
+
+    <!--is CoWork 검색-->
+    <select id="selectCoworkRecruitList" resultType="BoRecruitDTO">
+        /* com.fw.core.mapper.db1.bo.BoRecruitMapper.searchRecruitList, searchRecruitList, 2022.10.13, Ghazal,
+        BoRecruitMapper.xml */
+        SELECT p.id
+             , date_format(p.createdAt, '%Y-%m-%d') as createdAt
+             , date_format(p.updatedAt, '%Y-%m-%d') as updatedAt
+             , p.deleted
+             , date_format(p.endDate, '%Y-%m-%d') as endDate
+             , p.etc
+             , p.feeInfo
+             , p.industry
+             , p.isCowork
+             , p.isPrivate
+             , p.jopDescription
+             , p.pmComment
+             , p.status
+             , p.stopReason
+             , p.title
+             , p.hr_company_id
+             , p.member_id
+             , p.warrantyTerm
+             , p.keywords
+             , p.delFlag
+             , m.name
+             , h.companyName
+        FROM position p JOIN member m ON p.member_id = m.id JOIN hr_company h ON p.hr_company_id = h.id
+        WHERE isCowork = #{isCowork}
+
+    </select>
+
+    <!-- 상세조회-->
+    <select id="selectRecruitDetail" parameterType="BoRecruitDTO" resultType="BoRecruitDTO">
+        /* com.fw.core.mapper.db1.bo.BoRecruitMapper.selectRecruitDetail, selectRecruitDetail, 2022.10.13, Ghazal, BoRecruitMapper.xml */
+        <!-- position detail--> <!-- hr_company detail-->
+        SELECT
+        p.id
+        , date_format(p.createdAt, '%Y-%m-%d') as createdAt
+        , date_format(p.updatedAt, '%Y-%m-%d') as updatedAt
+        , p.deleted
+        , date_format(p.endDate, '%Y-%m-%d')   as endDate
+        , p.etc
+        , p.feeInfo
+        , p.industry
+        , p.isCowork
+        , p.isPrivate
+        , p.jopDescription
+        , p.pmComment
+        , p.status
+        , p.stopReason
+        , p.title
+        , p.hr_company_id
+        , p.member_id
+        , p.warrantyTerm
+        , p.keywords
+        , p.delFlag
+        , h.createdAt
+        , h.updatedAt
+        , h.address
+        , h.ceo
+        , h.closed
+        , h.companyName
+        , h.companyScale
+        , h.companyStatus
+        , h.deleted
+        , h.establishDate
+        , h.industry
+        , h.licenseNumber
+        , h.location
+        , h.marketListing
+        , h.phone
+        , m.name AS name
+        , (select COUNT(*) FROM position_participant pp JOIN member m ON pp.member_id = m.id WHERE pp.position_id = p.id ) count
+        FROM position p  JOIN hr_company h ON p.hr_company_id = h.id LEFT JOIN position_participant pp ON pp.position_id = p.id JOIN member m ON p.member_id = m.id
+        WHERE p.id = #{id}
+        GROUP BY p.id
+    </select>
+
+    <select id="selectParticipantName" parameterType="BoRecruitDTO" resultType="BoRecruitDTO">
+        select m.name AS participantName
+             , date_format( pp.createdAt, '%Y-%m-%d') AS joinDate
+        FROM position_participant pp
+            JOIN member m
+                ON pp.member_id = m.id
+        WHERE pp.position_id = #{id}
+    </select>
+
+    <!-- 금칙어 리스트 출력 -->
+    <select id="selectPositionBanWord" parameterType="BoPositionBanWordDTO" resultType="BoPositionBanWordDTO">
+        SELECT id
+             , word
+             , delFlag
+        FROM position_ban_word
+        WHERE delFlag = 'N'
+        ORDER BY id desc
+    </select>
+
+    <!-- 금칙어 생성 -->
+    <insert id="insertPositionBanWord" parameterType="BoPositionBanWordDTO">
+        INSERT INTO position_ban_word (
+            word
+        )
+        VALUES (
+            #{word}
+        )
+        <selectKey order="AFTER" keyProperty="id" resultType="String">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <!-- 금칙어 삭제 -->
+    <update id="updatePositionBanWord" parameterType="BoPositionBanWordDTO">
+        UPDATE position_ban_word
+        SET delFlag = 'Y'
+        WHERE id = #{id}
+    </update>
+
+    <!--  수정-->
+    <update id="updateRecruit" parameterType="BoRecruitDTO">
+        /* com.fw.core.mapper.db1.bo.RecruitMapper.updateRecruit, 공지사항수정, 2022.10.13, Ghazal, RecruitMapper.xml */
+        UPDATE position
+        SET status = #{status}
+          , updatedAt = NOW()
+        WHERE id = #{id}
+    </update>
+</mapper>

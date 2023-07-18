@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.common.CommonMapper">
+
+    <!-- 코드 검색 -->
+    <select id="selectCommonCodeNm" parameterType="CommonDTO" resultType="String">
+        /* com.fw.core.mapper.db1.common.CommonMapper.selectCommonCodeNm, 코드 검색, 22.12.20, sjpaik, CommonMapper.xml */
+        SELECT fn_get_common_cd(#{cd}, #{groupCd}, #{order})
+    </select>
+
+    <!-- 고등학교 검색 -->
+    <select id="selectHighSchoolList" parameterType="CommonDTO" resultType="CommonDTO">
+        /* com.fw.core.mapper.db1.common.CommonMapper.selectHighSchoolList, 고등학교 검색, 22.12.01, sjpaik, CommonMapper.xml */
+        SELECT code
+             , address
+             , link
+             , name
+             , region
+             , schoolType
+             , delFlag
+          FROM school_high
+         WHERE name LIKE CONCAT('%', #{searchValue}, '%')
+    </select>
+
+    <!-- RPA 고등학교검색 -->
+    <select id="selectHighSchoolListRpa" parameterType="CommonDTO" resultType="CommonDTO">
+        /* com.fw.core.mapper.db1.common.CommonMapper.selectHighSchoolListRpa, RPA 고등학교검색, 23.01.13, YJW, CommonMapper.xml */
+        SELECT code
+             , address
+             , link
+             , name
+             , region
+             , schoolType
+             , delFlag
+        FROM school_high
+        <where>
+            <if test="mode eq 'IN'">
+                AND name = #{searchValue}
+            </if>
+            <if test="mode eq 'IN_ADDRESS'">
+                AND name = #{searchValue}
+                AND address LIKE CONCAT ('%',#{address},'%')
+            </if>
+            <if test="mode eq 'CONCAT'">
+                AND name LIKE CONCAT ('%',#{searchValue},'%')
+            </if>
+            <if test="mode eq 'CONCAT_ADDRESS'">
+                AND name LIKE CONCAT ('%',#{searchValue},'%')
+                AND address LIKE CONCAT ('%',#{address},'%')
+            </if>
+        </where>
+        <if test='rowNum > 0'>
+            LIMIT #{rowNum}
+        </if>
+    </select>
+
+    <!-- 대학교 검색 -->
+    <select id="selectUniversityList" parameterType="CommonDTO" resultType="CommonDTO">
+        /* com.fw.core.mapper.db1.common.CommonMapper.selectUniversityList, 대학교 검색, 22.12.01, sjpaik, CommonMapper.xml */
+        SELECT code
+             , address
+             , campusName
+             , degreeType
+             , estType
+             , infoUrl
+             , link
+             , name
+             , region
+             , schoolType
+             , delFlag
+          FROM school_university
+         WHERE name LIKE CONCAT('%', #{searchValue}, '%')
+    </select>
+
+    <!-- RPA 대학교 검색 -->
+    <select id="selectUniversityListRpa" parameterType="CommonDTO" resultType="CommonDTO">
+        /* com.fw.core.mapper.db1.common.CommonMapper.selectUniversityListRpa, RPA 대학교 검색, 23.01.16, YJW, CommonMapper.xml */
+        SELECT code
+             , address
+             , campusName
+             , degreeType
+             , estType
+             , infoUrl
+             , link
+             , name
+             , region
+             , schoolType
+             , delFlag
+        FROM school_university
+        <where>
+            <if test="mode eq 'IN'">
+                AND name = #{searchValue}
+            </if>
+            <if test="mode eq 'IN_ADDRESS'">
+                AND name = #{searchValue}
+                AND address LIKE CONCAT ('%',#{address},'%')
+            </if>
+            <if test="mode eq 'CONCAT'">
+                AND name LIKE CONCAT ('%',#{searchValue},'%')
+            </if>
+            <if test="mode eq 'CONCAT_ADDRESS'">
+                AND name LIKE CONCAT ('%',#{searchValue},'%')
+                AND address LIKE CONCAT ('%',#{address},'%')
+            </if>
+        </where>
+        <if test='rowNum > 0'>
+            LIMIT #{rowNum}
+        </if>
+    </select>
+
+    <!-- 기업정보 검색 -->
+    <select id="selectCompanyList" parameterType="CommonDTO" resultType="CommonDTO">
+        /* com.fw.core.mapper.db1.common.CommonMapper.selectCompanyList, 기업정보 검색, 22.12.01, sjpaik, CommonMapper.xml */
+        SELECT address
+             , id
+             , ceo
+             , closed
+             , companyName
+             , companyScale
+             , companyStatus
+             , deleted
+             , establishDate
+             , industry
+             , licenseNumber
+             , location
+             , marketListing
+             , phone
+             , delFlag
+             , keywords
+          FROM hr_company
+         WHERE companyName LIKE CONCAT('%', #{searchValue}, '%')
+    </select>
+
+    <!-- 템플릿 리스트 -->
+    <select id="selectTemplateList" parameterType="CommonDTO" resultType="CommonDTO">
+        /* com.fw.core.mapper.db1.common.CommonMapper.selectTemplateList, 템플릿 리스트, 22.12.19, sjpaik, CommonMapper.xml */
+        SELECT htg.mediaTypeCd
+             , htg.member_id
+             , htc.id
+             , htc.content
+             , htc.isDefault
+             , htc.subject
+             , htc.name
+          FROM hh_template_group htg
+    INNER JOIN hh_template_content htc ON htg.id = htc.template_group_id
+         WHERE htg.delFlag = 'N'
+           AND htg.member_id = #{memberId}
+           AND htc.delFlag = 'N'
+           AND htg.mediaTypeCd = #{mediaType}
+    </select>
+
+    <!-- 공통코드 리스트 -->
+    <select id="selectCommonCodeList" parameterType="CommonDTO" resultType="CommonDTO">
+        /* com.fw.core.mapper.db1.common.CommonMapper.selectCommonCodeList, 공통코드 리스트, 22.12.27, YJW, CommonMapper.xml */
+        SELECT group_cd
+             , cd
+             , group_nm
+             , upper_cd
+             , cd_nm
+             , cd_order
+             , cd_desc
+             , cd_level
+             , use_flag
+             , del_flag
+             , create_seq
+             , create_dt
+             , update_seq
+             , update_dt
+             , cd_replace1
+             , cd_replace2
+        FROM tb_common_cd
+        <where>
+           <if test="groupCd != null and groupCd != ''">
+               group_cd = #{groupCd}
+           </if>
+        </where>
+        ORDER BY cd_order ASC
+    </select>
+
+    <!-- 푸쉬 등록 -->
+    <insert id="insertPushHist" parameterType="PushHistDTO">
+        /* com.fw.core.mapper.db1.common.CommonMapper.insertPushHist, 푸시 등록 , sjpaik, CommonMapper.xml */
+        INSERT INTO tb_push_hist (
+               disp_type
+             , member_id
+             , title
+             , content
+             , img_nm
+             , img_path
+             , img_size
+             , url
+             , phone_type
+             , phone_token
+             , set_time
+             , create_id
+             , create_time
+             , update_id
+             , update_time
+        ) VALUES (
+               #{dispType}
+             , #{memberId}
+             , #{title}
+             , #{content}
+             , #{imgNm}
+             , #{imgPath}
+             , #{imgSize}
+             , #{url}
+             , #{phoneType}
+             , #{phoneToken}
+             , NOW()
+             , #{createId}
+             , NOW()
+             , #{createId}
+             , NOW()
+        )
+    </insert>
+
+    <!-- 회원상세정보조회 -->
+    <select id="selectMemberInfoByMemberId" parameterType="FoMemberDTO" resultType="FoMemberDTO">
+        /* com.fw.core.mapper.db1.common.CommonMapper.selectMemberInfoByMemberId, 회원상세정보 조회, YJW, CommonMapper.xml */
+        SELECT m.DTYPE
+             , m.id
+             , m.createdAt
+             , m.updatedAt
+             , m.agreeMarketing
+             , m.agreeMarketingAt
+             , m.deleted
+             , m.email
+             , m.isTemp
+             , m.loginId
+             , m.name
+             , m.password
+             , m.passwordChangeDate
+             , m.phone
+             , m.privacyExpire
+             , m.privacyExpireDate
+             , m.profilePictureFileId
+             , m.deletedAt
+             , m.lastChangePassword
+             , m.pushToken
+             , m.useAppPush
+             , m.isStop
+             , m.passwordFailCount
+             , m.agreeAd
+             , m.agreeAdAt
+             , m.phoneType
+             , m.di
+             , m.ap_alarm_flag
+             , m.ap_comm_flag
+             , m.ap_posi_flag
+             , m.hh_resu_flag
+             , m.hh_msg_flag
+             , m.hh_ap_msg_flag
+             , m.hh_comm_flag
+             , m.hh_ap_flag
+             , a.birth
+             , YEAR(a.birth) AS year
+             , LEFT(DATE_FORMAT(NOW(), '%Y%m%d') - a.birth, 2)  AS age
+             , a.findingJob
+             , a.genderCd
+             , a.resumeRestricted
+             , a.member_id
+             , a.isPrivateAgreement
+             , a.hhReferralCode
+             , a.contactExceptHoliday
+             , a.contactableTime
+             , a.resumeSettingAt
+             , a.delFlag
+          FROM member m
+     LEFT JOIN applicant a ON a.member_id = m.id
+         WHERE m.deleted != 1
+           AND m.id = #{memberId}
+    </select>
+
+    <!-- 관리자 일련번호 조회 -->
+    <select id="selectAdminList" resultType="FoMemberDTO">
+        SELECT approval_seq
+        FROM tb_admin
+        WHERE del_flag = 'N'
+          AND approval_seq IS NOT NULL
+    </select>
+
+</mapper>

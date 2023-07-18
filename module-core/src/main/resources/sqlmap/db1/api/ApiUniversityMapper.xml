@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.api.ApiUniversityMapper">
+
+	<!-- 학력 셀렉터 리스트 -->
+    <select id="selectUniversityList" resultType="ApiResumeAcademicBackgroundDTO">
+        /* com.fw.core.mapper.db1.api.ApiUniversityMapper.selectUniversityList, 학력 셀렉터 리스트, 22.11.02, wsh, ApiUniversityMapper.xml */
+        SELECT rab.id
+             ,
+             CONCAT (rab.name, " " ,
+             CASE rab.graduationStatusCd
+	             WHEN 'doing' THEN '재학중'
+	             WHEN 'GRADUATION' THEN '졸업'
+	             WHEN 'SELF_LEAVE' THEN '자퇴'
+	             WHEN 'LEAVE' THEN '떠남'
+	             WHEN 'BREAK' THEN '휴학'
+	          	END
+             ) AS title
+        FROM resume_academic_background AS rab
+        WHERE rab.delFlag = 'N'
+        ORDER BY id
+    </select>
+</mapper>

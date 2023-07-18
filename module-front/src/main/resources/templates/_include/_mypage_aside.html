@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:fragment="common">
+<aside>
+  <ul>
+    <li>
+      <a href="javascript:void(0)"><span class="poppins">회원정보 관리</span></a>
+      <ul>
+        <li th:classappend="${activeMenuURI eq '/fo/mypage/profile-info'} ? 'active' : ''">
+          <a href="/fo/mypage/profile-info">회원정보 수정</a>
+        </li>
+        <li th:classappend="${activeMenuURI eq '/fo/mypage/password'} ? 'active' : ''">
+          <a href="/fo/mypage/password">비밀번호 변경</a>
+        </li>
+        <li th:classappend="${activeMenuURI eq '/fo/mypage/blacklist'} ? 'active' : ''">
+          <a href="/fo/mypage/blacklist">블랙리스트 관리</a>
+        </li>
+      </ul>
+    </li>
+    <li>
+      <a href="javascript:void(0)"><span class="poppins">보안</span></a>
+      <ul>
+        <li th:classappend="${activeMenuURI eq '/fo/mypage/login-log'} ? 'active' : ''">
+          <a href="/fo/mypage/login-log">로그인 기록</a>
+        </li>
+      </ul>
+    </li>
+    <li>
+      <a href="javascript:void(0)"><span class="poppins">리워드</span></a>
+      <ul>
+        <li th:classappend="${activeMenuURI eq '/fo/mypage/reward-point'} ? 'active' : ''">
+          <a href="/fo/mypage/reward-point">적립/사용내역</a>
+        </li>
+        <li th:classappend="${activeMenuURI eq '/fo/mypage/reward' or activeMenuURI eq '/fo/reward/detail'} ? 'active' : ''">
+          <a href="/fo/mypage/reward">리워드Mall</a>
+        </li>
+      </ul>
+    </li>
+    <li>
+      <a href="javascript:void(0)"><span class="poppins">관심/맞춤제안</span></a>
+      <ul>
+        <li th:classappend="${activeMenuURI eq '/fo/mypage/attention-headhunter'} ? 'active' : ''">
+          <a href="/fo/mypage/attention-headhunter">관심 헤드헌터</a>
+        </li>
+        <li th:classappend="${activeMenuURI eq '/fo/mypage/resume-scrap' or activeMenuURI eq '/fo/mypage/resume-reading-notice'} ? 'active' : ''">
+          <a href="/fo/mypage/resume-scrap">스크랩/최근열람 공고</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</aside>
+</div>
+</html>

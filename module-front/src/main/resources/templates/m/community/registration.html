@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layouts/mLayout">
+<body>
+<div id="container-block">
+    <div layout:fragment="contents" th:remove="tag">
+        <div class="container">
+            <div class="sub-content">
+                <form name="communityForm">
+                    <input type="hidden" name="memberId" th:value="${parameter.memberId}"/>
+                    <input type="hidden" name="type" th:value="${parameter.communityType}"/>
+                    <input type="hidden" name="passPositionCompanySeq" th:value="${parameter.companySeq}"/>
+                    <input type="hidden" name="secretFlag" value="N"/>
+                    <input type="hidden" name="companySeq" value=""/>
+                    <div class="select-form mb-3">
+                        <select class="select-design" name="communityType" id="communityType" style="width: 100%">
+                            <option value="">카테고리를 선택해주세요.</option>
+                            <th:block th:each="category : ${category}">
+                                <option th:value="${category.cd}" th:text="${category.cdNm}"></option>
+                            </th:block>
+                        </select>
+                    </div>
+                    <div class="form-check justify-content-start mb-3" name="secretChk" id="secretChk"
+                         style="display: none">
+                        <input class="form-check-input" name="secretChk" type="checkbox" value="Y" id="multipleCheck"/>
+                        <label class="form-check-label" for="multipleCheck"> 비밀글 설정 (체크시 해당 기업 헤드헌터와 작성자만 볼 수
+                            있습니다.) </label>
+                    </div>
+                    <div class="form-group position-relative company-area mb-3" name="searchCompany" id="searchCompany"
+                         style="display: none">
+                        <div class="search-box">
+                            <input type="text" name="companyNames" class="" placeholder="회사 이름을 입력하세요"/>
+                            <button type="button" class="search-btn"><i class="icon-search-dark"></i></button>
+                        </div>
+                        <div class="search-result-list company">
+                            <ul></ul>
+                        </div>
+                    </div>
+                    <div class="select-form mb-3" name="position" id="position" style="display: none">
+                        <select class="select-design" name="position" style="width: 100%">
+                            <option value="">채용공고를 선택하세요</option>
+                            <th:block th:each="position : ${position}">
+                                <option th:value="${position.companySeq}" th:text="${position.title}"></option>
+                            </th:block>
+                        </select>
+                    </div>
+                    <div class="form-group m-t-15">
+                        <input type="text" class="form-control form-md" name="title" id="title"
+                               placeholder="제목을 입력하세요" maxlength="30"/>
+                    </div>
+                    <div class="form-textarea">
+                        <textarea name="content" id="content" cols="30" rows="10" placeholder="내용을 입력하세요"
+                                  class="" maxlength="300"></textarea>
+                    </div>
+                    <div class="form-upload">
+                        <input type="file" data-role="upFile" data-seq="1" class="" name="files"
+                               id="communityFormFile1"/>
+                        <label for="communityFormFile1"><i class="icon-input-add"></i></label>
+                    </div>
+                    <div class="preview-image-wrap">
+                        <!-- <div class="preview-image" style="background-image: url('/static/images/about-01.png')">
+                             <div class="hover-close">
+                                 <button type="button"><i class="icon-del"></i></button>
+                             </div>
+                         </div>-->
+                    </div>
+                    <div class="send-btn">
+                        <button type="button" class="btn btn-primary btn-xl" data-role="registration">등록하기</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

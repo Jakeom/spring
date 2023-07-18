@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.m.MCompanyMapper">
+	
+	<select id="selectSuggetList" parameterType="MCompanyDTO" resultType="MCompanyDTO">
+        /* com.fw.core.mapper.db1.m.MCompanyMapper.selectSuggetList, 포지션 제안 리스트, wsh, MCompanyMapper.xml */
+        SELECT pa.id
+             , DATE_FORMAT(pa.createdAt, '%Y-%m-%d') AS createdAt
+             , pa.updatedAt
+             , DATE_FORMAT(pa.changeAt, '%Y-%m-%d') AS changeAt
+             , pa.hhTempStatus
+             , pa.hrCheckedAt
+             , pa.hrTempStatus
+             , pa.joinDate
+             , pa.joinMailSubmitDate
+             , pa.passedStatus
+             , pa.phoneOpened
+             , pa.pmSubmitted
+             , pa.processStatus
+             , fn_get_common_cd(pa.processStatus, 'POSITION_PROCESSSTATUS', 1) AS processStatusNm
+             , pa.progressStep
+             , DATE_FORMAT(pa.proposalAt, '%Y-%m-%d') AS proposalAt
+             , pa.proposalStatus
+             , fn_get_common_cd(pa.passedStatus, 'POSITION_PASSEDSTATUS', 1)  AS passedStatusNm
+             , fn_get_common_cd(pa.proposalStatus, 'POSITION_PROPOSALSTATUS', 1)  AS proposalStatusNm
+             , pa.proposedEamil
+             , pa.proposedSms
+             , pa.receiptPath
+             , (CASE WHEN pa.receiptPath = 'CO' THEN 'CO접수'
+                     WHEN pa.receiptPath = 'DIRECT' THEN '본인지원'
+                     WHEN pa.receiptPath = 'MANUAL' THEN '등록대행'
+                     WHEN pa.receiptPath = 'PROPOSAL_ACCEPT' THEN '제안승인'
+                END) AS receiptPathNm
+             , pa.receiptStatus
+             , pa.regPath
+             , (CASE WHEN pa.regPath = '1' THEN '내인재'
+                     WHEN pa.regPath = '2' THEN '직접지원'
+                     WHEN pa.regPath = '3' THEN '수동입력'
+                END) AS regPathNm
+             , (
+                 CASE WHEN pa.pmSubmitted = '0' THEN 'PM미제출'
+                      WHEN pa.pmSubmitted = '1' AND pa.receiptStatus = 'UNOPENED' THEN 'PM제출(미열람)'
+                      WHEN pa.pmSubmitted = '1' AND pa.receiptStatus IN ('OPEN', 'RECOMMENDED') THEN 'PM제출(열람)'
+                      ELSE 'PM미제출'
+                END) AS pmSubmitStatusNm
+             , pa.rejectReason
+             , pa.rejectReasonCd
+             , pa.resultNoticed
+             , pa.updateRequest
+             , pa.ap_member_id
+             , pa.hh_member_id
+             , pa.position_id
+             , pa.resume_id
+             , pa.submit_resume_file_id
+             , pa.delFlag
+             , pa.resume_modify_flag
+             , YEAR(r.birth) AS year
+             , LEFT(DATE_FORMAT(NOW(), '%Y%m%d') - r.birth, 2)  AS age
+             , m.name
+             , m.email
+             , m.phone
+             , m.id AS memberId
+             , concat(ROUND((r.totalCareer/12),0),'년',ROUND((r.totalCareer%12),0),'개월') totalCareers
+             , (SELECT name FROM resume_academic_background WHERE resume_id = r.id  and resume_academic_background.delFlag = 'N' ORDER BY entranceYm DESC LIMIT 1) AS finalSchool
+             , rm.id AS recommendId
+          FROM position_applicant pa
+    INNER JOIN resume r ON pa.resume_id = r.id
+    INNER JOIN member m ON pa.ap_member_id = m.id
+    INNER JOIN recommend_mail rm ON pa.position_id = rm.position_id
+         WHERE pa.position_id = #{positionId} AND rm.id = #{recommendId} AND pa.ReceiptStatus = 'RECOMMENDED' AND pa.progressStep = 'PROCESS' AND (processStatus NOT IN ('DOCUMENT_PASS', 'DOCUMENT_FAIL') OR processStatus IS NULL)
+    </select>
+    
+    <select id="selectPositionDetail" parameterType="MCompanyDTO" resultType="MCompanyDTO">
+        /* com.fw.core.mapper.db1.m.MCompanyMapper.selectPositionDetail, 포지션 상세, wsh, MCompanyMapper.xml */
+        SELECT p.id
+             , p.etc
+             , p.industry
+             , p.jobDescription
+             , p.pmComment
+             , p.status
+             , p.stopReason
+             , p.title
+             , p.hr_company_id
+             , p.member_id
+             , p.jopDescription
+             , p.delFlag
+             , (SELECT name FROM member m WHERE m.id = p.member_id) AS name
+             , (SELECT companyName FROM hr_company hc WHERE hc.id  = p.hr_company_id) AS companyName
+          FROM position p
+         WHERE p.id = #{positionId}
+    </select>
+    
+    <update id="updateSuggestStatus" parameterType="MCompanyDTO">
+		/* com.fw.core.mapper.db1.m.MCompanyMapper.updateSuggestStatus, 결과 수정, wsh, MCompanyMapper.xml */
+		UPDATE position_applicant
+		   SET processStatus = #{processStatus}
+		     , updatedAt = NOW()
+		 WHERE id = #{id}
+	</update>
+
+    <select id="selectCheckPassword" parameterType="MCompanyDTO" resultType="MCompanyDTO">
+        /* com.fw.core.mapper.db1.m.MCompanyMapper.selectPositionDetail, 포지션 상세, wsh, MCompanyMapper.xml */
+        SELECT id
+             , createdAt
+             , updatedAt
+             , content
+             , password
+             , subject
+             , position_id
+             , delFlag
+          FROM recommend_mail
+         WHERE id = #{id}
+    </select>
+
+</mapper>

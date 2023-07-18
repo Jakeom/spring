@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.fo.FoLoginLogMapper">
+
+	<!-- Front 메인 로그인 기록 cnt-->
+	<select id="selectLoginLogListCntPaging" resultType="int">
+		/*com.fw.core.mapper.db1.fo.FoLoginLogMapper.selectLoginLogListCntPaging, Front 메인 로그인 기록 cnt , 2022.12 , skayhlj@gmail.com, FoLoginLogMapper.xml*/
+		SELECT COUNT(1) AS CNT
+		  FROM tb_api_login_log
+		 WHERE id = #{frontSession.id}
+		   AND create_dt BETWEEN DATE_SUB(NOW(), INTERVAL 3 MONTH) AND NOW()
+	</select>
+
+<!-- Front 메인 로그인 기록 -->
+	<select id="selectLoginLogListPaging" parameterType="FoLoginLogDTO" resultType="FoLoginLogDTO">
+		/*com.fw.core.mapper.db1.fo.FoLoginLogMapper.selectLoginLogListPaging, Front 메인 로그인 기록 , 2022.12 , skayhlj@gmail.com, FoLoginLogMapper.xml*/
+		SELECT @rownum:=@rownum+1 AS rownum
+             , A.*
+		FROM (
+		SELECT api_login_log_seq
+	  		 , id
+	  		 , result_flag
+	  		 , access_ip
+	  		 , create_dt
+		  FROM tb_api_login_log
+		 WHERE id = #{frontSession.id}
+		   AND create_dt BETWEEN DATE_SUB(NOW(), INTERVAL 3 MONTH) AND NOW()
+		) AS A
+		, (SELECT @rownum:=0) TMP order by rownum DESC
+		<include refid="common.paging" />
+	</select>
+</mapper>

@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layout/mainLayout"
+>
+<div th:fragment="common">
+    <!-- 커뮤니티 글쓰기 - AP -->
+    <div class="modal fade" id="modal-write" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-write modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">게시글 쓰기</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form name="communityForm">
+                    <input type="hidden" name="secretFlag" value="N">
+                    <input type="hidden" name="companySeq" value=""/>
+                    <div class="modal-body">
+                        <div class="select-form">
+                            <select name="communityType" data-role="communitySelect" class="select-design" style="width: 100%">
+                                <option value="WORKER_TALK">직장인 수다</option>
+                                <option value="WORKER_WORRY">직장인 고민</option>
+                                <option value="WORKER_ALL">면접/이직/퇴사</option>
+                                <option value="PASS_REVIEW">합격 후기</option>
+                                <option value="COMPANY_CURIOUS">이 회사가 궁금해요</option>
+                            </select>
+                        </div>
+                        <div class="form-check justify-content-start mb-3" name="secretChk" id="secretChk"
+                             style="display: none">
+                            <input class="form-check-input" name="secretChk" type="checkbox" value="Y" id="multipleCheckAp"/>
+                            <label class="form-check-label" for="multipleCheckAp"> 비밀글 설정 (체크시 해당 기업 헤드헌터와 작성자만 볼 수
+                                있습니다.) </label>
+                        </div>
+                        <div class="form-group position-relative company-area mb-3" name="searchCompany" id="searchCompany"
+                             style="display: none">
+                            <div class="search-box">
+                                <input type="text" name="companyNames" class="" placeholder="회사 이름을 입력하세요"/>
+                                <button type="button" class="search-btn"><i class="icon-search-dark"></i></button>
+                            </div>
+                            <div class="search-result-list company">
+                                <ul></ul>
+                            </div>
+                        </div>
+                        <div class="select-form mb-3" name="position" id="position" style="display: none">
+                            <select class="select-design" name="position" style="width: 100%">
+                                <option value="">채용공고를 선택하세요</option>
+                                <th:block th:each="list : ${position}" th:if="${list.passCommunityCnt eq '0'}">
+                                    <option th:value="${list.companySeq}" th:text="${list.title}"></option>
+                                </th:block>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" class="form-control form-md" name="title" id="communityTitle"
+                                   placeholder="제목을 입력하세요"/>
+                        </div>
+                        <div class="form-textarea">
+                        <textarea name="content" id="communityContent" cols="30" rows="10"
+                                  placeholder="내용을 입력하세요"></textarea>
+                        </div>
+                        <div class="form-upload">
+                            <input type="file" data-role="upFile" data-seq="1" class="" name="files" id="communityFormFile1"/>
+                            <label for="communityFormFile1"><i class="icon-input-add"></i></label>
+                        </div>
+                        <div class="preview-image-wrap">
+                            <!-- <div class="preview-image" style="background-image: url('/static/images/about-01.png')">
+                                 <div class="hover-close">
+                                     <button type="button"><i class="icon-del"></i></button>
+                                 </div>
+                             </div>-->
+                        </div>
+                    </div>
+                </form>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-primary m-r-5" data-role="close" data-bs-dismiss="modal">닫기</button>
+                    <button type="button" data-role="save" class="btn btn-primary">등록</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 게시물 쓰기 + 비밀글 설정 (회사검색) -->
+<!--    <div class="modal fade" id="modal-write-secret-search" tabindex="-1" aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-write modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">게시글 쓰기</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form name="communityCompanySecretForm">
+                    <input type="hidden" name="communityType" value="5">
+                    <div class="modal-body">
+                        <div class="form-check justify-content-start">
+                            <input class="form-check-input" name="secretFlag" type="checkbox" value="Y" id="multipleCheck"/>
+                            <label class="form-check-label" for="multipleCheck"> 비밀글 설정 (체크시 해당 기업 헤드헌터와 작성자만 볼 수
+                                있습니다.) </label>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" name="title" class="form-control form-md" placeholder="제목을 입력하세요"/>
+                        </div>
+                        <div class="form-group position-relative company-area">
+                            <div class="search-box">
+                                <input type="text" name="companyNames" class="" placeholder="회사 이름을 입력하세요"/>
+                                <input type="hidden" name="companySeq" value=""/>
+                                <button type="button" class="search-btn"><i class="icon-search-dark"></i></button>
+                            </div>
+                            <div class="search-result-list company">
+                                <ul>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="form-textarea">
+                            <textarea name="content" id="" cols="30" rows="10" placeholder="내용을 입력하세요" class=""></textarea>
+                        </div>
+                        <div class="form-upload">
+                            <input type="file" data-role="upFile" data-seq="1" class="" id="communityCompanySecretFormFile1" name="files"/>
+                            <label for="communityCompanySecretFormFile1"><i class="icon-input-add"></i></label>
+                        </div>
+                        <div class="preview-image-wrap">
+                            &lt;!&ndash;<div class="preview-image" style="background-image: url('../assets/images/about-01.png')">
+                                <div class="hover-close">
+                                    <button type="button"><i class="icon-del"></i></button>
+                                </div>
+                            </div>&ndash;&gt;
+                        </div>
+                    </div>
+                </form>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">닫기</button>
+                    <button type="button" data-role="save" class="btn btn-primary">등록</button>
+                </div>
+            </div>
+        </div>
+    </div>-->
+
+    <!-- 일반 팝업 취소 -->
+    <div class="modal fade" id="modal-cancel" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-cancel modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-form">지원을 취소하시겠습니까?</div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">취소</button>
+                        <button type="button" class="btn btn-primary">확인</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 헤드헌터 상세 -->
+    <div class="modal fade" id="modal-headhunter" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-headhunter modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body pt-0">
+                    <form name="headhunterForm">
+                        <input type="hidden" name="headhunterId" />
+                        <input type="hidden" name="hhMemberId" />
+                    </form>
+                    <div class="headhunter-profile-content">
+                        <div class="headhunter-profile">
+                            <div class="headhunter-left">
+                                <div class="headhunter-profile-img" data-bs-toggle="modal" data-bs-target="#modal-headhunter"></div>
+                                <button type="button" class="btn btn-outline-dark btn-sm" data-role="addBlack">블랙리스트 추가</button>
+                            </div>
+                            <div class="headhunter-profile-info">
+                                <div>
+                                    <p class="company">맨쉬컨설팅(주)</p>
+                                    <p class="name">
+                                        <span name="hhName">홍길동</span>
+                                        <span name="hhPosition" class="rank">전무</span>
+                                        <span name="hhSchool" class="txt">연세대학교 금속공학과</span>
+                                    </p>
+                                </div>
+                                <div>
+                                    <div class="phone">
+                                        <p>
+                                            <span>연락처</span>
+                                            <span name="hhPhone" class="phone-number">***-****-****</span>
+                                        </p>
+                                        <button type="button" class="btn btn-outline-dark btn-sm" data-role="showPhone">연락처 보기</button>
+                                    </div>
+                                </div>
+                                <ul class="info-list">
+                                    <li>
+                                        <p>이메일</p>
+                                        <a href="" id="hhEmail">asdqwe1234@naver.com</a>
+                                    </li>
+                                    <li>
+                                        <p>최근로그인</p>
+                                        <p id="recentLogin">2022-10-11</p>
+                                    </li>
+                                    <li>
+                                        <p>진행중공고</p>
+                                        <p><a href="" class="text-danger" id="hhPostingCnt">3</a>건</p>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="apply-wrap">
+                        <div class="apply-wrap-body">
+                            <div class="content">
+                                <h4 class="table-subtitle mb-3">인사말</h4>
+                                <div class="desc">
+                                    <p class="introduce-text" name="hhIntro"></p>
+                                </div>
+                            </div>
+                            <div class="content">
+                                <h4 class="table-subtitle mb-3">주요이력</h4>
+                                <div class="desc" name="hhCareer">
+                                    <ul class="history">
+                                        <li></li>
+                                        <li></li>
+                                        <li></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="content">
+                                <h4 class="table-subtitle mb-3">전문분야</h4>
+                                <div class="desc">
+                                    <div class="badge-box" name="hhFields">
+                                      <span class="tag tag-lg tag-outline-primary none-border m-0" name="hhFieldsLow">
+                                        <em name="field"></em>
+                                      </span>
+                                        <!-- <span class="tag tag-lg tag-outline-primary none-border m-0">
+                                         <em>IT/인터넷</em>
+                                       </span>
+                                         <span class="tag tag-lg tag-outline-primary none-border m-0">
+                                         <em>제조/생산/화학</em>
+                                       </span>
+                                         <span class="tag tag-lg tag-outline-primary none-border m-0">
+                                         <em>의료/제약</em>
+                                       </span>
+                                         <span class="tag tag-lg tag-outline-primary none-border m-0">
+                                         <em>유통/판매</em>
+                                       </span>-->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 경력인증 -->
+    <div class="modal fade" id="modal-certification" tabindex="-1" aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-default modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-form">(주)소프트퍼즐</div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary m-r-5">경력인증 받기</button>
+                        <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">닫기</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 경력 나이스 확인불가 -->
+    <div class="modal fade" id="modal-nice-certification" tabindex="-1" aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-default modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="text-form qna">
+                        <span class="m-r-15">사업자등록번호</span>
+                        <input type="text" class="form-control" placeholder="숫자만입력"/>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary m-r-5">경력인증 받기</button>
+                        <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">닫기</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 인증 완료/실패 -->
+    <div class="modal fade" id="modal-certification-result" tabindex="-1" aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-default modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="btn-close" data-bs-sdismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-form">인증되었습니다</div>
+                    <div class="text-form">인증에 실패하였습니다.</div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">확인</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 지원하기 -->
+    <div class="modal fade" id="modal-apply" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-comment modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header justify-content-end">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-title">지원이 완료되었습니다.</div>
+                    <div class="text-form">
+                        채용기업의 규격에 맞게 이력서 변경이 필요한 경우<br/>
+                        본 채용공고 담당 헤드헌터가 지원이력서를 수정할 수 있는<br/>
+                        권한을 주시겠습니까?<br/>
+                        이력서 수정 권한을 주지 않는 경우 전형에 불이익이 있을 수 있습니다.
+                    </div>
+                    <div class="text-center" style="color:red;">미동의 시 채용에 불이익이 있을 수 있습니다.</div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary m-r-10" data-bs-toggle="modal"
+                                data-bs-target="#modal-apply-success" data-bs-dismiss="modal"
+                                data-role="editResumeAgree">동의
+                        </button>
+                        <button type="button" class="btn btn-outline-primary m-r-5" data-bs-toggle="modal"
+                                data-bs-target="#modal-apply-success" data-bs-dismiss="modal"
+                                data-role="editResumeRefuse">미동의
+                        </button>
+                        <input type="hidden" name="applicantId" value="">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 지원 완료 -->
+    <div class="modal fade" id="modal-apply-success" tabindex="-1" aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-comment modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header justify-content-end">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-title">지원이 완료되었습니다.</div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 경력인증 팝업 -->
+    <div class="modal fade" id="modal-career-certification" tabindex="-1" aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-comment modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header justify-content-end">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-form">
+                        경력 인증을 받지 않으셨습니다.<br/>
+                        인증 받지 않은 경력 사항을 저장하시겠습니까?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary m-r-10">확인</button>
+                        <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">취소</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 기본 공용 모달 링크이동 -->
+    <div class="modal fade" id="modal-default-link" tabindex="-1" aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-comment modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header justify-content-end">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-form text-center">
+                        보유하신 포인트가 없습니다.<br/>
+                        포인트를 충전하시겠습니까?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">취소</button>
+                        <a href="마이페이지 충전" class="btn btn-primary m-r-10">확인</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 기본 공용 모달 -->
+    <div class="modal fade" id="modal-default" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-comment modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header justify-content-end">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-form text-center">
+                        내 인재에서 삭제할 경우,<br/>
+                        인재검색 등에서 인재정보를 열람하기 위해서는 열람권을 다시 사용해야 합니다. 삭제 하시겠습니까?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">취소</button>
+                        <button type="button" class="btn btn-primary">확인</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 포지션 선택-->
+    <div class="modal fade" id="modal-select-position" tabindex="-1" aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-write modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">관심인재 추가 > 포지션 추천</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="font-bold m-b-25 font-size-18">포지션 선택</p>
+                    <p class="m-b-25">추가한 인재의 이력서는 선택한 포지션의 컨택리스트 목록으로 추가됩니다.</p>
+                    <div class="select-form">
+                        <select class="select-design" style="width: 100%">
+                            <option value="1">포지션을 선택해주세요.</option>
+                            <option value="3">-</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-primary">추가</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 고객사 등록 -->
+    <!--<div class="modal fade" id="modal-customer-registration" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-write modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">고객사 등록</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="tbl-head-cnt text-danger">내 고객사 리스트는 외부에 절대 공개되지 않습니다.</p>
+
+                    <p class="table-title m-t-30">기업정보</p>
+                    <table class="table border-top-1">
+                        <colgroup>
+                            <col width="25%" />
+                        </colgroup>
+                        <tbody>
+                        <tr>
+                            <th class="">기업명</th>
+                            <td class="">
+                                <input type="text" class="form-control form-lg" value="" name="companyName" placeholder="기업명 또는 사업자등록번호로 검색" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="">사업자등록번호</th>
+                            <td class="">
+                                <input type="text" class="form-control form-lg" value="" name="licenseNumber" placeholder="" maxlength="10" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="">소재지</th>
+                            <td class="">
+                                <input type="text" class="form-control form-lg" name="location" value="" placeholder="" />
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <p class="table-title m-t-30">인사담당자 정보</p>
+                    <table class="table border-top-1">
+                        <colgroup>
+                            <col width="25%" />
+                        </colgroup>
+                        <tbody>
+                        <tr>
+                            <th class="">이름</th>
+                            <td class="">
+                                <input type="text" class="form-control form-lg" value="" name="name" placeholder="이름" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="">이메일주소</th>
+                            <td class="">
+                                <input type="text" class="form-control form-lg" value="" name="email" placeholder="email@example.com" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="">유선연락처</th>
+                            <td class="">
+                                <input type="text" class="form-control form-lg" value="" name="phone" placeholder="(-)를 제외하고 입력" />
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-primary" data-role="insert">등록</button>
+                </div>
+            </div>
+        </div>
+    </div>-->
+
+    <!-- 받는사람 직접추가 -->
+    <div class="modal fade" id="modal-email-add" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-write modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">받는사람 직접추가</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <table class="table border-top-1 m-t-30">
+                        <colgroup>
+                            <col width="25%" />
+                        </colgroup>
+                        <tbody>
+                        <tr>
+                            <th class="">이름</th>
+                            <td class="">
+                                <input type="text" class="form-control form-lg" value="" placeholder="이름" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="">이메일주소</th>
+                            <td class="">
+                                <input type="text" class="form-control form-lg" value="" placeholder="email@example.com" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="">휴대폰번호</th>
+                            <td class="">
+                                <input type="text" class="form-control form-lg" value="" placeholder="(-)를 제외하고 입력" />
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <div class="form-check m-t-20">
+                        <input class="form-check-input" type="checkbox" value="" id="multipleCheck" />
+                        <label class="form-check-label" for="multipleCheck"> 이 정보를 [내 주소록]에도 추가합니다. </label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-primary">추가</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 합격자 등록 -->
+    <div class="modal fade" id="modal-passer" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-write modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">합격자 등록</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <table class="table border-top-1 m-t-30">
+                        <colgroup>
+                            <col width="25%" />
+                        </colgroup>
+                        <tbody>
+                        <tr>
+                            <th class="">합격자명</th>
+                            <td class="">
+                                <input type="text" class="form-control form-md" value="" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="">세금계산서</th>
+                            <td class="">
+                                <div class="form-upload mt-0">
+                                    <input type="file" class="" id="form-file" />
+                                    <label for="form-file"><i class="icon-input-add"></i></label>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="">발행일자</th>
+                            <td class="">
+                                <div class="form-date-wrap">
+                                    <input type="text" id="datepicker" class="form-date" />
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <p class="text-danger m-t-30 m-b-10">검토 후 등록 반영까지 영업일 기준 2~3일정도 소요됩니다.</p>
+                    <p class="text-danger m-b-10">정보가 잘못될 경우 반려처리되며, 별도 안내되지 않으니 개별 확인하시어 재등록 해주시면 됩니다.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-primary">변경</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 후보자 조회 보안 인증-->
+    <div class="modal fade" id="modal-security" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-write modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">후보자 조회 보안 인증</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="font-bold m-b-25 font-size-18 text-center">본 링크는 R9에서 발송된 보안링크입니다. <br />후보자를 확인하시려면 비밀번호를 입력해 주시기 바랍니다.</p>
+                    <p class="m-b-25 text-center">
+                        ※ 헤드헌터에게서 수신한 비밀번호를 입력해 주세요.<br />
+                        ※ 비밀번호를 수신하지 못한 경우, 헤드헌터에게 요청 후 다시 접속해 주세요.
+                    </p>
+                    <input type="password" class="form-control form-md" value="" />
+                </div>
+
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-primary">확인</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 포지션 상세 - 컨택리스트 상태 적합/부적합 선택 -->
+    <div class="modal fade" id="modal-position-state" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-comment modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header justify-content-end">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-form text-center">
+                        직접지원한 인재의 경우 이력서를 확인 후<br />
+                        적합, 부적합 여부를 선택해주세요.
+                    </div>
+                    <div class="d-flex justify-content-center m-b-25">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" value="" id="multipleCheck1" />
+                            <label class="form-check-label" for="multipleCheck1"> 적합 </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" value="" id="multipleCheck1" />
+                            <label class="form-check-label" for="multipleCheck1"> 부적합 </label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">취소</button>
+                        <button type="button" class="btn btn-primary">확인</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 이력서 양식 선택 -->
+    <!--<div class="modal fade" id="modal-resume-form" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-comment modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">이력서 양식 선택</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-form text-center">미리보기 할 이력서의 양식을 선택해 주세요.</div>
+                    <div class="d-flex justify-content-center m-b-25 gap-30">
+                        <div class="form-check block">
+                            <input class="form-check-input" type="radio" value="" id="multipleCheck1" name="multipleCheck1" />
+                            <label class="form-check-label" for="multipleCheck1">
+                                <p>R9 기본이력서</p>
+                                <img src="../assets/images/resume-case-1.png" alt="" />
+                            </label>
+                        </div>
+                        <div class="form-check block">
+                            <input class="form-check-input" type="radio" value="" id="multipleCheck2" name="multipleCheck1" />
+                            <label class="form-check-label" for="multipleCheck2">
+                                <p>선 형식 이력서</p>
+                                <img src="../assets/images/resume-case-2.png" alt="" />
+                            </label>
+                        </div>
+                        <div class="form-check block">
+                            <input class="form-check-input" type="radio" value="" id="multipleCheck3" name="multipleCheck1" />
+                            <label class="form-check-label" for="multipleCheck3">
+                                <p>표 형식 이력서</p>
+                                <img src="../assets/images/resume-case-3.png" alt="" />
+                            </label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">취소</button>
+                        <button type="button" class="btn btn-primary">선택</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>-->
+</div>
+</html>
+<script>
+    $(document).ready(function () {
+        $('.select-design').select2({
+            minimumResultsForSearch: -1,
+        });
+    });
+</script>

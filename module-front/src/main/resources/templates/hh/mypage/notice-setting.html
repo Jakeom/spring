@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/hh/hhMypageLayout">
+<body>
+<div id="container-block">
+     <div layout:fragment="contents" th:remove="tag">
+       <!-- 맞춤인재알림설정 데이터 존재 시 -->
+       <th:block th:if="${existence}">
+          <div class="layout-content">
+            <input type="hidden" name="apAlertSeq" th:value="${noticeSetting.apAlertSeq}">
+            <input type="hidden" name="ageSt" th:value="${noticeSetting.ageSt}">
+            <input type="hidden" name="ageEn" th:value="${noticeSetting.ageEn}">
+            <h3 class="subtitle">맞춤인재알림설정</h3>
+            <div class="title-line mt-4 mb-5"></div>
+            <div class="row row-40 align-items-center">
+              <div class="apply-wrap">
+                <table class="table border-top-1">
+                  <colgroup>
+                    <col width="20%" />
+                    <col width="80%" />
+                  </colgroup>
+                  <tbody>
+                    <tr>
+                      <th class="text-center">알림 설정</th>
+                      <td>
+                        <div class="toggle-btn d-flex">
+                          <input type="checkbox" class="sr-only" name="checkAlarm" value="N" id="checkAlarm" th:checked="${noticeSetting.hhApFlag} eq 'Y'" />
+                          <label for="checkAlarm">
+                            <div class="button">
+                              <div class="inside"></div>
+                            </div>
+                          </label>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <th class="text-center">경력</th>
+                      <td>
+                        <div class="d-flex align-items-center">
+                          <select class="select-design" name="careerSt" style="width: 100px">
+                            <option value="">선택</option>
+                            <th:block th:each="num: ${#numbers.sequence(0,30)}">
+                              <option th:selected="${num} == ${noticeSetting.careerSt}" th:value="${num}" th:text="${num+'년'}"></option>
+                            </th:block>
+                          </select>
+                          <p class="m-l-10 m-r-10">~</p>
+                          <select class="select-design" name="careerEn" style="width: 100px">
+                            <option value="">선택</option>
+                            <th:block th:each="num: ${#numbers.sequence(0,30)}">
+                              <option th:selected="${num} == ${noticeSetting.careerEn}" th:value="${num}" th:text="${num+'년'}"></option>
+                            </th:block>
+                          </select>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <th class="text-center">핵심역량</th>
+                      <td>
+                        <input type="text" class="form-control form-md" name="industry" placeholder="" th:value="${noticeSetting.industry}" />
+                      </td>
+                    </tr>
+                    <tr>
+                      <th class="text-center">연령</th>
+                      <td>
+                        <div class="d-flex align-items-center">
+                          <select class="select-design" name="ageSt" style="width: 140px">
+                            <option value="">선택</option>
+                          </select>
+                          <p class="m-l-10 m-r-10">~</p>
+                          <select class="select-design" name="ageEn" style="width: 140px">
+                            <option value="">선택</option>
+                          </select>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <th class="text-center">연봉</th>
+                      <td>
+                        <div class="d-flex align-items-center">
+                          <select class="select-design" name="salarySt" style="width: 140px">
+                            <option value="">선택</option>
+                            <th:block th:each="num: ${#numbers.sequence(1000,10000,1000)}">
+                              <option th:selected="${num} == ${noticeSetting.salarySt}" th:value="${num}" th:text="${#numbers.formatInteger(num,0,'COMMA') + '만원'}"></option>
+                            </th:block>
+                          </select>
+                          <p class="m-l-10 m-r-10">~</p>
+                          <select class="select-design" name="salaryEn" style="width: 140px">
+                            <option value="">선택</option>
+                            <th:block th:each="num: ${#numbers.sequence(1000,10000,1000)}">
+                              <option th:selected="${num} == ${noticeSetting.salaryEn}" th:value="${num}" th:text="${#numbers.formatInteger(num,0,'COMMA') + '만원'}"></option>
+                            </th:block>
+                          </select>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <th class="text-center">학력</th>
+                      <td>
+                        <div class="check-badge-wrap">
+                          <div>
+                            <input type="radio" class="check-badge" value="RESET" name="hp1" id="reset" />
+                            <label for="reset" class="check-badge-label">초기화</label>
+                          </div>
+                          <div>
+                            <input type="radio" class="check-badge" value="PHD" name="hp1" id="phd" th:checked="${noticeSetting.hp1} eq 'PHD'" />
+                            <label for="phd" class="check-badge-label">박사</label>
+                          </div>
+                          <div>
+                            <input type="radio" class="check-badge" value="MASTER" name="hp1" id="master" th:checked="${noticeSetting.hp1} eq 'MASTER'" />
+                            <label for="master" class="check-badge-label">석사</label>
+                          </div>
+                          <div>
+                            <input type="radio" class="check-badge" value="COLLEGE" name="hp1" id="college" th:checked="${noticeSetting.hp1} eq 'COLLEGE'" />
+                            <label for="college" class="check-badge-label">대졸(4)</label>
+                          </div>
+                          <div>
+                            <input type="radio" class="check-badge" value="JUNIOR_COLLEGE" name="hp1" id="juniorCollege" th:checked="${noticeSetting.hp1} eq 'JUNIOR_COLLEGE'" />
+                            <label for="juniorCollege" class="check-badge-label">전졸(2)</label>
+                          </div>
+                          <div>
+                            <input type="radio" class="check-badge" value="HIGH" name="hp1" id="high" th:checked="${noticeSetting.hp1} eq 'HIGH'" />
+                            <label for="high" class="check-badge-label">고졸</label>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <th class="text-center">학력2</th>
+                      <td>
+                        <div class="check-badge-wrap">
+                          <div>
+                            <input type="checkbox" class="check-badge" value="OVERSEAS" name="hp2" id="overseas" />
+                            <label for="overseas" class="check-badge-label">해외</label>
+                          </div>
+                          <div>
+                            <input type="checkbox" class="check-badge" value="SKY" name="hp2" id="sky" />
+                            <label for="sky" class="check-badge-label">SKY</label>
+                          </div>
+                          <div>
+                            <input type="checkbox" class="check-badge" value="SEOUL" name="hp2" id="seoul" />
+                            <label for="seoul" class="check-badge-label">인서울</label>
+                          </div>
+                          <div>
+                            <input type="checkbox" class="check-badge" value="REGION" name="hp2" id="region" />
+                            <label for="region" class="check-badge-label">지방국공립</label>
+                          </div>
+                          <div>
+                            <input type="checkbox" class="check-badge" value="NATION" name="hp2" id="nation" />
+                            <label for="nation" class="check-badge-label">정규4년제</label>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <th class="text-center">희망근무지</th>
+                      <td>
+                        <div class="check-badge-wrap">
+                          <div>
+                            <input type="checkbox" class="check-badge" name="loc" value="ALL" id="locAll" />
+                            <label for="locAll" class="check-badge-label">전국</label>
+                          </div>
+                          <div>
+                            <input type="checkbox" class="check-badge" name="loc" value="SEOUL" id="locSeoul" />
+                            <label for="locSeoul" class="check-badge-label">서울</label>
+                          </div>
+                          <div>
+                            <input type="checkbox" class="check-badge" name="loc" value="IN" id="locIn" />
+                            <label for="locIn" class="check-badge-label">수도권</label>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <th class="text-center">출신회사</th>
+                      <td>
+                        <input type="text" class="form-control form-md" name="company" placeholder="" th:value="${noticeSetting.company}" />
+                      </td>
+                    </tr>
+                    <tr>
+                      <th class="text-center">외국어</th>
+                      <td>
+                        <input type="text" class="form-control form-md" name="foreignLang" placeholder="" th:value="${noticeSetting.foreignLang}" />
+                      </td>
+                    </tr>
+                    <tr>
+                      <th class="text-center">자격증</th>
+                      <td>
+                        <input type="text" class="form-control form-md" name="certificate" placeholder="" th:value="${noticeSetting.certificate}" />
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="send-btn">
+                <button type="button" class="btn btn-dark btn-xl" data-role="save">저장</button>
+              </div>
+            </div>
+          </div>
+       </th:block>
+       <!-- 맞춤인재알림설정 데이터 미 존재 시 (첫등록) -->
+       <th:block th:if="!${existence}">
+         <div class="layout-content">
+           <h3 class="subtitle">맞춤인재알림설정</h3>
+           <div class="title-line mt-4 mb-5"></div>
+           <div class="row row-40 align-items-center">
+             <div class="apply-wrap">
+               <table class="table border-top-1">
+                 <colgroup>
+                   <col width="20%" />
+                   <col width="80%" />
+                 </colgroup>
+                 <tbody>
+                 <tr>
+                   <th class="text-center">알림 설정</th>
+                   <td>
+                     <div class="toggle-btn d-flex">
+                       <input type="checkbox" class="sr-only" name="checkAlarm" value="N" id="checkAlarm2"/>
+                       <label for="checkAlarm2">
+                         <div class="button">
+                           <div class="inside"></div>
+                         </div>
+                       </label>
+                     </div>
+                   </td>
+                 </tr>
+                 <tr>
+                   <th class="text-center">경력</th>
+                   <td>
+                     <div class="d-flex align-items-center required">
+                       <select class="select-design" name="careerSt" style="width: 100px">
+                         <option value="">선택</option>
+                         <th:block th:each="num: ${#numbers.sequence(0,30)}">
+                           <option th:value="${num}" th:text="${num+'년'}"></option>
+                         </th:block>
+                       </select>
+                       <p class="m-l-10 m-r-10">~</p>
+                       <select class="select-design" name="careerEn" style="width: 100px">
+                         <option value="">선택</option>
+                         <th:block th:each="num: ${#numbers.sequence(0,30)}">
+                           <option th:value="${num}" th:text="${num+'년'}"></option>
+                         </th:block>
+                       </select>
+                     </div>
+                   </td>
+                 </tr>
+                 <tr>
+                   <th class="text-center">핵심역량</th>
+                   <td>
+                     <input type="text" class="form-control form-md" name="industry" placeholder=""/>
+                   </td>
+                 </tr>
+                 <tr>
+                   <th class="text-center">연령</th>
+                   <td>
+                     <div class="d-flex align-items-center">
+                       <select class="select-design" name="ageSt" style="width: 140px">
+                         <option value="">선택</option>
+                       </select>
+                       <p class="m-l-10 m-r-10">~</p>
+                       <select class="select-design" name="ageEn" style="width: 140px">
+                         <option value="">선택</option>
+                       </select>
+                     </div>
+                   </td>
+                 </tr>
+                 <tr>
+                   <th class="text-center">연봉</th>
+                   <td>
+                     <div class="d-flex align-items-center">
+                       <select class="select-design" name="salarySt" style="width: 140px">
+                         <option value="">선택</option>
+                         <th:block th:each="num: ${#numbers.sequence(1000,10000,1000)}">
+                           <option th:value="${num}" th:text="${#numbers.formatInteger(num,0,'COMMA') + '만원'}"></option>
+                         </th:block>
+                       </select>
+                       <p class="m-l-10 m-r-10">~</p>
+                       <select class="select-design" name="salaryEn" style="width: 140px">
+                         <option value="">선택</option>
+                         <th:block th:each="num: ${#numbers.sequence(1000,10000,1000)}">
+                           <option th:value="${num}" th:text="${#numbers.formatInteger(num,0,'COMMA') + '만원'}"></option>
+                         </th:block>
+                       </select>
+                     </div>
+                   </td>
+                 </tr>
+                 <tr>
+                   <th class="text-center">학력</th>
+                   <td>
+                     <div class="check-badge-wrap">
+                       <div>
+                         <input type="radio" class="check-badge" value="PHD" name="hp1" id="phd1" />
+                         <label for="phd1" class="check-badge-label">박사</label>
+                       </div>
+                       <div>
+                         <input type="radio" class="check-badge" value="MASTER" name="hp1" id="master1" />
+                         <label for="master1" class="check-badge-label">석사</label>
+                       </div>
+                       <div>
+                         <input type="radio" class="check-badge" value="COLLEGE" name="hp1" id="college1" />
+                         <label for="college1" class="check-badge-label">대졸(4)</label>
+                       </div>
+                       <div>
+                         <input type="radio" class="check-badge" value="JUNIOR_COLLEGE" name="hp1" id="juniorCollege1" />
+                         <label for="juniorCollege1" class="check-badge-label">전졸(2)</label>
+                       </div>
+                       <div>
+                         <input type="radio" class="check-badge" value="HIGH" name="hp1" id="high1" />
+                         <label for="high1" class="check-badge-label">고졸</label>
+                       </div>
+                     </div>
+                   </td>
+                 </tr>
+                 <tr>
+                   <th class="text-center">학력2</th>
+                   <td>
+                     <div class="check-badge-wrap">
+                       <div>
+                         <input type="checkbox" class="check-badge" value="OVERSEAS" name="hp2" id="overseas1" />
+                         <label for="overseas1" class="check-badge-label">해외</label>
+                       </div>
+                       <div>
+                         <input type="checkbox" class="check-badge" value="SKY" name="hp2" id="sky1" />
+                         <label for="sky1" class="check-badge-label">SKY</label>
+                       </div>
+                       <div>
+                         <input type="checkbox" class="check-badge" value="SEOUL" name="hp2" id="seoul1" />
+                         <label for="seoul1" class="check-badge-label">인서울</label>
+                       </div>
+                       <div>
+                         <input type="checkbox" class="check-badge" value="REGION" name="hp2" id="region1" />
+                         <label for="region1" class="check-badge-label">지방국공립</label>
+                       </div>
+                       <div>
+                         <input type="checkbox" class="check-badge" value="NATION" name="hp2" id="nation1" />
+                         <label for="nation1" class="check-badge-label">정규4년제</label>
+                       </div>
+                     </div>
+                   </td>
+                 </tr>
+                 <tr>
+                   <th class="text-center">희망근무지</th>
+                   <td>
+                     <div class="check-badge-wrap">
+                       <div>
+                         <input type="checkbox" class="check-badge" name="loc" value="ALL" id="locAll1" />
+                         <label for="locAll1" class="check-badge-label">전국</label>
+                       </div>
+                       <div>
+                         <input type="checkbox" class="check-badge" name="loc" value="SEOUL" id="locSeoul1" />
+                         <label for="locSeoul1" class="check-badge-label">서울</label>
+                       </div>
+                       <div>
+                         <input type="checkbox" class="check-badge" name="loc" value="IN" id="locIn1" />
+                         <label for="locIn1" class="check-badge-label">수도권</label>
+                       </div>
+                     </div>
+                   </td>
+                 </tr>
+                 <tr>
+                   <th class="text-center">출신회사</th>
+                   <td>
+                     <input type="text" class="form-control form-md" name="company" placeholder="" />
+                   </td>
+                 </tr>
+                 <tr>
+                   <th class="text-center">외국어</th>
+                   <td>
+                     <input type="text" class="form-control form-md" name="foreignLang" placeholder="" />
+                   </td>
+                 </tr>
+                 <tr>
+                   <th class="text-center">자격증</th>
+                   <td>
+                     <input type="text" class="form-control form-md" name="certificate" placeholder="" />
+                   </td>
+                 </tr>
+                 </tbody>
+               </table>
+             </div>
+             <div class="send-btn">
+               <button type="button" class="btn btn-dark btn-xl" data-role="save">저장</button>
+             </div>
+           </div>
+         </div>
+       </th:block>
+        </div>
+  </div>
+</body>
+</html>

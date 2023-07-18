@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html  xmlns:th="http://www.thymeleaf.org"
+       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+       layout:decorate="layouts/mypageLayout">
+<body>
+<div id="container-block">
+  <div layout:fragment="contents" th:remove="tag">
+          <div class="layout-content">
+            <h3 class="subtitle poppins">관심 헤드헌터</h3>
+            <div class="title-line mt-4 mb-5"></div>
+            <div class="headhunter-profile-list"  th:each="interestHh : ${interestHhList}">
+            <div class="headhunter-profile-content attention">
+             <input type="hidden" id="interestHhId" th:value="${interestHh.id}" />
+              <div class="headhunter-profile">
+                <div class="d-flex">
+                  <div class="headhunter-profile-img" th:style="${!#lists.isEmpty(interestHh.commonFileList)? 'background-image : url('+ interestHh.commonFileList[0].url+')':''}" ></div>
+                  <div class="content">
+                    <div class="headhunter-profile-info">
+                      <span class="name" th:text="${interestHh.name}">홍길동</span>
+                      <span class="company" th:text="${interestHh.company}">맨쉬컨설팅(주)</span>
+                    </div>
+                    <p class="phone-num">***-****-****</p>
+                    <p class="email" th:text="${interestHh.email}">abcd1234@naver.com</p>
+                    <div class="m-t-15">
+                      <p class="desc">
+                        <span class="desc-title">HH한마디</span>
+                        <span class="desc-text" th:text="${interestHh.greeting}">한 마디 하십시오! 한 마디 하십시오! 두줄까지만 노출 넘으면 두줄까지만 노출 넘으면</span>
+                      </p>
+                      <p class="desc">
+                        <span class="desc-title">전문분야</span>
+                        <span class="desc-text" th:text="${interestHh.fieldCdNm}">서비스, 교육, 금융/은행, 기관/협회, 미디어/광고/출판, 두줄까지 노출넘으면</span>
+                      </p>
+                    </div>
+                    <a href="javascript:void(0)" class="d-flex align-items-center m-t-15 open-btn">
+                      <p class="txt">진행 중 공고</p>
+                      <p class="num" th:text="${interestHh.progressCnt} + '건' ">건</p>
+                      <i class="icon-select-arrow m-l-5"></i>
+                    </a>
+                  </div>
+                </div>
+                <div class="btn-group">
+                  <button type="button" class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#modal-headhunter" data-role="hhDetail" th:data-member-id="${interestHh.headhunterId}">프로필 보기</button>
+                  <button type="button" class="btn btn-outline-primary m-t-10" data-role="deleteInterestHh" th:data-member-id="${interestHh.headhunterId}">관심해제</button>
+                </div>
+              </div>
+            </div>
+              <div class="resume-form" >
+                <th:block th:each=" list : ${interestHh.positionDTOList}">
+                  <div class="resume-form-list headhunter-form w-100" >
+                    <div class="announcement-wrap">
+                      <input type="hidden" name="id" th:value="${list.id}">
+                      <p class="scale" th:text="${list.companyScale}">
+                        <span class="company" th:text="${list.publicCd} == 0 ? ${list.companyName} : '***'">삼성전자</span>
+                      </p>
+                      <a th:href="'/fo/user/jop/posting/detail?id='+${list.id}" class="title" th:text="${list.title}" data-role="postingDetail" th:data-seq="${list.id}"></a>
+                      <p class="date">
+                        <span>공고마감일</span>
+                        <span th:text="${list.endDate}">2022.10.21 (금)</span>
+                        <span class="text-danger" th:text="${#strings.contains(list.dDay, '-') ? '공고마감' : '(D-' + list.dDay + ')'}">(D-15)</span>
+                      </p>
+                    </div>
+                    <div class="btn-group">
+                      <button href="javascript:void(0)" th:data-id="${list.id}" data-role=checkApplicant
+                         th:text="${list.applicantYn eq '1'? '지원완료':'즉시지원'}" th:disabled="${list.applicantYn eq '1'}" class="btn btn-outline-danger btn-md">즉시지원</button>
+                    </div>
+                  </div>
+                </th:block>
+              </div>
+            </div>
+          </div>
+      </div>
+      <!-- 헤드헌터 상세 -->
+      <div class="modal fade" id="modal-headhunter" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-headhunter modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body pt-0">
+          <form name="headhunterForm">
+            <input type="hidden" name="headhunterId" />
+            <input type="hidden" name="hhMemberId" />
+          </form>
+          <div class="headhunter-profile-content">
+            <div class="headhunter-profile">
+              <div class="headhunter-left">
+                <div class="headhunter-profile-img" data-bs-toggle="modal" data-bs-target="#modal-headhunter"></div>
+                <button type="button" class="btn btn-outline-dark btn-sm" data-role="addBlack">블랙리스트 추가</button>
+              </div>
+              <div class="headhunter-profile-info">
+                <div>
+                  <p class="company">맨쉬컨설팅(주)</p>
+                  <p class="name">
+                    <span name="hhName">홍길동</span>
+                    <span name="hhPosition" class="rank">전무</span>
+                    <span name="hhSchool" class="txt">연세대학교 금속공학과</span>
+                  </p>
+                </div>
+                <div>
+                  <div class="phone">
+                    <p>
+                      <span>연락처</span>
+                      <span name="hhPhone" class="phone-number">***-****-****</span>
+                    </p>
+                    <button type="button" class="btn btn-outline-dark btn-sm" data-role="showPhone">연락처 보기</button>
+                  </div>
+                </div>
+                <ul class="info-list">
+                  <li>
+                    <p>이메일</p>
+                    <a href="" id="hhEmail">asdqwe1234@naver.com</a>
+                  </li>
+                  <li>
+                    <p>최근로그인</p>
+                    <p id="recentLogin">2022-10-11</p>
+                  </li>
+                  <li>
+                    <p>진행중공고</p>
+                    <p><a href="" class="text-danger" id="hhPostingCnt">3</a>건</p>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="apply-wrap">
+            <div class="apply-wrap-body">
+              <div class="content">
+                <h4 class="table-subtitle mb-3">인사말</h4>
+                <div class="desc">
+                  <p class="introduce-text" name="hhIntro"></p>
+                </div>
+              </div>
+              <div class="content">
+                <h4 class="table-subtitle mb-3">주요이력</h4>
+                <div class="desc" name="hhCareer">
+                  <ul class="history">
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                  </ul>
+                </div>
+              </div>
+              <div class="content">
+                <h4 class="table-subtitle mb-3">전문분야</h4>
+                <div class="desc">
+                  <div class="badge-box" name="hhFields">
+                                      <span class="tag tag-lg tag-outline-primary none-border m-0" name="hhFieldsLow">
+                                        <em name="field"></em>
+                                      </span>
+                    <!-- <span class="tag tag-lg tag-outline-primary none-border m-0">
+                     <em>IT/인터넷</em>
+                   </span>
+                     <span class="tag tag-lg tag-outline-primary none-border m-0">
+                     <em>제조/생산/화학</em>
+                   </span>
+                     <span class="tag tag-lg tag-outline-primary none-border m-0">
+                     <em>의료/제약</em>
+                   </span>
+                     <span class="tag tag-lg tag-outline-primary none-border m-0">
+                     <em>유통/판매</em>
+                   </span>-->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+    </div>
+  </body>
+</html>

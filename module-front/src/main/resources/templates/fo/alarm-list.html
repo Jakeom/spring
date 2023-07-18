@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/empty}">
+<head>
+</head>
+<body>
+<div layout:fragment="contents" th:remove="tag">
+  <ul>
+    <th:block  th:each="list : ${alarmList}">
+      <li th:classappend="${list.receiveYn eq 'N' ? 'active' : 'disabled'}" th:value="${list.pushHistSeq}" th:data-url="${list.url}" name="alarm">
+        <div class="d-flex">
+          <span class="profile"><img src="/static/images/icon-chat-notice-active.svg" alt="김신"/></span>
+          <a href="javascript:;">
+            <div class="cont">
+              <span class="title" th:text="${list.dispTypeNm}">dispTypeNm - 알림종류</span>
+              <span class="name" th:text="${list.title}">title - 알림제목</span>
+              <span class="msg" th:text="${list.content}">content - 알림내용</span>
+              <span th:classappend="${list.receiveYn eq 'N' ? 'notice' : ''}" name="receiveYn"></span>
+            </div>
+          </a>
+        </div>
+        <div class="list-out">
+          <span th:text="${list.sendTime}">sendTime - 보낸시간</span>
+        </div>
+      </li>
+    </th:block>
+  </ul>
+</div>
+</body>
+</html>

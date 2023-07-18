@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security" layout:decorate="~{layouts/popup}">
+<body class="body-talk">
+	<div id="container-block">
+		<div layout:fragment="contents" th:remove="tag">
+			<div class="talk-inbox">
+				<div class="message-wrap">
+					<div class="">
+						<ul class="nav nav-tabs border-bottom-0" id="myTab" role="tablist">
+							<li class="nav-item" role="presentation">
+								<button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home"
+									aria-selected="true">알림</button>
+							</li>
+							<li class="nav-item" role="presentation">
+								<button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile"
+									aria-selected="false" tabindex="-1">채팅</button>
+							</li>
+						</ul>
+						<div class="tab-content" id="myTabContent">
+							<div class="tab-pane fade active show" id="home" role="tabpanel" aria-labelledby="home-tab">
+								<div class="message-list">
+									<div class="message-search">
+										<div class="input-group">
+											<input type="text" class="form-control bg-light" placeholder="검색어를 입력하세요" />
+											<div class="input-group-append">
+												<button class="btn btn-light" type="submit">
+													<i class="icon-input-search-dark"><span class="sr-only">검색</span></i>
+												</button>
+											</div>
+										</div>
+									</div>
+									<div class="list">
+										<ul>
+											<li class="active">
+												<div class="d-flex">
+													<span class="profile"><img src="/static/images/about-01.png" alt="김신" /></span>
+													<a href="javascript:;">
+														<div class="cont">
+															<span class="title">국내 및 해외 영업관리​</span>
+															<span class="name">홍길동</span>
+															<span class="msg">"경영전략"에 해당되는 인재를 발견했습니다</span>
+															<span class="notice"></span>
+														</div>
+													</a>
+												</div>
+												<div class="list-out">
+													<a href="javascript:void(0)">나가기</a>
+													<span>2022-12-25</span>
+												</div>
+												<div class="refuse">
+													<p>거절된 대화입니다.</p>
+												</div>
+												</li>
+											<li class="disabled">
+												<div class="d-flex">
+													<span class="profile"><img src="/static/images/about-01.png" alt="김신" /></span>
+													<a href="javascript:;">
+														<div class="cont">
+															<p class="d-flex">
+																<span class="title">대기업 인사재무관리</span>
+																<span class="cnt">(15)</span>
+															</p>
+															<span class="msg">"경영전략"에 해당되는 인재를 발견했습니다 "경영전략"에 해당되는 인재를 발견했습니다</span>
+															<span class="notice"></span>
+														</div>
+													</a>
+												</div>
+												<div class="list-out">
+													<a href="javascript:void(0)">나가기</a>
+													<span>2022-12-25</span>
+												</div>
+												<!-- li에 disabled 클래스 넣으면 활성화 -->
+												<div class="refuse">
+													<p>거절된 대화입니다.</p>
+												</div>
+											</li>
+										</ul>
+									</div>
+								</div>
+							</div>
+							<div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+								<div class="message-list">
+									<div class="message-search">
+										<div class="input-group">
+											<input type="text" class="form-control bg-light" placeholder="검색어를 입력하세요" />
+											<div class="input-group-append">
+												<button class="btn btn-light" type="submit">
+													<i class="icon-input-search-dark"><span class="sr-only">검색</span></i>
+												</button>
+											</div>
+										</div>
+									</div>
+									<div class="list">
+										<ul>
+											<li class="active">
+												<div class="d-flex">
+													<span class="profile"><img src="/static/images/about-01.png" alt="김신" /></span>
+													<a href="javascript:;">
+														<div class="cont">
+															<span class="title">국내 및 해외 영업관리​</span>
+															<span class="name">홍길동</span>
+															<span class="msg">"경영전략"에 해당되는 인재를 발견했습니다</span>
+															<span class="notice"></span>
+														</div>
+													</a>
+												</div>
+												<div class="list-out">
+													<a href="javascript:void(0)">나가기</a>
+													<span>2022-12-25</span>
+												</div>
+												<div class="refuse">
+													<p>거절된 대화입니다.</p>
+												</div>
+											</li>
+											<li class="disabled">
+												<div class="d-flex">
+													<span class="profile"><img src="/static/images/about-01.png" alt="김신" /></span>
+													<a href="javascript:;">
+														<div class="cont">
+															<p class="d-flex">
+																<span class="title">대기업 인사재무관리</span>
+																<span class="cnt">(15)</span>
+															</p>
+															<span class="msg">"경영전략"에 해당되는 인재를 발견했습니다 "경영전략"에 해당되는 인재를 발견했습니다</span>
+															<span class="notice"></span>
+														</div>
+													</a>
+												</div>
+												<div class="list-out">
+													<a href="javascript:void(0)">나가기</a>
+													<span>2022-12-25</span>
+												</div>
+												<!-- li에 disabled 클래스 넣으면 활성화 -->
+												<div class="refuse">
+													<p>거절된 대화입니다.</p>
+												</div>
+											</li>
+										</ul>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="message-content">
+						<div class="message-header">
+							<div class="opponent">
+								<a href="javascript:void(0)" class="back"><i class="icon-b-prev"></i></a>
+								<span class="profile"><img src="/static/images/about-01.png" alt="김신" /></span>
+								<div>
+									<p class="name">김신</p>
+									<p class="object">중견기업 임원급 인사팀장 모집​</p>
+								</div>
+							</div>
+						</div>
+						<div class="message-body">
+							<div class="date">
+								<span>2020. 09. 17 목요일</span>
+							</div>
+							<div class="item">
+								<div class="d-flex align-items-center m-b-10">
+									<span class="profile"><img src="/static/images/about-01.png" alt="김신" /></span>
+									<span class="name m-l-10">김신</span>
+								</div>
+								<p>안녕하세요. 이번 지원 프로그램 관련하여 궁금한 사항이 있어서 메시지 보냅니다. 서류는 이렇게 준비해서 지원하면 되나요?</p>
+								<div class="time">오전 10:50</div>
+							</div>
+							<div class="date">
+								<span>2020. 09. 18 금요일</span>
+							</div>
+							<div class="item my">
+								<p>네 안녕하세요. 지원 프로그램에 지원 바랍니다.</p>
+								<div class="time">오전 10:50</div>
+							</div>
+
+							<div class="item">
+								<div class="d-flex align-items-center m-b-10">
+									<span class="profile"><img src="/static/images/about-01.png" alt="김신" /></span>
+									<span class="name m-l-10">김신</span>
+								</div>
+								<p>네 지원 하였습니다.</p>
+								<div class="time">오전 10:50</div>
+							</div>
+							<div class="item my">
+								<p>지원 갑사합니다.</p>
+								<div class="time">오전 10:50</div>
+							</div>
+						</div>
+						<div class="message-footer">
+							<div class="input-group">
+								<input type="file" class="clip-file" id="inp-file" /> <label for="inp-file" class="clip-file-label"><i class="icon-clip"></i></label> <input
+									type="text" class="form-control form-md bg-light" placeholder="메시지를 입력하세요." />
+								<div class="input-group-append">
+									<button type="submit" class="btn btn-dark">전송</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

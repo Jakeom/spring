@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.bo.BoQnaMapper">
+
+    <!-- 1:1 문의 리스트 조회-->
+    <select id="selectQnaList" resultType="BoQnaDTO">
+        /* com.fw.core.mapper.db1.bo.BoQnaMapper.selectQnaList, selectQnaList, 22.10.11 , Ghazal, BoQnaMapper.xml */
+        SELECT q.id
+             , date_format(q.createdAt, '%Y-%m-%d ') as createdAt
+             , date_format(q.updatedAt, '%Y-%m-%d ') as updatedAt
+             , q.answer
+             , date_format(q.answeredAt, '%Y-%m-%d') as answeredAt
+             , q.content
+             , q.kindCd
+             , fn_get_common_cd(q.kindCd, 'QNA_TYPE', 1) AS qnaTypeCd
+             , q.subject
+             , q.attach_file_id
+             , q.member_id
+             , q.admin_id
+             , ta.admin_nm adminName
+             , q.delFlag
+             , q.answerYn
+             , m.name AS memberName
+             , m.DTYPE AS memberType
+        FROM qna q
+            LEFT JOIN member m ON q.member_id = m.id
+            LEFT JOIN tb_admin ta ON ta.admin_seq = q.admin_id
+        <where>
+            AND delFlag = 'N'
+            <if test="answerYn != null and answerYn != '' ">
+                AND q.answerYn = #{answerYn}
+            </if>
+            <if test="memberType != null and memberType != '' ">
+                AND m.DTYPE = #{memberType}
+            </if>
+            <if test="memberName != null and memberName != '' ">
+                AND m.name LIKE CONCAT('%', #{memberName}, '%')
+            </if>
+            <if test="adminName != null and adminName != ''">
+                AND ta.admin_nm LIKE CONCAT('%', #{adminName}, '%')
+            </if>
+            <if test="searchStart != '' and searchStart!=null and searchEnd !='' and searchEnd!=null">
+                AND date_format(q.createdAt, '%Y-%m-%d') BETWEEN #{searchStart} AND #{searchEnd}
+            </if>
+        </where>
+        ORDER BY q.createdAt DESC
+    </select>
+
+    <!-- 1:1 문의 검색-->
+    <select id="searchQnaList" resultType="BoQnaDTO">
+        /* com.fw.core.mapper.db1.bo.BoQnaMapper.searchQnaList, searchQnaList, 22.10.11 , Ghazal, BoQnaMapper.xml */
+        SELECT
+              q.admin_id
+            , m.id
+            , date_format(q.createdAt, '%Y-%m-%d') as createdAt
+            , date_format(q.updatedAt, '%Y-%m-%d') as updatedAt
+            , q.answer
+            , date_format(q.answeredAt, '%Y-%m-%d') as answeredAt
+            , q.content
+            , q.kindCd
+            , fn_get_common_cd(q.kindCd, 'QNA_TYPE', 1) AS qnaTypeCd
+            , q.subject
+            , q.admin_id
+            , ta.admin_nm adminName
+            , q.attach_file_id
+            , q.member_id
+            , q.delFlag
+            , q.answerYn
+            , m.DTYPE AS memberType
+            , m.phone
+            , m.email
+            , m.name AS memberName
+        FROM qna q
+            LEFT JOIN member m ON q.member_id = m.id
+            LEFT JOIN tb_admin ta ON ta.admin_seq = q.admin_id
+        <where>
+                AND delFlag = 'N'
+            <if test="searchStart != '' and searchStart!=null and searchEnd !='' and searchEnd!=null">
+                AND date_format(q.createdAt, '%Y-%m-%d') BETWEEN #{searchStart} AND #{searchEnd}
+            </if>
+            <if test="memberName != null and memberName != ''">
+                AND m.name LIKE CONCAT('%', #{memberName}, '%')
+            </if>
+            <if test="memberPhone != null and memberPhone != ''">
+                And m.phone LIKE CONCAT('%', #{memberPhone}, '%')
+            </if>
+            <if test="memberEmail != null and memberEmail != ''">
+                AND m.email LIKE CONCAT('%', #{memberEmail}, '%')
+            </if>
+            <if test="adminName != null and adminName != ''">
+                AND ta.admin_nm LIKE CONCAT('%', #{adminName}, '%')
+            </if>
+        </where>
+        ORDER BY q.createdAt DESC
+    </select>
+
+    <!-- 1:1 문의 상세조회-->
+    <select id="selectQnaDetail" parameterType="BoQnaDTO" resultType="BoQnaDTO">
+        /* com.fw.core.mapper.db1.bo.BoQnaMapper.selectQnaDetail, selectQnaDetail, 22.10.11 , Ghazal, BoQnaMapper.xml */
+        SELECT q.id
+             , date_format(q.createdAt, '%Y-%m-%d') as createdAt
+             , date_format(q.updatedAt, '%Y-%m-%d') as updatedAt
+             , fn_get_common_cd(q.kindCd, 'QNA_TYPE', 1) AS qnaTypeCd
+             , q.answer
+             , q.answerAt
+             , q.content
+             , q.kindCd
+             , q.subject
+             , q.attach_file_id
+             , q.member_id
+             , q.admin_id
+             , ta.admin_nm adminName
+             , q.delFlag
+             , q.answerYn
+        FROM qna q
+            LEFT JOIN tb_admin ta ON q.admin_id = ta.admin_seq
+        WHERE q.id = #{id}
+    </select>
+
+    <!-- 1:1 문의 상세 modify -->
+    <select id="selectQnaModify" parameterType="BoQnaDTO" resultType="BoQnaDTO">
+        /* com.fw.core.mapper.db1.bo.QnaMapper.selectQnarModify, 1:1 문의 상세 조회, 22.10.11 , Ghazal , QnaMapper.xml */
+        SELECT q.id
+             , date_format(q.createdAt, '%Y-%m-%d') as createdAt
+             , date_format(q.updatedAt, '%Y-%m-%d') as updatedAt
+             , fn_get_common_cd(q.kindCd, 'QNA_TYPE', 1) AS qnaTypeCd
+             , q.answer
+             , q.answerAt
+             , q.content
+             , q.kindCd
+             , q.subject
+             , q.attach_file_id
+             , q.member_id
+             , q.admin_id
+             , ta.admin_nm adminName
+             , q.delFlag
+        FROM qna q
+                 LEFT JOIN tb_admin ta ON q.admin_id = ta.admin_seq
+        WHERE  q.id = #{id}
+    </select>
+
+    <!-- 1:1 문의 답변 수정-->
+    <update id="updateQna" parameterType="BoQnaDTO">
+        /* com.fw.core.mapper.db1.bo.QnaMapper.updateQna, 1:1 문의수정, 22.10.11 , Ghazal  , QnaMapper.xml */
+        UPDATE qna
+        SET answer = #{answer}
+          , answeredAt = NOW()
+          , admin_id = #{adminSession.adminSeq}
+          , answerYn = 'Y'
+        WHERE id = #{id}
+    </update>
+
+</mapper>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+		xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+		layout:decorate="~{layouts/default}">
+<body>
+<div layout:fragment="contents" th:remove="tag">
+  <input type="hidden" id="adminDetailSeq" th:value="${detail.adminSeq}"/>
+    <div id="container-block">
+        <main id="content" role="main">
+            <h2 class="title">관리자 상세</h2>
+            <div class="p-3">
+                <table class="table table-bordered color">
+                    <colgroup>
+                        <col style="width:15%">
+                        <col style="width:35%">
+                        <col style="width:15%">
+                        <col style="width:35%">
+                        <col style="width:15%">
+                    </colgroup>
+                    <tbody>
+                    <tr>
+                        <th class="text-center none-sort" style="background-color:#D2DAFF">순번</th>
+                        <td th:text="${detail.adminSeq}"></td>
+                        <th class="text-center none-sort" style="background-color:#D2DAFF;">조직ID</th>
+                        <td th:text="${detail.orgId}"></td>
+                    </tr>
+                    <tr>
+                        <th class="text-center none-sort" style="background-color:#D2DAFF;">관리자ID</th>
+                        <td th:text="${detail.adminId}"></td>
+                        <th class="text-center none-sort" style="background-color:#D2DAFF;">관리자이름</th>
+                        <td th:text="${detail.adminNm}"></td>
+                    </tr>
+                    <tr>
+                        <th class="text-center none-sort" style="background-color:#D2DAFF;">이메일</th>
+                        <td th:text="${detail.email}"></td>
+                        <th class="text-center none-sort" style="background-color:#D2DAFF;">사용일</th>
+                        <td th:text="${detail.useStartDt} + '~' + ${detail.useEndDt}"></td>
+                    </tr>
+                    <tr>
+                        <th class="text-center none-sort" style="background-color:#D2DAFF;">관리자 상태</th>
+                        <td th:text="${detail.adminStatusNm}"></td>
+                        <th class="text-center none-sort" style="background-color:#D2DAFF;">IP</th>
+                        <td><span th:each="list : ${ipList}" th:text="${list.ip} + '&nbsp;' + '&nbsp;'"></span></td>
+                    </tr>
+                    <tr>
+                        <th class="text-center none-sort" style="background-color:#D2DAFF;">등록일시</th>
+                        <td th:text="${detail.createDt}"></td>
+                        <th class="text-center none-sort" style="background-color:#D2DAFF;">등록자</th>
+                        <td th:text="${detail.createSeq}"></td>
+                    </tr>
+                    <tr>
+                        <th class="text-center none-sort" style="background-color:#D2DAFF;">수정일시</th>
+                        <td th:text="${detail.updateDt}"></td>
+                        <th class="text-center none-sort" style="background-color:#D2DAFF;">수정자</th>
+                        <td th:text="${detail.updateSeq}"></td>
+                    </tr>
+                    <tr>
+                        <th class="text-center none-sort" style="background-color:#D2DAFF;">승인일시</th>
+                        <td th:text="${detail.approvalDt}"></td>
+                        <th class="text-center none-sort" style="background-color:#D2DAFF;">승인자</th>
+                        <td th:text="${detail.approvalSeq}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+                <button type="button" class="btn btn-dark" data-role="modify">수정</button>
+                <button type="button" class="btn btn-dark" data-role="detail" style="float: right;">목록</button>
+                <button type="button" class="btn btn-danger" data-role="delete">삭제</button>
+            </div>
+        </main>
+    </div>>
+</div>
+<div layout:fragment="modal" th:remove="tag"></div>
+</div>
+</body>
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/empty}">
+<head>
+</head>
+<body>
+<div layout:fragment="contents" th:remove="tag">
+    <div class="tbl-head">
+        <input type="hidden" id="page" name="page" value="1" />
+        <div class="btn-group date-list" role="group">
+            <p class="m-r-20 hidden-mobile">조회기간</p>
+            <input type="hidden" name="selectPeriod" th:value="${searchInfo.selectPeriod}"/>
+            <button type="button" class="btn btn-outline-primary" th:classappend="${searchInfo.selectPeriod} =='1month'? 'active':'' " data-role="date" value="1month">1개월
+            </button>
+            <button type="button" class="btn btn-outline-primary" th:classappend="${searchInfo.selectPeriod} =='3month'? 'active':'' " data-role="date" value="3month">3개월
+            </button>
+            <button type="button" class="btn btn-outline-primary" th:classappend="${searchInfo.selectPeriod} =='6month'? 'active':'' " data-role="date" value="6month">6개월
+            </button>
+            <button type="button" class="btn btn-outline-primary" th:classappend="${searchInfo.selectPeriod} =='1year'? 'active':'' " data-role="date" value="1year">1년
+            </button>
+        </div>
+        <div class="d-flex align-items-center gap-10">
+            <input type="hidden" name="useType" th:value="${searchInfo.useType}"/>
+            <select class="select-design" style="width: 180px" name="pointUseType">
+                <option value="">전체</option>
+                <option value="ADD_JOIN_FREE" th:selected="${searchInfo.useType == 'ADD_JOIN_FREE'}">신규가입 축하포인트</option>
+                <option value="ADD_PURCHASE" th:selected="${searchInfo.useType == 'ADD_PURCHASE'}">포인트 충전</option>
+                <option value="USE_RESUME" th:selected="${searchInfo.useType == 'USE_RESUME'}">이력서 등록</option>
+                <option value="CANCEL_PURCHASE" th:selected="${searchInfo.useType == 'CANCEL_PURCHASE'}">포인트 구매 취소</option>
+                <option value="ADD_PURCHASE_FREE" th:selected="${searchInfo.useType == 'ADD_PURCHASE_FREE'}">추가적립</option>
+                <option value="ADMIN_INPUT_REASON" th:selected="${searchInfo.useType == 'ADMIN_INPUT_REASON'}">관리자 입력</option>
+                <option value="USE_SEND_SMS" th:selected="${searchInfo.useType == 'USE_SEND_SMS'}">SMS 발송</option>
+                <option value="USE_SEND_LMS" th:selected="${searchInfo.useType == 'USE_SEND_LMS'}">LMS 발송</option>
+                <option value="USE_TEMPLATE" th:selected="${searchInfo.useType == 'USE_TEMPLATE'}">템플릿 구매</option>
+                <option value="REFUND" th:selected="${searchInfo.useType == 'REFUND'}">포인트 환불</option>
+                <option value="SHOW_PHONE" th:selected="${searchInfo.useType == 'SHOW_PHONE'}">연락처보기</option>
+            </select>
+        </div>
+    </div>
+    <div id="pointUseHistory">
+        <table class="table m-t-15 border-top-1">
+            <colgroup>
+                <col style="width:25%"/>
+                <col style="width:25%"/>
+                <col style="width:25%"/>
+                <col style="width:25%"/>
+            </colgroup>
+            <thead>
+            <tr>
+                <th class="text-center">구분</th>
+                <th class="text-center">일시</th>
+                <th class="text-center">내역</th>
+                <th class="text-center">포인트</th>
+            </tr>
+            </thead>
+            <tbody>
+            <th:block th:if="${#lists.isEmpty(pointUseHistory)}">
+                <tr>
+                    <td class="text-center" colspan="5">
+                        <p class="m-t-30 m-b-30">포인트 내역이 없습니다.</p>
+                    </td>
+                </tr>
+            </th:block>
+            <th:block th:if="${!#lists.isEmpty(pointUseHistory)}">
+                <th:block th:each="list : ${pointUseHistory}">
+                    <tr>
+                        <td class="text-center">
+                            <th:block th:if="${list.pointIncrease} > '0'">
+                                <p class="text-danger">적립</p>
+                            </th:block>
+                            <th:block th:unless="${list.pointIncrease} > '0'">
+                                <p class="text-primary">사용</p>
+                            </th:block>
+                        </td>
+                        <td class="text-center">
+                            <p th:text="${list.createdAt}">2022.11.01</p>
+                        </td>
+                        <td class="text-center">
+                            <p th:text="${list.reasonNm}">LMS 발송</p>
+                        </td>
+                        <td class="text-center">
+                            <th:block th:if="${list.pointIncrease} > '0'">
+                                <p th:text="${'+'+list.pointIncrease+' P'}" class="text-danger">
+                                    감소포인트</p>
+                            </th:block>
+                            <th:block th:unless="${list.pointIncrease} > '0'">
+                                <p th:text="${list.pointIncrease+' P'}" class="text-primary">
+                                    증가포인트</p>
+                            </th:block>
+                        </td>
+                    </tr>
+                </th:block>
+            </th:block>
+            </tbody>
+        </table>
+        <div class="d-flex justify-content-center mt-5">
+            <th:block th:include="common/paging :: paging_Fragment(fnc=*{'fn_go_page(this)'}, pageId=*{'pageName1'})"/>
+        </div>
+    </div>
+</div>
+</body>
+</html>

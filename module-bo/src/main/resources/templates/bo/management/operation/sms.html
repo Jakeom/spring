@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/default}">
+
+<body>
+	<div layout:fragment="contents" th:remove="tag">
+		<main id="content" role="main">
+			<h2 class="title">SMS발송</h2>
+			<div class="row p-3">
+				<div class="col-12">
+					<!-- Search -->
+					<div class="">
+						<form id="searchQna" name="searchQna">
+							<div class="row mt-5">
+								<div class="col-4">
+									<div class="d-flex align-items-center">
+										<input type="text" id="qnaStartDt" name="qnaStartDt" class="form-control form-datepicker" placeholder="날짜 선택">
+										<div class="mr-2">~</div>
+										<input type="text" id="qnaEndDt" name="qnaEndDt" class="form-control form-datepicker" placeholder="날짜 선택">
+									</div>
+								</div>
+								<div class="col-2">
+									<div class="d-flex align-items-center">
+										<button type="button" class="btn btn-dark" data-role="all" id="all" name="colorChange">전체</button>
+										<button type="button" class="btn btn-dark" data-role="today" id="today" name="colorChange">오늘</button>
+										<button type="button" class="btn btn-dark" data-role="week" id="week" name="colorChange">7일</button>
+										<button type="button" class="btn btn-dark" data-role="month" id="month" name="colorChange">1개월</button>
+		
+									</div>
+								</div>
+								<div class="col-6 text-right">
+									<div class="d-flex" style="float: right">
+										<select id="personalInfo" class="custom-select w-auto mr-2">
+											<option value="name">이름</option>
+											<option value="id">회원 ID</option>
+										</select> <input type="text" class="form-control w-auto" data-role="member" />
+										<button type="button" class="btn btn-primary mr-2" data-role="search">검색하기</button>
+									</div>
+									<button type="button" class="btn btn-dark" id="openMailModal" data-toggle="modal" data-target="#mailModal">메일발송</button>
+									<button type="button" class="btn btn-dark mr-2" id="openSmsModal" data-toggle="modal" data-target="#smsModal">문자발송</button>
+								</div>
+							</div>
+						</form>
+						<!-- Search -->
+						<div class="row mt-3">
+							<div class="col">
+								<table id="datatable" class="table">
+									<thead>
+										<tr>
+											<th><input type="checkbox" class="form-check-input m-0 align-middle" th:id="mainCheckbox" /></th>
+											<th>회원 ID</th>
+											<th>구분</th>
+											<th>이름</th>
+											<th>휴대폰번호</th>
+											<th>이메일</th>
+										</tr>
+									</thead>
+								</table>
+							</div>
+						</div>
+					</div>
+					<!-- 이메일 Modal -->
+					<div class="modal fade" tabindex="-1" id="mailModal" role="dialog">
+						<div class="modal-dialog modal-dialog-centered">
+							<!-- Modal content-->
+							<div class="modal-content">
+								<div class="modal-header">
+									<h4 class="modal-title">메일발송</h4>
+									<i class="fas fa-window-close float-right" id="closeMailModal"></i>
+								</div>
+								<div class="modal-body">
+									<form name="register" accept-charset="UTF-8">
+										<div class="form-group form-inline name-area col">
+											<label th:text="받는사람  "></label>
+											<p></p>
+										</div>
+										<div class="form-group form-inline col">
+											<input type="text" data-role="email" class="form-control col" placeholder="이메일 직접입력"> <i class="fa fa-plus float-right col"
+												aria-hidden="true" id="addName"></i>
+										</div>
+										<div class="form-group form-inline col">
+											<input type="text" class="form-control" placeholder="제목" data-role="subject">
+										</div>
+										<div class="form-group form-inline col">
+											<textarea class="form-control  ckeditor" rows="10" cols="30" name="content"></textarea>
+										</div>
+									</form>
+								</div>
+								<div class="modal-footer d-flex justify-content-center">
+									<button type="button" class="btn btn-default btn-outline-dark" data-role="sendEmail">전송</button>
+								</div>
+							</div>
+		
+						</div>
+					</div>
+					<!--/이메일 modal-->
+					<!-- SMS Modal -->
+					<div class="modal fade" tabindex="-1" id="smsModal" role="dialog">
+						<div class="modal-dialog modal-dialog-centered">
+							<!-- Modal content-->
+							<div class="modal-content">
+								<div class="modal-header">
+									<h4 class="modal-title">문자발송</h4>
+									<i class="fas fa-window-close float-right" id="closeSmsModal"></i>
+								</div>
+								<div class="modal-body">
+									<form name="register" accept-charset="UTF-8">
+										<div class="form-group form-inline col msg-name-area">
+											<label>받는사람<span> </span></label>
+											<p></p>
+										</div>
+										<div class="form-group form-inline col">
+											<input type="text" class="form-control col" data-role="msgPhone" placeholder="휴대번호 직접입력" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"> <i class="fa fa-plus float-right col"
+												aria-hidden="true" id="msgAddName"></i>
+										</div>
+										<div class="form-group form-inline col">
+											<input type="text" class="form-control " placeholder="제목" data-role="msgSubject">
+										</div>
+										<div class="form-group form-inline col">
+											<textarea class="form-control ckeditor " rows="10" cols="30" name="msgContent"></textarea>
+										</div>
+									</form>
+								</div>
+								<div class="modal-footer d-flex justify-content-center">
+									<button type="button" class="btn btn-default btn-outline-dark" data-role="sendSms">전송</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</main>
+	</div>
+</body>
+</html>
+

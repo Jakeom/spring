@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/default}">
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div layout:fragment="contents" th:remove="tag">
+    <div id="container-block">
+        <main id="content" role="main">
+            <h2 class="title">API 로그 확인</h2>
+            <div class="p-3">
+                <div class="row">
+                    <div class="col col-6">
+                        <div style="width:700px;height:700px;">
+                            <h4 class="text-center m-3">CHART</h4>
+                            <canvas id="myChart">API 로그</canvas>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <h4 class="text-center m-3">API</h4>
+                        <table class="table table-bordered table-center">
+                            <thead>
+                            <tr>
+                                <th>URL</th>
+                                <th>COUNT</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="log : ${apiLog}" data-role="detailLog" th:data-url="${log.url}"
+                                style="cursor:pointer">
+                                <td th:text="${log.url}"></td>
+                                <td th:text="${log.count}"></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+<div layout:fragment="modal" th:remove="tag"></div>
+</body>
+</html>

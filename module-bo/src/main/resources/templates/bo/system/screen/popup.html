@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/default}">
+<head>
+    <style>
+    </style>
+</head>
+<body>
+<div layout:fragment="contents" th:remove="tag">
+    <div id="container-block">
+        <main id="content" role="main">
+            <h2 class="title">팝업 관리</h2>
+            <div class="p-3">
+                <table id="datatable" class="table">
+                    <thead>
+                    <tr>
+                        <th>순번</th>
+                        <th>제목</th>
+                        <th>내용</th>
+                        <th>메뉴 순서</th>
+                        <th>사용여부</th>
+                        <th>팝업 시작 일시</th>
+                        <th>팝업 종료 일시</th>
+                        <th>링크 URL</th>
+                        <th>오프셋 X</th>
+                        <th>오프셋 Y</th>
+                        <th>생성 일시</th>
+                        <th>관리</th>
+                    </tr>
+                    </thead>
+                </table>
+            </div>
+            <button type="button" class="btn btn-dark float-lg-right mx-7" data-role="form">등록</button>
+        </main>
+    </div>
+    <div layout:fragment="modal" th:remove="tag"></div>
+</div>
+</body>
+</html>

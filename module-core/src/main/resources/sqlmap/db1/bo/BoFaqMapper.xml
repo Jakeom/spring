@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.bo.BoFaqMapper">
+
+    <!-- FaqList 조회 -->
+    <select id="selectFaqList" parameterType="BoFaqDTO" resultType="BoFaqDTO">
+        /* com.fw.core.mapper.db1.bo.BoFaqMapper.selectFaqList, FAQ 리스트 조회, 22.09.30, dongbeom, BoFaqMapper.xml */
+        SELECT tb.faq_seq
+             , tb.display_flag
+             , tb.faq_category_seq
+             , tb.title
+             , tb.content
+             , tb.file_seq
+             , tb.hit
+             , tb.del_flag
+             , tb.create_seq
+             , (SELECT admin_nm FROM tb_admin WHERE admin_seq = tb.create_seq) writer
+             , (SELECT admin_nm FROM tb_admin WHERE admin_seq = tb.update_seq) editor
+             , date_format(tb.create_dt, '%Y-%m-%d') as create_dt
+             , tb.update_seq
+             , date_format(tb.update_dt, '%Y-%m-%d') as update_dt
+             , tbc.category_nm
+             , tbc.member_type_cd
+        FROM tb_faq tb
+        INNER JOIN tb_faq_category tbc
+		  ON tb.faq_category_seq = tbc.faq_category_seq
+        WHERE tb.del_flag = 'N'
+        <if test='memberTypeCd != null and memberTypeCd !=""'>
+            AND tbc.member_type_cd = #{memberTypeCd}
+        </if>
+        <if test='categoryNm != null and categoryNm !=""'>
+            AND tbc.category_nm = #{categoryNm}
+        </if>
+        ORDER BY tb.faq_seq desc
+    </select>
+
+    <!-- APFaqDisplayList 조회 -->
+    <select id="selectFaqDisplayList" parameterType="BoFaqDTO" resultType="BoFaqDTO">
+        /* com.fw.core.mapper.db1.bo.BoFaqMapper.selectFaqDisplayList, FAQ 메인노출 리스트 조회, 22.09.30, dongbeom, BoFaqMapper.xml */
+        SELECT tb.faq_seq
+             , tb.display_flag
+             , tb.title
+             , tb.content
+             , tb.del_flag
+             , tb.create_seq
+             , (SELECT admin_nm FROM tb_admin WHERE admin_seq = tb.create_seq) writer
+             , (SELECT admin_nm FROM tb_admin WHERE admin_seq = tb.update_seq) editor
+             , date_format(tb.create_dt, '%Y-%m-%d') as create_dt
+             , tb.update_seq
+             , date_format(tb.update_dt, '%Y-%m-%d') as update_dt
+             , tbc.category_nm
+             , tbc.member_type_cd
+        FROM tb_faq tb
+        INNER JOIN tb_faq_category tbc
+		  ON tb.faq_category_seq = tbc.faq_category_seq
+        WHERE tb.del_flag = 'N'
+          AND tb.display_flag is not null
+          AND tbc.member_type_cd = 'AP'
+        ORDER BY tb.faq_seq desc
+    </select>
+
+    <!-- HHFaqDisplayList 조회 -->
+    <select id="selectHHFaqDisplayList" parameterType="BoFaqDTO" resultType="BoFaqDTO">
+        /* com.fw.core.mapper.db1.bo.BoFaqMapper.HHFaqDisplayList, FAQ 메인노출 리스트 조회, 22.09.30, dongbeom, BoFaqMapper.xml */
+        SELECT tb.faq_seq
+             , tb.display_flag
+             , tb.title
+             , tb.content
+             , tb.del_flag
+             , tb.create_seq
+             , (SELECT admin_nm FROM tb_admin WHERE admin_seq = tb.create_seq) writer
+             , (SELECT admin_nm FROM tb_admin WHERE admin_seq = tb.update_seq) editor
+             , date_format(tb.create_dt, '%Y-%m-%d') as create_dt
+             , tb.update_seq
+             , date_format(tb.update_dt, '%Y-%m-%d') as update_dt
+             , tbc.category_nm
+             , tbc.member_type_cd
+        FROM tb_faq tb
+        INNER JOIN tb_faq_category tbc
+		  ON tb.faq_category_seq = tbc.faq_category_seq
+        WHERE tb.del_flag = 'N'
+          AND tb.display_flag is not null
+          AND tbc.member_type_cd = 'HH'
+        ORDER BY tb.faq_seq desc
+    </select>
+
+    <!-- Faq 상세보기 -->
+    <select id="selectFaq" parameterType="BoFaqDTO" resultType="BoFaqDTO">
+        /* com.fw.core.mapper.db1.bo.BoFaqMapper.selectFaq, FAQ 상세보기, 22.10.04, dongbeom, BoFaqMapper.xml */
+          SELECT tb.faq_seq
+             , tb.display_flag
+             , tb.faq_category_seq
+             , tb.title
+             , tb.content
+             , tb.file_seq
+             , tb.hit
+             , tb.del_flag
+             , tb.create_seq
+             , (SELECT admin_nm FROM tb_admin WHERE admin_seq = tb.create_seq) writer
+             , (SELECT admin_nm FROM tb_admin WHERE admin_seq = tb.update_seq) editor
+             , date_format(tb.create_dt, '%Y-%m-%d')   as create_dt
+             , tb.update_seq
+             , date_format(tb.update_dt, '%Y-%m-%d')   as update_dt
+             , tbc.category_nm
+             , tbc.member_type_cd
+        FROM tb_faq tb
+        INNER JOIN tb_faq_category tbc
+          ON tb.faq_category_seq = tbc.faq_category_seq
+        WHERE tb.del_flag = 'N'
+              AND faq_seq = #{faqSeq}
+              ORDER BY tb.faq_seq desc
+    </select>
+
+    <!-- 날짜 검색 FAQ 리스트 조회 -->
+    <select id="searchFaqList" parameterType="BoFaqDTO" resultType="BoFaqDTO">
+        /* com.fw.core.mapper.db1.bo.BoFaqMapper.searchFaqList, 날짜 검색 FAQ 리스트 조회, 22.10.11, dongbeom, BoFaqMapper.xml */
+        SELECT tb.faq_seq
+             , tb.display_flag
+             , tb.faq_category_seq
+             , tb.title
+             , tb.content
+             , tb.file_seq
+             , tb.hit
+             , tb.del_flag
+             , tb.create_seq
+             , (SELECT admin_nm FROM tb_admin WHERE admin_seq = tb.create_seq) writer
+             , (SELECT admin_nm FROM tb_admin WHERE admin_seq = tb.update_seq) editor
+             , date_format(tb.create_dt, '%Y-%m-%d') as create_dt
+             , tb.update_seq
+             , date_format(tb.update_dt, '%Y-%m-%d') as update_dt
+             , tbc.category_nm
+             , tbc.member_type_cd
+        FROM tb_faq tb
+                 INNER JOIN tb_faq_category tbc
+                            ON tb.faq_category_seq = tbc.faq_category_seq
+        WHERE tb.del_flag = 'N'
+            AND date_format(tb.create_dt, '%Y-%m-%d') BETWEEN #{startDate} AND #{endDate}
+        <if test='memberTypeCd != null and memberTypeCd !=""'>
+            AND tbc.member_type_cd = #{memberTypeCd}
+        </if>
+        <if test='categoryNm != null and categoryNm !=""'>
+            AND tbc.category_nm = #{categoryNm}
+        </if>
+        ORDER BY tb.faq_seq desc
+    </select>
+
+    <select id="cntDisplayFlag" parameterType="BoFaqDTO" resultType="BoFaqDTO">
+        SELECT COUNT(*) as displayCnt
+        FROM tb_faq
+        WHERE display_flag is not null
+        AND del_flag = 'N'
+    </select>
+
+    <!-- FAQ 등록 -->
+    <insert id="insertFaq" parameterType="BoFaqDTO">
+        /* com.fw.core.mapper.db1.bo.BoFaqMapper.insertFaq, FAQ 등록, 22.10.04, dongbeom, BoFaqMapper.xml */
+        INSERT INTO tb_faq (
+               faq_category_seq
+             , title
+             , content
+             , hit
+             , del_flag
+             , create_seq
+             , create_dt
+        ) VALUES (
+               #{faqCategorySeq}
+             , #{title}
+             , #{content}
+             , '0'
+             , 'N'
+             , #{adminSession.adminSeq}
+             , NOW()
+        )
+    </insert>
+
+    <!-- Faq 삭제(delFlag Y 업데이트) -->
+    <update id="deleteFaq" parameterType="BoFaqDTO">
+        /* com.fw.core.mapper.db1.bo.BoFaqMapper.deleteFaq, Faq 삭제(delFlag Y 업데이트), 22.10.04, dongbeom , BoFaqMapper.xml */
+        UPDATE tb_faq
+        SET del_flag = 'Y'
+        WHERE faq_seq = #{faqSeq}
+    </update>
+
+    <!-- Faq 삭제(deleteDisplay null 업데이트) -->
+    <update id="deleteDisplay" parameterType="BoFaqDTO">
+        /* com.fw.core.mapper.db1.bo.BoFaqMapper.deleteDisplay, Faq 삭제(deleteDisplay null 업데이트), 22.11.17, dongbeom , BoFaqMapper.xml */
+        UPDATE tb_faq
+        SET display_flag = null
+        WHERE display_flag = #{displayFlag}
+    </update>
+
+    <!-- Faq 업데이트 -->
+    <update id="updateFaq" parameterType="BoFaqDTO">
+        /* com.fw.core.mapper.db1.bo.BoFaqMapper.updateFaq, Faq 업데이트, 22.10.05, dongbeom , BoFaqMapper.xml */
+        UPDATE tb_faq
+        SET title = #{title}
+          , faq_category_seq = #{faqCategorySeq}
+          , content = #{content}
+          , update_seq = #{adminSession.adminSeq}
+          , update_dt = NOW()
+        WHERE faq_seq = #{faqSeq}
+    </update>
+
+    <!-- updateDisplayFlag 업데이트 -->
+    <update id="updateDisplayFlag" parameterType="BoFaqDTO">
+        /* com.fw.core.mapper.db1.bo.BoFaqMapper.updateFaqupdateDisplayFlag, updateDisplayFlag 업데이트, 22.11.16, dongbeom , BoFaqMapper.xml */
+        UPDATE tb_faq
+        SET display_flag = #{displayFlag}
+          , update_dt = NOW()
+          , update_seq = #{adminSession.adminSeq}
+        WHERE faq_seq = #{faqSeq}
+    </update>
+
+</mapper>

@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.fo.FoRewardMapper">
+
+    <!-- 리워드 상품 조회 카운트 취득-->
+    <select id="selectRewardListCntForPaging" resultType="int">
+        /*com.fw.core.mapper.db1.fo.FoPositionMapper.selectPositionListCntForPaging,  채용공고 조회 카운트 취득 , 2022.11 , skayhlj@gmail.com, FoPositionMapper.xml*/
+        SELECT COUNT(1) AS CNT
+        FROM reward_goods
+        WHERE delFlag = 'N'
+    </select>
+
+    <!-- 리워드 상품 조회 -->
+    <select id="selectRewardList" parameterType="FoRewardDTO" resultType="FoRewardDTO">
+        /* com.fw.core.mapper.db1.fo.FoRewardMapper.selectRewardList, 리워드 상품 조회, jung , FoRewardMapper.xml */
+        SELECT @rownum:=@rownum+1 AS rownum
+             , A.*
+        FROM (
+            SELECT id
+                , point
+                , goodNm
+                , goodComp
+                , goodDetail
+                , delFlag
+                , create_seq
+                , create_dt
+                , update_seq
+                , update_dt
+                , file_seq
+            FROM reward_goods
+            WHERE delFlag = 'N'
+            ) AS A
+        , (SELECT @rownum:=0) TMP order by rownum DESC
+        <include refid="common.paging" />
+    </select>
+
+    <!-- 리워드 상품 상세 -->
+    <select id="selectRewardDetail" parameterType="FoRewardDTO" resultType="FoRewardDTO">
+        /* com.fw.core.mapper.db1.fo.FoRewardMapper.selectRewardList, 리워드 상품 조회, jung , FoRewardMapper.xml */
+        SELECT id
+             , point
+             , goodNm
+             , goodComp
+             , goodDetail
+             , delFlag
+             , create_seq
+             , create_dt
+             , update_seq
+             , update_dt
+             , file_seq
+          FROM reward_goods
+         WHERE delFlag = 'N'
+           AND id = #{id}
+    </select>
+
+    <!-- 리워드 내역-->
+    <select id="selectRewardHistoryListCntForPaging" resultType="int">
+        /*com.fw.core.mapper.db1.fo.FoPositionMapper.selectPositionListCntForPaging,  리워드 내역 , 2022.11 , skayhlj@gmail.com, FoPositionMapper.xml*/
+        SELECT COUNT(1) AS CNT
+        FROM reward_history
+        WHERE delFlag = 'N'
+          AND applicant_id = #{frontSession.id}
+        <if test="goodsCd != '' and goodsCd != null">
+            AND goodsCd = #{goodsCd}
+        </if>
+        <if test="selectPeriod != '' and selectPeriod != null">
+            <if test="selectPeriod eq '1month'">
+                AND createdAt BETWEEN DATE_SUB(NOW(), INTERVAL 1 MONTH) AND NOW()
+            </if>
+            <if test="selectPeriod eq '3month'">
+                AND createdAt BETWEEN DATE_SUB(NOW(), INTERVAL 3 MONTH) AND NOW()
+            </if>
+            <if test="selectPeriod eq '6month'">
+                AND createdAt BETWEEN DATE_SUB(NOW(), INTERVAL 6 MONTH) AND NOW()
+            </if>
+            <if test="selectPeriod eq '12month'">
+                AND createdAt BETWEEN DATE_SUB(NOW(), INTERVAL 1 YEAR) AND NOW()
+            </if>
+        </if>
+    </select>
+
+    <!-- 리워드 적립/사용 내역 -->
+    <select id="selectRewardHistoryListPaging" parameterType="FoRewardDTO" resultType="FoRewardDTO">
+        /* com.fw.core.mapper.db1.fo.FoRewardMapper.selectRewardHistoryList, 리워드 적립/사용 내역, jung , FoRewardMapper.xml */
+        SELECT @rownum:=@rownum+1 AS rownum
+             , A.*
+        FROM (
+        SELECT id
+             , DATE_FORMAT(createdAt,'%Y.%m.%d') AS createdAt
+             , updatedAt
+             , balance
+             , goodsCd
+             , fn_get_common_cd(goodsCd,'REWARD_GOODS',1) AS goodsNm
+             , increase
+             , reasonCd
+             , fn_get_common_cd(reasonCd, 'REWARD_GOODS', 1) AS reasonCdNm
+             , trId
+             , applicant_id
+             , headhunter_id
+             , reward_id
+             , adminReason
+             , backoffice_admin_id
+             , delFlag
+             , reward_goods_id
+          FROM reward_history
+         WHERE delFlag = 'N'
+        AND applicant_id = #{frontSession.id}
+        <if test="goodsCd != '' and goodsCd != null">
+            AND goodsCd = #{goodsCd}
+        </if>
+        <if test="selectPeriod != '' and selectPeriod != null">
+            <if test="selectPeriod eq '1month'">
+                AND createdAt BETWEEN DATE_SUB(NOW(), INTERVAL 1 MONTH) AND NOW()
+            </if>
+            <if test="selectPeriod eq '3month'">
+                AND createdAt BETWEEN DATE_SUB(NOW(), INTERVAL 3 MONTH) AND NOW()
+            </if>
+            <if test="selectPeriod eq '6month'">
+                AND createdAt BETWEEN DATE_SUB(NOW(), INTERVAL 6 MONTH) AND NOW()
+            </if>
+            <if test="selectPeriod eq '12month'">
+                AND createdAt BETWEEN DATE_SUB(NOW(), INTERVAL 1 YEAR) AND NOW()
+            </if>
+        </if>
+        ) AS A
+        , (SELECT @rownum:=0) TMP order by rownum DESC
+        <include refid="common.paging" />
+    </select>
+
+    <!--리워드 insert-->
+    <insert id="insertReward" parameterType="FoRewardDTO">
+        /*com.fw.core.mapper.db1.fo.FoRewardMapper.insertReward, 리워드 insert , 2023.1 , skayhlj@gmail.com, FoRewardMapper.xml*/
+        INSERT INTO reward (
+               createdAt
+             , updatedAt
+             , balance
+             , applicant_id
+             , delFlag
+        ) VALUES (
+               NOW()
+             , NOW()
+             , 0
+             , #{frontSession.id}
+             , 'N'
+        )
+    </insert>
+
+    <!--리워드 유무-->
+    <select id="selectReward" parameterType="FoRewardDTO" resultType="int">
+        /*com.fw.core.mapper.db1.fo.FoRewardMapper.selectReward, 리워드 유무 , 2023.1 , skayhlj@gmail.com, FoRewardMapper.xml*/
+       SELECT COUNT(1) AS rewardYnCNT
+         FROM reward
+        WHERE delFlag = 'N'
+          AND applicant_id = #{frontSession.id}
+    </select>
+
+    <!-- 리워드 업데이트-->
+    <update id="updateReward" parameterType="FoRewardDTO">
+        /*com.fw.core.mapper.db1.fo.FoRewardMapper.updateReward, 리워드 업데이트 , 2022.11 , skayhlj@gmail.com, FoRewardMapper.xml*/
+        UPDATE reward
+           SET balance = (SELECT balance from reward where applicant_id = #{frontSession.id}) + #{increase}
+             , updatedAt = NOW()
+         WHERE id = (SELECT id from reward where applicant_id = #{frontSession.id} AND delFlag = 'N')
+    </update>
+
+    <!--리워드 히스토리-->
+    <insert id="insertRewardHistory" parameterType="FoRewardDTO">
+        /*com.fw.core.mapper.db1.fo.FoRewardMapper.insertRewardHistory, 리워드 히스토리 , 2023.1 , skayhlj@gmail.com, FoRewardMapper.xml*/
+        INSERT INTO reward_history (
+               createdAt
+             , updatedAt
+             , balance /*not null*/
+             , goodsCd
+             , increase /*not null*/
+             , reasonCd
+             , trId
+             , applicant_id /*not null*/
+             , headhunter_id
+             , reward_id /*not null*/
+             , adminReason
+             , backoffice_admin_id
+             , delFlag
+             , reward_goods_id
+        )
+        SELECT
+               NOW()
+             , NOW()
+             , balance+#{increase}
+             , #{goodsCd}
+             , #{increase}
+             , #{reasonCd}
+             , #{trId}
+             , #{frontSession.id}
+             , #{headhunterId}
+             , id
+             , #{adminReason}
+             , #{backofficeAdminId}
+             , 'N'
+             , #{rewardGoodsId}
+          FROM reward
+         WHERE applicant_id = #{frontSession.id}
+    </insert>
+
+
+
+</mapper>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/default}">
+<head>
+</head>
+<body>
+    <div layout:fragment="contents" th:remove="tag">
+        <div id="container-block">
+            <main id="content" role="main">
+                <h2 class="title">관리자 관리</h2>
+                <div class="p-3">
+                    <table id="datatable" class="table">
+                        <thead>
+                        <tr>
+                            <th>순번</th>
+                            <th>조직</th>
+                            <th>관리자아이디</th>
+                            <th>관리자이름</th>
+                            <th>이메일</th>
+                            <th>관리자상태</th>
+                            <th>사용일</th>
+                            <th>등록일시</th>
+                            <th>관리</th>
+                        </tr>
+                        </thead>
+                    </table>
+                </div>
+                <button type="button" class="btn btn-dark float-lg-right mx-7" data-role="form">등록</button>
+            </main>
+        </div>
+    </div>
+</body>
+</html>

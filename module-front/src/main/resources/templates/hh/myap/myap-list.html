@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layouts/hh/mainLayout}">
+<body>
+
+<div id="container-block" layout:fragment="contents" th:remove="tag">
+    <form name="openMyapForm">
+        <input type="hidden" name="resumeId" id="resumeId">
+        <input type="hidden" name="opened" id="opened">
+    </form>
+    <div class="container">
+        <div class="sub-content">
+            <h3 class="subtitle">내 인재관리</h3>
+            <form name="searchForm">
+                <input type="hidden" name="page" />
+                <div class="management-filter">
+                    <div class="management-filter-title">
+                        <p>열람권을 사용하거나 인재등록을 통해 등록된 인재의 목록을 볼 수 있습니다.</p>
+                        <button type="button" class="btn btn-primary" data-role="addMember" onclick="addMyAp()">+ 인재등록
+                        </button>
+                    </div>
+                    <div class="management-filter-content">
+                        <div class="resources-search-content">
+                            <p class="title">경력</p>
+                            <div class="d-flex align-items-center m-b-10">
+                                <input type="hidden" id="careerSt" th:value="${searchInfo.careerSt}">
+                                <input type="hidden" id="careerEn" th:value="${searchInfo.careerEn}">
+                                <select class="select-design" style="min-width: 88px" name="careerSt">
+                                    <option value="">선택</option>
+                                </select>
+                                <p class="m-l-10 m-r-10">~</p>
+                                <select class="select-design" style="min-width: 88px" name="careerEn">
+                                    <option value="">선택</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="resources-search-content">
+                            <p class="title">이름</p>
+                            <input type="text" class="form-control form-md" name="name" id="name"
+                                   th:value="${searchInfo.name}"/>
+                        </div>
+                        <div class="resources-search-content">
+                            <p class="title">최종회사</p>
+                            <input type="text" class="form-control form-md" name="finalCompany" id="finalCompany"
+                                   th:value="${searchInfo.finalCompany}"/>
+                        </div>
+                        <div class="resources-search-content">
+                            <p class="title">연령</p>
+                            <div class="d-flex align-items-center m-b-10">
+                                <input type="hidden" id="ageSt" th:value="${searchInfo.ageSt}">
+                                <input type="hidden" id="ageEn" th:value="${searchInfo.ageEn}">
+                                <select class="select-design" style="min-width: 170px;" name="ageSt">
+                                    <option value="">선택</option>
+                                </select>
+                                <p class="m-l-10 m-r-10">~</p>
+                                <select class="select-design" style="min-width: 170px;" name="ageEn">
+                                    <option value="">선택</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="resources-search-content">
+                            <p class="title">키워드(핵심역량)</p>
+                            <input type="text" class="form-control form-md" name="keyword" id="keyword"
+                                   th:value="${searchInfo.keyword}"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="btn-group d-flex align-items-center justify-content-center m-t-30">
+                    <button type="button" class="btn btn-primary m-r-10" data-role="search">검색하기</button>
+                    <button type="button" class="btn btn-outline-gray" data-role="reset">초기화</button>
+                </div>
+
+                <div class="tbl-head">
+                    <th:block th:if="${#lists.isEmpty(detailList)}">
+                        <p class="tbl-head-cnt"></p>
+                    </th:block>
+                    <th:block th:if="${!#lists.isEmpty(detailList)}">
+                        <p class="tbl-head-cnt">총 <span th:text="${searchInfo.totalCount}"></span>건의 내 인재가 있습니다.</p>
+                    </th:block>
+
+                    <div class="d-flex align-items-center gap-10">
+                        <select class="select-design" style="width: 100%" name="registerPathCd" id="registerPathCd">
+                            <option value="" th:selected="${searchInfo.registerPathCd}">전체</option>
+                            <option value="REGISTER" th:selected="${searchInfo.registerPathCd eq 'REGISTER'}">인재등록
+                            </option>
+                            <option value="POINT" th:selected="${searchInfo.registerPathCd eq 'POINT'}">연락처보기</option>
+                        </select>
+                        <select class="select-design" style="width: 100%" name="rowSize" id="rowSize">
+                            <option value="10">10개씩 보기</option>
+                            <option value="30" th:selected="${searchInfo.endRow eq 30}">30개씩 보기</option>
+                            <option value="50" th:selected="${searchInfo.endRow eq 50}">50개씩 보기</option>
+                        </select>
+                    </div>
+                </div>
+            </form>
+
+            <th:block th:if="${#lists.isEmpty(detailList)}">
+                <div class="fake-table-column text-center">데이터가 없습니다.</div>
+            </th:block>
+            <th:block th:if="${!#lists.isEmpty(detailList)}">
+
+
+                <table class="table m-t-15">
+                    <thead>
+                    <tr>
+                        <th class="text-center">사진</th>
+                        <th class="text-center">이름</th>
+                        <th class="text-center">경력</th>
+                        <th class="text-center">최종회사<br/>최장회사</th>
+                        <th class="text-center">최종학교</th>
+                        <th class="text-center">핵심역량</th>
+                        <th class="text-center">이직횟수</th>
+                        <th class="text-center">등록방식</th>
+                        <th class="text-center">열람만료일</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <th:block th:each="data : ${detailList}">
+                        <tr>
+                            <td class="text-center">
+                                <div class="img-box">
+                                    <th:block th:if="${!#lists.isEmpty(data.commonFileList) and #strings.equals('CLEAN', data.isExpired)}">
+                                        <th:block th:each="item : ${data.commonFileList}">
+                                            <img th:src="${item.url eq null ? '/static/images/about-01.png' : item.url}"/>
+                                        </th:block>
+                                    </th:block>
+                                    <th:block th:if="${#lists.isEmpty(data.commonFileList) or !#strings.equals('CLEAN', data.isExpired)}">
+                                        <img src="/static/images/icon-login.svg"/>
+                                    </th:block>
+                                </div>
+                                <th:block th:if="${#strings.equals('EXPIRED', data.isExpired)}">
+                                    <br/>열람만료
+                                </th:block>
+                            </td>
+                            <td class="text-center">
+                                <th:block th:if="${#strings.equals('AP_NOOPEN', data.isExpired)}">
+                                    <p>비공개</p>
+                                    <p th:text="${data.birthNm}"><!-- 1975 (19) , 남 --></p>
+                                </th:block>
+                                <th:block th:if="${#strings.equals('EXPIRED', data.isExpired)}">
+                                    <a th:href="'/m/resume/resume-detail-hh?resumeId='+${data.resumeId} + '&memberId=' + ${#authentication.principal.id}">
+                                        <p>***</p>
+                                        <p th:text="${data.birthNm}"><!-- 1975 (19) , 남 --></p>
+                                    </a>
+                                </th:block>
+                                <th:block th:if="${#strings.equals('CLEAN', data.isExpired) or #strings.equals('HH_NOOPEN', data.isExpired)}">
+                                    <a th:href="'/m/resume/resume-detail-hh?resumeId='+${data.resumeId} + '&memberId=' + ${#authentication.principal.id}">
+                                        <p th:text="${data.name}"><!-- 곽정석 --></p>
+                                        <p th:text="${data.birthNm}"><!-- 1975 (19) , 남 --></p>
+                                    </a>
+                                    <th:block th:if="${!#strings.equals('연락처보기', data.registerPathNm)}">
+                                        <button type="button" th:attr="data-resumeid=${data.resumeId}"
+                                                class="btn btn-outline-dark btn-sm" th:if="${#strings.equals('1', data.opened)}"
+                                                onclick="openMyap(this, 0)">비공개하기
+                                        </button>
+                                        <button type="button" th:attr="data-resumeid=${data.resumeId}"
+                                                class="btn btn-outline-dark btn-sm" th:if="${#strings.equals('0', data.opened)}"
+                                                onclick="openMyap(this, 1)">공개하기
+                                        </button>
+                                    </th:block>
+                                </th:block>
+                            </td>
+                            <td class="text-center">
+                                <p th:text="${data.totalCareerNm}"><!-- 11년 11개월--></p>
+                            </td>
+                            <td class="text-center">
+                                <p th:text="${data.finalCompany}"><!-- 락앤락 --></p>
+                                <p th:text="${data.longestCompany}"><!-- 락앤락 --></p>
+                            </td>
+                            <td class="text-center">
+                                <p th:utext="${data.finalSchool}"><!-- 고려대학교 --></p>
+                            </td>
+                            <td class="text-center">
+                                <div class="form-cell cell-2"
+                                     th:each="_d,status : ${#strings.arraySplit(data.coreAbility, '|')}">
+                                    <p th:text="${_d}"></p>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <p th:text="|${data.turnoverCnt}회|"><!-- 8회 --></p>
+                            </td>
+                            <td class="text-center">
+                                <p th:text="${data.registerPathNm}"><!--열람권--></p>
+                            </td>
+                            <td class="text-center">
+                                <p th:text="${data.expireAt}"><!--2022-12-20--></p>
+                            </td>
+                        </tr>
+                    </th:block>
+                    </tbody>
+                </table>
+            </th:block>
+            <div class="d-flex justify-content-center mt-5">
+                <th:block
+                        th:include="common/paging :: paging_Fragment(fnc=*{'fn_go_page(this)'}, pageId=*{'pageName1'})"/>
+            </div>
+        </div>
+    </div>
+
+    <!-- 그룹 등록/수정/삭제 -->
+    <div class="modal fade" id="modal-history-group" tabindex="-1" aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-write modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form name="historyGroupForm">
+                        <input type="hidden" name="groupId" id="groupId">
+                        <input type="hidden" name="delFlag" id="delFlag">
+                        <input type="hidden" name="id" id="id">
+                        <input type="hidden" name="checkedFields" id="checkedFields">
+                        <input type="text" class="form-control form-md" placeholder="새 그룹" name="name" id="name"/>
+                    </form>
+                    <button type="button" class="btn btn-outline-dark btn-sm" onclick="groupAdd('add')">추가</button>
+                    <button type="button" class="btn btn-outline-dark btn-sm" onclick="groupAdd('modi')">수정</button>
+                    <button type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="modal"
+                            data-bs-target="#modal-gorup-delete">삭제
+                    </button>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-primary" onclick="groupMove()">이동</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 삭제하시겠습니까? -->
+    <div class="modal fade" id="modal-gorup-delete" tabindex="-1" aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-comment modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header justify-content-end">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-title">삭제하시겠습니까?</div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">취소</button>
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal"
+                                onclick="groupAdd('delete')">확인
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+
+
+</html>
+

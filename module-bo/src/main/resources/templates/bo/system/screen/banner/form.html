@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/default}">
+<body>
+	<div layout:fragment="contents" th:remove="tag">
+		<main id="content" role="main">
+			<h2 class="title">배너 등록</h2>
+			<div class="row p-3">
+	            <div class="col-12">
+					<form name="insertBannerForm">
+						<!-- table -->
+						<table class="table table-bordered">
+							<colgroup>
+								<col style="width:120px" />
+								<col />
+							</colgroup>
+							<tr>
+								<th class="text-center">배너 종류</th>
+								<td><select id="selectType" name="selectType"
+									data-role="select" class="form-control w-auto"
+									data-url="/bo/cd/BANNER_TYPE" data-default-option="선택">
+										<option value="MOBILE_MAIN">모바일 메인</option>
+										<option value="MOBILE_AP_SIGNIN">모바일 후보자 회원가입</option>
+										<option value="FRONT_TOP_BANNER">프론트 상단 배너</option>
+										<option value="FRONT_LOGO">프론트 로고</option>
+										<option value="BOTTOM_CONTENT">하단 컨텐츠</option>
+										<option value="BOTTOM_LINE_BANNER">하단 띠배너</option>
+								</select></td>
+							</tr>
+							<tr>
+								<th class="text-center">배너 이름</th>
+								<td><input type="text" class="form-control"
+									id="insertBannerFormBannerNm" name="bannerNm"
+									placeholder="배너 이름을 입력하세요"></td>
+							</tr>
+							<tr>
+								<th class="text-center">배너 순서</th>
+								<td><input type="text" class="form-control"
+									id="insertBannerFormBannerOrder" name="bannerOrder"
+									placeholder="배너순서를 입력하세요"></td>
+							</tr>
+							<tr>
+								<th class="text-center">사용 여부</th>
+								<td><input type="radio" id="insertBannerFormUseFlagY"
+									name="useFlag" value="Y" checked /> <label
+									for="insertBannerFormUseFlagY">사용</label> <input type="radio"
+									id="insertBannerFormUseFlagN" name="useFlag" value="N" /> <label
+									for="insertBannerFormUseFlagN">미사용</label></td>
+							</tr>
+							<tr>
+								<th class="text-center">배너 시작 일자</th>
+								<td><input type="text" id="insertBannerFormBannerStartDt"
+									name="bannerStartDt" class="col-4 form-control form-datepicker"
+									placeholder="날짜 선택" readonly></td>
+							</tr>
+							<tr>
+								<th class="text-center">배너 종료 일자</th>
+								<td><input type="text" id="insertBannerFormBannerEndDt"
+									name="bannerEndDt" class="col-4 form-control form-datepicker"
+									placeholder="날짜 선택" readonly></td>
+							</tr>
+							<tr>
+								<th class="text-center">링크 URL</th>
+								<td><input type="text" class="form-control"
+									id="insertBannerFormLinkUrl" name="linkUrl"
+									placeholder="링크URL을 입력하세요"></td>
+							</tr>
+							<tr>
+								<th class="text-center">첨부파일</th>
+								<td><input type="file" id="banner-upload"
+									multiple="multiple" name="file"></td>
+							</tr>
+						</table>
+						<!-- table -->
+						<div class="m-t-10 text-right">
+							<button type="button" class="btn btn-dark"
+								data-role="save">등록</button>
+							<button type="button" class="btn btn-dark"
+								data-role="list">목록</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</main>
+	</div>
+</body>
+</html>

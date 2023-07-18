@@ -1,0 +1,1380 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.fo.resume.FoResumeMapper">
+
+    <!-- 이력서 리스트 카운트 취득-->
+    <select id="selectResumeListCnt" parameterType="string" resultType="int">
+        /*com.fw.core.mapper.db1.fo.FoResumeMapper.selectResumeList, 이력서 리스트 취득 , 2022.11 , skayhlj@gmail.com, FoResumeMapper.xml*/
+        SELECT COUNT(1) AS CNT
+         FROM resume
+        WHERE delFlag = 'N'
+          AND member_id = #{frontSession.id}
+    </select>
+
+    <!-- 이력서 리스트 취득-->
+    <select id="selectResumeList" parameterType="string" resultType="FoResumeDTO">
+        /*com.fw.core.mapper.db1.fo.FoResumeMapper.selectResumeList, 이력서 리스트 취득 , 2022.11 , skayhlj@gmail.com, FoResumeMapper.xml*/
+            SELECT id
+                 , name AS resumeTitle
+                 , member_id
+                 , createdAt
+                 , DATE_FORMAT(updatedAt,'%y-%m-%d %H:%i:%S') updatedAt
+                 , address
+                 , birth
+                 , YEAR(birth) AS year
+                 , LEFT(DATE_FORMAT(NOW(), '%Y%m%d') - birth, 2)  AS age
+                 , opened
+                 , representation
+                 , totalCareer totalCareerMonth
+                 , concat(TRUNCATE((totalCareer/12),0),'년',(totalCareer%12),'개월') totalCareer
+                 , create_member_id
+                 , (SELECT position_id FROM position_applicant WHERE resume_id = resume.id AND delFlag = 'N' ORDER BY position_id LIMIT 1) applicantPositionId
+                 , (SELECT title FROM position WHERE id = (SELECT position_id FROM position_applicant WHERE resume_id = resume.id AND delFlag = 'N' LIMIT 1 )) positionTitle
+                 , (SELECT DATE_FORMAT(createdAt,'%y-%m-%d') FROM position_applicant WHERE resume_id = resume.id AND delFlag = 'N' ORDER BY position_id LIMIT 1) applicantDt
+                 , (SELECT DATE_FORMAT(updatedAt,'%y-%m-%d %H:%i:%S') FROM position_applicant WHERE resume_id = resume.id AND delFlag = 'N' ORDER BY position_id LIMIT 1) applicantUpDt
+                 , (SELECT name FROM resume_academic_background WHERE resume_id = resume.id and resume_academic_background.delFlag = 'N' ORDER BY entranceYm DESC LIMIT 1) AS finalSchool
+                 , (SELECT companyName FROM resume_career WHERE resume_id = resume.id ORDER BY holdOffice DESC, resignationYm DESC LIMIT 1) AS finalCompany
+                 , representation
+              FROM resume
+             WHERE delFlag = 'N'
+               AND member_id = #{frontSession.id}
+          ORDER BY representation DESC, id DESC
+    </select>
+
+    <!-- 이력서 취득-->
+    <select id="selectResumeInfo" resultType="FoResumeDTO">
+        /*com.fw.core.mapper.db1.fo.FoResumeMapper.selectResumeInfo, 이력서 취득 , 2022.11 , skayhlj@gmail.com, FoResumeMapper.xml*/
+        SELECT id
+             , name AS resumeTitle
+             , createdAt
+             , updatedAt
+             , address
+             , birth
+             , YEAR(birth) AS year
+             , LEFT(DATE_FORMAT(NOW(), '%Y%m%d') - birth, 2)  AS age
+             , bylaws
+             , careerDescription
+             , coreAbility
+             , deleted
+             , deletedAt
+             , desiredPosition
+             , desiredSalary
+             , desiredHire
+             , fn_get_common_cd(desiredHire,'DESIRED_HIRE',1) AS desiredHireNm
+             , disability
+             , disabilityRatingCd
+             , disabilityRatingReason
+             , employmentStatusCd
+             , existTemp
+             , finalPosition
+             , isVeterans
+             , joinDateCd
+             , fn_get_common_cd(joinDateCd,'JOIN_DATE',1) AS joinDateNm
+             , militaryServiceCd
+             , fn_get_common_cd(militaryServiceCd,'MILITARY_SERVICE',1) AS militaryServiceNm
+             , opened
+             , last_salary
+             , representation
+             , selfIntroduction
+             , totalCareer
+             , concat(TRUNCATE((totalCareer/12),0),'년',(totalCareer%12),'개월') totalCareers
+             , veteransReason
+             , create_member_id
+             , member_id
+             , parent_resume_id
+             , picture_file_id
+             , createPath
+             , firstOpenChanged
+             , delFlag
+             , (SELECT name FROM member WHERE id = member_id) name
+             , (SELECT email FROM member WHERE id = member_id) email
+             , (SELECT phone FROM member WHERE id = member_id) phone
+             , (SELECT location_cd FROM resume_location WHERE delFlag = 'N' AND resume_id = #{resumeId}) AS desiredLocationCd
+             , (SELECT name FROM resume_academic_background WHERE resume_id = #{resumeId}  and resume_academic_background.delFlag = 'N' ORDER BY entranceYm DESC LIMIT 1) AS finalSchool
+             , (SELECT degreeCd FROM resume_academic_background WHERE resume_id = #{resumeId}  and resume_academic_background.delFlag = 'N' ORDER BY entranceYm DESC LIMIT 1) AS degreeCd
+             , (SELECT locationCd FROM resume_academic_background WHERE resume_id = #{resumeId}  and resume_academic_background.delFlag = 'N' ORDER BY entranceYm DESC LIMIT 1) AS finalSchoolLocationCd
+             , representation
+             , (SELECT genderCd FROM applicant WHERE member_id = resume.member_id) AS gender_cd
+             , (SELECT findingJob FROM applicant WHERE member_id = resume.member_id) AS findingJob
+          FROM resume
+         WHERE delFlag = 'N'
+           AND id = #{id}
+    </select>
+
+    <!-- 학력,전공 정보 취득-->
+    <select id="selectAcademicInfo" parameterType="FoResumeDTO" resultType="FoResumeDTO">
+        /*com.fw.core.mapper.db1.fo.FoResumeMapper.selectAcademicInfo, 학력,전공 정보 취득 , 2022.11 , skayhlj@gmail.com, FoResumeMapper.xml*/
+        SELECT RAB.id
+             , RAB.degreeCd
+             , fn_get_common_cd(RAB.degreeCd, 'UNIV_FILTER', 1) AS degreeNm
+             , concat(substr(RAB.entranceYm,1,4),'.',substr(RAB.entranceYm,5,6)) entranceYm
+             , RAB.entranceStatusCd
+             , RAB.grades
+             , RAB.graduationStatusCd
+             , fn_get_common_cd(RAB.graduationStatusCd,'GRADUATION_STATUS',1) AS graduationStatusNm
+             , concat(substr(RAB.graduationYm,1,4),'.',substr(RAB.graduationYm,5,6)) graduationYm
+             , RAB.inOverseas
+             , RAB.locationCd
+             , RAB.name AS schoolName
+             , RAB.schoolCd
+             , RABM.majorClassCd
+             , RABM.majorName
+             , (SELECT majorClassCd FROM resume_academic_background_major WHERE academic_background_id = RAB.id AND majorClassCd = 'MINOR' AND delFlag = 'N') AS minorClassCd
+             , (SELECT majorName FROM resume_academic_background_major WHERE academic_background_id = RAB.id AND majorClassCd = 'MINOR' AND delFlag = 'N') AS minorName
+             , RAB.resume_id
+             , RAB.delFlag
+          FROM resume_academic_background RAB
+    LEFT OUTER JOIN resume_academic_background_major RABM ON RAB.id = RABM.academic_background_id AND RABM.majorClassCd <![CDATA[ <> ]]> 'MINOR' AND RABM.delFlag = 'N'
+         WHERE RAB.delFlag = 'N'
+           AND resume_id = #{resumeId}
+    </select>
+
+    <!-- 경력 정보 취득-->
+    <select id="selectCareerInfo" parameterType="FoResumeDTO" resultType="FoResumeDTO">
+        /*com.fw.core.mapper.db1.fo.FoResumeMapper.selectCareerInfo, 경력 정보 취득 , 2022.11 , skayhlj@gmail.com, FoResumeMapper.xml*/
+        SELECT id
+             , annualSalary
+             , category
+             , companyName
+             , departmentName
+             , dutyCd
+             , dutyInput
+             , concat(substr(entranceYm,1,4),'.',substr(entranceYm,5,6)) entranceYmCareer
+             , entranceYm
+             , holdOffice
+             , fn_get_common_cd(holdOffice,'HOLD_OFFICE',1) AS holdOfficeNm
+             , positionCd
+             , positionInput
+             , concat(substr(resignationYm,1,4),'.',substr(resignationYm,5,6)) resignationYmCareer
+             , resignationYm
+             , task
+             , resume_id
+             , salary
+             , certFlag
+             , delFlag
+             , concat(TRUNCATE((PERIOD_DIFF(resignationYm,entranceYm)/12),0),'년',(PERIOD_DIFF(resignationYm,entranceYm)%12),'개월') AS finalCareer
+             , concat(TRUNCATE((PERIOD_DIFF(DATE_FORMAT(NOW(),'%Y%m'),entranceYm)/12),0),'년',(PERIOD_DIFF(DATE_FORMAT(NOW(),'%Y%m'),entranceYm)%12),'개월') AS currentCareer
+          FROM resume_career
+         WHERE delFlag = 'N'
+           AND resume_id = #{resumeId}
+    </select>
+
+    <!-- 최종경력 정보 취득 -->
+    <select id="selectFinalCareerInfo" parameterType="FoResumeDTO" resultType="FoResumeDTO">
+        SELECT id
+             , annualSalary
+             , category
+             , companyName
+             , departmentName
+             , dutyCd
+             , dutyInput
+             , concat(substr(entranceYm,1,4),'.',substr(entranceYm,5,6)) entranceYmCareer
+             , entranceYm
+             , holdOffice
+             , fn_get_common_cd(holdOffice,'HOLD_OFFICE',1) AS holdOfficeNm
+             , positionCd
+             , positionInput
+             , concat(substr(resignationYm,1,4),'.',substr(resignationYm,5,6)) resignationYmCareer
+             , resignationYm
+             , task
+             , resume_id
+             , salary
+             , certFlag
+             , delFlag
+             , concat(TRUNCATE((PERIOD_DIFF(resignationYm,entranceYm)/12),0),'년',(PERIOD_DIFF(resignationYm,entranceYm)%12),'개월') AS finalCareer
+             , concat(TRUNCATE((PERIOD_DIFF(DATE_FORMAT(NOW(),'%Y%m'),entranceYm)/12),0),'년',(PERIOD_DIFF(DATE_FORMAT(NOW(),'%Y%m'),entranceYm)%12),'개월') AS CurrentCareer
+        FROM resume_career
+        WHERE delFlag = 'N' AND resume_id = #{resumeId}
+        ORDER BY entranceYm DESC
+        LIMIT 1
+    </select>
+
+    <!-- 핵심역량 정보 취득-->
+    <select id="selectSpecInfo" parameterType="FoResumeDTO" resultType="FoResumeDTO">
+        /*com.fw.core.mapper.db1.fo.FoResumeMapper.selectSpecInfo, 핵심역량 정보 취득 , 2022.11 , skayhlj@gmail.com, FoResumeMapper.xml*/
+        SELECT id
+             , resume_id
+             , spec_type
+             , fn_get_common_cd(spec_type,'SPEC',1) AS specNm
+             , spec
+             , delFlag
+          FROM resume_spec
+         WHERE delFlag = 'N'
+           AND resume_id = #{resumeId}
+      ORDER BY FIELD(spec_type, 'MAIN', 'DETAIL', 'ETC') ASC
+    </select>
+
+    <!-- 희망근무지 정보 취득-->
+    <select id="selectDesiredLocationInfo" parameterType="FoResumeDTO" resultType="FoResumeDTO">
+        /*com.fw.core.mapper.db1.fo.FoResumeMapper.selectDesiredInfo,  희망근무지 정보 취득 , 2022.11 , skayhlj@gmail.com, FoResumeMapper.xml*/
+        SELECT id
+             , resume_id
+             , location_cd AS desiredLocationCd
+             , fn_get_common_cd(location_cd,'LOC',1) AS desiredLocationNm
+             , delFlag
+          FROM resume_location
+         WHERE delFlag = 'N'
+           AND resume_id = #{resumeId}
+    </select>
+
+    <!-- 어학 정보 취득-->
+    <select id="selectLanguageInfo" parameterType="FoResumeDTO" resultType="FoResumeDTO">
+        /*com.fw.core.mapper.db1.fo.FoResumeMapper.selectLanguageInfo,  어학 정보 취득 , 2022.11 , skayhlj@gmail.com, FoResumeMapper.xml*/
+        SELECT id
+             , conversationCd
+             , languageCd
+             , languageCertificationCd
+             , languageInput
+             , obtainYm
+             , testInput
+             , testScore
+             , testTypeCd
+             , resume_id
+             , delFlag
+          FROM resume_language
+         WHERE delFlag = 'N'
+           AND resume_id = #{resumeId}
+      ORDER BY languageCertificationCd
+    </select>
+
+    <!-- 자격증 정보 취득-->
+    <select id="selectLicenseInfo" parameterType="FoResumeDTO" resultType="FoResumeDTO">
+        /*com.fw.core.mapper.db1.fo.FoResumeMapper.selectLicenseInfo,  자격증 정보 취득 , 2022.11 , skayhlj@gmail.com, FoResumeMapper.xml*/
+        SELECT id
+             , agency
+             , name AS licenseName
+             , obtainYm
+             , resume_id
+             , delFlag
+          FROM resume_license
+         WHERE delFlag = 'N'
+           AND resume_id = #{resumeId}
+    </select>
+
+    <!-- 수상 정보 취득-->
+    <select id="selectAwardInfo" parameterType="FoResumeDTO" resultType="FoResumeDTO">
+        /*com.fw.core.mapper.db1.fo.FoResumeMapper.selectAwardInfo,  수상 정보 취득 , 2022.11 , skayhlj@gmail.com, FoResumeMapper.xml*/
+        SELECT id
+             , agency AS awardAgency
+             , awardYm
+             , name AS awardName
+             , resume_id
+             , delFlag
+          FROM resume_award
+         WHERE delFlag = 'N'
+           AND resume_id = #{resumeId}
+    </select>
+
+    <!-- 대외활동 정보 취득-->
+    <select id="selectActivityInfo" parameterType="FoResumeDTO" resultType="FoResumeDTO">
+        /*com.fw.core.mapper.db1.fo.FoResumeMapper.selectActivityInfo,  대외활동 정보 취득 , 2022.11 , skayhlj@gmail.com, FoResumeMapper.xml*/
+        SELECT id
+             , content
+             , resume_id
+             , delFlag
+          FROM resume_external_activity
+         WHERE delFlag = 'N'
+           AND resume_id = #{resumeId}
+    </select>
+
+    <!-- 포트폴리오 정보 취득-->
+    <select id="selectPortfolioInfo" parameterType="FoResumeDTO" resultType="FoResumeDTO">
+        /*com.fw.core.mapper.db1.fo.FoResumeMapper.selectPortfolioInfo,  포트폴리오 정보 취득 , 2022.11 , skayhlj@gmail.com, FoResumeMapper.xml*/
+        SELECT id
+             , attachType
+             , url
+             , attach_file_id
+             , resume_id
+             , delFlag
+          FROM resume_portfolio
+         WHERE delFlag = 'N'
+           AND resume_id = #{resumeId}
+    </select>
+
+    <!-- 영문이력서 정보 취득-->
+    <select id="selectEnglishResumeInfo" parameterType="FoResumeDTO" resultType="FoResumeDTO">
+        /*com.fw.core.mapper.db1.fo.FoResumeMapper.selectEnglishResumeInfo,  영문이력서 정보 취득 , 2022.11 , skayhlj@gmail.com, FoResumeMapper.xml*/
+        SELECT id
+             , attachType AS enAttachType
+             , url AS enUrl
+             , attach_file_id AS enAttachFileId
+             , resume_id
+             , delFlag
+          FROM resume_english
+         WHERE delFlag = 'N'
+           AND resume_id = #{resumeId}
+    </select>
+
+    <!-- 이력서 수정동의-->
+    <update id="update" parameterType="FoResumeDTO" >
+        /*com.fw.core.mapper.db1.fo.FoResumeMapper.selectEnglishResumeInfo,  영문이력서 정보 취득 , 2022.11 , skayhlj@gmail.com, FoResumeMapper.xml*/
+        UPDATE tb_simple_auth
+           SET del_flag = 'Y'
+         WHERE member_id = #{memberId}
+           AND simple_auth_cd = #{simpleAuthCd}
+           AND del_flag = 'N'
+    </update>
+
+    <update id="updateApplicantForResumeId" parameterType="FoResumeDTO" >
+        /*com.fw.core.mapper.db1.fo.FoResumeMapper.updateApplicantForResumeId,  지원서 이력서 업데이트 , 2023.01 , yhEom FoResumeMapper.xml*/
+        update position_applicant SET updatedAt = NOW(), resume_id = #{resumeId} 
+        WHERE id = #{applicantId} AND ap_member_id = #{memberId} AND hh_member_id = #{frontSession.id}
+    </update>
+
+  
+    <!-- 이력서 저장-->
+    <insert id="insertResume" parameterType="FoResumeDTO">
+        /*com.fw.core.mapper.db1.fo.FoResumeMapper.insertResume,  이력서 저장 , 2022.11 , skayhlj@gmail.com, FoResumeMapper.xml*/
+        INSERT INTO resume (
+               address
+             , name
+             , birth
+             , genderCd
+             , bylaws /*not null*/
+             , desiredPosition
+             , desiredSalary
+             , disability /*not null*/
+             , militaryServiceCd
+             , isVeterans /*not null*/
+             , employmentStatusCd
+             , selfIntroduction
+             , deleted /*not null*/
+             , existTemp /*not null*/
+             , opened /*not null*/
+             , representation /*not null*/
+             , firstOpenChanged /*not null*/
+             , create_member_id /*not null*/
+             , member_id /*not null*/
+             , createdAt
+             , updatedAt
+             , careerDescription
+             , joinDateCd
+             , totalCareer
+             , picture_file_id
+             , last_salary
+             , desiredHire
+        ) VALUES (
+               #{address}
+             , #{name}
+             , #{birth}
+             , #{genderCd}
+             , #{bylaws}
+             , #{desiredPosition}
+             , #{desiredSalary}
+             , #{disability}
+             , #{militaryServiceCd}
+             , #{isVeterans}
+             , #{employmentStatusCd}
+             , #{selfIntroduction}
+             , 0
+             , 0
+             <choose>
+                 <when test="opened != null and opened != ''">
+                     , #{opened}
+                 </when>
+                 <otherwise>
+                    , 1
+                 </otherwise>
+             </choose>
+             , #{representation}
+             , 0
+             , #{frontSession.id}
+             , #{memberId}
+             , NOW()
+             , NOW()
+             , #{careerDescription}
+             , #{joinDateCd}
+             , #{totalCareer}
+             , #{pictureFileId}
+             , #{lastSalary}
+             , #{desiredHire}
+        )
+        <selectKey order="AFTER" keyProperty="id" resultType="String">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <!-- 핵심역량 저장-->
+    <insert id="insertResumeSpec" parameterType="FoResumeDTO">
+        /*com.fw.core.mapper.db1.fo.FoResumeMapper.insertResumeSpec,  핵심역량 저장 , 2022.11 , skayhlj@gmail.com, FoResumeMapper.xml*/
+        INSERT INTO resume_spec (
+               resume_id
+             , spec_type
+             , spec
+             , delFlag
+        ) VALUES (
+               #{resumeId}
+             , #{specType}
+             , #{spec}
+             , 'N'
+        )
+    </insert>
+
+    <!-- 경력 저장-->
+    <insert id="insertResumeCareer" parameterType="FoResumeDTO" >
+        /*com.fw.core.mapper.db1.fo.FoResumeMapper.insertResumeSpec,  핵심역량 저장 , 2022.11 , skayhlj@gmail.com, FoResumeMapper.xml*/
+        INSERT INTO resume_career (
+               companyName      /*not null*/
+             , departmentName
+             , dutyCd
+             , dutyInput
+             , entranceYm
+             , holdOffice  /*not null*/
+             , positionCd
+             , positionInput
+             , resignationYm
+             , task
+             , resume_id /*not null*/
+             , salary
+             , certFlag
+             , delFlag
+        ) VALUES (
+               #{companyName}
+             , #{departmentName}
+             , #{dutyCd}
+             , #{dutyInput}
+             , #{entranceYm}
+             , #{holdOffice}
+             , #{positionCd}
+             , #{positionInput}
+             , #{resignationYm}
+             , #{task}
+             , #{resumeId}
+             , #{salary}
+             , #{certFlag}
+             , 'N'
+        )
+    </insert>
+
+    <!-- 학력 저장-->
+    <insert id="insertResumeAcademicBackground" parameterType="FoResumeDTO" >
+        /*com.fw.core.mapper.db1.fo.FoResumeMapper.insertResumeAcademicBackground,  학력 저장 , 2022.11 , skayhlj@gmail.com, FoResumeMapper.xml*/
+        INSERT INTO resume_academic_background (
+               degreeCd /*not null*/
+             , entranceStatusCd
+             , entranceYm
+             , grades
+             , graduationStatusCd
+             , graduationYm
+             , inOverseas /*not null*/
+             , locationCd
+             , name /*not null*/
+             , schoolCd /*not null*/
+             , resume_id /*not null*/
+             , delFlag
+        ) VALUES (
+               #{degreeCd}
+             , #{entranceStatusCd}
+             , #{entranceYm}
+             , #{majorGrades}
+             , #{graduationStatusCd}
+             , #{graduationYm}
+             , #{inOverseas}
+             , #{locationCd}
+             , #{name}
+             , #{schoolCd}
+             , #{resumeId}
+             , 'N'
+        )
+        <selectKey order="AFTER" keyProperty="id" resultType="String">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <!-- 전공 저장-->
+    <insert id="insertResumeAcademicBackgroundMajor" parameterType="FoResumeDTO" >
+        /*com.fw.core.mapper.db1.fo.FoResumeMapper.insertResumeAcademicBackgroundMajor,  전공 저장 , 2022.11 , skayhlj@gmail.com, FoResumeMapper.xml*/
+        INSERT INTO resume_academic_background_major (
+               majorClassCd /*not null*/
+             , majorName /*not null*/
+             , academic_background_id /*not null*/
+             , delFlag
+        ) VALUES (
+               #{majorClassCd}
+             , #{majorName}
+             , #{academicBackgroundId}
+             , 'N'
+        )
+    </insert>
+
+    <!-- 어학 저장-->
+    <insert id="insertResumeLanguage" parameterType="FoResumeDTO" >
+        /*com.fw.core.mapper.db1.fo.FoResumeMapper.insertResumeLanguage, 어학 저장 , 2022.11 , skayhlj@gmail.com, FoResumeMapper.xml*/
+        INSERT INTO resume_language (
+               conversationCd
+             , languageCd /*not null*/
+             , languageCertificationCd
+             , languageInput
+             , obtainYm
+             , testScore
+             , testTypeCd
+             , resume_id /*not null*/
+             , delFlag
+        ) VALUES (
+               #{conversationCd}
+             , 'ETC'
+             , #{languageCertificationCd}
+             , #{languageInput}
+             , #{obtainYm}
+             , #{testScore}
+             , #{testTypeCd}
+             , #{resumeId}
+             , 'N'
+        )
+    </insert>
+
+    <!-- 자격증 저장-->
+    <insert id="insertResumeLicense" parameterType="FoResumeDTO" >
+        /*com.fw.core.mapper.db1.fo.FoResumeMapper.insertResumeLicense,  자격증 저장 , 2022.11 , skayhlj@gmail.com, FoResumeMapper.xml*/
+        INSERT INTO resume_license (
+               agency
+             , name /*not null*/
+             , obtainYm
+             , resume_id /*not null*/
+             , delFlag
+        ) VALUES (
+               #{agency}
+             , #{name}
+             , #{obtainYmLicense}
+             , #{resumeId}
+             , 'N'
+        )
+    </insert>
+
+    <!-- 수상 저장-->
+    <insert id="insertResumeAward" parameterType="FoResumeDTO" >
+        /* com.fw.core.mapper.db1.fo.FoResumeMapper.insertResumeAward,  수상 저장 , 2022.11 , skayhlj@gmail.com, FoResumeMapper.xml*/
+        INSERT INTO resume_award (
+               agency
+             , awardYm
+             , name /*not null*/
+             , resume_id /*not null*/
+             , delFlag
+        ) VALUES (
+               #{awardAgency}
+             , #{awardYm}
+             , #{name}
+             , #{resumeId}
+             , 'N'
+        )
+    </insert>
+
+    <!-- 외부활동 저장-->
+    <insert id="insertResumeExternalActivity" parameterType="FoResumeDTO" >
+        /* com.fw.core.mapper.db1.fo.FoResumeMapper.insertResumeExternalActivity,  외부활동 저장 , 2022.11 , skayhlj@gmail.com, FoResumeMapper.xml*/
+        INSERT INTO resume_external_activity (
+               content
+             , resume_id /*not null*/
+             , delFlag
+        ) VALUES (
+               #{content}
+             , #{resumeId}
+             , 'N'
+        )
+    </insert>
+
+    <!-- 포트폴리오 저장-->
+    <insert id="insertResumePortfolio" parameterType="FoResumeDTO" >
+        /* com.fw.core.mapper.db1.fo.FoResumeMapper.insertResumePortfolio,  포트폴리오 저장 , 2022.11 , skayhlj@gmail.com, FoResumeMapper.xml*/
+        INSERT INTO resume_portfolio (
+               attachType
+             , url
+             , attach_file_id
+             , resume_id /*not null*/
+             , delFlag
+        ) VALUES (
+               #{attachType}
+             , #{url}
+             , #{attachFileId}
+             , #{resumeId}
+             , 'N'
+        )
+    </insert>
+
+    <!-- 영문이력서 저장-->
+    <insert id="insertResumeEnglish" parameterType="FoResumeDTO" >
+        /* com.fw.core.mapper.db1.fo.FoResumeMapper.insertResumeEnglish,  영문이력서 저장 , 2022.11 , skayhlj@gmail.com, FoResumeMapper.xml*/
+        INSERT INTO resume_english (
+               attachType
+             , url
+             , attach_file_id /*not null*/
+             , resume_id
+             , delFlag
+        ) VALUES (
+               #{attachType}
+             , #{url}
+             , #{attachFileId}
+             , #{resumeId}
+             , 'N'
+        )
+    </insert>
+
+    <!-- 필터링 삭제 -->
+    <delete id="deleteResumeFiltering" parameterType="FoResumeDTO" >
+        /* com.fw.core.mapper.db1.fo.FoResumeMapper.deleteResumeFiltering, 필터링 삭제 , 2022.11 , skayhlj@gmail.com, FoResumeMapper.xml*/
+        DELETE FROM resume_filtering
+              WHERE resume_id = #{resumeId}
+    </delete>
+
+    <!-- 필터링 저장-->
+    <insert id="insertResumeFiltering" parameterType="FoResumeDTO" >
+        /* com.fw.core.mapper.db1.fo.FoResumeMapper.insertResumeFiltering, 필터링 저장 , 2022.11 , skayhlj@gmail.com, FoResumeMapper.xml*/
+        INSERT INTO resume_filtering (
+               filterCd
+             , resume_id
+             , delFlag
+        ) VALUES (
+               #{filterCd}
+             , #{resumeId}
+             , 'N'
+        )
+    </insert>
+
+    <!-- 지역 저장-->
+    <insert id="insertResumeLocation" parameterType="FoResumeDTO" >
+        /* com.fw.core.mapper.db1.fo.FoResumeMapper.insertResumeLocation, 지역 저장 , 2022.11 , skayhlj@gmail.com, FoResumeMapper.xml*/
+        INSERT INTO resume_location (
+               resume_id
+             , location_cd
+             , delFlag
+        ) VALUES (
+               #{resumeId}
+             , #{desiredLocationCd}
+             , 'N'
+        )
+    </insert>
+
+    <!--이력서 수정-->
+    <update id="updateResume" parameterType="FoResumeDTO">
+        UPDATE resume
+           SET name = #{name}
+             , address = #{address}
+             , birth = #{birth}
+             , bylaws = #{bylaws}
+             , desiredPosition = #{desiredPosition}
+             , desiredSalary = #{desiredSalary}
+             , disability = #{disability}
+             , militaryServiceCd = #{militaryServiceCd}
+             , employmentStatusCd = #{employmentStatusCd}
+             , selfIntroduction = #{selfIntroduction}
+             , isVeterans = #{isVeterans}
+             , genderCd = #{genderCd}
+             , updatedAt = NOW()
+             , last_Salary = #{lastSalary}
+             , joinDateCd = #{joinDateCd}
+             , careerDescription = #{careerDescription}
+             , totalCareer = #{totalCareer}
+             , desiredHire = #{desiredHire}
+        <if test="pictureFileId != '' and pictureFileId != null">
+             , picture_file_id = #{pictureFileId}
+        </if>
+         WHERE id = #{id}
+    </update>
+
+    <!--핵심역량 -->
+    <select id="selectResumeSpecCnt" parameterType="BoResumeDTO" resultType="int">
+        SELECT COUNT(1)
+          FROM resume_spec
+         WHERE resume_id = #{resumeId}
+           AND spec_type = #{specType}
+    </select>
+
+    <!--핵심역량 수정-->
+    <update id="updateResumeSpec" parameterType="FoResumeDTO">
+        UPDATE resume_spec
+           SET spec = #{spec}
+         WHERE resume_id = #{resumeId}
+           AND spec_type = #{specType}
+    </update>
+
+    <!--학력 수정-->
+    <update id="updateResumeAcademicBackground" parameterType="FoResumeDTO">
+        UPDATE resume_academic_background
+           SET degreeCd = #{degreeCd}
+             , entranceStatusCd = #{entranceStatusCd}
+             , entranceYm = #{entranceYm}
+             , grades = #{majorGrades}
+             , graduationStatusCd = #{graduationStatusCd}
+             , graduationYm = #{graduationYm}
+             , inOverseas = #{inOverseas}
+             , name = #{name}
+             , locationCd = #{locationCd}
+             , schoolCd = #{schoolCd}
+         WHERE id = #{id}
+    </update>
+
+    <!--전공 수정-->
+    <update id="updateResumeAcademicBackgroundMajor" parameterType="FoResumeDTO">
+        UPDATE resume_academic_background_major
+           SET majorName = #{majorName}
+         WHERE academic_background_id = #{academicBackgroundId}
+           AND majorClassCd = #{majorClassCd}
+    </update>
+
+    <!--전공 수정전 부전공 여부-->
+    <select id="selectMinorCnt" resultType="int">
+       SELECT COUNT(1)
+         FROM resume_academic_background_major
+        WHERE academic_background_id = #{academicBackgroundId}
+          AND majorClassCd = 'MINOR'
+    </select>
+
+    <!-- 전공 일괄 삭제 업데이트-->
+    <delete id="deleteResumeAcademicBackgroundMajor" parameterType="FoResumeDTO">
+        DELETE FROM resume_academic_background_major
+         WHERE academic_background_id = #{academicBackgroundId}
+    </delete>
+
+    <!--학력 삭제 업데이트-->
+    <update id="updateDeleteResumeAcademicBackground" parameterType="FoResumeDTO">
+        UPDATE resume_academic_background
+        SET delFlag = 'Y'
+        WHERE id in
+        <foreach collection="deleteAcademicList" item="deleteAcademicList" open="(" close=")"  index="index" separator=",">
+            '${deleteAcademicList}'
+        </foreach>
+    </update>
+
+    <!--경력 수정-->
+    <update id="updateResumeCareer" parameterType="FoResumeDTO">
+        UPDATE resume_career
+           SET companyName = #{companyName}
+             , departmentName = #{departmentName}
+             , entranceYm = #{entranceYm}
+             , resignationYm = #{resignationYm}
+             , holdOffice = #{holdOffice}
+             , positionInput = #{positionInput}
+             , dutyInput = #{dutyInput}
+             , salary = #{salary}
+             , task = #{task}
+             , certFlag = #{certFlag}
+         WHERE id = #{id}
+    </update>
+
+    <!--경력 삭제 업데이트-->
+    <update id="updateDeleteResumeCareer" parameterType="FoResumeDTO">
+        UPDATE resume_career
+          SET delFlag = 'Y'
+        WHERE id in
+        <foreach collection="deleteCareerList" item="deleteCareerList" open="(" close=")"  index="index" separator=",">
+        '${deleteCareerList}'
+        </foreach>
+    </update>
+
+    <!--어학 수정-->
+    <update id="updateResumeLanguage" parameterType="FoResumeDTO">
+        UPDATE resume_language
+           SET languageInput = #{languageInput}
+         WHERE resume_id = #{resumeId}
+    </update>
+
+    <!--자격증 수정-->
+    <update id="updateResumeLicense" parameterType="FoResumeDTO">
+        UPDATE resume_license
+           SET name = #{name} /*not null*/
+         WHERE resume_id = #{resumeId}
+    </update>
+
+    <!--수상 수정-->
+    <update id="updateResumeAward" parameterType="FoResumeDTO">
+        UPDATE resume_award
+           SET name = #{name}
+         WHERE resume_id = #{resumeId}
+    </update>
+
+    <!--외부활동 수정-->
+    <update id="updateResumeExternalActivity" parameterType="FoResumeDTO">
+        UPDATE resume_external_activity
+           SET content = #{content}
+         WHERE resume_id = #{resumeId}
+    </update>
+
+    <!--포트폴리오 수정-->
+    <update id="updateResumePortfolio" parameterType="FoResumeDTO">
+        UPDATE resume_portfolio
+           SET attachType = #{attachType}
+             , url = #{url}
+             , attach_file_id = #{attachFileId}
+         WHERE id = #{id}
+    </update>
+
+    <!--포트폴리오 삭제 업데이트-->
+    <update id="updateDeleteResumeResumePortfolio" parameterType="FoResumeDTO">
+        UPDATE resume_portfolio
+        SET delFlag = 'Y'
+        WHERE id in
+        <foreach collection="deletePortfolioList" item="deletePortfolioList" open="(" close=")"  index="index" separator=",">
+            '${deletePortfolioList}'
+        </foreach>
+    </update>
+
+    <!--영문이력서 수정-->
+    <update id="updateResumeEnglish" parameterType="FoResumeDTO">
+        UPDATE resume_english
+           SET attach_file_id = #{attachFileId}
+         WHERE resume_id = #{resumeId}
+    </update>
+
+    <!--지역 수정-->
+    <update id="updateResumeLocation" parameterType="FoResumeDTO">
+        UPDATE resume_location
+           SET location_cd = #{desiredLocationCd}
+         WHERE resume_id = #{resumeId}
+    </update>
+
+    <!-- 이력서 공개여부, 구직의사여부-->
+    <select id="selectResumeOpened" parameterType="string" resultType="FoApplicantDTO">
+        /*com.fw.core.mapper.db1.fo.FoResumeMapper.selectResumeList,  이력서 공개여부, 구직의사여부 , 2022.12 , skayhlj@gmail.com, FoResumeMapper.xml*/
+        SELECT member_id
+             , birth
+             , genderCd
+             , findingJob
+             , resumeRestricted
+             , isPrivateAgreement
+             , contactExceptHoliday
+             , contactableTime
+             , hhReferralCode
+             , resumeSettingAt
+             , delFlag
+          FROM applicant
+         WHERE delFlag = 'N'
+           AND member_id = #{frontSession.id}
+    </select>
+
+    <!--이력서 공개여부-->
+    <update id="updateResumeRestricted" parameterType="FoApplicantDTO">
+        /*com.fw.core.mapper.db1.fo.FoResumeMapper.updateResumeOpened,  이력서 공개여부 , 2022.12 , skayhlj@gmail.com, FoResumeMapper.xml*/
+        UPDATE applicant
+           SET resumeRestricted = #{resumeRestricted} /*not null*/
+         WHERE member_id = #{frontSession.id}
+    </update>
+
+    <!--구직의사여부-->
+    <update id="updateFindingJob" parameterType="FoApplicantDTO">
+        /*com.fw.core.mapper.db1.fo.FoResumeMapper.updateResumeOpened,  구직의사여부 , 2022.12 , skayhlj@gmail.com, FoResumeMapper.xml*/
+        UPDATE applicant
+        SET findingJob = #{findingJob} /*not null*/
+        WHERE member_id = #{frontSession.id}
+    </update>
+
+    <!--맞춤 채용 공고 리스트 취득-->
+    <select id="selectPositionAlert" resultType="FoResumeDTO">
+        /*com.fw.core.mapper.db1.fo.FoResumeMapper.selectPositionAlert, 맞춤 채용 공고 리스트 취득 , 2022.12 , skayhlj@gmail.com, FoResumeMapper.xml*/
+        SELECT position_alert_seq
+             , industry
+             , member_id
+             , del_flag
+             , reg_seq
+             , reg_date
+          FROM tb_position_alert
+         WHERE member_id = #{frontSession.id}
+           AND del_flag = 'N'
+    </select>
+
+    <!--맞춤 채용 공고 직무 저장-->
+    <insert id="insertPositionAlert" parameterType="FoResumeDTO">
+        /*com.fw.core.mapper.db1.fo.FoResumeMapper.insertPositionAlert, 맞춤 채용 공고 직무 저장 , 2022.12 , skayhlj@gmail.com, FoResumeMapper.xml*/
+        INSERT INTO tb_position_alert (
+               industry
+             , member_id
+             , del_flag
+             , reg_seq
+             , reg_date
+        ) VALUES (
+               #{industry}
+             , #{frontSession.id}
+             , 'N'
+             , '1'
+             , NOW()
+        )
+    </insert>
+
+    <!--맞춤 채용 공고 직무 삭제-->
+    <update id="deletePositionAlert" parameterType="FoResumeDTO">
+        /*com.fw.core.mapper.db1.fo.FoResumeMapper.deletePositionAlert, 맞춤 채용 공고 직무 삭제 , 2022.12 , skayhlj@gmail.com, FoResumeMapper.xml*/
+        UPDATE tb_position_alert
+           SET del_flag = 'Y'
+         WHERE position_alert_seq = #{positionAlertSeq}
+    </update>
+
+    <!-- .........................이력서 복사.........................................-->
+
+    <!-- 이력서 복사-->
+    <insert id="insertResumeClone" parameterType="FoResumeDTO">
+        /*com.fw.core.mapper.db1.fo.FoResumeMapper.insertResume,  이력서 저장 , 2022.11 , skayhlj@gmail.com, FoResumeMapper.xml*/
+        INSERT INTO resume (
+               address
+             , name
+             , birth
+             , genderCd
+             , bylaws /*not null*/
+             , desiredPosition
+             , desiredSalary
+             , disability /*not null*/
+             , militaryServiceCd
+             , isVeterans /*not null*/
+             , employmentStatusCd
+             , selfIntroduction
+             , deleted /*not null*/
+             , existTemp /*not null*/
+             , opened /*not null*/
+             , representation /*not null*/
+             , firstOpenChanged /*not null*/
+             , create_member_id /*not null*/
+             , member_id /*not null*/
+             , createdAt
+             , updatedAt
+             , careerDescription
+             , joinDateCd
+             , totalCareer
+             , picture_file_id
+             , last_salary
+             , desiredHire
+        )
+        SELECT address
+             , name
+             , birth
+             , genderCd
+             , bylaws
+             , desiredPosition
+             , desiredSalary
+             , disability
+             , militaryServiceCd
+             , isVeterans
+             , employmentStatusCd
+             , selfIntroduction
+             , 0
+             , 0
+             , 1
+             , #{representation}
+             , 0
+             , #{frontSession.id}
+             , #{frontSession.id}
+             , NOW()
+             , NOW()
+             , careerDescription
+             , joinDateCd
+             , totalCareer
+             , picture_file_id
+             , last_salary
+             , desiredHire
+          FROM resume
+         WHERE id = #{id}
+        <selectKey order="AFTER" keyProperty="id" resultType="String">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <!-- 핵심역량 저장-->
+    <insert id="insertResumeSpecClone" parameterType="FoResumeDTO">
+        /*com.fw.core.mapper.db1.fo.FoResumeMapper.insertResumeSpec,  핵심역량 저장 , 2022.11 , skayhlj@gmail.com, FoResumeMapper.xml*/
+        INSERT INTO resume_spec (
+               resume_id
+             , spec_type
+             , spec
+             , delFlag
+        )
+        SELECT #{resumeId}
+             , spec_type
+             , spec
+             , 'N'
+          FROM resume_spec
+         WHERE resume_id = #{id}
+           AND delFlag = 'N'
+    </insert>
+
+    <!-- 경력 저장-->
+    <insert id="insertResumeCareerClone" parameterType="FoResumeDTO" >
+        /*com.fw.core.mapper.db1.fo.FoResumeMapper.insertResumeSpec,  핵심역량 저장 , 2022.11 , skayhlj@gmail.com, FoResumeMapper.xml*/
+        INSERT INTO resume_career (
+               companyName      /*not null*/
+             , departmentName
+             , dutyCd
+             , dutyInput
+             , entranceYm
+             , holdOffice  /*not null*/
+             , positionCd
+             , positionInput
+             , resignationYm
+             , task
+             , resume_id /*not null*/
+             , salary
+             , certFlag
+             , delFlag
+        )
+        SELECT companyName
+             , departmentName
+             , dutyCd
+             , dutyInput
+             , entranceYm
+             , holdOffice
+             , positionCd
+             , positionInput
+             , resignationYm
+             , task
+             , #{resumeId}
+             , salary
+             , certFlag
+             , 'N'
+          FROM resume_career
+         WHERE resume_id = #{id}
+           AND delFlag = 'N'
+    </insert>
+
+    <!-- 학력 저장-->
+    <insert id="insertResumeAcademicBackgroundClone" parameterType="FoResumeDTO" >
+        /*com.fw.core.mapper.db1.fo.FoResumeMapper.insertResumeAcademicBackground,  학력 저장 , 2022.11 , skayhlj@gmail.com, FoResumeMapper.xml*/
+        INSERT INTO resume_academic_background (
+               degreeCd /*not null*/
+             , entranceStatusCd
+             , entranceYm
+             , grades
+             , graduationStatusCd
+             , graduationYm
+             , inOverseas /*not null*/
+             , locationCd
+             , name /*not null*/
+             , schoolCd /*not null*/
+             , resume_id /*not null*/
+             , delFlag
+        )
+        SELECT degreeCd
+             , entranceStatusCd
+             , entranceYm
+             , grades
+             , graduationStatusCd
+             , graduationYm
+             , inOverseas
+             , locationCd
+             , name
+             , schoolCd
+             , #{resumeId}
+             , 'N'
+          FROM resume_academic_background
+         WHERE id = #{id}
+           AND delFlag = 'N'
+        <selectKey order="AFTER" keyProperty="id" resultType="String">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <!-- 전공 저장-->
+    <insert id="insertResumeAcademicBackgroundMajorClone" parameterType="FoResumeDTO" >
+        /*com.fw.core.mapper.db1.fo.FoResumeMapper.insertResumeAcademicBackgroundMajor,  전공 저장 , 2022.11 , skayhlj@gmail.com, FoResumeMapper.xml*/
+        INSERT INTO resume_academic_background_major (
+               majorClassCd /*not null*/
+             , majorName /*not null*/
+             , academic_background_id /*not null*/
+             , delFlag
+        )
+        SELECT majorClassCd
+             , majorName
+             , #{academicBackgroundId}
+             , 'N'
+          FROM resume_academic_background_major
+         WHERE academic_background_id = #{id}
+           AND delFlag = 'N'
+    </insert>
+
+    <!-- 어학 저장-->
+    <insert id="insertResumeLanguageClone" parameterType="FoResumeDTO" >
+        /*com.fw.core.mapper.db1.fo.FoResumeMapper.insertResumeLanguage, 어학 저장 , 2022.11 , skayhlj@gmail.com, FoResumeMapper.xml*/
+        INSERT INTO resume_language (
+               conversationCd
+             , languageCd /*not null*/
+             , languageCertificationCd
+             , languageInput
+             , obtainYm
+             , testScore
+             , testTypeCd
+             , resume_id /*not null*/
+             , delFlag
+        )
+        SELECT conversationCd
+             , 'ETC'
+             , languageCertificationCd
+             , languageInput
+             , obtainYm
+             , testScore
+             , testTypeCd
+             , #{resumeId}
+             , 'N'
+          FROM resume_language
+         WHERE resume_id = #{id}
+           AND delFlag = 'N'
+    </insert>
+
+    <!-- 자격증 저장-->
+    <insert id="insertResumeLicenseClone" parameterType="FoResumeDTO" >
+        /*com.fw.core.mapper.db1.fo.FoResumeMapper.insertResumeLicense,  자격증 저장 , 2022.11 , skayhlj@gmail.com, FoResumeMapper.xml*/
+        INSERT INTO resume_license (
+               agency
+             , name /*not null*/
+             , obtainYm
+             , resume_id /*not null*/
+             , delFlag
+        )
+        SELECT agency
+             , name
+             , obtainYm
+             , #{resumeId}
+             , 'N'
+          FROM resume_license
+         WHERE resume_id = #{id}
+           AND delFlag = 'N'
+    </insert>
+
+    <!-- 수상 저장-->
+    <insert id="insertResumeAwardClone" parameterType="FoResumeDTO" >
+        /* com.fw.core.mapper.db1.fo.FoResumeMapper.insertResumeAward,  수상 저장 , 2022.11 , skayhlj@gmail.com, FoResumeMapper.xml*/
+        INSERT INTO resume_award (
+               agency
+             , awardYm
+             , name /*not null*/
+             , resume_id /*not null*/
+             , delFlag
+        )
+        SELECT agency
+             , awardYm
+             , name
+             , #{resumeId}
+             , 'N'
+          FROM resume_award
+         WHERE resume_id = #{id}
+           AND delFlag = 'N'
+    </insert>
+
+    <!-- 외부활동 저장-->
+    <insert id="insertResumeExternalActivityClone" parameterType="FoResumeDTO" >
+        /* com.fw.core.mapper.db1.fo.FoResumeMapper.insertResumeExternalActivity,  외부활동 저장 , 2022.11 , skayhlj@gmail.com, FoResumeMapper.xml*/
+        INSERT INTO resume_external_activity (
+               content
+             , resume_id /*not null*/
+             , delFlag
+        )
+        SELECT content
+             , #{resumeId}
+             , 'N'
+          FROM resume_external_activity
+         WHERE resume_id = #{id}
+           AND delFlag = 'N'
+    </insert>
+
+    <!-- 포트폴리오 저장-->
+    <insert id="insertResumePortfolioClone" parameterType="FoResumeDTO" >
+        /* com.fw.core.mapper.db1.fo.FoResumeMapper.insertResumePortfolio,  포트폴리오 저장 , 2022.11 , skayhlj@gmail.com, FoResumeMapper.xml*/
+        INSERT INTO resume_portfolio (
+               attachType
+             , url
+             , attach_file_id
+             , resume_id /*not null*/
+             , delFlag
+        )
+        SELECT attachType
+             , url
+             , attach_file_id
+             , #{resumeId}
+             , 'N'
+          FROM resume_portfolio
+         WHERE resume_id = #{id}
+           AND delFlag = 'N'
+    </insert>
+
+    <!-- 영문이력서 저장-->
+    <insert id="insertResumeEnglishClone" parameterType="FoResumeDTO" >
+        /* com.fw.core.mapper.db1.fo.FoResumeMapper.insertResumeEnglish,  영문이력서 저장 , 2022.11 , skayhlj@gmail.com, FoResumeMapper.xml*/
+        INSERT INTO resume_english (
+               attachType
+             , url
+             , attach_file_id /*not null*/
+             , resume_id
+             , delFlag
+        )
+        SELECT attachType
+             , url
+             , attach_file_id
+             , #{resumeId}
+             , 'N'
+          FROM resume_english
+         WHERE resume_id = #{id}
+           AND delFlag = 'N'
+    </insert>
+
+    <!-- 필터링 저장-->
+    <insert id="insertResumeFilteringClone" parameterType="FoResumeDTO" >
+        /* com.fw.core.mapper.db1.fo.FoResumeMapper.insertResumeFiltering, 필터링 저장 , 2022.11 , skayhlj@gmail.com, FoResumeMapper.xml*/
+        INSERT INTO resume_filtering (
+               filterCd
+             , resume_id
+             , delFlag
+        )
+        SELECT filterCd
+             , #{resumeId}
+             , 'N'
+          FROM resume_filtering
+         WHERE resume_id = #{id}
+           AND delFlag = 'N'
+    </insert>
+
+    <!-- 지역 저장-->
+    <insert id="insertResumeLocationClone" parameterType="FoResumeDTO" >
+        /* com.fw.core.mapper.db1.fo.FoResumeMapper.insertResumeLocation, 지역 저장 , 2022.11 , skayhlj@gmail.com, FoResumeMapper.xml*/
+        INSERT INTO resume_location (
+               resume_id
+             , location_cd
+             , delFlag
+        )
+        SELECT #{resumeId}
+             , location_cd
+             , 'N'
+          FROM resume_location
+         WHERE resume_id = #{id}
+           AND delFlag = 'N'
+    </insert>
+
+    <!-- .........................이력서 복사.........................................-->
+
+
+    <!--기본이력서 등록여부-->
+    <select id="selectResumeRepresentationCnt" parameterType="string" resultType="int">
+        /*com.fw.core.mapper.db1.fo.FoResumeMapper.selectResumeRepresentationCnt, 기본이력서 등록여부 , 2022.12 , skayhlj@gmail.com, FoResumeMapper.xml*/
+        SELECT COUNT(1) AS representationCnt
+          FROM resume
+         WHERE delFlag = 'N'
+           AND member_id = #{frontSession.id}
+           AND representation = 1
+    </select>
+
+    <!--기본이력서 변경-->
+    <update id="updateResumeRepresentation" parameterType="FoResumeDTO">
+        /*com.fw.core.mapper.db1.fo.FoResumeMapper.updateResumeRepresentation, 기본이력서 등록여부 , 2022.12 , skayhlj@gmail.com, FoResumeMapper.xml*/
+        UPDATE resume
+           SET representation = '1'
+         WHERE id = #{id}
+    </update>
+
+    <!--기본이력서 변경시 원래 기본이력서 변경-->
+    <update id="updateResumeOriginRepresentation" parameterType="FoResumeDTO">
+        /*com.fw.core.mapper.db1.fo.FoResumeMapper.updateResumeOriginRepresentation, 기본이력서 변경시 원래 기본이력서 변경 , 2022.12 , skayhlj@gmail.com, FoResumeMapper.xml*/
+        UPDATE resume
+           SET representation = '0'
+         WHERE member_id = #{frontSession.id}
+           AND delFlag = 'N'
+           AND representation = '1'
+    </update>
+
+    <!--이력서 삭제-->
+    <update id="updateDeleteResume" parameterType="FoResumeDTO">
+        /*com.fw.core.mapper.db1.fo.FoResumeMapper.updateDeleteResume, 이력서 삭제 , 2022.12 , skayhlj@gmail.com, FoResumeMapper.xml*/
+        UPDATE resume
+           SET delFlag = 'Y'
+         WHERE id = #{id}
+    </update>
+
+    <!--가장 최근 insert 이력서-->
+    <select id="selectLastResume"  parameterType="FoResumeDTO"  resultType="FoResumeDTO">
+        /*com.fw.core.mapper.db1.fo.FoResumeMapper.selectLastResume, 이력서 삭제 , 2023.1 , skayhlj@gmail.com, FoResumeMapper.xml*/
+        SELECT MAX(id) id
+          FROM resume
+         WHERE delFlag = 'N'
+           AND member_id = #{frontSession.id}
+           AND representation = 0
+    </select>
+
+    <!--가입시 hh추천코드입력했는지 확인-->
+    <select id="selectHhReferralCode"  parameterType="FoResumeDTO"  resultType="FoResumeDTO">
+        /*com.fw.core.mapper.db1.fo.FoResumeMapper.selectLastResume, 이력서 삭제 , 2023.1 , skayhlj@gmail.com, FoResumeMapper.xml*/
+        SELECT A.hhReferralCode
+             , H.member_id
+          FROM applicant A
+    INNER JOIN headhunter H on A.hhReferralCode = H.referralCode
+         WHERE A.delFlag = 'N'
+           AND A.member_id = #{frontSession.id}
+    </select>
+
+    <!-- 보유 포인트 조회 -->
+    <select id="selectHhPoint" parameterType="FoPointDTO" resultType="FoPointDTO">
+        /*com.fw.core.mapper.db1.fo.FoResumeMapper.selectHhPoint,  보유 포인트 조회 update 2023.1 , skayhlj@gmail.com, FoResumeMapper.xml*/
+        SELECT p.id
+             , p.balance
+             , m.id memberId
+             , p.paidPoint
+             , p.freePoint
+          FROM point p
+RIGHT OUTER JOIN member m ON m.id = p.member_id
+         WHERE m.id = #{memberId}
+    </select>
+
+    <!-- 추천코드입력한 ap가 이력서 입력시 hh에 포인트 추가 update  -->
+    <update id="updatePointForResume" parameterType="FoPointDTO">
+        /*com.fw.core.mapper.db1.fo.FoResumeMapper.updatePointForResume, 추천코드입력한 ap가 이력서 입력시 hh에 포인트 추가 update 2023.1 , skayhlj@gmail.com, FoResumeMapper.xml*/
+        UPDATE point
+           SET balance = freePoint + #{freeIncrease} + paidPoint + #{paidIncrease}
+             , freePoint = freePoint + #{freeIncrease}
+             , paidPoint = paidPoint + #{paidIncrease}
+             , updatedAt = NOW()
+         WHERE member_id = #{memberId}
+    </update>
+
+    <!-- 추천코드입력한 ap가 이력서 입력시 hh에 포인트 추가 -->
+    <insert id="insertPointUseHistoryForResume" parameterType="FoPointDTO">
+        /*com.fw.core.mapper.db1.fo.FoResumeMapper.insertPointUseHistoryForResume,  추천코드입력한 ap가 이력서 입력시 hh에 포인트 추가  2023.1 , skayhlj@gmail.com, FoResumeMapper.xml*/
+        INSERT INTO point_use_history (
+               createdAt
+             , updatedAt
+             , reasonCd
+             , member_id
+             , point_id
+             , freeBalance
+             , freeIncrease
+             , paidBalance
+             , paidIncrease
+        )
+        SELECT NOW()
+             , NOW()
+             , #{type}
+             , member_id
+             , id
+             , freePoint
+             , #{freeIncrease}
+             , paidPoint
+             , #{paidIncrease}
+          FROM point
+         WHERE member_id = #{memberId}
+    </insert>
+
+    <!-- hh포인트테이블에 없을시 insert -->
+    <insert id="insertPointHh" parameterType="FoPointDTO">
+        /*com.fw.core.mapper.db1.fo.FoResumeMapper.insertPointHh, hh포인트테이블에 없을시 insert  2023.1 , skayhlj@gmail.com, FoResumeMapper.xml*/
+        INSERT INTO point (
+               createdAt
+             , updatedAt
+             , balance
+             , freePoint
+             , paidPoint
+             , member_id
+             , delFlag
+        ) VALUES (
+               NOW()
+             , NOW()
+             , 0
+             , 0
+             , 0
+             , #{memberId}
+             , 'N'
+        )
+    </insert>
+
+    <!-- 재직중 확인 -->
+    <select id="selectHoldOffice" parameterType="FoResumeDTO" resultType="boolean">
+        /*com.fw.core.mapper.db1.fo.FoResumeMapper.selectHoldOffice,  재직중 확인 2023.1 , skayhlj@gmail.com, FoResumeMapper.xml*/
+        SELECT EXISTS (
+                       SELECT 1
+                       FROM resume_career
+                       WHERE resume_id = #{id}
+                         AND holdOffice = 1
+                   ) AS CNT
+    </select>
+
+</mapper>
+

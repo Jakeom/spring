@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.fo.FoHhReadingHistoryMapper">
+
+	<!-- 헤드헌터 열람 내역 추가 -->
+	<insert id="insertHhReadingHistory" parameterType="FoHhReadingHistoryDTO">
+		/* com.fw.core.mapper.db1.fo.FoHhReadingHistoryMapper.insertHhReadingHistory, 헤드헌터 열람 내역 추가, 2022.11 , sjpaik, FoHhReadingHistoryMapper.xml*/
+		INSERT INTO hh_reading_history (
+			   reg_date
+			 , hh_member_id
+			 , ap_member_id
+		) VALUES (
+			   NOW()
+			 , #{hhMemberId}
+			 , #{frontSession.id}
+		)
+	</insert>
+
+</mapper>

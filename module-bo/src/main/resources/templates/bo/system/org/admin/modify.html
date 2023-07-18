@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/default}">
+<head>
+    <link rel="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
+</head>
+<body>
+<div layout:fragment="contents" th:remove="tag">
+    <div id="container-block">
+        <main id="content" role="main">
+            <h2 class="title">관리자 수정</h2>
+            <div class="p-3">
+                <form id="updateAdminForm" name="updateAdminForm" th:object="${modify}">
+                    <input type="hidden" id="adminModifySeq" th:value="${modify.adminSeq}"/>
+                    <div class="form-group">
+                        <label for="orgId">조직</label>
+                        <select id="orgId" name="orgId" class="form-control w-auto"
+                                th:data-selected="${modify.orgId}"
+                                data-url="/bo/org"
+                                data-default-option="선택"
+                                data-show-name="orgNm"
+                                data-value-name="orgId"
+                        >
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="adminId">관리자 아이디</label>
+                        <div class="input-group mb-3">
+                            <input type="text" class="form-control col-xl-2" id="adminId" name="adminId"
+                                   th:field="*{adminId}" placeholder="관리자ID를 입력하세요" check_result="no" maxlength='30'
+                                   readonly>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="adminNm">관리자 이름</label>
+                        <input type="text" class="form-control col-xl-2" id="adminNm" name="adminNm"
+                               th:field="*{adminNm}"
+                               placeholder="이름을 입력하세요" maxlength='5'>
+                    </div>
+                    <div class="form-group">
+                        <label for="emailId">이메일</label>
+                        <div class="input-group mb-3">
+                            <input type="text" id="emailId" name="emailId" class="form-control col-xl-1"
+                                   th:field="*{emailId}" value="" placeholder="이메일 아이디" maxlength="18"/>
+                            <span class="input-group-text">@</span>
+                            <input type="text" id="emailDomain" name="emailDomain" class="form-control col-xl-1"
+                                   th:field="*{emailDomain}" placeholder="도메인" maxlength="18"/>
+                            <select class="form-control col-xl-1" id="selectDomain" name="selectDomain">
+                                <option value="self">직접입력</option>
+                                <option th:selected="${modify.emailDomain} eq softpuzzle.co.kr">softpuzzle.co.kr
+                                </option>
+                                <option th:selected="${modify.emailDomain} eq gmail.com">gmail.com</option>
+                                <option th:selected="${modify.emailDomain} eq naver.com">naver.com</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="adminStatusCd">관리자 상태</label>
+                        <select id="adminStatusCd" name="adminStatusCd" class="form-control w-auto"
+                                th:data-selected="${modify.adminStatusCd}"
+                                data-url="/bo/cd/ADMIN_STATUS"
+                                data-default-option="선택"
+                        ></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="adminPassword">새로운 비밀번호<p>
+                            <div id="currentPw" name="currentPw" style="color:blue;">변경하지 않을 시 기존 비밀번호가 유지됩니다.</div>
+                            <div id="changePw" name="changePw" style="display:none; color:red;">설정한 새로운 비밀번호로 변경됩니다.
+                            </div>
+                            </p></label>
+                        <div class="input-group mb-3">
+                            <input type="password" class="form-control col-xl-2" id="adminPassword" name="adminPassword"
+                                   placeholder="기존 비밀번호가 유지됩니다." maxlength='15'>
+                            <i class="fa fa-eye fa-lg" style="position: relative; right:30px; top:10px;"></i>
+                        </div>
+                        <input type="hidden" class="form-control" id="currentPassword" name="currentPassword"
+                               th:value="${modify.adminPassword}"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="useStartDt">사용일</label>
+                        <div class="input-group mb-3">
+                            <input type="text" id="useStartDt" name="useStartDt"
+                                   class="form-control form-datepicker col-xl-1"
+                                   th:field="*{useStartDt}" placeholder="시작일 선택" readonly>
+                            <span class="input-group-text">~</span>
+                            <input type="text" id="useEndDt" name="useEndDt"
+                                   class="form-control form-datepicker col-xl-1"
+                                   th:field="*{useEndDt}" placeholder="종료일 선택" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="adminNm">PUSH 수신인 일련번호</label>
+                        <div class="input-group mb-3">
+                            <input type="text" class="form-control col-xl-1" name="approvalSeq" placeholder="회원 일련번호" maxlength="6" th:value="${modify.approvalSeq}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="mytext">IP</label>
+                        <div class="input_fields_wrap" name="wrapper">
+                            <div class="input-group mb-3">
+                                <input type="text" class="form-control col-xl-2" id="mytext" name="mytext"
+                                       placeholder="Enter Ip">
+                                <button type="button" class="btn btn-danger" data-role="MoreFields">Add More Fields
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-dark" id="btnUpdate" data-role="update">수정</button>
+                    <button type="button" class="btn btn-danger" id="btnCancel" data-role="detail">취소</button>
+                </form>
+            </div>
+        </main>
+    </div>
+    <div layout:fragment="modal" th:remove="tag"></div>
+</div>
+</body>
+</html>

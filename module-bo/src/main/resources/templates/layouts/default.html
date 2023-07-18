@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+    <head>
+        <th:block th:include="fragments/head :: commonMetaAndTitle" />
+        <th:block th:include="fragments/head :: commonStyle" />
+        <th:block layout:fragment="head" th:remove="tag" />
+    </head>
+    <body>
+        <div class="wrap">
+            <div th:include="fragments/header :: common" th:remove="tag"></div>
+            <div th:include="fragments/aside :: common" th:remove="tag"></div>
+            <th:block layout:fragment="contents" />
+        </div>
+        <th:block layout:fragment="modal" />
+        <script>var UPLOAD_PATH = '${uploadPath}'; //기본 파일 경로</script>
+        <th:block th:include="fragments/javascript :: common" th:remove="tag" />
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+                /*[# th:if="${not #strings.isEmpty(noAuth)}"]*/
+                    alert('[[${noAuth}]]');
+                /*[/]*/
+            /*]]>*/
+        </script>
+    </body>
+</html>

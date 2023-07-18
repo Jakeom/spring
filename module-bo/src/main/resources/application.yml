@@ -1,0 +1,43 @@
+spring:
+  profiles:
+    active: local
+    include:
+      - app
+      - db
+      - file
+  mvc:
+    throw-exception-if-no-handler-found: true
+    dispatch-options-request: false
+  config:
+    messages:
+      basename: messages/bo/message
+      encoding: UTF-8
+  web:
+    resources:
+      add-mappings: false
+  thymeleaf:
+    cache: false
+    check-template-location: true
+    prefix: classpath:/templates/
+    suffix: .html
+
+# JWT Setting
+# AccessToken = Minute, RefreshToken = Day
+jwt:
+  secret:
+    key: xxx
+  access:
+    token:
+      expiration: 10
+  refresh:
+    token:
+      expiration: 30
+
+app-config:
+  host-url: http://localhost:3000
+  bootpay:
+    rest-application-id: xxx
+    web-application-id: xxx
+    private-key: "xxx="
+
+---

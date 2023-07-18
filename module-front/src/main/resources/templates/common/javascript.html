@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" >
+    <div th:fragment="common">
+        <script layout:fragment="javascript"></script>
+        <script type="text/javascript" th:inline="javascript" th:src="@{/static/js/common/common.js}"></script>
+        <script type="text/javascript" th:inline="javascript" th:src="@{/static/js/common/utils.js}"></script>
+        <script type="text/javascript" th:inline="javascript" th:src="@{/static/js/common/selectAjax.js}"></script>
+        <script type="text/javascript" th:inline="javascript" th:src="@{/static/js/common/moment.js}"></script>
+        <script type="text/javascript" th:inline="javascript" th:src="@{/static/js/common/ckeditor/ckeditor.js}"></script>
+        <script type="text/javascript" th:inline="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+        <script type="text/javascript" th:inline="javascript" th:src="@{/static/lib/jquery-serialize-object/jquery.serializeObject.min.js}"></script>
+        <script src="https://static.nid.naver.com/js/naveridlogin_js_sdk_2.0.2.js" charset="utf-8"></script>
+        <script type="text/javascript" src="https://static.nid.naver.com/js/naverLogin_implicit-1.0.3.js" charset="utf-8"></script>
+        <script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
+        <script src="https://accounts.google.com/gsi/client" async defer></script>
+        <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
+        <script src="https://js.bootpay.co.kr/bootpay-4.2.7.min.js" type="application/javascript"></script>
+        <script type="text/javascript" th:inline="javascript" th:src="@{/static/js/additional.js}"></script>
+        <script type="text/javascript" th:inline="javascript" th:src="@{${jsName}}"></script>
+    </div>
+    <div th:fragment="login">
+        <script layout:fragment="javascript"></script>
+        <script type="text/javascript" th:inline="javascript" th:src="@{/static/js/additional.js}"></script>
+        <script type="text/javascript" th:inline="javascript" th:src="@{/static/js/common/utils.js}"></script>
+        <script type="text/javascript" th:inline="javascript" th:src="@{/static/lib/jquery-serialize-object/jquery.serializeObject.min.js}"></script>
+        <script src="https://static.nid.naver.com/js/naveridlogin_js_sdk_2.0.2.js" charset="utf-8"></script>
+        <script type="text/javascript" src="https://static.nid.naver.com/js/naverLogin_implicit-1.0.3.js" charset="utf-8"></script>
+        <script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
+        <script src="https://accounts.google.com/gsi/client" async defer></script>
+        <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
+        <script src="https://js.bootpay.co.kr/bootpay-4.2.7.min.js" type="application/javascript"></script>
+        <script type="text/javascript" th:inline="javascript" th:src="@{${jsName}}"></script>
+    </div>
+</html>

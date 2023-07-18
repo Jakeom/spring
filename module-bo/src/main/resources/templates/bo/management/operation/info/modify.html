@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/default}">
+
+<body>
+	<div layout:fragment="contents" th:remove="tag">
+		<main id="content" role="main">
+			<h2 class="title">정보 수정</h2>
+			<div class="row p-3">
+	            <div class="col-12">
+					<!-- form -->
+					<form id="updateInfoForm" name="updateInfo"	th:object="${modify}">
+						<input type="hidden" id="infoSeq" name="infoSeq" th:value="${modify.mainDisplaySeq}" />
+						<table class="table table-bordered">
+							<colgroup>
+								<col style="width:120px" />
+								<col />
+							</colgroup>
+							<tr>
+								<th class="text-center">종류</th>
+								<td th:text="${modify.infoTypeCd}"><!--
+									<select id="selectType" name="selectType" data-role="select" class="form-control w-auto"
+											th:data-selected="${modify.infoType}"
+											data-url="/bo/cd/INFO ">
+									</select>-->
+								</td>
+							</tr>
+							<tr>
+								<td colspan="2">
+									<textarea class="form-control ckeditor" id="infoContent" name="content"	th:field="*{content}" placeholder="내용을 입력하세요" rows="12" cols="50" form="updateinfoForm"></textarea>
+								</td>
+							</tr>
+						</table>
+						<div class="m-t-10 text-right">
+							<button type="button" class="btn btn-primary float-right" data-role="update">수정</button>
+							<button type="button" class="btn btn-danger float-right m-r-5" data-role="detail">취소</button>
+						</div>
+					</form>
+					<!-- form -->
+				</div>
+			</div>
+		</main>
+	</div>
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/default}">
+<body>
+	<div layout:fragment="contents" th:remove="tag">
+		<main id="content" role="main">
+			<h2 class="title">상세보기</h2>
+			<div class="row p-3">
+            	<div class="col-12">
+					<input type="hidden" id="noticeDetailSeq" th:value="${detail.noticeSeq}" />
+					<input type="hidden" id="noticeFileSeq" th:value="${detail.fileSeq}" />
+					<!-- table -->
+					<table class="table table-bordered">
+						<colgroup>
+							<col style="width:120px" />
+							<col />
+						</colgroup>
+						<tbody>
+							<tr>
+								<th class="text-center">등록일</th>
+								<td th:text="${detail.createDt}"></td>
+							</tr>
+							<tr>
+								<th class="text-center">공지 종류</th>
+								<td th:text="${detail.noticeCd}"></td>
+							</tr>
+							<tr>
+								<th class="text-center">공지 제목</th>
+								<td th:text="${detail.title}"></td>
+							</tr>
+							<th:block th:if="${file ne null}">
+								<tr th:if="${file.size() ne 0}">
+									<th class="text-center">첨부 파일</th>
+									<td>
+										<th:block th:unless="${#lists.isEmpty(file)}" th:each="list : ${file}">
+										<a th:text="${list.originName}" th:href="${list.url}"></a><p></p>
+										</th:block>
+									</td>
+								</tr>
+							</th:block>
+							<tr>
+								<td colspan="2" th:utext="${detail.content}" class="p-5"></td>
+							</tr>
+						</tbody>
+					</table>
+					<!-- table -->
+					<div class="m-t-10 text-right">
+						<button type="button" class="btn btn-dark" data-role="update">수정하기</button>
+						<button type="button" class="btn btn-dark" data-role="delete">삭제하기</button>
+						<button type="button" class="btn btn-dark" data-role="list">목록</button>
+					</div>
+				</div>
+			</div>
+		</main>
+		<div layout:fragment="modal" th:remove="tag"></div>
+	</div>
+</body>
+</html>

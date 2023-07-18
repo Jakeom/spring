@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+	 xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+	 layout:decorate="~{layouts/default}">
+<body>
+<div layout:fragment="contents" th:remove="tag">
+	<div id="container-block">
+		<main id="content" role="main">
+		<h2 class="title">공통 코드 등록</h2>
+		<div class="p-3">
+			<form id="insertHelp" name="insertHelp">
+				<div class="form-group">
+					<label for="groupCd">메뉴 Cd</label>
+					<input type="text" class="form-control" id="menuCd" name="menuCd" placeholder="Menu CD를 입력하세요">
+				</div>
+				<div class="form-group">
+					<label for="groupNm">Content</label>
+					<input type="text" class="form-control" name="content" placeholder="Content를 입력하세요">
+				</div>
+					<button type="button" class="btn btn-primary" id="save" data-role="save">등록</button>
+					<button type="button" class="btn btn-success ml-2" id="list" data-role="list">목록</button>
+			</form>
+        </div>
+		</main>
+    </div>
+    <div layout:fragment="modal" th:remove="tag"></div>
+</div>
+</body>

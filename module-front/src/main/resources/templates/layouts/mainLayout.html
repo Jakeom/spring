@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <th:block th:include="_include/_head :: commonMetaAndTitle" />
+    <th:block th:include="_include/_head :: commonStyle" />
+    <th:block layout:fragment="head" th:remove="tag" />
+</head>
+<body>
+    <div class="wrap">
+        <div th:include="_include/_header :: common" th:remove="tag"></div>
+        <div id="container">
+            <th:block layout:fragment="contents" />
+
+            <!-- 알림 버튼 -->
+            <th:block th:if="${alarmCnt != null}">
+            <a href="javascript:void(0)" class="chat-notice" th:classappend="${alarmCnt > 0 ? 'active' : ''}" data-role="chat" th:style="${#authentication.principal} eq 'anonymousUser' ?'display:none;':''" >
+                <i class="icon-chat-notice"></i>
+            </a>
+            <a href="#" class="top-btn">
+                <i class="icon-top-btn"></i>
+            </a>
+            </th:block>
+            <!--// 알림 버튼 -->
+
+        </div>
+    </div>
+    <th:block layout:fragment="modal" />
+    <div th:include="_include/_modal :: common" th:remove="tag"></div>
+    <div th:include="_guide/viewModal :: common" th:remove="tag"></div>
+    <div th:include="common/javascript :: common" th:remove="tag"></div>
+    <script>
+        const mainSwiper = new Swiper('.main-content__join .swiper-container', {
+            // If we need pagination
+            slidesPerView: 1,
+            pagination: {
+                el: '.main-content__join .swiper-pagination',
+            },
+
+            autoplay:{
+                delay: 5000,
+            },
+
+            // Navigation arrows
+            navigation: {
+                nextEl: '.main-content__join .swiper-button-next',
+                prevEl: '.main-content__join .swiper-button-prev',
+            },
+        });
+
+        const announcementSwiper = new Swiper('.main-content__announcement .swiper-container', {
+            // If we need pagination
+            slidesPerView: 1,
+
+            autoplay:{
+                delay: 5000,
+            },
+
+            // Navigation arrows
+            navigation: {
+                nextEl: '.main-content__announcement .swiper-button-next',
+                prevEl: '.main-content__announcement .swiper-button-prev',
+            },
+        });
+
+        const searchSwiper = new Swiper('.swiper-search .swiper-container', {
+            // If we need pagination
+            breakpoints: {
+                996: {
+                    slidesPerView: 4,
+                    spaceBetween: 24,
+                },
+            },
+            slidesPerView: 1,
+            spaceBetween: 0,
+            autoplay:{
+                delay: 5000,
+            },
+            // Navigation arrows
+            navigation: {
+                nextEl: '.swiper-search .swiper-button-next',
+                prevEl: '.swiper-search .swiper-button-prev',
+            },
+
+            scrollbar: {
+                el: '.swiper-search .swiper-scrollbar',
+            },
+        });
+        const customerSwiper = new Swiper('.swiper-customer .swiper-container', {
+            // If we need pagination
+            breakpoints: {
+                996: {
+                    slidesPerView: 4,
+                    spaceBetween: 24,
+                },
+            },
+            slidesPerView: 1,
+            spaceBetween: 0,
+            autoplay:{
+                delay: 5000,
+            },
+            // Navigation arrows
+            navigation: {
+                nextEl: '.swiper-customer .swiper-button-next',
+                prevEl: '.swiper-customer .swiper-button-prev',
+            },
+
+            scrollbar: {
+                el: '.swiper-customer .swiper-scrollbar',
+            },
+        });
+        const platformSwiper = new Swiper('.main-content__platform .swiper-container', {
+            // If we need pagination
+            breakpoints: {
+                996: {
+                    slidesPerView: 'auto',
+                    spaceBetween: 140,
+                    centeredSlides: true,
+                    loop: true,
+                },
+            },
+            autoplay:{
+                delay: 5000,
+            },
+            slidesPerView: 1,
+            navigation: {
+                nextEl: '.main-content__platform .swiper-button-next',
+                prevEl: '.main-content__platform .swiper-button-prev',
+            },
+            pagination: {
+                el: '.main-content__platform .swiper-pagination',
+                clickable: true,
+                renderBullet: function (index, className) {
+                    return '<span class="' + className + '">' + (index + 1) + '</span>';
+                },
+            },
+        });
+    </script>
+    <footer>
+        <th:block th:include="_include/_footer :: commonMetaAndTitle" />
+        <th:block layout:fragment="footer" th:remove="tag" />
+    </footer>
+</body>
+</html>

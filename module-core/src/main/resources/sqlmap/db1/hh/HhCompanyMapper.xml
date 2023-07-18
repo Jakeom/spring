@@ -1,0 +1,357 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.hh.HhCompanyMapper">
+
+    <!-- 고객사 등록 -->
+    <insert id="insertHrCompany" parameterType="HhCompanyDTO">
+        /* com.fw.core.mapper.db1.hh.HhPositionMapper.insertHrCompany, 고객사 등록, wsh, HhCompanyMapper.xml */
+        INSERT INTO hr_company (
+               createdAt
+             , address
+             , ceo
+             , closed
+             , companyName
+             , companyScale
+             , companyStatus
+             , deleted
+             , establishDate
+             , industry
+             , licenseNumber
+             , location
+             , marketListing
+             , phone
+             , member_id
+             , delFlag
+        ) VALUES (
+               NOW()
+             , #{address}
+             , #{ceo}
+             , 0
+             , #{companyName}
+             , #{companyScale}
+             , #{companyStatus}
+             , 0
+             , #{establishDate}
+             , #{industry}
+             , #{licenseNumber}
+             , #{location}
+             , #{marketListing}
+             , #{phone}
+             , #{frontSession.id}
+             , 'N'
+        )
+        <selectKey order="AFTER" keyProperty="id" resultType="String">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+	
+	<!-- 고객사 인사담당 등록 -->
+    <insert id="insertHrManager" parameterType="HhCompanyDTO">
+        /* com.fw.core.mapper.db1.hh.HhPositionMapper.insertHrManager, 고객사 인사담당 등록, wsh, HhCompanyMapper.xml */
+        INSERT INTO hr_manager (
+               createdAt
+             , email
+             , name
+             , phone
+             , workAddress
+             , hr_company_id
+             , delFlag
+        ) VALUES (
+               NOW()
+             , #{email}
+             , #{name}
+             , #{phone}
+             , #{workAddress}
+             , #{id}
+             , 'N'
+        )
+    </insert>
+    
+    <!-- 고객사 메모 등록 -->
+    <insert id="insertHrMemo" parameterType="HhCompanyDTO">
+        /* com.fw.core.mapper.db1.hh.HhPositionMapper.insertHrMemo, 고객사 메모 등록, wsh, HhCompanyMapper.xml */
+        INSERT INTO hr_memo (
+               createdAt
+             , content
+             , hr_company_id
+             , delFlag
+        ) VALUES (
+               NOW()
+             , #{content}
+             , #{id}
+             , 'N'
+        )
+    </insert>
+
+    <!-- 고객사 삭제 -->
+    <update id="deleteHrCompany" parameterType="HhCompanyDTO">
+        /* com.fw.core.mapper.db1.hh.HhPositionMapper.deleteHrCompany, 고객사 삭제, wsh, HhCompanyMapper.xml */
+        UPDATE hr_company
+           SET delFlag = 'Y'
+        WHERE id = #{id}
+    </update>
+    
+    <!-- 인사담당 삭제 -->
+    <update id="deleteHrManager" parameterType="HhCompanyDTO">
+        /* com.fw.core.mapper.db1.hh.HhPositionMapper.deleteHrManager, 고객사 인사담당 삭제, wsh, HhCompanyMapper.xml */
+        UPDATE hr_manager
+           SET delFlag = 'Y'
+        WHERE hr_company_id = #{id}
+    </update>
+
+    <!-- 고객사 조회 -->
+    <select id="selectHrCompanyList" parameterType="HhCompanyDTO" resultType="HhCompanyDTO">
+        /* com.fw.core.mapper.db1.hh.HhPositionMapper.selectHrCompanyList, 고객사 조회, wsh, HhCompanyMapper.xml */
+        SELECT hc.id
+             , DATE_FORMAT(hc.createdAt,'%Y-%m-%d') AS createdAt
+             , DATE_FORMAT(hc.updatedAt,'%Y-%m-%d') AS updatedAt
+             , hc.address
+             , hc.ceo
+             , hc.closed
+             , hc.companyName
+             , hc.companyScale
+             , hc.companyStatus
+             , hc.establishDate
+             , hc.industry
+             , hc.licenseNumber
+             , hc.location
+             , hc.marketListing
+             , hc.phone
+             , hc.member_id
+             , hc.delFlag
+             , (SELECT GROUP_CONCAT(name separator '/') FROM hr_manager a WHERE a.hr_company_id = hc.id AND a.delFlag = 'N') AS name
+             , p.title
+             , DATE_FORMAT(p.endDate,'%Y-%m-%d') AS endDate
+             , fn_get_common_cd(p.status , 'POSITION_STATUS' , '1') AS status
+             , p.id AS positionId
+          FROM hr_company AS hc
+     LEFT JOIN (SELECT * FROM position WHERE id IN (SELECT MAX(id) from position group by hr_company_id)) AS p ON hc.id = p.hr_company_id
+         WHERE hc.member_id = #{frontSession.id}
+      <if test="licenseNumber != null and licenseNumber != ''">
+           AND hc.licenseNumber = #{licenseNumber}
+      </if>
+           AND hc.delFlag = 'N'
+           ORDER BY hc.createdAt DESC
+    </select>
+    
+    <!-- 고객사 상세 -->
+    <select id="selectHrCompanyDetail" parameterType="HhCompanyDTO" resultType="HhCompanyDTO">
+        /* com.fw.core.mapper.db1.hh.HhPositionMapper.selectHrCompanyDetail, 고객사 상세, wsh, HhCompanyMapper.xml */
+        SELECT hc.id
+             , DATE_FORMAT(hc.createdAt,'%Y-%m-%d') AS createdAt
+             , DATE_FORMAT(hc.updatedAt,'%Y-%m-%d') AS updatedAt
+             , hc.address
+             , hc.ceo
+			 , hc.closed
+             , hc.companyName
+             , hc.companyScale
+             , hc.companyStatus
+             , DATE_FORMAT(hc.establishDate, '%Y.%m.%d') AS establishDate
+             , hc.industry
+             , hc.licenseNumber
+             , hc.location
+             , hc.marketListing
+             , hc.phone
+             , hc.member_id
+             , hc.delFlag
+             , p.title
+             , DATE_FORMAT(p.endDate,'%Y-%m-%d') AS endDate
+             , fn_get_common_cd(p.status , 'POSITION_STATUS' , '1') AS status
+             , p.id
+             , DATE_FORMAT(p.createdAt,'%Y-%m-%d') AS positionCreatedAt
+        FROM hr_company AS hc
+      LEFT JOIN position AS p
+      ON hc.id = p.id
+        WHERE hc.id = #{id}
+      <if test="licenseNumber != null and licenseNumber != ''">
+          AND hc.licenseNumber = #{licenseNumber}
+      </if>
+          AND hc.delFlag = 'N'
+    </select>
+    
+    <!-- 고객사 상세(수정가능) -->
+    <select id="selectHrDetailCompany" parameterType="HhCompanyDTO" resultType="HhCompanyDTO">
+        /* com.fw.core.mapper.db1.hh.HhPositionMapper.selectHrDetailCompany, 고객사 상세(수정가능), wsh, HhCompanyMapper.xml */
+        SELECT hc.id
+             , DATE_FORMAT(hc.createdAt,'%Y-%m-%d') AS createdAt
+             , DATE_FORMAT(hc.updatedAt,'%Y-%m-%d') AS updatedAt
+             , hc.address
+             , hc.ceo
+			 , hc.closed
+             , hc.companyName
+             , hc.companyScale
+             , hc.companyStatus
+             , establishDate
+             , hc.industry
+             , hc.licenseNumber
+             , hc.location
+             , hc.marketListing
+             , hc.phone
+             , hc.member_id
+             , hc.delFlag
+             , p.title
+             , DATE_FORMAT(p.endDate,'%Y-%m-%d') AS endDate
+             , fn_get_common_cd(p.status , 'POSITION_STATUS' , '1') AS status
+             , p.id
+             , DATE_FORMAT(p.createdAt,'%Y-%m-%d') AS positionCreatedAt
+        FROM hr_company AS hc
+      LEFT JOIN position AS p
+      ON hc.id = p.id
+        WHERE hc.id = #{id}
+      <if test="licenseNumber != null and licenseNumber != ''">
+          AND hc.licenseNumber = #{licenseNumber}
+      </if>
+          AND hc.delFlag = 'N'
+    </select>
+    <!-- 인사담당자 정보 조회 -->
+    <select id="selectHrManagerList" parameterType="HhCompanyDTO" resultType="HhCompanyDTO">
+    	/* com.fw.core.mapper.db1.hh.HhPositionMapper.selectHrManagerList, 인사담당자 정보 조회, wsh, HhCompanyMapper.xml */
+    	SELECT hm.id
+    		 , hm.createdAt
+    		 , hm.updatedAt
+    		 , hm.name
+    		 , hm.email
+    		 , hm.phone
+    		 , hm.workAddress
+    		 , hm.hr_company_id
+    		 , hm.delFlag
+		FROM hr_manager AS hm
+		WHERE hm.delFlag = 'N' AND hm.hr_company_id = #{id}
+    </select>
+		
+	<!-- 고객사 수정 -->
+	<update id="updateHrCompany" parameterType="HhCompanyDTO">
+		/* com.fw.core.mapper.db1.hh.HhPositionMapper.updateHrCompany, 고객사 수정, wsh, HhCompanyMapper.xml */
+		UPDATE hr_company
+		SET companyName = #{companyName}
+			, licenseNumber = #{licenseNumber}
+			, ceo = #{ceo}
+			, establishDate = #{establishDate}
+			, phone = #{phone}
+			, address = #{address}
+			, companyScale = #{companyScale}
+			, industry = #{industry}
+			, marketListing = #{marketListing}
+			, closed = #{closed}
+			, companyStatus = #{companyStatus}
+			, updatedAt = NOW()
+			, member_id = #{frontSession.id}
+		WHERE id = #{id}
+	</update>
+	
+	<!-- 고객사 메모 조회 -->
+	<select id="selectHrMemoList" parameterType="HhCompanyDTO" resultType="HhCompanyDTO">
+		/* com.fw.core.mapper.db1.hh.HhPositionMapper.selectHrMemoList, 고객사 메모, wsh, HhCompanyMapper.xml */
+		SELECT hm.id 
+ 	  		 , DATE_FORMAT(hm.createdAt,'%Y-%m-%d') AS createdAt
+ 	  		 , hm.updatedAt
+ 	  		 , hm.content
+ 	  		 , hm.delFlag
+		FROM hr_memo AS hm
+		WHERE hm.delFlag = 'N' AND hm.hr_company_id = #{id} 
+	</select>
+	
+	<!-- 상세에서 고객사 인사담당 등록 -->
+    <insert id="insertHrDetailManager" parameterType="HhCompanyDTO">
+        /* com.fw.core.mapper.db1.hh.HhPositionMapper.insertHrDetailManager, 상세에서 고객사 인사담당 등록, wsh, HhCompanyMapper.xml */
+        INSERT INTO hr_manager (
+               createdAt
+             , email
+             , name
+             , phone
+             , workAddress
+             , hr_company_id
+             , delFlag
+        ) VALUES (
+               NOW()
+             , #{email}
+             , #{name}
+             , #{phone}
+             , #{workAddress}
+             , #{hrCompanyId}
+             , 'N'
+        )
+    </insert>
+    
+    <!-- 고객사 인사담당자 상세 -->
+    <select id="selectHrManagerDetail" parameterType="HhCompanyDTO" resultType="HhCompanyDTO">
+        /* com.fw.core.mapper.db1.hh.HhPositionMapper.selectHrManagerDetail, 고객사 인사담당자 상세, wsh, HhCompanyMapper.xml */
+        SELECT id
+        	 , createdAt
+        	 , updatedAt
+        	 , email
+        	 , name
+        	 , phone
+        	 , workAddress
+        	 , delFlag
+        FROM hr_manager
+        WHERE delFlag = 'N' AND hr_company_id = #{id}
+    </select>
+    
+    <!-- 고객사 인사담당자 수정 -->
+	<update id="updateHrManager" parameterType="HhCompanyDTO">
+		/* com.fw.core.mapper.db1.hh.HhPositionMapper.updateHrManager, 고객사 인사담당자 수정, wsh, HhCompanyMapper.xml */
+		UPDATE hr_manager
+		SET name = #{name}
+			, email = #{email}
+			, phone = #{managerPhone}
+			, updatedAt = NOW()
+		WHERE id = #{managerId}
+	</update>
+	
+	<!-- 포지션 리스트 -->
+    <select id="selectHrPositionList" parameterType="HhCompanyDTO" resultType="HhCompanyDTO">
+        /* com.fw.core.mapper.db1.hh.HhPositionMapper.selectHrPositionList, 포지션 리스트, wsh, HhCompanyMapper.xml */
+        SELECT p.title
+             , DATE_FORMAT(p.endDate,'%Y-%m-%d') AS endDate
+             , fn_get_common_cd(p.status , 'POSITION_STATUS' , '1') AS status
+             , p.id
+             , DATE_FORMAT(p.createdAt,'%Y-%m-%d') AS createdAt
+             , hc.id AS hrCompanyId
+             , hc.member_id
+        FROM hr_company AS hc
+      INNER JOIN position AS p
+      ON hc.id = p.hr_company_id
+        WHERE hc.id = #{id} AND hc.delFlag = 'N' AND hc.member_id = #{frontSession.id}
+    </select>
+    
+    <!-- 인사담당자 모두 삭제 -->
+    <update id="deleteManagerAll" parameterType="HhCompanyDTO">
+        /* com.fw.core.mapper.db1.hh.HhPositionMapper.deleteManager, 상세에서 인사담당자 삭제, wsh, HhCompanyMapper.xml */
+        UPDATE hr_manager
+           SET delFlag = 'Y'
+         WHERE hr_company_id = #{id}
+    </update>
+    
+	<!-- 메모 삭제 -->
+    <update id="deleteHrMemo" parameterType="HhCompanyDTO">
+        /* com.fw.core.mapper.db1.hh.HhPositionMapper.deleteHrMemo, 메모 삭제, wsh, HhCompanyMapper.xml */
+        UPDATE hr_memo
+           SET delFlag = 'Y'
+        WHERE id = #{id}
+    </update>
+
+    <!-- 사업자번호로 고객사 리스트 조회 -->
+    <select id="selectCompanyDetailByLicense" parameterType="HhCompanyDTO" resultType="HhCompanyDTO">
+        /* com.fw.core.mapper.db1.hh.HhPositionMapper.selectCompanyDetailByLicense, 사업자번호로 고객사 리스트 조회, YJW, HhCompanyMapper.xml */
+        SELECT hc.id
+             , DATE_FORMAT(hc.createdAt,'%Y-%m-%d') AS createdAt
+             , DATE_FORMAT(hc.updatedAt,'%Y-%m-%d') AS updatedAt
+             , hc.address
+             , hc.ceo
+             , hc.closed
+             , hc.companyName
+             , hc.companyScale
+             , hc.companyStatus
+             , hc.industry
+             , hc.licenseNumber
+             , hc.location
+             , hc.marketListing
+             , hc.phone
+             , hc.member_id
+             , hc.delFlag
+        FROM hr_company AS hc
+        WHERE hc.licenseNumber = #{licenseNumber}
+          AND hc.delFlag = 'N'
+    </select>
+</mapper>

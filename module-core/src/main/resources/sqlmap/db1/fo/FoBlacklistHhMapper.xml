@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.fo.FoBlacklistHhMapper">
+	
+	<!-- 블랙리스트 헤드헌터 추가 -->
+	<insert id="insertBlacklistHh" parameterType="FoBlacklistHhDTO">
+		/* com.fw.core.mapper.db1.fo.FoBlacklistHhMapper.insertBlacklistHh, 블랙리스트 헤드헌터 추가 , 2022.11 , sjpaik, FoBlacklistHhMapper.xml*/
+		INSERT INTO blacklist_hh (
+			   createdAt
+			 , headhunter_id
+			 , applicant_id
+			 , delFlag
+		) VALUES (
+			   NOW()
+			 , #{headhunterId}
+			 , #{frontSession.id}
+			 , 'N'
+		)
+	</insert>
+
+</mapper>

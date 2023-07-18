@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/default}">
+
+<body>
+	<div layout:fragment="contents" th:remove="tag">
+		<main id="content" role="main">
+			<h2 class="title">배너 관리</h2>
+			<div class="row p-3">
+				<div class="col-12">
+					<table id="datatable" class="table">
+						<thead>
+							<tr>
+								<th>순번</th>
+								<th>배너 종류</th>
+								<th>배너 이름</th>
+								<th>배너 순서</th>
+								<th>사용여부</th>
+								<th>배너 시작 일자</th>
+								<th>배너 종료 일자</th>
+								<th>링크 URL</th>
+								<th>수정자</th>
+								<th>수정 일자</th>
+								<th>더보기</th>
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+			<!--			<button type="button" class="btn btn-primary float-right" data-role="form">배너등록</button>-->
+		</main>
+	</div>
+</body>
+</html>

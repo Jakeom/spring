@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/default}">
+<body>
+<div layout:fragment="contents" th:remove="tag">
+    <div id="container-block">
+        <main id="content" role="main" style="padding: 0 20px;">
+            <h2 class="title">조직별 권한 관리</h2>
+            <div class="row">
+                <div class="col-12">
+					<span class="wid-5 mg_r1">
+                       	<select class="form-control" name="orgId">
+                       		<th:block th:each="list :${orgList}">
+                       			<option th:value="${list.orgId}" th:text="${list.orgNm}"></option>
+                       		</th:block>
+                       	</select>
+					</span>
+                    <div class="d-flex justify-content-end">
+                        <button type="button" class="btn btn-block" style="background-color: #AAC4FF" data-role="save">
+                            적용
+                        </button>
+                    </div>
+                    <table class="table">
+                        <colgroup>
+                            <col style="width:70%">
+                            <col style="width:30%">
+                        </colgroup>
+                        <thead>
+                        <tr>
+                            <th class="text-center border-right" style="background-color:#D2DAFF">메뉴명</th>
+                            <th class="text-center" style="background-color:#D2DAFF">
+                                <label for="checkAll">
+                                    <input type="checkbox" id="checkAll" name="checkAll"/>권한
+                                </label>
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="list :${menuProgramList}">
+                            <td class="text-center border-right" th:text="${list.programNm}">
+                                <span>안녕하세요</span>
+                            </td>
+                            <td class="text-center">
+                                <input type="checkbox" name="checkAuth" th:value="${list.programCd}"
+                                       th:data-menu-cd="${list.menuCd}">
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+</body>
+</html>

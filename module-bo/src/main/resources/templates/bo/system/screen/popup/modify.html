@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/default}">
+<head>
+</head>
+<body>
+<div layout:fragment="contents" th:remove="tag">
+    <div id="container-block">
+        <input type="hidden" id="popupModifySeq" th:value="${modify.popupSeq}"/>
+        <main id="content" role="main">
+            <h2 class="title">팝업 수정</h2>
+            <div class="p-3">
+                <form id="updatePopupForm" name="updatePopupForm" th:object="${modify}">
+                    <div class="form-group">
+                        <label for="popupTitleDetail">제목</label>
+                        <input type="text" class="form-control col-xl-2" id="popupTitleDetail" name="title"
+                               th:field="*{title}" placeholder="제목을 입력하세요">
+                    </div>
+                    <div class="form-group">
+                        <label for="popupContentDetail">내용</label>
+                        <textarea class="form-control col-xl-1" id="popupContentDetail" name="content"
+                                  placeholder="내용을 입력하세요" th:field="*{content}" rows="10"
+                                  cols="50"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="popupOrder">메뉴 순서</label>
+                        <input type="text" class="form-control col-xl-2" id="popupOrder" name="popupOrder"
+                               th:field="*{popupOrder}" placeholder="메뉴순서를 입력하세요"
+                               maxlength='10'>
+                    </div>
+                    <div class="form-group">
+                        <label>사용 여부</label>
+                        <input type="radio" id="useFlagDetailY" name="useFlag" value="Y"
+                               th:checked="${modify.useFlag eq 'Y'}"/>
+                        <label for="useFlagDetailY">사용</label>
+                        <input type="radio" id="useFlagDetailN" name="useFlag" value="N"
+                               th:checked="${modify.useFlag eq 'N'}"/>
+                        <label for="useFlagDetailN">미사용</label>
+                    </div>
+                    <div class="form-group">
+                        <label for="popupStartDt">팝업일시</label>
+                        <div class="input-group mb-3">
+                            <input type="text" id="popupStartDt" name="popupStartDt"
+                                   class="form-control form-datepicker col-xl-1" th:field="*{popupStartDt}"
+                                   placeholder="날짜 선택" readonly>
+                            <span class="input-group-text">~</span>
+                            <label for="popupEndDt"></label>
+                            <input type="text" id="popupEndDt" name="popupEndDt"
+                                   class="form-control form-datepicker col-xl-1" th:field="*{popupEndDt}"
+                                   placeholder="날짜 선택" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="linkUrl">링크 URL</label>
+                        <input type="text" class="form-control col-xl-2" id="linkUrl" name="linkUrl"
+                               th:field="*{linkUrl}" placeholder="링크URL을 입력하세요">
+                    </div>
+                    <div class="form-group">
+                        <label for="offsetX">오프셋X</label>
+                        <input type="text" class="form-control col-xl-2" id="offsetX" name="offsetX"
+                               th:field="*{offsetX}" placeholder="오프셋x 입력" maxlength='10'>
+                    </div>
+                    <div class="form-group">
+                        <label for="offsetY">오프셋Y</label>
+                        <input type="text" class="form-control col-xl-2" id="offsetY" name="offsetY"
+                               th:field="*{offsetY}" placeholder="오프셋Y 입력" maxlength='10'>
+                    </div>
+                    <button type="button" class="btn btn-info btn-lg" data-role="update">수정</button>
+                    <button type="button" class="btn btn-danger btn-lg" data-role="detail">취소</button>
+                </form>
+            </div>
+        </main>
+    </div>
+    <div layout:fragment="modal" th:remove="tag"></div>
+</div>
+</body>
+</html>

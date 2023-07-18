@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.api.ApiResumeMapper">
+	
+	<!-- 이력서 리스트 조회 -->
+	<select id="selectResumeList" parameterType="ApiResumeDTO" resultType="ApiResumeDTO">
+		/* com.fw.core.mapper.db1.api.ApiResumeMapper.selectResumeList, 이력서 리스트 조회, 22.12.20, YJW, ApiResumeMapper.xml */
+		SELECT r.name
+			 , CONCAT((r.totalCareer DIV 12),'년',MOD(r.totalCareer,12),'개월') AS totalCareer
+			 , r.id AS resumeId
+		     , YEAR(r.birth) AS birthYear
+			 , LEFT(DATE_FORMAT(NOW(), '%Y%m%d') - r.birth, 2) AS age
+			 , (SELECT name FROM resume_academic_background rab WHERE rab.resume_id = r.id and rab.delFlag = 'N' ORDER BY rab.entranceYm DESC LIMIT 1) AS finalSchool
+             , (SELECT companyName FROM resume_career rc WHERE rc.delFlag='N' AND rc.resume_id = r.id ORDER BY holdOffice DESC, resignationYm DESC LIMIT 1) AS finalCompany
+		 	 , r.representation
+		FROM resume r
+		WHERE r.member_id = #{memberId}
+		 AND r.delFlag = 'N'
+		 AND r.representation = 1
+
+		UNION
+
+		SELECT r.name
+			 , CONCAT((r.totalCareer DIV 12),'년',MOD(r.totalCareer,12),'개월') AS totalCareer
+			 , r.id AS resumeId
+			 , YEAR(r.birth) AS birthYear
+			 , LEFT(DATE_FORMAT(NOW(), '%Y%m%d') - r.birth, 2) as age
+			 , (SELECT name FROM resume_academic_background rab WHERE rab.resume_id = r.id and rab.delFlag = 'N' ORDER BY rab.entranceYm DESC LIMIT 1) AS finalSchool
+             , (SELECT companyName FROM resume_career rc WHERE rc.delFlag='N' AND rc.resume_id = r.id ORDER BY holdOffice DESC, resignationYm DESC LIMIT 1) AS finalCompany
+			 , r.representation
+		FROM resume r
+		WHERE r.member_id = #{memberId}
+		  AND r.delFlag = 'N'
+		  AND r.representation != 1
+		  AND NOT EXISTS (SELECT 1 FROM position_applicant pa WHERE pa.resume_id = r.id)
+	</select>
+
+	<!-- 이력서 존재여부 확인 -->
+	<select id="selectResumeExists" parameterType="ApiResumeDTO" resultType="boolean">
+		/* com.fw.core.mapper.db1.api.ApiResumeMapper.selectResumeList, 이력서 존재여부 확인, 22.12.21, YJW, ApiResumeMapper.xml */
+		SELECT EXISTS (
+					   SELECT 1
+					   FROM resume
+					   WHERE delFlag = 'N'
+						 AND id = #{resumeId}
+						 AND member_id = #{memberId}
+		  		  ) AS CNT
+	</select>
+
+	<!-- 이력서 상세조회 -->
+	<select id="selectResumeInfo" parameterType="ApiResumeDTO" resultType="ApiResumeDTO">
+		/* com.fw.core.mapper.db1.api.ApiResumeMapper.selectResumeInfo, 이력서 상세조회, 23.01.08, YJW, ApiResumeMapper.xml */
+		SELECT address
+			 , birth
+			 , bylaws
+             , careerDescription
+             , coreAbility
+             , create_member_id
+             , createdAt
+             , createPath
+             , deleted
+             , deletedAt
+             , delFlag
+             , desiredHire
+             , desiredPosition
+             , desiredSalary
+             , disability
+             , disabilityRatingCd
+             , disabilityRatingReason
+             , employmentStatusCd
+             , existTemp
+             , finalPosition
+             , firstOpenChanged
+             , genderCd
+             , id
+             , isVeterans
+             , joinDateCd
+             , last_salary
+             , member_id
+             , militaryServiceCd
+             , name
+             , opened
+             , parent_resume_id
+             , picture_file_id
+             , representation
+             , selfIntroduction
+             , totalCareer
+             , updatedAt
+             , veteransReason
+		FROM resume
+		WHERE id = #{resumeId}
+	</select>
+
+	<!-- 이력서 복사-->
+	<insert id="insertResumeClone" parameterType="ApiResumeDTO">
+		/*com.fw.core.mapper.db1.api.ApiResumeMapper.insertResumeClone,  이력서 복사 , 2023.01, ApiResumeMapper.xml*/
+		INSERT INTO resume (
+			   address
+		     , name
+		     , birth
+		     , genderCd
+		     , bylaws /*not null*/
+		     , desiredPosition
+		     , desiredSalary
+		     , disability /*not null*/
+		     , militaryServiceCd
+		     , isVeterans /*not null*/
+		     , employmentStatusCd
+		     , selfIntroduction
+		     , deleted /*not null*/
+		     , existTemp /*not null*/
+		     , opened /*not null*/
+		     , representation /*not null*/
+		     , firstOpenChanged /*not null*/
+		     , create_member_id /*not null*/
+		     , member_id /*not null*/
+		     , createdAt
+		     , careerDescription
+		     , joinDateCd
+		     , totalCareer
+		     , picture_file_id
+		     , last_salary
+		     , desiredHire
+		)
+		SELECT address
+		     , name
+		     , birth
+		     , genderCd
+		     , bylaws
+		     , desiredPosition
+		     , desiredSalary
+		     , disability
+		     , militaryServiceCd
+		     , isVeterans
+		     , employmentStatusCd
+		     , selfIntroduction
+		     , 0
+		     , 0
+		     , 1
+		     , #{representation}
+		     , 0
+		     , #{memberId}
+		     , #{memberId}
+		     , NOW()
+		     , careerDescription
+		     , joinDateCd
+		     , totalCareer
+		     , picture_file_id
+		     , last_salary
+		     , desiredHire
+		FROM resume
+		WHERE id = #{resumeId}
+		<selectKey order="AFTER" keyProperty="resumeId" resultType="String">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+
+	<!-- 최근 등록 이력서 조회 -->
+	<select id="selectLastResume"  parameterType="ApiResumeDTO"  resultType="ApiResumeDTO">
+		/*com.fw.core.mapper.db1.api.ApiResumeMapper.selectLastResume, 최근 등록 이력서 조회 , 2023.01 , ApiResumeMapper.xml*/
+		SELECT MAX(id) id
+		FROM resume
+		WHERE delFlag = 'N'
+		  AND member_id = #{memberId}
+		  AND representation = 0
+	</select>
+</mapper>

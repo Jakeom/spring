@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <th:block th:include="_include/_head :: commonMetaAndTitle" />
+    <th:block th:include="_include/_head :: commonStyle" />
+    <th:block layout:fragment="head" th:remove="tag" />
+</head>
+<body>
+<div class="wrap">
+    <div th:include="_include/_header :: common" th:remove="tag"></div>
+    <div id="container">
+        <!--<th:block th:include="_include/_aside :: common" th:remove="tag"/>-->
+        <!-- Content Wrapper. Contains page content -->
+        <th:block layout:fragment="contents" />
+    </div>
+</div>
+    <th:block layout:fragment="modal" />
+    <!--/* 각 페이지에서 추가되는 모달 영역 */-->
+    <div th:include="_include/_modal :: common" th:remove="tag"></div>
+
+    <div th:include="common/javascript :: common" th:remove="tag"></div>
+</body>
+</html>

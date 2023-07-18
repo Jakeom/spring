@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html  xmlns:th="http://www.thymeleaf.org"
+       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+       layout:decorate="~{layouts/resumeLayout}">
+  <body>
+    <div id="container-block">
+      <div layout:fragment="contents" th:remove="tag">
+        <form name="reportFormBasic" th:action="${reportDomain} + '/report/ubi4/ubihtml_2.jsp?jrf=default.jrf'"
+          method="POST" enctype="application/json" target="reportFormBasic">
+          <input type="hidden" name="data">
+        </form>
+        <form name="reportFormLine" th:action="${reportDomain} + '/report/ubi4/ubihtml_2.jsp?jrf=line.jrf'"
+          method="POST" enctype="application/json" target="reportFormLine">
+          <input type="hidden" name="data">
+        </form>
+        <form name="reportFormTable" th:action="${reportDomain} + '/report/ubi4/ubihtml_2.jsp?jrf=table.jrf'"
+          method="POST" enctype="application/json" target="reportFormTable">
+          <input type="hidden" name="data">
+        </form>
+        <div class="layout-content">
+            <div class="community-content">
+              <div class="sub-content-head">
+                <h3 class="subtitle">이력서 목록</h3>
+              </div>
+              <div class="example-form">
+                <ul>
+                  <li>이력서는 <span class="text-danger">최대 99개</span>까지 등록 가능합니다.</li>
+                  <li>기본이력서는 <span class="text-danger">1개</span>만 등록 가능합니다.</li>
+                </ul>
+              </div>
+              <p class="m-b-10">총 <span class="text-danger" th:text="${searchInfo.totalCount}">5</span>건의 이력서가 있습니다.</p>
+              <div class="feed-list">
+                <ul>
+                  <th:block th:each="list : ${resumeList}">
+                    <li>
+                      <div class="row row-40 align-items-center">
+                        <div class="resume-list-wrap">
+                          <div class="resume-list-object">
+                            <span class="tag tag-lg tag-outline-primary none-border m-0" th:if="${list.representation eq '1'}">
+                              <em >기본이력서</em>
+                            </span>
+                            <span class="tag tag-lg tag-outline-danger none-border m-0" th:if="${list.applicantPositionId ne null and list.representation eq '0'}">
+                            <!--<span class="tag tag-lg tag-outline-danger none-border m-0" th:if="${list.representation eq '0'}">-->
+                              <em >지원이력서</em>
+                            </span>
+                            <div class="title" th:if="${#strings.isEmpty(list.applicantPositionId) or list.representation eq '1'}"><a th:href="'/fo/user/resume/resume-Info?id='+${list.id}+'&resumeId='+${list.id}"
+                                                  th:text="${list.resumeTitle+'_'+list.totalCareer+'_'+list.year+'('+list.age+')'+(#strings.isEmpty(list.finalCompany) ? '' : '_' + list.finalCompany) + (#strings.isEmpty(list.finalSchool) ? '' : '_' + list.finalSchool)}" data-role="resumeInfo">
+                            </a></div>
+                            <div class="title" th:if="${list.applicantPositionId ne null and list.representation eq '0'}"><a th:href="'/fo/user/resume/resume-Info?id='+${list.id}+'&resumeId='+${list.id}"
+                                                                                                        th:text="${list.applicantDt+'_'+list.positionTitle}" data-role="resumeInfo">
+                            </a></div>
+                          </div>
+                          <select class="select-design" onchange="resumeEdit(this)" th:data-id="${list.id}">
+                            <option value="">관리</option>
+                            <option value="1" th:href="'/fo/user/resume/resume-cooy?id='+${list.id}">복사</option>
+                            <option value="2" th:href="'/fo/user/resume/resume-Info?id='+${list.id}+'&resumeId='+${list.id}" th:if="${#strings.isEmpty(list.applicantPositionId)} or ${list.representation eq '1'}">수정</option>
+                            <option value="3" th:data-id="${list.id}">파일저장하기</option>
+                            <option value="4" th:if="${(list.representation eq '0') and (#strings.isEmpty(list.applicantPositionId))}">기본이력서로설정</option>
+                            <option value="5" th:if="${list.representation eq '0'}">삭제</option>
+                          </select>
+                        </div>
+                        <div class="total-career" data-role="modalResume" data-bs-toggle="modal" data-bs-target="#modal-resume-form" th:data-id="${list.id}" >
+                          <span th:text="${list.totalCareer}">총  년 5개월</span><a href="javascipt:void(0)" class="print">인쇄하기</a>
+                        </div>
+                        <div class="post-cell">
+                          <p class="date" th:if="${list.representation eq '1' or list.applicantPositionId eq null}">최종수정일: <span th:text="${list.updatedAt}">2022-07-07 09:15:02</span></p>
+                          <p class="date" th:if="${list.applicantPositionId ne null and list.representation eq '0'}">지원일: <span th:text="${list.applicantUpDt}">2022-07-07 09:15:02</span></p>
+                        </div>
+                      </div>
+                    </li>
+                  </th:block>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <!-- 이력서 양식 선택 -->
+          <div class="modal fade" id="modal-resume-form" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-comment modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">이력서 양식 선택</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <div class="text-form text-center">미리보기 할 이력서의 양식을 선택해 주세요.</div>
+                <div class="d-flex justify-content-center m-b-25 gap-30">
+                  <input type="hidden" name="openReportResumeId" value="">
+                  <div class="form-check block">
+                    <input class="form-check-input" type="radio" value="basic" id="multipleCheck1" name="resumeFormChoice" />
+                    <label class="form-check-label" for="multipleCheck1">
+                      <p>R9 기본이력서</p>
+                      <img src="/static/images/resume-case-1.png" alt="" />
+                    </label>
+                  </div>
+                  <div class="form-check block">
+                    <input class="form-check-input" type="radio" value="line" id="multipleCheck2" name="resumeFormChoice" />
+                    <label class="form-check-label" for="multipleCheck2">
+                      <p>선 형식 이력서</p>
+                      <img src="/static/images/resume-case-2.png" alt="" />
+                    </label>
+                  </div>
+                  <div class="form-check block">
+                    <input class="form-check-input" type="radio" value="table" id="multipleCheck3" name="resumeFormChoice" />
+                    <label class="form-check-label" for="multipleCheck3">
+                      <p>표 형식 이력서</p>
+                      <img src="/static/images/resume-case-3.png" alt="" />
+                    </label>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-outline-primary m-r-5" data-bs-dismiss="modal">취소</button>
+                  <button type="button" class="btn btn-primary" data-role="openReport" >선택</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

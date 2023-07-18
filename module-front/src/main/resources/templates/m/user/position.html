@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <th:block th:include="_include/_head :: commonMetaAndTitle"/>
+    <th:block th:include="_include/_head :: commonStyle"/>
+    <th:block layout:fragment="head" th:remove="tag"/>
+</head>
+<body>
+<div id="container-block">
+    <div class="container">
+        <div class="sub-content">
+            <input type="hidden" name="memberId" th:value="${searchInfo.memberId}"/>
+            <h3 class="subtitle">동의서 및 이력서 등록하기</h3>
+            <div class="example-form suggestion mt-2">
+                <p>
+                    이력서와 동의서를 첨부해주세요<br/>
+                    <br/>
+                    동의서 (<a href="/static/file/동의서.docx" download="동의서">다운로드</a>)
+                </p>
+            </div>
+            <div class="title-line mt-4 mb-5"></div>
+            <table class="table m-t-15 border-top-1">
+                <tbody>
+                    <tr>
+                        <td class="text-center">동의서</td>
+                        <td class="text-center">
+                            <div class="form-upload">
+                                <input type="file" id="agreeFile" />
+                                <label for="agreeFile"><span class="file-name m-r-10"></span><i class="icon-input-add"></i></label>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="text-center">이력서</td>
+                        <td class="text-center">
+                            <div class="form-upload">
+                                <input type="file" id="resumeFile" />
+                                <label for="resumeFile"><span class="file-name m-r-10"></span><i class="icon-input-add"></i></label>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="d-flex align-items-center justify-content-center m-t-30">
+                <button type="button" class="btn btn-primary" data-role="uploadResume">업로드</button>
+            </div>
+        </div>
+    </div>
+</div>
+<th:block th:include="fragments/javascript :: common" th:remove="tag"/>
+</body>
+</html>

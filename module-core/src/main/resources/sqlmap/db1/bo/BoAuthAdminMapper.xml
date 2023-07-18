@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.bo.BoAuthAdminMapper">
+
+    <!-- 메뉴프로그램 리스트 -->
+    <select id="selectMenuProgram" parameterType="BoAdminMenuProgramDTO" resultType="BoAdminMenuProgramDTO">
+        /* com.fw.core.mapper.db1.bo.BoAuthAdminMapper.selectMenuProgram, 메뉴 프로그램 리스트 조회,22.09.21, yjw , PersonMapper.xml */
+        SELECT program_nm
+             , menu_cd
+             , program_cd
+        FROM tb_admin_menu_program
+    </select>
+
+    <!-- 관리자 리스트 -->
+    <select id="selectAdminList" parameterType="BoAdminDTO" resultType="BoAdminDTO">
+        /* com.fw.core.mapper.db1.bo.BoAuthAdminMapper.selectAdminList, 관리자 리스트 ,22.09.21, yjw , AuthAdminMapper.xml */
+        SELECT admin_nm
+             , admin_seq
+             , admin_id
+             , admin_status_cd
+        FROM tb_admin
+        WHERE del_flag = 'N'
+    </select>
+
+    <!-- 관리자별 권한 정보 -->
+    <select id="selectAdminAuth" parameterType="BoAuthAdminDTO" resultType="BoAuthAdminDTO">
+        /* com.fw.core.mapper.db1.bo.BoAuthAdminMapper.selectAdminAuth, 관리자별 권한정보 ,22.09.23, yjw , AuthAdminMapper.xml */
+        SELECT menu_cd
+             , program_cd
+             , create_seq
+             , create_dt
+        FROM tb_admin_person_auth
+        WHERE admin_seq = #{adminSeq}
+    </select>
+
+    <!-- 관리자별 권한 적용 -->
+    <insert id="insertAdminAuth" parameterType="BoAuthAdminDTO">
+        /* com.fw.core.mapper.db1.bo.BoAuthAdminMapper.insertAdminAuth, 개인권한적용,22.09.21, yjw , AuthAdminMapper.xml */
+        INSERT INTO tb_admin_person_auth
+        ( admin_seq
+        , program_cd
+        , menu_cd
+        , create_dt
+        )
+        VALUES
+        <foreach collection="adminAuthList" item="item" separator=",">
+            ( #{adminSeq}
+            , #{item.programCd}
+            , #{item.menuCd}
+            , NOW()
+            )
+        </foreach>
+    </insert>
+
+    <!-- 관리자 권한 초기화 -->
+    <delete id="deleteAdminAuth" parameterType="BoAuthAdminDTO">
+        /* com.fw.core.mapper.db1.bo.BoAuthAdminMapper.deleteAdminAuth, 관리자 권한 초기화,22.09.21, yjw , AuthAdminMapper.xml */
+        DELETE
+        FROM tb_admin_person_auth
+        WHERE admin_seq = #{adminSeq}
+    </delete>
+</mapper>

@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/default}">
+
+<body>
+<div id="container-block" layout:fragment="contents" th:remove="tag">
+    <main id="content" role="main">
+        <h2 class="title">유입/이탈 현황(Day)<span class="text-left font-size-16px ml-2 mr-2">(임시회원은 통계에서 제외)</span></h2>
+        <div class="row p-3">
+            <div class="col-12">
+                <div class="row">
+                    <div class="col-4">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">총 가입자 수</th>
+                                    <td class="text-center" th:text="${memberCnt.memberCnt}">229</td>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                    <div class="col-4">
+                        <table class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th class="text-center">총 탈퇴자 수</th>
+                                <td class="text-center" th:text="${memberCnt.quitMemberCnt}">229</td>
+                            </tr>
+                            </thead>
+                        </table>
+                    </div>
+                    <div class="col-4">
+                        <table class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th class="text-center">순 가입자 수</th>
+                                <td class="text-center" th:text="${memberCnt.joinMemberCnt}">229</td>
+                            </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 mt-3">
+                <div class="row">
+                    <div class="col-4">
+                        <table class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th colspan="3" class="text-center">AP</th>
+                            </tr>
+                            <tr>
+                                <th class="text-center">가입</th>
+                                <th class="text-center">탈퇴</th>
+                                <th class="text-center">순가입</th>
+                            </tr>
+                            <tr>
+                                <td class="text-center" th:text="${memberCnt.apMemberCnt}">114</td>
+                                <td class="text-center" th:text="${memberCnt.quitApMemberCnt}">95</td>
+                                <td class="text-center" th:text="${memberCnt.joinApMemberCnt}">19</td>
+                            </tr>
+                            </thead>
+                        </table>
+                    </div>
+                    <div class="col-4">
+                        <table class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th colspan="3" class="text-center">이력서</th>
+                            </tr>
+                            <tr>
+                                <th class="text-center">이력서</th>
+                                <th class="text-center">공개</th>
+                                <th class="text-center">비공개</th>
+                            </tr>
+                            <tr>
+                                <td class="text-center" th:text="${resumeCnt.resumeCnt}">2832</td>
+                                <td class="text-center" th:text="${resumeCnt.openResumeCnt}">2823</td>
+                                <td class="text-center" th:text="${resumeCnt.closeResumeCnt}">9</td>
+                            </tr>
+                            </thead>
+                        </table>
+                    </div>
+                    <div class="col-4">
+                        <table class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th colspan="3" class="text-center">HH</th>
+                            </tr>
+                            <tr>
+                                <th class="text-center">가입</th>
+                                <th class="text-center">탈퇴</th>
+                                <th class="text-center">순가입</th>
+                            </tr>
+                            <tr>
+                                <td class="text-center" th:text="${memberCnt.hhMemberCnt}">114</td>
+                                <td class="text-center" th:text="${memberCnt.quitHhMemberCnt}">12</td>
+                                <td class="text-center" th:text="${memberCnt.joinHhMemberCnt}">102</td>
+                            </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="row">
+                <div class="col-4">
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th class="text-center">금일 가입자 수</th>
+                            <td class="text-center" th:text="${toDayMemberCnt.todayMemberCnt}">0</td>
+                        </tr>
+                        </thead>
+                    </table>
+                </div>
+                <div class="col-4">
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th class="text-center">금일 탈퇴자 수</th>
+                            <td class="text-center" th:text="${toDayMemberCnt.todayQuitMemberCnt}">0</td>
+                        </tr>
+                        </thead>
+                    </table>
+                </div>
+                <div class="col-4">
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th class="text-center">금일 순 가입자 수</th>
+                            <td class="text-center" th:text="${toDayMemberCnt.todayJoinMemberCnt}">0</td>
+                        </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-4">
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th colspan="3" class="text-center">AP</th>
+                        </tr>
+                        <tr>
+                            <th class="text-center">가입</th>
+                            <th class="text-center">탈퇴</th>
+                            <th class="text-center">순가입</th>
+                        </tr>
+                        <tr>
+                            <td class="text-center" th:text="${toDayMemberCnt.todayApMemberCnt}">0</td>
+                            <td class="text-center" th:text="${toDayMemberCnt.todayApQuitMemberCnt}">0</td>
+                            <td class="text-center" th:text="${toDayMemberCnt.todayApJoinMemberCnt}">0</td>
+                        </tr>
+                        </thead>
+                    </table>
+                </div>
+                <div class="col-4">
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th colspan="3" class="text-center">이력서</th>
+                        </tr>
+                        <tr>
+                            <th class="text-center">이력서</th>
+                            <th class="text-center">공개</th>
+                            <th class="text-center">비공개</th>
+                        </tr>
+                        <tr>
+                            <td class="text-center" th:text="${toDayResumeCnt.todayResumeCnt}">0</td>
+                            <td class="text-center" th:text="${toDayResumeCnt.todayOpenResumeCnt}">0</td>
+                            <td class="text-center" th:text="${toDayResumeCnt.todayCloseResumeCnt}">0</td>
+                        </tr>
+                        </thead>
+                    </table>
+                </div>
+                <div class="col-4">
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th colspan="3" class="text-center">HH</th>
+                        </tr>
+                        <tr>
+                            <th class="text-center">가입</th>
+                            <th class="text-center">탈퇴</th>
+                            <th class="text-center">순가입</th>
+                        </tr>
+                        <tr>
+                            <td class="text-center" th:text="${toDayMemberCnt.todayHhMemberCnt}">0</td>
+                            <td class="text-center" th:text="${toDayMemberCnt.todayHhQuitMemberCnt}">0</td>
+                            <td class="text-center" th:text="${toDayMemberCnt.todayHhJoinMemberCnt}">0</td>
+                        </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+            <div class="row mt-5">
+                <div class="col-4">
+	                <div class="d-flex align-items-center">
+	                    <input type="text" id="startDate" class="form-datepicker form-control mr-2" placeholder="날짜 선택">
+	                    <div class="mr-2">~</div>
+	                    <input type="text" id="endDate" class="form-datepicker form-control" placeholder="날짜 선택">
+	                </div>
+                </div>
+                <div class="col-4">
+                	<div class="d-flex align-items-center">
+	                    <button class="btn btn-dark" name="colorChange" id="month" data-role="month">1개월</button>
+	                    <button class="btn btn-dark" name="colorChange" id="threeMonths" data-role="threeMonths">3개월</button>
+	                    <button class="btn btn-dark" name="colorChange" id="sixMonths" data-role="sixMonths">6개월</button>
+	                    <button class="btn btn-dark mr-2" name="colorChange" id="twelveMonths" data-role="twelveMonths">12개월</button>
+                    </div>
+                </div>
+                <div class="col-4 text-right">
+                    <button class="btn btn-primary" data-role="search"> 검색하기 </button>
+                    <button class="btn btn-success" data-role="downloadExcel">엑셀 다운로드</button>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col">
+                    <table class="table" id="datatable">
+                        <thead>
+                        <tr>
+                            <th class="text-center" rowspan="2">날짜</th>
+                            <th class="text-center" colspan="2">AP</th>
+                            <th class="text-center" colspan="3">이력서</th>
+                            <th class="text-center" colspan="2">HH</th>
+                        </tr>
+                        <tr>
+                            <th class="text-center">가입</th>
+                            <th class="text-center">탈퇴</th>
+                            <th class="text-center">기본</th>
+                            <th class="text-center">공개</th>
+                            <th class="text-center">비공개</th>
+                            <th class="text-center">가입</th>
+                            <th class="text-center">탈퇴</th>
+                        </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>

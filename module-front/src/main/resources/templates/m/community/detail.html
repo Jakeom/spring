@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layouts/mLayout">
+<body>
+<div id="container-block">
+    <div layout:fragment="contents" th:remove="tag">
+        <div class="layout-content">
+            <input type="hidden" id="communitySeq" th:value="${detail.communitySeq}"/>
+            <input type="hidden" id="memberId" th:value="${memberId}"/>
+            <div class="community-content">
+                <div class="feed-list-detail">
+                    <div class="row align-items-center">
+                        <th:block th:if="${detail.communityType} eq 'COMPANY_CURIOUS' or ${detail.communityType} eq 'PASS_REVIEW'">
+                         <div>
+                            <span class="tag tag-lg tag-outline-primary m-0">
+                              <em th:text="${detail.companyName}">삼성전자</em>
+                            </span>
+                        </div>
+                        </th:block>
+                        <div class="col feed-body">
+                            <div class="title" th:text="${detail.title}">이직 결정!! 차마 입이 떨어지지 않네요</div>
+                            <div class="date-box">
+                                <p class="date" th:text="${detail.createDt}">2022.12.24 17:58</p>
+                                <p class="views">조회수 <span th:text="${detail.hit}">5,200</span></p>
+                            </div>
+                            <p class="name" th:text="${#strings.equals(detail.dtype,'AP') ? detail.maskingName : detail.name}">홍**</p>
+                        </div>
+                        <div class="desc">
+                            <p th:text="${detail.content}"></p>
+                            <th:block th:each="list : ${detail.commonFileList}" th:if="${list.isImage eq '1'}">
+                                <img th:src="${list.url}"/>
+                            </th:block>
+                            <div class="d-flex align-items-center justify-content-center mt-5 mb-5">
+                                <div onclick="clickLike()" class="like-btn active">
+                                    <p id="recommendCnt" th:text="${detail.recommend}"></p>
+                                    <p><i class="icon-like"></i></p>
+                                </div>
+                            </div>
+                            <div class="comment-wrap">
+                                <h4 class="table-subtitle mb-3">전체댓글 <span th:text="${detail.commentCnt}">4</span></h4>
+                                <div class="comment-wrap-content">
+                                    <div th:fragment="commentTree" th:remove="tag">
+                                        <th:block th:each="list, status : ${commentList}">
+                                            <th:block th:each="num : ${#numbers.sequence(1, list.depthInteger)}"
+                                                      th:uText="'<div class=\'re-reply\'>'"/>
+                                            <div class="d-flex">
+                                                <i class="icon-reply"></i>
+                                                <div>
+                                                    <div class="reply-head">
+                                                        <span class="name" th:text="${#strings.equals(detail.dtype,'AP') ? list.maskingName : list.name}">김**</span>
+                                                        <span class="time" th:text="${list.dateDiff}">3시간 전</span>
+                                                    </div>
+                                                    <div class="reply-desc">
+                                                        <p th:text="${list.content}"></p>
+                                                    </div>
+                                                    <div class="re-reply-btn">
+                                                        <a href="javascript:void(0)" data-role="openCommentWrite">
+                                                            <span>댓글 달기 |</span>
+                                                            <span th:text="${list.commentCnt} + '개'">1개</span>
+                                                        </a>
+                                                        <a href="javascript:void(0)"></a>
+                                                    </div>
+                                                    <div class="comment-write" style="display: none;">
+                                                        <textarea name="reContent" id="" cols="30" rows="10" placeholder="댓글을 입력하세요."></textarea>
+                                                        <button type="button" th:data-parent-depth="${list.depth}" th:data-parent-seq="${list.communityCommentSeq}" data-role="replSave" class="btn btn-primary">등록</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!--코멘트 원래 위치-->
+                                            <th:block th:each="num : ${#numbers.sequence(1, list.depthInteger)}"
+                                                      th:uText="'</div>'"/>
+                                            <th:block th:if="${!#lists.isEmpty(list.subList)}">
+                                                <th:block th:with="commentList = ${list.subList}"
+                                                          th:include="this :: commentTree"/>
+                                            </th:block>
+                                        </th:block>
+                                    </div>
+                                    <th:block th:each="list, status : ${detailComment}">
+                                        <div class="reply">
+                                            <div class="reply-head">
+                                                <span class="name" th:text="${#strings.equals(detail.dtype,'AP') ? list.maskingName : list.name}">김**</span>
+                                                <span class="time" th:text="${list.dateDiff}">3시간 전</span>
+                                            </div>
+                                            <div class="reply-desc">
+                                                <p th:text="${list.content}"></p>
+                                            </div>
+                                            <!-- 게시판 - 이 회사가 궁금해요 -->
+                                            <th:block th:if="${detail.communityType eq 'COMPANY_CURIOUS'}">
+                                                <div class="re-reply-btn" th:style="${memberInfo.dtype eq 'AP' and detail.myBoardFlag eq 'N'?'display:none;':''}">
+                                                    <a href="javascript:void(0)" data-role="openCommentWrite">
+                                                        <span>댓글 달기 |</span>
+                                                        <span th:text="${list.commentCnt} + '개'">1개</span>
+                                                    </a>
+                                                </div>
+                                                <div class="comment-write" style="display: none;">
+                                                    <textarea name="reContent" id="" cols="30" rows="10" placeholder="댓글을 입력하세요."></textarea>
+                                                    <button type="button" th:data-parent-depth="${list.depth}" th:data-parent-seq="${list.communityCommentSeq}" data-role="replSave" class="btn btn-primary">등록</button>
+                                                </div>
+                                            </th:block>
+                                            <!-- 게시판 - 이 회사가 궁금해요X -->
+                                            <th:block th:unless="${detail.communityType eq 'COMPANY_CURIOUS'}">
+                                                <div class="re-reply-btn">
+                                                    <a href="javascript:void(0)" data-role="openCommentWrite">
+                                                        <span>댓글 달기 |</span>
+                                                        <span th:text="${list.commentCnt} + '개'">1개</span>
+                                                    </a>
+                                                </div>
+                                                <div class="comment-write" style="display: none;">
+                                                    <textarea name="reContent" cols="30" rows="10" placeholder="댓글을 입력하세요."></textarea>
+                                                    <button type="button" th:data-parent-depth="${list.depth}" th:data-parent-seq="${list.communityCommentSeq}" data-role="replSave" class="btn btn-primary">등록</button>
+                                                </div>
+                                            </th:block>
+                                        </div>
+                                        <th:block th:if="${!#lists.isEmpty(list.subList)}">
+                                            <th:block th:with="commentList = ${list.subList}"
+                                                      th:include="this :: commentTree"/>
+                                        </th:block>
+                                    </th:block>
+                                </div>
+                                <!-- 게시판 - 이 회사가 궁금해요 -->
+                                <th:block th:if="${detail.communityType} eq 'COMPANY_CURIOUS'">
+                                    <div class="comment-write" th:style="${memberInfo.dtype eq 'AP' and detail.myBoardFlag eq 'N'?'display:none;':''}">
+                                        <textarea name="content" id="content" cols="30" rows="10" placeholder="댓글을 입력하세요."></textarea>
+                                        <button data-role="commentSave" type="button" class="btn btn-primary">등록</button>
+                                    </div>
+                                </th:block>
+                                <!-- 게시판 - 이 회사가 궁금해요X -->
+                                <th:block th:unless="${detail.communityType} eq 'COMPANY_CURIOUS'">
+                                    <div class="comment-write">
+                                        <textarea name="content" id="content1" cols="30" rows="10" placeholder="댓글을 입력하세요."></textarea>
+                                        <button data-role="commentSave" type="button" class="btn btn-primary">등록</button>
+                                    </div>
+                                </th:block>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

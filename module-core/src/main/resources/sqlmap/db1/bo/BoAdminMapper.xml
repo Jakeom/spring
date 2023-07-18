@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.bo.BoAdminMapper">
+
+    <!-- 관리자 리스트 조회 -->
+    <select id="selectAdminList" parameterType="BoAdminDTO" resultType="BoAdminDTO">
+        /* com.fw.core.mapper.db1.bo.AdminMapper.selectAdminList, 관리자 리스트 조회, 22.09.15, yjw, AdminMapper.xml */
+        SELECT admin_seq
+             , org_id
+             , admin_id
+             , admin_nm
+             , email
+             , fn_get_common_cd(admin_status_cd,'ADMIN_STATUS',1) as adminStatusNm
+             , admin_password
+             , date_format(use_start_dt, '%Y-%m-%d')      as use_start_dt
+             , date_format(use_end_dt, '%Y-%m-%d')        as use_end_dt
+             , approval_seq
+             , date_format(approval_dt, '%Y-%m-%d %H:%i') as approval_dt
+             , create_seq
+             , date_format(create_dt, '%Y-%m-%d %H:%i')   as create_dt
+             , update_seq
+             , date_format(update_dt, '%Y-%m-%d %H:%i')   as update_dt
+             , del_flag
+          FROM tb_admin
+         WHERE del_flag = 'N'
+      ORDER BY admin_seq
+    </select>
+
+    <!-- ip 리스트 조회 -->
+    <select id="selectIpForAdminSeq" parameterType="BoAdminIpDTO" resultType="BoAdminIpDTO">
+        /* com.fw.core.mapper.db1.bo.AdminMapper.selectIpForAdminSeq, ip 리스트 조회, 22.10.05, yjw, AdminMapper.xml */
+        SELECT ip
+        FROM tb_admin_ip
+        WHERE admin_seq = #{adminSeq}
+    </select>
+
+    <!-- 관리자 아이디 중복체크 -->
+    <select id="selectIdCheck" parameterType="BoAdminDTO" resultType="int">
+        /* com.fw.core.mapper.db1.bo.AdminMapper.selectIdCheck, 관리자 아이디 중복체크, 22.09.16, yjw, AdminMapper.xml */
+        SELECT COUNT(1)
+          FROM tb_admin
+         WHERE admin_id = #{adminId}
+           AND del_flag = 'N'
+    </select>
+
+    <!-- 관리자 상세 조회 -->
+    <select id="selectAdmin" parameterType="BoAdminDTO" resultType="BoAdminDTO">
+        /* com.fw.core.mapper.db1.bo.AdminMapper.selectAdmin, 관리자 상세 조회, 22.09.15, yjw, AdminMapper.xml */
+        SELECT admin_seq
+             , org_id
+             , admin_id
+             , admin_nm
+             , email
+             , SUBSTRING_INDEX(email, '@', 1)             as email_id
+             , SUBSTRING_INDEX(email, '@', -1)            as email_domain
+             , fn_get_common_cd(admin_status_cd,'ADMIN_STATUS',1) as adminStatusNm
+             , admin_status_cd as adminStatusCd
+             , admin_password
+             , date_format(use_start_dt, '%Y-%m-%d')      as use_start_dt
+             , date_format(use_end_dt, '%Y-%m-%d')        as use_end_dt
+             , approval_seq
+             , date_format(approval_dt, '%Y-%m-%d %H:%i') as approval_dt
+             , create_seq
+             , date_format(create_dt, '%Y-%m-%d %H:%i')   as create_dt
+             , update_seq
+             , date_format(update_dt, '%Y-%m-%d %H:%i')   as update_dt
+             , del_flag
+          FROM tb_admin
+         WHERE del_flag = 'N'
+           AND admin_seq = #{adminSeq}
+    </select>
+
+    <!-- 관리자 상세 조회 -->
+    <select id="selectAdminForAdminId" parameterType="BoAdminDTO" resultType="BoAdminDTO">
+        /* com.fw.core.mapper.db1.bo.AdminMapper.selectAdminForAdminId, 관리자 상세 조회, 22.09.15, yjw, AdminMapper.xml */
+        SELECT admin_seq
+             , org_id
+             , admin_id
+             , admin_nm
+             , email
+             , SUBSTRING_INDEX(email, '@', 1)             as email_id
+             , SUBSTRING_INDEX(email, '@', -1)            as email_domain
+             , fn_get_common_cd(admin_status_cd,'ADMIN_STATUS',1) as admin_status_cd
+             , admin_password
+             , date_format(use_start_dt, '%Y-%m-%d')      as use_start_dt
+             , date_format(use_end_dt, '%Y-%m-%d')        as use_end_dt
+             , approval_seq
+             , date_format(approval_dt, '%Y-%m-%d %H:%i') as approval_dt
+             , create_seq
+             , date_format(create_dt, '%Y-%m-%d %H:%i')   as create_dt
+             , update_seq
+             , date_format(update_dt, '%Y-%m-%d %H:%i')   as update_dt
+             , del_flag
+          FROM tb_admin
+         WHERE del_flag = 'N'
+           AND admin_id = #{adminId}
+    </select>
+
+    <!-- 관리자 등록 -->
+    <insert id="insertAdmin" parameterType="BoAdminDTO">
+        /* com.fw.core.mapper.db1.bo.AdminMapper.insertAdmin, 관리자 등록, 22.09.15, yjw, AdminMapper.xml */
+        INSERT INTO tb_admin (
+               org_id
+             , admin_id
+             , admin_nm
+             , email
+             , admin_status_cd
+             , admin_password
+             , use_start_dt
+             , use_end_dt
+             , create_seq
+             , create_dt
+             , approval_seq
+        ) VALUES (
+               #{orgId}
+             , #{adminId}
+             , #{adminNm}
+             , #{email}
+             , #{adminStatusCd}
+             , #{adminPassword}
+             , #{useStartDt}
+             , #{useEndDt}
+             , #{adminSession.adminSeq}
+             , NOW()
+             , #{approvalSeq}
+        )
+        <selectKey order="AFTER" keyProperty="adminSeq" resultType="String">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <!-- 관리자 수정 -->
+    <update id="updateAdmin" parameterType="BoAdminDTO">
+        /* com.fw.core.mapper.db1.bo.AdminMapper.updateAdmin, 관리자 수정, 22.09.15, yjw, AdminMapper.xml */
+        UPDATE tb_admin
+           SET org_id = #{orgId}
+             , admin_nm = #{adminNm}
+             , email = #{email}
+             , admin_status_cd = #{adminStatusCd}
+             , admin_password = #{adminPassword}
+             , use_start_dt = #{useStartDt}
+             , use_end_dt = #{useEndDt}
+             , update_seq = #{adminSession.adminSeq}
+             , update_dt = NOW()
+             , approval_seq = #{approvalSeq}
+         WHERE admin_seq = #{adminSeq}
+    </update>
+
+    <!-- 관리자 삭제 -->
+    <delete id="deleteAdmin" parameterType="BoAdminDTO">
+        /* com.fw.core.mapper.db1.bo.AdminMapper.deleteAdmin, 관리자 삭제, 22.09.15, yjw, AdminMapper.xml */
+        UPDATE tb_admin
+           SET del_flag = 'Y'
+         WHERE admin_seq = #{adminSeq}
+    </delete>
+
+    <!-- 관리자 - 비밀번호 틀린 횟수 증가 -->
+    <update id="updatePasswordFailCount" parameterType="BoAdminDTO">
+        /* com.fw.core.mapper.db1.bo.BoLoginMapper.updatePasswordFailCount, 비밀번호 틀린 횟수 증가, 22.09.22, dongbeom, BoLoginMapper.xml */
+        UPDATE tb_admin
+           SET password_fail_count = password_fail_count + 1
+        WHERE admin_id = #{adminId}
+    </update>
+
+    <!-- 관리자 - 비밀번호 틀린 횟수 초기화 -->
+    <update id="updateResetPasswordFailCount" parameterType="BoAdminDTO">
+        /* com.fw.core.mapper.db1.bo.BoLoginMapper.updateResetPasswordFailCount, 비밀번호 틀린 횟수 초기화, 22.09.22, dongbeom, BoLoginMapper.xml */
+        UPDATE tb_admin
+           SET password_fail_count = 0
+         WHERE admin_id = #{adminId}
+    </update>
+</mapper>

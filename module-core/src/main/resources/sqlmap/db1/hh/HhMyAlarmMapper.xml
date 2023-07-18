@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.hh.HhMyAlarmMapper">
+
+    <!-- 발송한 메일/문자 리스트 -->
+    <select id="selectSendMediaList" parameterType="HhMyAlarmDTO" resultType="HhMyAlarmDTO">
+        /* com.fw.core.mapper.db1.hh.HhMyAlarmMapper.selectSendMediaList, 발송한 메일/문자 리스트, YJW, HhMyAlarmMapper.xml */
+        SELECT hsm.id
+             , DATE_FORMAT(hsm.createdAt,'%m-%d %H:%i:%s') AS createdAt
+             , hsm.content
+             , hsm.media
+             , hsm.subject
+             , hsm.kindCd
+             , hsmt.isRead
+             , hsmt.name
+             , hsmf.file_id
+        FROM hh_send_msg hsm
+    INNER JOIN hh_send_msg_target hsmt on hsm.id = hsmt.msg_id
+    LEFT JOIN hh_send_msg_file hsmf on hsm.id = hsmf.msg_id
+        WHERE hsm.media IN <foreach collection="mediaList" item="item" open="(" close=")" separator=",">#{item}</foreach>
+              AND hsm.member_id = #{frontSession.id}
+              AND hsm.kindCd != 'TEMP_SIGNUP'
+              AND hsm.delFlag ='N'
+              AND hsm.success ='0'
+      <if test="searchValue != null and searchValue != ''">
+          <if test="searchType eq 'name'">
+              AND hsmt.name LIKE CONCAT('%', #{searchValue}, '%')
+          </if>
+          <if test="searchType eq 'titleContent'">
+              AND (hsm.subject LIKE CONCAT('%', #{searchValue}, '%') OR hsm.content LIKE CONCAT('%', #{searchValue} '%'))
+          </if>
+      </if>
+        ORDER BY hsm.createdAt DESC
+        <include refid="common.paging" />
+    </select>
+
+    <!-- 발송한 메일/문자 상세 -->
+    <select id="selectSendMediaInfo" parameterType="HhMyAlarmDTO" resultType="HhMyAlarmDTO">
+        /* com.fw.core.mapper.db1.hh.HhMyAlarmMapper.selectSendMediaInfo, 발송한 메일/문자 상세, YJW, HhMyAlarmMapper.xml */
+        SELECT hsm.id
+             , DATE_FORMAT(hsm.createdAt,'%m-%d %H:%i:%s') AS createdAt
+             , hsm.content
+             , hsm.media
+             , hsm.subject
+             , hsm.kindCd
+             , hsm.member_id
+             , hsmt.isRead
+             , hsmt.name
+             , hsmf.file_id
+             , hsmt.target
+             , hsmt.val
+        FROM hh_send_msg hsm
+    INNER JOIN hh_send_msg_target hsmt on hsm.id = hsmt.msg_id
+    LEFT JOIN hh_send_msg_file hsmf on hsm.id = hsmf.msg_id
+        WHERE hsm.media IN <foreach collection="mediaList" item="item" open="(" close=")" separator=",">#{item}</foreach>
+          AND hsm.delFlag ='N'
+          AND hsm.id = #{id}
+    </select>
+
+    <select id="selectCountTemplateGroup" parameterType="HhMyAlarmDTO" resultType="HhMyAlarmDTO">
+        select id
+        from hh_template_group
+        where member_id = #{memberId}
+        AND delFlag = 'N'
+        AND mediaTypeCd = #{mediaTypeCd}
+    </select>
+
+    <!-- 발송한 메일/문자 리스트 카운트 -->
+    <select id="selectSendMediaListCount" parameterType="HhMyAlarmDTO" resultType="int">
+        /* com.fw.core.mapper.db1.hh.HhMyAlarmMapper.selectSendMediaList, 발송한 메일/문자 리스트 카운트, YJW, HhMyAlarmMapper.xml */
+        SELECT COUNT(1)
+        FROM hh_send_msg hsm
+    INNER JOIN hh_send_msg_target hsmt on hsm.id = hsmt.msg_id
+    LEFT JOIN hh_send_msg_file hsmf on hsm.id = hsmf.msg_id
+        WHERE hsm.media IN <foreach collection="mediaList" item="item" open="(" close=")" separator=",">#{item}</foreach>
+              AND hsm.member_id = #{frontSession.id}
+              AND hsm.delFlag ='N'
+              AND hsm.success ='0'
+      <if test="searchValue != null and searchValue != ''">
+          <if test="searchType eq 'name'">
+              AND hsmt.name LIKE CONCAT('%', #{searchValue}, '%')
+          </if>
+          <if test="searchType eq 'titleContent'">
+              AND (hsm.subject LIKE CONCAT('%', #{searchValue}, '%') OR hsm.content LIKE CONCAT('%', #{searchValue} '%'))
+          </if>
+      </if>
+    </select>
+
+    <!-- 발송한 메일 삭제 -->
+    <update id="deleteSendMail" parameterType="HhMyAlarmDTO">
+        /* com.fw.core.mapper.db1.hh.HhMyAlarmMapper.deleteSendMail, 발송한 메일 삭제, YJW, HhMyAlarmMapper.xml */
+        UPDATE hh_send_msg
+           SET delFlag = 'Y'
+             , updatedAt = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <!-- 발송한 메세지 삭제 -->
+    <update id="deleteSendMessage" parameterType="HhMyAlarmDTO">
+        /* com.fw.core.mapper.db1.hh.HhMyAlarmMapper.deleteSendMessage, 발송한 메세지 삭제, YJW, HhMyAlarmMapper.xml */
+        UPDATE hh_send_msg
+           SET delFlag = 'Y'
+             , updatedAt = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <select id="selectEmailTemplateFileSeq" parameterType="HhMyAlarmDTO" resultType="HhMyAlarmDTO">
+        SELECT template_file_id
+        FROM hh_template_file
+        WHERE template_content_id = #{id}
+        AND delFlag = 'N'
+    </select>
+
+    <update id="updateTemplateFile" parameterType="HhMyAlarmDTO">
+        UPDATE hh_template_file
+        SET delFlag = 'Y'
+        WHERE template_content_id = #{id}
+    </update>
+
+    <update id="deleteSmsTemplate" parameterType="HhMyAlarmDTO">
+        UPDATE hh_template_content
+        SET delFlag = 'Y'
+        WHERE id in
+        <foreach collection="deleteTemplateList" item="deleteTemplateList" open="(" close=")"  index="index" separator=",">
+            '${deleteTemplateList}'
+        </foreach>
+    </update>
+
+    <update id="updateSmsTemplate" parameterType="HhMyAlarmDTO">
+        UPDATE hh_template_content
+        SET updatedAt = NOW()
+          , content = #{content}
+          , name = #{name}
+          , subject = #{subject}
+        WHERE id = #{id}
+    </update>
+
+    <insert id="insertTemplateEmailFile" parameterType="HhMyAlarmDTO">
+        insert into hh_template_file(createdAt, updatedAt, template_content_id, template_file_id, delFlag) VALUES(NOW(), NOW(), #{id}, #{fileSeq}, 'N')
+    </insert>
+
+    <insert id="insertTemplateContent" parameterType="HhMyAlarmDTO">
+        insert into hh_template_content(createdAt, updatedAt, content, isDefault, subject, template_group_id, name, delFlag) VALUES (NOW(), NOW(), #{content}, '0', #{subject}, #{templateGroupId}, #{name}, 'N')
+        <selectKey resultType="String" keyProperty="templateContentId" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <insert id="insertTemplateGroup" parameterType="HhMyAlarmDTO">
+        insert into hh_template_group(
+                createdAt
+              , updatedAt
+              , isDefault
+              , mediaTypeCd
+              , name
+              , member_id
+              , delFlag
+              ) VALUES (
+                NOW()
+              , NOW()
+              , '1'
+              , #{mediaTypeCd}
+              , #{name}
+              , #{memberId}
+              , 'N')
+        <selectKey resultType="String" keyProperty="id" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+
+</mapper>

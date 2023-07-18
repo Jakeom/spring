@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/default}">
+
+<body>
+	<div layout:fragment="contents" th:remove="tag">
+		<main id="content" role="main">
+			<h2 class="title">블랙리스트 조회 및 관리</h2>
+			<div class="row p-3">
+				<div class="col-12">
+					<form id="searchMember" name="searchMember">
+						<div class="row mt-5">
+							<div class="col-4">
+								<div class="d-flex align-items-center">
+									<input type="text" id="memberStartDt" name="memberStartDt"
+													class="form-control form-datepicker" placeholder="날짜 선택">
+									<div class="mr-2">~</div>
+									<input type="text" id="memberEndDt" name="memberEndDt"
+													class="form-control form-datepicker" placeholder="날짜 선택">
+								</div>
+							</div>
+							<div class="col-2">
+								<div class="d-flex align-items-center">
+									<button type="button" class="btn btn-dark" id="all" data-role="all">전체</button>
+									<button type="button" class="btn btn-dark" id="today" data-role="today">오늘</button>
+									<button type="button" class="btn btn-dark" id="week" data-role="week">7일</button>
+									<button type="button" class="btn btn-dark" id="month" data-role="month">1개월</button>
+								</div>
+							</div>
+							<div class="col-6">
+								<div class="d-flex" style="float: right">
+									<select name="optionTypeSelect" id="optionTypeSelect"
+													class="form-control w-auto">
+													<option value="id">회원ID</option>
+													<option value="name">이름</option>
+													<option value="phone">휴대폰번호</option>
+													<option value="email">이메일</option>
+												</select><input class="form-control w-auto" data-role="enter"
+												type="text" id="inputSelect" />
+									<button type="button" class="btn btn-primary mr-2"
+										data-role="search">검색</button>
+									<button type="button" data-role="blacklistForm" class="btn btn-dark">블랙리스트
+										등록</button>
+								</div>
+							</div>
+							<div class="col-12 mt-3">
+								<div class="d-flex">
+									<select id="memberSelect" name="memberSelect" class="form-control w-auto">
+										<option value="">전체</option>
+										<option value="MEMBER">회원</option>
+										<option value="GUEST">비회원</option>
+									</select> <select id="useFlagSelect" name="useFlagSelect" class="form-control w-auto">
+										<option value="">전체</option>
+										<option value="1">활성</option>
+										<option value="0">비활성</option>
+									</select>
+								</div>
+							</div>
+						</div>
+					</form>
+					<div class="row mt-3">
+						<div class="col">
+							<table class="table" id="datatable">
+								<thead>
+									<tr>
+										<th>회원ID</th>
+										<th>이름</th>
+										<th>휴대폰</th>
+										<th>이메일</th>
+										<th>상태</th>
+										<th>등록/수정일</th>
+										<th>상세보기</th>
+									</tr>
+								</thead>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</main>
+	</div>
+</body>
+</html>

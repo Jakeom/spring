@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.bo.BoMaindisplayMapper">
+
+    <!-- 메인노출 리스트 조회 -->
+    <select id="selectMaindisplayList" parameterType="BoMaindisplayDTO" resultType="BoMaindisplayDTO">
+        /* com.fw.core.mapper.db1.bo.BoMaindisplayMapper.selectMaindisplayList, 메인노출 리스트 조회, 22.11.16, dongbeom, BoMaindisplayMapper.xml */
+        SELECT main_display_seq
+             , (SELECT fn_get_common_cd(display_type, 'MAIN_DISPLAY', 1)) commoncdType
+             , display_type
+             , url
+             , file_seq
+             , sort
+             , use_flag
+             , del_flag
+             , reg_seq
+             , reg_date
+             , company_name
+        FROM tb_main_display
+        WHERE date_format(reg_date, '%Y-%m-%d') BETWEEN #{startDate} AND #{endDate}
+        AND del_flag = 'N'
+        <if test="displayType != '' and displayType != null">
+            AND display_type = #{displayType}
+        </if>
+        ORDER BY main_display_seq desc
+    </select>
+
+    <!-- 메인노출 리스트 상세보기 -->
+    <select id="selectMaindisplay" parameterType="BoMaindisplayDTO" resultType="BoMaindisplayDTO">
+        /* com.fw.core.mapper.db1.bo.BoMaindisplayMapper.selectMaindisplay, 메인노출 리스트 상세보기, 22.11.16, dongbeom, BoMaindisplayMapper.xml */
+        SELECT main_display_seq
+             , url
+             , file_seq
+             , sort
+             , use_flag
+             , del_flag
+             , reg_seq
+             , reg_date
+             , display_type
+             , company_name
+             , (SELECT fn_get_common_cd(display_type, 'MAIN_DISPLAY', 1)) commoncdType
+        FROM tb_main_display
+        WHERE del_flag = 'N'
+            AND main_display_seq = #{mainDisplaySeq}
+        ORDER BY main_display_seq desc
+    </select>
+
+    <!-- 메인노출 리스트 상세보기 -->
+    <insert id="insertMaindisplay" parameterType="BoMaindisplayDTO">
+        /* com.fw.core.mapper.db1.bo.BoMaindisplayMapper.insertMaindisplay, 메인노출 추가, 22.11.16, dongbeom, BoMaindisplayMapper.xml */
+        INSERT INTO tb_main_display(display_type, url, sort, use_flag, reg_date, file_seq, company_name)
+        VALUES ( #{displayType}
+               , #{url}
+               , #{sort}
+               , #{useFlag}
+               , NOW()
+               , #{fileSeq}
+               , #{companyName}
+               )
+    </insert>
+
+    <!-- 메인노출 삭제 -->
+    <update id="deleteMaindisplay" parameterType="BoMaindisplayDTO">
+        /* com.fw.core.mapper.db1.bo.BoMaindisplayMapper.deleteMaindisplay, 메인노출 삭제, 22.11.16, dongbeom, BoMaindisplayMapper.xml */
+        UPDATE tb_main_display
+        SET del_flag = 'Y'
+        WHERE main_display_seq = #{mainDisplaySeq}
+    </update>
+
+    <!-- 메인노출 업데이트 -->
+    <update id="updateMaindisplay" parameterType="BoMaindisplayDTO">
+        /* com.fw.core.mapper.db1.bo.BoMaindisplayMapper.updateMaindisplay, 메인노출 업데이트, 22.11.16, dongbeom, BoMaindisplayMapper.xml */
+        UPDATE tb_main_display
+        SET display_type = #{displayType}
+          , url = #{url}
+          , sort = #{sort}
+          , use_flag = #{useFlag}
+          , reg_seq = #{adminSession.adminSeq}
+          , company_name = #{companyName}
+        <if test="fileSeq != '' and fileSeq != null">
+          , file_seq = #{fileSeq}
+        </if>
+        WHERE main_display_seq = #{mainDisplaySeq}
+    </update>
+
+</mapper>

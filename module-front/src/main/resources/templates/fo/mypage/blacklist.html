@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/mypageLayout">
+<body>
+<div id="container-block">
+    <div layout:fragment="contents" th:remove="tag">
+        <div class="layout-content">
+            <h3 class="subtitle poppins">블랙리스트 관리</h3>
+            <div class="title-line mt-4 mb-5"></div>
+            <form name="searchForm" style="display: none;">
+                <input type="hidden" name="page" th:value="${searchInfo.page}"/>
+            </form>
+            <p class="m-b-10">블랙리스트에 등록된 헤드헌터를 확인/해제할 수 있습니다.</p>
+            <div class="fake-table">
+                <div class="fake-table-head">
+                    <div class="fake-table-cell">이름</div>
+                    <div class="fake-table-cell">서치펌명</div>
+                    <div class="fake-table-cell">이메일</div>
+                    <div class="fake-table-cell">관리</div>
+                </div>
+                <div class="fake-table-column" th:each="list : ${blacklist}">
+                    <div class="fake-table-cell" th:text="${list.name}">장영은</div>
+                    <div class="fake-table-cell" th:text="${list.sfName}">서치펌명</div>
+                    <div class="fake-table-cell" th:text="${list.email}">asdqwe1234@naver.com</div>
+                    <div class="fake-table-cell">
+                        <div class="form-check p-0">
+                            <button type="button" class="btn btn-outline-primary m-t-10" data-role="deleteBlack" th:data-id="${list.id}">블랙리스트 해제</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex justify-content-center mt-5">
+                <th:block th:include="common/paging :: paging_Fragment(fnc=*{'fn_go_page(this)'}, pageId=*{'pageName1'})"/>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

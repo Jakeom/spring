@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html  xmlns:th="http://www.thymeleaf.org"
+       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+       layout:decorate="~{layouts/applicationLayout}">
+  <body>
+    <div id="container-block">
+      <div layout:fragment="contents" th:remove="tag">
+          <div class="layout-content">
+            <h3 class="subtitle poppins">입사지원 현황</h3>
+            <div class="title-line mt-4 mb-5"></div>
+            <div class="apply-dashbaord">
+              <div class="row row-0">
+                <div class="col">
+                  <a href="/fo/user/application/job-position" class="">
+                    <strong th:text="${searchInfo.totalProposalCnt}"></strong>
+                    <span>받은 포지션 제안</span>
+                  </a>
+                </div>
+                <div class="col">
+                  <a href="/fo/mypage/application-status">
+                    <strong  th:text="${searchInfo.totalCount}"></strong>
+                    <span>지원완료</span>
+                  </a>
+                </div>
+                <div class="col">
+                  <a href="javascript:;">
+                    <strong th:text="${searchInfo.totalPassCnt}">0</strong>
+                    <span>최종합격</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+            <form name="searchForm">
+              <input type="hidden" name="page" th:value="${searchInfo.page}"/>
+            </form>
+            <div class="resume-form">
+              <div class="fake-table">
+                <div class="fake-table-head">
+                  <div class="fake-table-cell">지원형태</div>
+                  <div class="fake-table-cell">지원내역</div>
+                  <div class="fake-table-cell">합격여부</div>
+                </div>
+                <th:block th:if="${#lists.isEmpty(passPositionList)}">
+                  <div class="fake-table-column none-data">
+                    <div class="fake-table-cell">
+                      <p></p>
+                    </div>
+                    <div class="fake-table-cell">
+                      <p class="none-data__desc">데이터가 없습니다.</p>
+                    </div>
+                    <div class="fake-table-cell">
+                      <p></p>
+                    </div>
+                  </div>
+                </th:block>
+                <th:block  th:each="list : ${passPositionList}">
+                  <div class="fake-table-column">
+                    <div class="fake-table-cell">
+                      <div class="headhunter-wrap">
+                        <p class="h-tag" th:text="${list.processStatus}">지원완료</p>
+                      </div>
+                    </div>
+                    <div class="fake-table-cell text-start">
+                      <div class="announcement-wrap">
+                        <p class="scale">
+                          <span th:text="${list.companyScale}"></span>
+                          <span class="company"  th:text="${list.publicCd} == 0 ? ${list.companyName} : '***'">삼성전자</span>
+                          <button type="button" class="favorites" data-role="clickScrap" th:data-positionId="${list.postingId}" th:classappend="${list.scrapId eq null? '':'active'}"><i class="icon-favorites-off"></i></button>
+                        </p>
+                        <a th:href="'/fo/user/jop/posting/detail?id='+${list.postingId}" class="title" th:text="${list.title}" data-role="postingDetail"></a>
+                        <p class="date"><span>지원일</span><span th:text="${list.createdAt}">2022.10.21 (금)</span></p>
+                      </div>
+                    </div>
+                    <div class="fake-table-cell">
+                      <div class="btn-group">
+                        <span class="btn btn-outline-primary btn-md" >합격</span>
+                      </div>
+                    </div>
+                  </div>
+                </th:block>
+              </div>
+            </div>
+            <div class="d-flex justify-content-center mt-5">
+              <th:block th:include="common/paging :: paging_Fragment(fnc=*{'fn_go_page(this)'}, pageId=*{'pageName1'})"/>
+            </div>
+          </div>
+      </div>
+    </div>
+  </body>
+</html>

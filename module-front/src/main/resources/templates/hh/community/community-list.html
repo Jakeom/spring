@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/hh/hhCommunityLayout}">
+  <body>
+    <div id="container-block">
+      <div layout:fragment="contents" th:remove="tag">
+          <div class="layout-content" >
+            <div class="community-content">
+              <div class="d-flex align-items-center justify-content-between">
+                <h3 class="table-subtitle mb-3">베스트 글</h3>
+              </div>
+              <div class="feed-list">
+                <ul>
+                  <th:block th:each="list : ${bestList}">
+                    <li>
+                      <div class="row row-40 align-items-center">
+                        <div>
+                        <span class="tag tag-lg tag-outline-primary m-0">
+                          <em th:text="${list.communityTypeNm}"></em>
+                        </span>
+                        </div>
+                        <div class="col feed-body">
+                          <div class="title">
+                            <a th:href="'/hh/community/board/detail?communityType=' + ${list.communityType} + '&communitySeq='+ ${list.communitySeq}" th:text="${list.title}"></a>
+                          </div>
+                          <p class="desc" th:text="${list.content}"></p>
+                          <p class="name" th:text="${list.name}">홍**</p>
+                        </div>
+                        <div class="post-cell">
+                          <p class="date" th:text="${list.difDate}">24시간 전</p>
+                          <div>
+                            <span class="view" th:text="'조회수 ' + ${list.hit}">조회수 123</span>
+                            <span class="like" th:text="'좋아요 ' + ${list.recommend}">좋아요 1</span>
+                            <span class="comment" th:text="'댓글 ' + ${list.commentCnt}">댓글 13</span>
+                          </div>
+                        </div>
+                      </div>
+                    </li>
+                  </th:block>
+                </ul>
+              </div>
+            </div>
+            <div class="community-content">
+              <h3 class="table-subtitle mt-5 mb-3">새 글 피드</h3>
+              <div class="feed-list">
+                <ul>
+                  <th:block th:each="list : ${recentList}">
+                    <li>
+                      <div class="row row-40 align-items-center">
+                        <div>
+                        <span class="tag tag-lg tag-outline-primary m-0">
+                          <em th:text="${list.communityTypeNm}"></em>
+                        </span>
+                        </div>
+                        <div class="col feed-body">
+                          <div class="title">
+                            <a th:href="'/hh/community/board/detail?communityType=' + ${list.communityType} + '&communitySeq='+ ${list.communitySeq}" th:text="${list.title}"></a>
+                          </div>
+                          <p class="desc" th:text="${list.content}"></p>
+                          <p class="name" th:text="${list.name}">홍**</p>
+                        </div>
+                        <div class="post-cell">
+                          <p class="date" th:text="${list.difDate}">24시간 전</p>
+                          <div>
+                            <span class="view" th:text="'조회수 ' + ${list.hit}">조회수 123</span>
+                            <span class="like" th:text="'좋아요 ' + ${list.recommend}">좋아요 1</span>
+                            <span class="comment" th:text="'댓글 ' + ${list.commentCnt}">댓글 13</span>
+                          </div>
+                        </div>
+                      </div>
+                    </li>
+                  </th:block>
+                </ul>
+              </div>
+            </div>
+          </div>
+      </div>
+    </div>
+  </body>
+</html>

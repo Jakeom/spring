@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.fo.FoSimpleLoginMapper">
+
+    <!-- 간편 인증 등록 -->
+    <insert id="insertMemberSimpleAuth" parameterType="FoSimpleLoginDTO">
+        /* com.fw.core.mapper.db1.fo.FoSimpleLoginMapper.insertMemberSimpleAuth, 간편 인증 등록, sjpaik, FoSimpleLoginMapper.xml */
+        INSERT INTO tb_simple_auth (
+               member_id
+             , simple_auth_cd
+             , simple_auth_val
+             , del_flag
+             , reg_seq
+             , reg_date
+        ) VALUES (
+               #{memberId}
+             , UPPER(#{simpleAuthCd})
+             , #{simpleAuthVal}
+             , 'N'
+             , #{memberId}
+             , NOW()
+        )
+    </insert>
+
+    <!-- 간편 인증 삭제 -->
+    <insert id="updateMemberSimpleAuthDel" parameterType="FoSimpleLoginDTO">
+        /* com.fw.core.mapper.db1.fo.FoSimpleLoginMapper.updateMemberSimpleAuthDel, 간편 인증 삭제, sjpaik, FoSimpleLoginMapper.xml */
+        UPDATE tb_simple_auth
+           SET del_flag = 'Y'
+         WHERE member_id = #{memberId}
+           AND simple_auth_cd = #{simpleAuthCd}
+           AND del_flag = 'N'
+    </insert>
+
+    <!-- 간편 로그인 등록 여부 -->
+    <select id="selectSimpleLoginInfo" resultType="FoSimpleLoginDTO">
+        /* com.fw.core.mapper.db1.fo.FoSimpleLoginMapper.selectSimpleLoginInfo, 간편 로그인 등록 여부, jung, FoSimpleLoginMapper.xml */
+        SELECT simple_auth_seq
+             , member_id
+             , simple_auth_cd
+             , simple_auth_val
+             , del_flag
+             , reg_seq
+             , reg_date
+          FROM tb_simple_auth
+         WHERE del_flag = 'N'
+           AND simple_auth_cd = #{simpleAuthCd}
+           AND simple_auth_val = #{simpleAuthVal}
+    </select>
+
+</mapper>

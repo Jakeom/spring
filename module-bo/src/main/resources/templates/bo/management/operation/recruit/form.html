@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/default}">
+
+<body>
+	<div layout:fragment="contents" th:remove="tag">
+		<div id="container-block">
+			<main id="content" role="main">
+				<h2 class="title">공지사항 등록</h2>
+				<div class="p-3 m-3">
+					<!-- form -->
+					<form id="insertNotice" name="insertNotice">	
+					<div class="form-group">
+							<select id="selectType" name="selectType" class="form-control w-auto"
+                                data-url="/bo/cd/BOARD_TYPE"
+                                data-default-option="선택"
+                        ></select>
+						</div>					
+						<div class="form-group">
+							<input type="text" class="form-control" id="noticeTitle"
+								name="noticeTitle" placeholder="제목을 입력하세요">
+						</div>
+						<div class="form-group">
+							<textarea  id="noticeContent" name= "noticeContent" placeholder="내용을 입력하세요" class="form-control" rows="12" cols="50"></textarea>
+						</div>						
+						<button type="button" class="btn btn-primary float-right" id="Save"
+							data-role="save">등록</button>
+						<button type="button" class="btn btn-danger float-right" id="list"
+							data-role="list">취소</button>
+					</form>
+					<!-- form -->
+				</div>
+			</main>
+		</div>
+		<div layout:fragment="modal" th:remove="tag"></div>
+	</div>
+	
+	  <script>
+    window.onload = function() {
+        CKEDITOR.replace('noticeContent');
+    };
+</script>
+</body>
+</html>

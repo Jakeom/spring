@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.bo.BoHelpMapper">
+
+	<!-- 글 조회  -->
+	<select id="selectHelpList"  parameterType="BoHelpDTO" resultType="BoHelpDTO">
+		/* com.fw.core.mapper.db1.bo.BoHelpMapper.selectHelpList, 등록, 22.09.22, jhmoon, BoHelpMapper.xml */
+		SELECT menu_cd
+             , content
+          FROM tb_help
+		
+	</select>
+	
+	<!-- 등록 -->
+	<insert id ="insertHelpInfo" parameterType="BoHelpDTO">
+	/* com.fw.core.mapper.db1.bo.BoHelpMapper.insertHelpInfo, 등록, 22.09.22, jhmoon, BoHelpMapper.xml */
+	INSERT INTO tb_help (
+			menu_cd,
+			content
+	) VALUES (
+			#{menuCd},
+			#{content}
+	)
+	</insert>
+	
+</mapper>   

@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layouts/mainLayout}">
+<body>
+<div id="container-block" layout:fragment="contents" th:remove="tag">
+    <input type="hidden" name="webDomain" th:value="${webDomain}" />
+    <div class="main-content">
+        <div class="main-visual"></div>
+        <div class="container main-content__join">
+            <div class="swiper-container">
+                <div class="swiper-wrapper">
+                        <input type="hidden" id="errorMessage" th:value="${errorMessage}">
+                    <th:block sec:authorize="hasRole('ROLE_AP')" >
+                        <input type="hidden" id="autoLoginToken" th:value="${#authentication.principal.autoLoginToken}">
+                        <input type="hidden" id="autoLogindType" th:value="${#authentication.principal.dType}">
+                        <input type="hidden" id="autoLoginMemberId" th:value="${#authentication.principal.id}">
+                        <input type="hidden" id="autoLoginLoginId" th:value="${#authentication.principal.loginId}">
+                    </th:block>
+                        <th:block  th:each="list : ${topBannerList}">
+                            <div class="swiper-slide" th:style="${!#lists.isEmpty(list.commonFileList)? 'background-size: 100% 100% ; background : url('+ list.commonFileList[0].url+')':''} ">
+                                <div class="desc-con" th:if="${#lists.isEmpty(list.commonFileList)}">
+                                    <p class="desc-con__txt1" th:text="${list.bannerNm}">취업의 시작 경력의 완성</p>
+                                    <p class="desc-con__txt2" th:text="${list.infoType}">경력직은 헤드헌터, 헤드헌터 Platform RESUME9</p>
+                                    <p class="desc-con__txt3" th:text="${list.content}">헤드헌터에게 의뢰된 <br/>비공개 채용정보도 확인할 수 있는 곳</p>
+                                </div>
+                            </div>
+                        </th:block>
+                </div>
+                <div class="swiper-pagination"></div>
+                <div class="swiper-button-prev"></div>
+                <div class="swiper-button-next"></div>
+            </div>
+            <div class="sign-wrap">
+                <div class="login-group">
+                    <div class="login-group__con">
+                        <button type="button" data-hasrole="ap-login" class="group__individual">개인회원<br/>로그인</button>
+                        <button type="button" data-hasrole="hh-login" class="login-group__headhunter">헤드헌터<br/>로그인
+                        </button>
+                    </div>
+                    <!--  <div class="login-group__sns">
+                          <a href=""><i class="icon-b-naver"></i></a>
+                          <a href=""><i class="icon-b-kakao"></i></a>
+                          <a href=""><i class="icon-b-facebook"></i></a>
+                          <a href=""><i class="icon-b-google"></i></a>
+                          <a href=""><i class="icon-b-apple"></i></a>
+                      </div>-->
+                </div>
+                <div class="sign-wrap__banner">
+                    <th:block th:each="list : ${nonLoginLogoBannerList}">
+                        <div class="swiper-slide" th:style="${!#lists.isEmpty(list.commonFileList)? 'background-size: 100% 100% ; background : url('+ list.commonFileList[0].url+')':''} ">
+                        </div>
+                    </th:block>
+                </div>
+                <form action="/fo/auth/signup-temp" name="tempMember"  method="post">
+                    <input type="hidden" name="memberId" value="" />
+                </form>
+                <div class="sign-btn__group">
+                    <a type="button" class="btn btn-outline-primary btn-lg" href="/fo/auth/signup">개인 회원가입</a>
+                    <a type="button" class="btn btn-outline-primary btn-lg" href="/hh/auth/signup">헤드헌터 회원가입</a>
+                </div>
+            </div>
+            <th:block sec:authorize="isAnonymous()">
+                <div class="sign-wrap__login ap">
+                    <p class="sign-wrap__title">개인회원 로그인</p>
+                    <a href="javascript:void(0);" class="close"><i class="icon-g-close"></i></a>
+                    <input type="hidden" name="ReturnURL" id="returnURL" th:value="${@environment.getProperty('service.web_domain')}">
+                        <div class="signin-form">
+                            <form action="/fo/auth/login" name="loginApForm" method="post">
+                                <input type="hidden" name="dType" value="AP" />
+                                <input type="hidden" name="autoLoginToken" value="" />
+                                <input type="hidden" name="id" value="">
+                                <input type="hidden" name="autoLogin" value="">
+                            <div>
+                                <input name="loginId" type="text" class="form-control main-login"/>
+                                <input name="password" type="password" class="form-control main-pw"/>
+                            </div>
+                            </form>
+                            <button class="wrap-login__btn" data-role="loginAp">로그인</button>
+                        </div>
+                    <div class="sign-wrap__form">
+                        <div class="use-login">
+                            <div class="form-check">
+                                <input class="form-check-input" data-role="autoLoginCheck" type="checkbox" value="" id="autoLogin"/>
+                                <label class="form-check-label" for="autoLogin">로그인 상태 유지</label>
+                            </div>
+                        </div>
+                        <div class="hidden-flex-mobile">
+                            <a href="/fo/auth/find-id" class="pw-reset">ID 찾기</a>
+                            <a href="/fo/auth/pw-reset" class="pw-reset">PW 찾기</a>
+                        </div>
+                    </div>
+                    <div class="login-sns main">
+                        <div class="login-sns__wrap">
+                            <a href="javascript:void(0)" id="naver_id_login" style="display: none;">
+                                <div class="icon-naver" ></div>
+                            </a>
+                            <a href="javascript:void(0)">
+                                <div class="icon-naver" id="naver_login"></div>
+                            </a>
+                            <a href="javascript:void(0)">
+                                <div class="icon-kakao" onclick="kakaoLogin();"></div>
+                            </a>
+                            <a href="javascript:void(0)">
+                                <div id="facebook_id" class="icon-facebook"></div>
+                            </a>
+                            <input type="hidden" id="g_id_onload"
+                                   data-client_id="476582313019-grue92go9crgvthb59scm64bnd7h7v69.apps.googleusercontent.com"
+                                   data-callback="handleCredentialResponse">
+                            <div class="g_id_signin" data-type="icon" data-shape="circle"></div>
+                        </div>
+                        <p class="sign-up">아직 회원이 아니세요? <a href="/hh/auth/signup">회원가입</a></p>
+                    </div>
+                </div>
+                <div class="sign-wrap__login hh">
+                    <p class="sign-wrap__title">헤드헌터 로그인</p>
+                    <a href="javascript:void(0);" class="close"><i class="icon-g-close"></i></a>
+                        <div class="signin-form">
+                            <form action="/hh/auth/login" name="loginHhForm" method="post">
+                                <input type="hidden" name="dType" value="HH" />
+                                <input type="hidden" name="autoLoginToken" value="" />
+                                <input type="hidden" name="id" value="">
+                                <input type="hidden" name="autoLogin" value="">
+                                <div>
+                                    <input name="loginId" type="text" class="form-control main-login"/>
+                                    <input name="password" type="password" class="form-control main-pw"/>
+                                </div>
+                            </form>
+                            <button class="wrap-login__btn" data-role="loginHh" data-hasrole="loginHhForm" >로그인</button>
+                        </div>
+                    <div class="sign-wrap__form">
+                        <div class="use-login">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" data-role="autoLoginCheck" value="" id="multipleCheck"/>
+                                <label class="form-check-label" for="multipleCheck">로그인 상태 유지</label>
+                            </div>
+                        </div>
+                        <div class="hidden-flex-mobile">
+                            <a href="/fo/auth/find-id" class="pw-reset">ID 찾기</a>
+                            <a href="/fo/auth/pw-reset" class="pw-reset">PW 찾기</a>
+                        </div>
+                    </div>
+                    <div class="login-sns main">
+                        <p class="sign-up">아직 회원이 아니세요? <a href="/fo/auth/signup">회원가입</a></p>
+                    </div>
+                </div>
+            </th:block>
+            <th:block sec:authorize="hasRole('ROLE_AP')">
+                <div class="sign-wrap__success">
+                    <div class="sign-success__con">
+                        <a href="javascript:void(0)" id="naver_id_login" style="display: none;">
+                            <div class="icon-naver" ></div>
+                        </a>
+                        <div class="profile-img"
+                             th:style="'background: url(' + ${#authentication.principal.profileUrl eq null ? '/static/images/no-img.png' : #authentication.principal.profileUrl} + '); background-size: 100% 100%'"></div>
+                        <p class="name" th:text="${#authentication.principal.name}">홍길동 님</p>
+                        <p class="email" th:text="${#authentication.principal.loginId}">admin@resume9.co.kr</p>
+                        <input type="hidden" name="hiddenLoginId" id="hiddenLoginId" th:value="${#authentication.principal.loginId}">
+                        <div class="d-flex justify-content-center">
+                            <div class="notice-con">
+                                <a href="javascript:void(0)" data-role="chat">
+                                    <i class="icon-notice"></i>
+                                    <p class="content-txt">읽지 않은 알림</p>
+                                    <p class="content-cnt" th:text="${#numbers.formatInteger(myAlarm.pushCnt,0,'COMMA')}">10</p>
+                                </a>
+                            </div>
+                            <div class="reward-con">
+                                <a href="javascript:void(0)">
+                                    <i class="icon-reward"></i>
+                                    <p class="content-txt">리워드</p>
+                                    <p class="content-cnt" th:text="${#authentication.principal.balance == null? '0':#numbers.formatInteger(#authentication.principal.balance,0,'COMMA') + 'P'}">
+                                        20,000</p>
+                                </a>
+                            </div>
+                        </div>
+                        <button type="button" data-role="resumeWrite" class="btn btn-outline-primary btn-lg">이력서 작성하기
+                        </button>
+                    </div>
+                </div>
+            </th:block>
+        </div>
+
+        <div class="main-content__announcement">
+            <div class="container">
+                <div class="announcement-head">
+                    <p class="main-content-title">실시간 헤드헌팅 채용공고</p>
+                    <div class="">
+                        <div class="swiper-button-prev"></div>
+                        <div class="swiper-button-next"></div>
+                    </div>
+                </div>
+                <div class="announcement-wrap">
+                    <div class="swiper-container">
+                        <div class="swiper-wrapper">
+                            <div class="swiper-slide">
+                                <ul class="announcement-wrap__list">
+                                    <th:block th:each="list : ${positionList}" th:if="${list.rowNum <=12}">
+                                        <li class="">
+                                            <a th:href="'/fo/user/jop/posting/detail?id='+${list.id}">
+                                                <div class="scale">
+                                                    <p class="announcement-classification"
+                                                       th:text="${list.companyScale}">중소기업</p>
+                                                    <span class="company" th:text="${list.publicCd} == 0 ? ${list.companyName} : '***'">삼성전자</span>
+                                                </div>
+                                                    <p class="announcement-object" th:text="${list.title}">뉴프렉스 베트남 인사팀장
+                                                        모집</p>
+                                                <div class="date-wrap">
+                                                    <p class="date"
+                                                       th:text="${#strings.contains(list.dDay, '-') ? '공고마감' : '(D-' + list.dDay + ')'}">
+                                                        D-26</p>
+                                                    <p class="deadline" th:text="${list.endDate}">공고마감일 : 2022.10.12</p>
+                                                </div>
+                                            </a>
+                                        </li>
+                                    </th:block>
+                                </ul>
+                            </div>
+                            <div class="swiper-slide">
+                                <ul class="announcement-wrap__list">
+                                    <th:block th:each="list : ${positionList}"
+                                              th:if="${list.rowNum >=13 and list.rowNum <=24}">
+                                        <li class="">
+                                            <a th:href="'/fo/user/jop/posting/detail?id='+${list.id}">
+                                                <div class="scale">
+                                                    <p class="announcement-classification"
+                                                       th:text="${list.companyScale}">중소기업</p>
+                                                    <span class="company" th:text="${list.publicCd} == 0 ? ${list.companyName} : '***'">삼성전자</span>
+                                                </div>
+                                                    <p class="announcement-object" th:text="${list.title}">뉴프렉스 베트남 인사팀장
+                                                        모집</p>
+                                                <div class="date-wrap">
+                                                    <p class="date"
+                                                       th:text="${#strings.contains(list.dDay, '-') ? '공고마감' : '(D-' + list.dDay + ')'}">
+                                                        D-26</p>
+                                                    <p class="deadline" th:text="${list.endDate}">공고마감일 : 2022.10.12</p>
+                                                </div>
+                                            </a>
+                                        </li>
+                                    </th:block>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="announcement-more">
+                        <button type="button" data-role="goPosition" class="btn btn-primary btn-xl round">채용정보 더보기
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--  main-content__search -->
+        <div class="main-content__search">
+            <div class="container">
+                <div class="main-search-box swiper-search">
+                    <p class="title">참여 서치펌</p>
+                    <div class="swiper-container">
+                        <div class="swiper-wrapper">
+                            <th:block th:each="list : ${searchList}">
+                                <div class="swiper-slide" >
+                                    <div class="search-card">
+                                        <div class="search-card__logo">
+                                            <img th:src="${list.commonFileList[0].url}">
+                                        </div>
+                                    </div>
+                                </div>
+                            </th:block>
+                        </div>
+                    </div>
+                    <div class="swiper-button-prev"></div>
+                    <div class="swiper-button-next"></div>
+                </div>
+                <div class="main-search-box swiper-customer">
+                    <p class="title">고객사</p>
+                    <div class="swiper-container">
+                        <div class="swiper-wrapper">
+                            <th:block th:each="list : ${mainDisplayList}">
+                                <div class="swiper-slide">
+                                    <div class="search-card">
+                                        <div class="search-card__logo">
+                                            <img th:src="${list.commonFileList[0].url}">
+                                        </div>
+                                    </div>
+                                </div>
+                            </th:block>
+                        </div>
+                    </div>
+                    <div class="swiper-button-prev"></div>
+                    <div class="swiper-button-next"></div>
+                </div>
+            </div>
+        </div>
+        <!-- / main-content__search -->
+        <!-- main-content__platform  하단 컨텐츠-->
+        <div class="main-content__platform">
+            <div class="container">
+                <div class="platform-head">
+                    <p class="platform-title">헤드헌터 플랫폼 레쥬메나인</p>
+                    <p class="main-content-title">레쥬메나인의 장점을 둘러보세요.</p>
+                </div>
+                <div class="platform-bg-card">
+                    <p class="platform-desc-title">Platform RESUME9</p>
+                    <p class="platform-desc-txt">RESUME9 이력서 등록 한 번으로 AI가 당신을 원하는 곳으로 당신의 경력을 최고 우대하는 곳으로 안내해줍니다.</p>
+                </div>
+            </div>
+            <div class="swiper-container">
+                <div class="swiper-wrapper">
+<!--                    <th:block  th:each="list : ${topBannerList}">-->
+<!--                        <div class="swiper-slide" th:style="${!#lists.isEmpty(list.commonFileList)? 'background-size: 100% 100% ; background : url('+ list.commonFileList[0].url+')':''} ">-->
+<!--                            <div class="desc-con" th:if="${#lists.isEmpty(list.commonFileList)}">-->
+<!--                                <p class="desc-con__txt1" th:text="${list.bannerNm}">취업의 시작 경력의 완성</p>-->
+<!--                                <p class="desc-con__txt2" th:text="${list.infoType}">경력직은 헤드헌터, 헤드헌터 Platform RESUME9</p>-->
+<!--                                <p class="desc-con__txt3" th:text="${list.content}">헤드헌터에게 의뢰된 <br/>비공개 채용정보도 확인할 수 있는 곳</p>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </th:block>-->
+
+                    <th:block th:each="list : ${bottomContentList}">
+                        <div class="swiper-slide" th:style="${!#lists.isEmpty(list.commonFileList)? 'background-size: 100% 100% ; background : url('+ list.commonFileList[0].url+')':''} ">
+                            <div class="platform-card" th:if="${#lists.isEmpty(list.commonFileList)}" style="background-color: inherit!important;">
+                                <p class="platform-card-title">귀찮은 이력서 작성,<br/>로봇에게 맡기세요.</p>
+                                <p class="platform-card-desc">RESUME9 이력서 양식으로 등록하면 RPA로 1초만에 뚝딱!<br/>귀찮은 항목들도 자동으로 입력해 줍니다.</p>
+                                <a href="${list.linkUrl}" class="btn btn-md round">자세히보기</a>
+                            </div>
+                            <div class="platform-card" th:unless="${#lists.isEmpty(list.commonFileList)}" style="background-color: inherit!important;">
+                                <p class="platform-card-title"></p>
+                                <p class="platform-card-desc"></p>
+                            </div>
+                        </div>
+                    </th:block>
+                </div>
+                <div class="container platform-controller">
+                    <div class="swiper-button-prev"></div>
+                    <div class="swiper-pagination"></div>
+                    <div class="swiper-button-next"></div>
+                </div>
+            </div>
+        </div>
+        <!-- /main-content__platform 하단 컨텐츠-->
+        <div class="main-content__list">
+            <div class="container">
+                <div class="main-content-notice">
+                    <div class="list-head">
+                        <p class="content-title">공지사항</p>
+                        <a href="/fo/service/notice" class="content-more">더보기 <i class="icon-plus"></i></a>
+                    </div>
+                    <ul class="list-content">
+                        <th:block th:each="list : ${noticeList}">
+                            <li><a th:href="'/fo/service/notice/detail?noticeSeq='+${list.noticeSeq}"
+                                   th:text="${list.title}"></a></li>
+                        </th:block>
+                    </ul>
+                </div>
+                <div class="main-content-faq">
+                    <div class="list-head">
+                        <p class="content-title">FAQ</p>
+                        <a href="/fo/service/faq-individual" class="content-more">더보기 <i class="icon-plus"></i></a>
+                    </div>
+                    <ul class="list-content">
+                        <th:block th:each="list : ${mainFaqList}">
+                            <li>
+                                <a th:href="'/fo/service/faq-individual?faqCategorySeq='+${list.faqCategorySeq}+'&faqSeq='+${list.faqSeq}"
+                                   th:text="${'['+list.categoryNm +']'+list.title}">[회원가입·로그인]로그인 상태 유지란?</a></li>
+                        </th:block>
+                    </ul>
+                </div>
+            </div>
+        </div>
+     <!-- 경력직 Platform RESUME9 -->
+        <div class="main-content__product">
+            <div class="container">
+                <div class="platform-head">
+                    <p class="platform-title dark">경력직 Platform RESUME9</p>
+                    <p class="main-content-title dark">개인정보를 상업적으로 판매할 경우, 50%의 Reward를 레쥬메나인이 제공해드립니다.</p>
+                </div>
+                <div class="product-list">
+                    <th:block th:each="list : ${frontBottomContentList}">
+                        <div class="product-content">
+                            <img th:src="${list.commonFileList[0].url}" alt="회원가입 절차">
+                            <p class="product-title"></p>
+                            <p class="product-desc"></p>
+                            <div class="view-more">
+                                <a th:href="${list.linkUrl}">
+                                    <i class="icon-round-arrow"></i>
+                                    <span>자세히보기</span>
+                                </a>
+                            </div>
+                        </div>
+                    </th:block>
+                </div>
+            </div>
+        </div>
+        <!-- 하단 띠베너 -->
+        <div class="sm-banner">경력직은 헤드헌터, 헤드헌터 Platform RESUME9</div>
+        <!-- /하단 띠베너 -->
+    </div>
+    <form style="display: none" action="/fo/auth/signup" method="GET" id="simpleLoginInfo">
+        <input type="hidden" name="simpleAuthCd" value=""/>
+        <input type="hidden" name="simpleAuthVal" value=""/>
+        <input type="hidden" name="email" value=""/>
+    </form>
+</div>
+</body>
+</html>

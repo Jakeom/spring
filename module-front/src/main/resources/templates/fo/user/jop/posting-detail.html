@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/mainLayout">
+<body>
+<div id="container-block" layout:fragment="contents" th:remove="tag">
+    <form name="proposalAcceptForm" action="/fo/user/application/proposal-accept" method="GET">
+        <input type="hidden" name="positionId" th:value="${postingInfo.id}"/>
+        <input type="hidden" name="applicantId" th:value="${searchInfo.applicantId}"/>
+    </form>
+    <div class="container">
+        <div class="sub-content">
+            <div class="row row-40 align-items-center">
+                <h3 class="subtitle">채용공고 상세</h3>
+                <div class="title-line mt-4 mb-4"></div>
+                <div class="poting-detail-wrap">
+                    <div class="d-flex justify-content-between">
+                        <div class="announcement-wrap">
+                            <input type="hidden" name="id" th:value="${postingInfo} eq null ? '':${postingInfo.id} ">
+                            <p class="scale"><span th:text="${postingInfo.companyScale}"></span><span class="company"
+                                                                                                      th:text="${postingInfo.publicCd} == 0? ${postingInfo.companyName}:'***'">삼성전자</span>
+                                <button type="button" class="favorites" data-role="clickScrap" th:data-positionId="${postingInfo.id}" th:classappend="${postingInfo.scrapId eq null? '':'active'}"><i class="icon-favorites-off"></i></button>
+                            </p>
+                            <div class="title" th:text="${postingInfo.title}">MIS/인사시스템관리,IT운영-CC파트 콜센터운영/전사/기획 서버 및
+                                DB관리
+                            </div>
+                            <p class="date">
+                                <span>공고마감일</span>
+                                <span th:text="${postingInfo.endDate}">2022.10.21 (금)</span>
+                                <span class="tag tag-lg tag-outline-primary m-0">
+                                <em th:text="${#strings.contains(postingInfo.dDay, '-') ? '공고마감' : 'D-' + postingInfo.dDay}">D-16</em></span>
+                            </p>
+                            <p class="date mt-2">
+                                <span>직무</span>
+                                <span th:text="${postingInfo.industry}"></span>
+                            </p>
+
+                        </div>
+                        <div></div>
+                    </div>
+                    <div class="desc" th:utext="${postingInfo.jobDescription eq null? '':postingInfo.jobDescription.replaceAll('\n','<br/>')}">
+                    </div>
+                    <h3 class="table-subtitle">헤드헌터 정보</h3>
+                    <div class="headhunter-profile-content">
+                        <div class="headhunter-profile">
+                            <div class="d-flex align-items-center">
+                                <div class="headhunter-profile-img" data-bs-toggle="modal"
+                                     data-bs-target="#modal-headhunter" th:data-member-id="${postingInfo.memberId}"
+                                     data-role="hhInfo"
+                                     th:style="${postingInfo.commonFileList != null? 'background-image: url('+ postingInfo.commonFileList[0].url+')':''}">
+                                </div>
+                                <div class="headhunter-profile-info">
+                                    <p class="company" th:text="${postingInfo.sfName}">맨쉬컨설팅(주)</p>
+                                    <p class="name">
+                                        <button type="button" class="favorites"  data-role="likeHh" th:data-member-id="${postingInfo.memberId}" th:classappend="${postingInfo.interestHh != null? 'active':''}"><i class="icon-favorites-off"></i>
+                                        </button>
+                                        <span th:text="${postingInfo.name}">홍길동</span>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="headhunter-profile-info detail">
+                                <div class="d-flex">
+                                    <p class="txt first">이메일</p>
+                                    <a th:href="'mailto:'+${postingInfo.email}" class="email"
+                                       th:text="${postingInfo.email}">abce111@naver.com</a>
+                                </div>
+                                <div class="d-flex">
+                                    <p class="txt">진행 중 공고</p>
+                                    <p><a th:href="'/fo/user/jop/posting-hunter?memberId='+${postingInfo.memberId}"
+                                          class="num" th:text="${postingInfo.postingCnt}">14</a>건</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="send-btn">
+                    <th:block th:if="${#strings.isEmpty(searchInfo.mode)}">
+                        <a data-role="goBack" class="btn btn-primary btn-xl">목록</a>
+                        <button thref="javascript:void(0)" th:data-id="${postingInfo.id}" class="btn btn-primary btn-xl" th:disabled="${postingInfo.applicantYn eq '1'}"
+                                th:text="${postingInfo.applicantYn eq '1'? '지원완료':'지원하기'}" data-role="apply">지원하기</button>
+                    </th:block>
+                    <th:block th:if="${!#strings.isEmpty(searchInfo.mode)}">
+                        <button data-role="reject" class="btn btn-info btn-xl">지원의사 없음</button>
+                        <button data-role="accept" class="btn btn-primary btn-xl">지원수락</button>
+                    </th:block>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 헤드헌터 상세 -->
+    <div class="modal fade" id="modal-headhunter" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-headhunter modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body pt-0">
+                    <form name="headhunterForm">
+                        <input type="hidden" name="headhunterId" />
+                        <input type="hidden" name="hhMemberId" />
+                    </form>
+                    <div class="headhunter-profile-content">
+                        <div class="headhunter-profile">
+                            <div class="headhunter-left">
+                                <div class="headhunter-profile-img" data-bs-toggle="modal" data-bs-target="#modal-headhunter"></div>
+                                <button type="button" class="btn btn-outline-dark btn-sm" data-role="addBlack">블랙리스트 추가</button>
+                            </div>
+                            <div class="headhunter-profile-info">
+                                <div>
+                                    <p class="company">맨쉬컨설팅(주)</p>
+                                    <p class="name">
+                                        <span name="hhName">홍길동</span>
+                                        <span name="hhPosition" class="rank">전무</span>
+                                        <span name="hhSchool" class="txt">연세대학교 금속공학과</span>
+                                    </p>
+                                </div>
+                                <div>
+                                    <div class="phone">
+                                        <p>
+                                            <span>연락처</span>
+                                            <span name="hhPhone" class="phone-number">***-****-****</span>
+                                        </p>
+                                        <button type="button" class="btn btn-outline-dark btn-sm" data-role="showPhone">연락처 보기</button>
+                                    </div>
+                                </div>
+                                <ul class="info-list">
+                                    <li>
+                                        <p>이메일</p>
+                                        <a href="" id="hhEmail">asdqwe1234@naver.com</a>
+                                    </li>
+                                    <li>
+                                        <p>최근로그인</p>
+                                        <p id="recentLogin">2022-10-11</p>
+                                    </li>
+                                    <li>
+                                        <p>진행중공고</p>
+                                        <p><a href="" class="text-danger" id="hhPostingCnt">3</a>건</p>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="apply-wrap">
+                        <div class="apply-wrap-body">
+                            <div class="content">
+                                <h4 class="table-subtitle mb-3">인사말</h4>
+                                <div class="desc">
+                                    <p class="introduce-text" name="hhIntro"></p>
+                                </div>
+                            </div>
+                            <div class="content">
+                                <h4 class="table-subtitle mb-3">주요이력</h4>
+                                <div class="desc" name="hhCareer">
+                                    <ul class="history">
+                                        <li></li>
+                                        <li></li>
+                                        <li></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="content">
+                                <h4 class="table-subtitle mb-3">전문분야</h4>
+                                <div class="desc">
+                                    <div class="badge-box" name="hhFields">
+                                      <span class="tag tag-lg tag-outline-primary none-border m-0" name="hhFieldsLow">
+                                        <em name="field"></em>
+                                      </span>
+                                        <!-- <span class="tag tag-lg tag-outline-primary none-border m-0">
+                                         <em>IT/인터넷</em>
+                                       </span>
+                                         <span class="tag tag-lg tag-outline-primary none-border m-0">
+                                         <em>제조/생산/화학</em>
+                                       </span>
+                                         <span class="tag tag-lg tag-outline-primary none-border m-0">
+                                         <em>의료/제약</em>
+                                       </span>
+                                         <span class="tag tag-lg tag-outline-primary none-border m-0">
+                                         <em>유통/판매</em>
+                                       </span>-->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

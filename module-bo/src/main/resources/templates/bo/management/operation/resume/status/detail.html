@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/default}">
+<body>
+<div layout:fragment="contents" th:remove="tag">
+	<main id="content" role="main">
+		<h2 class="title">이력서 상세</h2>
+		<div class="row p-3">
+			<div class="col-12">
+				<h4 class="table-subtitle mb-3">인적사항</h4>
+				<input type="hidden" name="resumeId" th:value="${resumeInfo.id}">
+				<div class="mt-3 mb-3 text-center">
+					<img th:if="${resumeInfo.commonFileList ne null and resumeInfo.commonFileList.size() ne 0}" th:src=" ${resumeInfo.commonFileList eq null ? '/static/images/icon-login.svg' : resumeInfo.commonFileList[0].url}" alt="" style="height:150px" />
+				</div>
+				<table class="table">
+					<colgroup>
+						<col style="width: 7%">
+						<col style="width: 25.5%">
+						<col style="width: 7%">
+						<col style="width: 25.5%">
+					</colgroup>
+					<tbody>
+						<tr>
+							<th class="text-center">이름</th>
+							<td th:text="${resumeInfo.name}"></td>
+							<th class="text-center">주소</th>
+							<td th:text="${resumeInfo.address}"></td>
+						</tr>
+						<tr>
+							<th class="text-center">생년월일</th>
+							<td th:text="${resumeInfo.birth}"></td>
+							<th class="text-center">최종연봉</th>
+							<td th:text="${#strings.isEmpty(resumeInfo.lastSalary) or resumeInfo.lastSalary eq '0'? '-':#numbers.formatInteger(resumeInfo.lastSalary, 0, 'COMMA')+'만원'}"></td>
+						</tr>
+						<tr>
+							<th class="text-center">연락처</th>
+							<td th:text="${resumeInfo.phone}"></td>
+							<th class="text-center">이메일</th>
+							<td th:text="${resumeInfo.email}"></td>
+						</tr>
+					</tbody>
+				</table>
+				<h4 class="table-subtitle mb-3 mt-3">핵심역량</h4>
+				<table class="table">
+					<colgroup>
+						<col style="width: 7%">
+						<col style="width: 25.5%">
+						<col style="width: 7%">
+						<col style="width: 25.5%">
+					</colgroup>
+					<tbody>
+						<th:block th:each="list : ${specInfo}">
+							<tr th:if="${list.specType eq 'MAIN'}">
+								<th class="text-center">Main</th>
+								<td colspan="3" th:text="${list.spec}"></td>
+							</tr>
+							<tr th:if="${list.specType eq 'DETAIL'}">
+								<th class="text-center">상세</th>
+								<td colspan="3" th:text="${list.spec}"></td>
+							</tr>
+							<tr th:if="${list.specType eq 'ETC'}">
+								<th class="text-center">기타</th>
+								<td colspan="3" th:text="${list.spec}"></td>
+							</tr>
+						</th:block>
+					</tbody>
+				</table>
+				<h4 class="table-subtitle mb-3 mt-3">학력</h4>
+				<th:block th:each="list : ${academicInfo}" th:if="${list.degreeCd eq 'HIGH'}">
+					<table class="table">
+						<colgroup>
+							<col style="width: 7%">
+							<col style="width: 25.5%">
+							<col style="width: 7%">
+							<col style="width: 25.5%">
+						</colgroup>
+						<tbody>
+							<tr>
+								<th class="text-center">고등학교</th>
+								<td th:text="${list.schoolName}"></td>
+								<th class="text-center">소재지</th>
+								<td th:text="${list.locationCd}"></td>
+							</tr>
+							<tr>
+								<th class="text-center">졸업년월</th>
+								<td th:text="${list.graduationYm}"></td>
+								<th class="text-center">졸업상태</th>
+								<td th:text="${list.graduationStatusNm}"></td>
+							</tr>
+						</tbody>
+					</table>
+				</th:block>
+				<th:block th:each="list : ${academicInfo}" th:if="${list.degreeCd ne 'HIGH'}">
+					<table class="table mt-2">
+						<colgroup>
+							<col style="width: 7%">
+							<col style="width: 25.5%">
+							<col style="width: 7%">
+							<col style="width: 25.5%">
+						</colgroup>
+						<tbody>
+							<tr>
+								<th class="text-center">
+									<span th:if="${list.degreeCd eq 'JUNIOR_COLLEGE'}">대학(2/3년)</span>
+									<span th:if="${list.degreeCd eq 'COLLEGE'}">대학교(4년)</span>
+									<span th:if="${list.degreeCd eq 'MASTER'}">석사</span>
+									<span th:if="${list.degreeCd eq 'PHD'}">박사</span>
+								</th>
+								<td th:text="${list.schoolName}"></td>
+								<th class="text-center">소재지</th>
+								<td th:text="${list.locationCd}"></td>
+							</tr>
+							<tr>
+								<th class="text-center">입학년월</th>
+								<td th:text="${list.entranceYm}"></td>
+								<th class="text-center">입학상태</th>
+								<td>
+									<span th:if="${list.entranceStatusCd eq 'ENTRANCE'}">입학</span>
+									<span th:if="${list.entranceStatusCd eq 'TRANSFER'}">편입</span>
+									<span th:if="${list.entranceStatusCd eq ''}"></span>
+								</td>
+							</tr>
+							<tr>
+								<th class="text-center">졸업년월</th>
+								<td th:text="${list.graduationYm}"></td>
+								<th class="text-center">졸업상태</th>
+								<td>
+									<span th:if="${list.graduationStatusCd eq 'GRADUATION'}">졸업</span>
+									<span th:if="${list.graduationStatusCd eq 'EXPECTANT_GRADUATION'}">졸업예정</span>
+									<span th:if="${list.graduationStatusCd eq 'DOING'}">재학중</span>
+									<span th:if="${list.graduationStatusCd eq 'BREAK'}">휴학중</span>
+									<span th:if="${list.graduationStatusCd eq 'SELF_LEAVE'}">중퇴</span>
+									<span th:if="${list.graduationStatusCd eq 'COMPLETION'}">수료</span>
+									<span th:if="${list.graduationStatusCd eq ''}"></span>
+								</td>
+							</tr>
+							<tr>
+								<th class="text-center">주전공명</th>
+								<td th:text="${list.majorName}"></td>
+								<th class="text-center">학점</th>
+								<td th:text="${list.grades}"></td>
+							</tr>
+							<tr>
+								<th class="text-center">부전공명</th>
+								<td th:text="${list.minorName}"></td>
+								<th class="text-center">학점</th>
+								<td th:text="${list.minorGrades}"></td>
+							</tr>
+							</tbody>
+					</table>
+				</th:block>
+				<h4 class="table-subtitle mb-3 mt-3">경력사항 <span th:text="${'(' + resumeInfo.totalCareers + ')'}"></span></h4>
+				<th:block th:each="list : ${careerInfo}">
+					<table class="table">
+						<colgroup>
+							<col style="width: 7%">
+							<col style="width: 25.5%">
+							<col style="width: 7%">
+							<col style="width: 25.5%">
+						</colgroup>
+						<tbody>
+							<tr>
+								<th class="text-center">회사명</th>
+								<td th:text="${list.companyname}"></td>
+								<th class="text-center">부서명</th>
+								<td th:text="${list.departmentName}"></td>
+							</tr>
+							<tr>
+								<th class="text-center">입사년월</th>
+								<td>
+									<th:block th:if="${list.holdOffice eq 1}">
+										<span th:text="${list.entranceYm}"></span>
+									</th:block>
+									<th:block th:if="${list.holdOffice ne 1}">
+										<span th:text="${list.entranceYmCareer}"></span>
+									</th:block>
+								</td>
+								<th class="text-center">퇴사년월</th>
+								<td>
+									<th:block th:if="${list.holdOffice eq 1}">
+										<span>재직중</span>
+									</th:block>
+									<th:block th:if="${list.holdOffice ne 1}">
+										<span th:text="${list.resignationYmCareer}"></span>
+									</th:block>
+								</td>
+							</tr>
+							<tr>
+								<th class="text-center">직급 / 직책</th>
+								<td th:text="${list.positionInput + ' / ' + list.dutyInput}"></td>
+								<th class="text-center">최종연봉</th>
+								<td>
+									<span th:if="${list.salary ne null}" th:text="${list.salary + '만원'}">졸업</span>
+									<span th:if="${list.salary eq null}"></span>
+								</td>
+							</tr>
+							<tr>
+								<td colspan="4" th:text="${list.task}"></td>
+							</tr>
+						</tbody>
+					</table>
+				</th:block>
+				<h4 class="table-subtitle mb-3 mt-3">희망근무조건</h4>
+				<table class="table">
+					<colgroup>
+						<col style="width: 7%">
+						<col style="width: 25.5%">
+						<col style="width: 7%">
+						<col style="width: 25.5%">
+					</colgroup>
+					<tbody>
+						<tr>
+							<th class="text-center">고용형태</th>
+							<td>
+								<span th:if="${resumeInfo.desiredHire eq 'FULL_TIME'}">정규직</span>
+								<span th:if="${resumeInfo.desiredHire eq 'PART_TIME'}">계약직</span>
+								<span th:if="${resumeInfo.desiredHire eq 'INTERN'}">인턴</span>
+								<span th:if="${resumeInfo.desiredHire eq 'DISPATCH'}">파견직</span>
+								<span th:if="${resumeInfo.desiredHire eq 'FREELANCER'}">프리랜서</span>
+								<span th:if="${resumeInfo.desiredHire eq 'MILITARY_SERVICE'}">병역특례</span>
+								<span th:if="${resumeInfo.desiredHire eq ''}"></span>
+							</td>
+							<th class="text-center">희망근무지</th>
+							<td>
+								<span th:if="${resumeInfo.desiredLocationCd eq 'SEOUL'}">서울</span>
+								<span th:if="${resumeInfo.desiredLocationCd eq 'IN'}">수도원</span>
+								<span th:if="${resumeInfo.desiredLocationCd eq 'ALL'}">전국</span>
+								<span th:if="${resumeInfo.desiredLocationCd eq ''}"></span>
+							</td>
+						</tr>
+						<tr>
+							<th class="text-center">입사가능시기</th>
+							<td th:text="${resumeInfo.joinDateNm}"></td>
+							<th class="text-center">희망직급</th>
+							<td th:text="${resumeInfo.desiredPosition}"></td>
+						</tr>
+						<tr>
+							<th class="text-center">희망연봉</th>
+							<td>
+							<th:block th:if="${resumeInfo.bylaws} eq '0'">
+								<span
+									th:text="${#strings.isEmpty(resumeInfo.desiredSalary) or resumeInfo.desiredSalary eq '0'? '-':#numbers.formatInteger(resumeInfo.desiredSalary, 0, 'COMMA')+'만원'}">
+								</span>
+							</th:block>
+							<th:block th:if="${resumeInfo.bylaws} eq '1'">
+								<span>내규에 따름</span>
+							</th:block>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				<h4 class="table-subtitle mb-3 mt-3">채용우대자격</h4>
+				<table class="table">
+					<colgroup>
+						<col style="width: 7%">
+						<col style="width: 25.5%">
+						<col style="width: 7%">
+						<col style="width: 25.5%">
+					</colgroup>
+					<tbody>
+						<tr>
+							<th class="text-center">보훈대상</th>
+							<td th:text="${resumeInfo.isVeterans eq '0'}? '비대상':'대상'">
+							</td>
+							<th class="text-center">장애여부</th>
+							<td th:text="${resumeInfo.disability eq '0'}? '비대상':'대상'">
+						</tr>
+						<tr>
+							<th class="text-center">병역</th>
+							<td th:text="${resumeInfo.militaryServiceNm}"></td>
+							<th class="text-center"></th>
+							<td></td>
+						</tr>
+					</tbody>
+				</table>
+				<h4 class="table-subtitle mb-3 mt-3">어학</h4>
+				<table class="table">
+					<colgroup>
+						<col style="width: 7%">
+						<col style="width: 25.5%">
+						<col style="width: 7%">
+						<col style="width: 25.5%">
+					</colgroup>
+					<tbody>
+						<th:block th:each="list : ${languageInfo}" >
+							<th class="text-center">어학</th>
+							<td colspan="3" th:text="${list.languageInput}">
+							</td>
+						<tr>
+					</tbody>
+				</table>
+				<h4 class="table-subtitle mb-3 mt-3">자격증</h4>
+				<table class="table">
+					<colgroup>
+						<col style="width: 7%">
+						<col style="width: 25.5%">
+						<col style="width: 7%">
+						<col style="width: 25.5%">
+					</colgroup>
+					<tbody>
+						<th:block th:each="list : ${licenseInfo}" >
+							<th class="text-center">자격증</th>
+							<td colspan="3" th:text="${list.licenseName}">
+							</td>
+						<tr>
+					</tbody>
+				</table>
+				<h4 class="table-subtitle mb-3 mt-3">수상</h4>
+				<table class="table">
+					<colgroup>
+						<col style="width: 7%">
+						<col style="width: 25.5%">
+						<col style="width: 7%">
+						<col style="width: 25.5%">
+					</colgroup>
+					<tbody>
+						<th:block th:each="list : ${awardInfo}" >
+							<th class="text-center">수상</th>
+							<td colspan="3" th:text="${list.awardName}">
+							</td>
+						<tr>
+					</tbody>
+				</table>
+				<h4 class="table-subtitle mb-3 mt-3">대외활동</h4>
+				<table class="table">
+					<colgroup>
+						<col style="width: 7%">
+						<col style="width: 25.5%">
+						<col style="width: 7%">
+						<col style="width: 25.5%">
+					</colgroup>
+					<tbody>
+						<th:block th:each="list : ${activityInfo}" >
+							<th class="text-center">대외활동</th>
+							<td colspan="3" th:text="${list.content}">
+							</td>
+						<tr>
+					</tbody>
+				</table>
+				<h4 class="table-subtitle mb-3 mt-3">포트폴리오</h4>
+				<table class="table">
+					<colgroup>
+						<col style="width: 7%">
+						<col style="width: 25.5%">
+						<col style="width: 7%">
+						<col style="width: 25.5%">
+					</colgroup>
+					<tbody>
+						<th:block th:each="list : ${portfolioInfo}" >
+							<th class="text-center">포트폴리오</th>
+							<td colspan="3">
+								<a th:if="${list.attachType eq 'URL'}" th:href="${list.url}" th:text="${list.url}"></a>
+								<a th:if="${list.attachType eq 'FILE'}" th:href="${list.commonFileList[0].url}" th:text="${list.commonFileList[0].originName}" download></a>
+							</td>
+						<tr>
+					</tbody>
+				</table>
+				<h4 class="table-subtitle mb-3 mt-3">영문이력서</h4>
+				<table class="table">
+					<colgroup>
+						<col style="width: 7%">
+						<col style="width: 25.5%">
+						<col style="width: 7%">
+						<col style="width: 25.5%">
+					</colgroup>
+					<tbody>
+						<th:block>
+							<th class="text-center">영문이력서</th>
+							<td colspan="3">
+								<th:block th:if="${englishResumeInfo ne null}" >
+									<th:block th:if="${englishResumeInfo.commonFileList ne null}">
+										<a th:href="${englishResumeInfo.commonFileList[0].url}" th:text="${englishResumeInfo.commonFileList[0].originName}" download></a>
+									</th:block>
+								</th:block>
+							</td>
+						<tr>
+					</tbody>
+				</table>
+				<h4 class="table-subtitle mb-3 mt-3">자기소개서</h4>
+				<table class="table">
+					<colgroup>
+						<col style="width: 7%">
+						<col style="width: 25.5%">
+						<col style="width: 7%">
+						<col style="width: 25.5%">
+					</colgroup>
+					<tbody>
+						<th:block>
+							<th class="text-center">자기소개서</th>
+							<td colspan="3" th:utext="${resumeInfo.selfIntroduction eq null? '':resumeInfo.selfIntroduction.replaceAll('\n','<br/>')}">
+							</td>
+						<tr>
+					</tbody>
+				</table>
+				<div class="text-center m-t-20 m-b-20">
+					<button data-role="modify" type="button" class="btn btn-primary" name="resumeModify">수정하기</button>
+				</div>
+			</div>
+		</div>
+	</main>
+</div>
+</body>
+</html>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.bo.BoClientMapper">
+
+    <!-- 고객사 리스트 조회 -->
+    <select id="selectClientPmList" parameterType="BoClientPmDTO" resultType="BoClientPmDTO">
+        /* com.fw.core.mapper.db1.bo.BoClientMapper.selectClientPmList, 회원 리스트 조회, 22.11.14, dongbeom, BoBlacklistMapper.xml */
+        SELECT c.id
+        , c.licenseNo
+        , c.companyName
+        , m.name
+        , date_format(c.createdAt, '%Y-%m-%d') createdAt
+        , date_format(c.expiredAt, '%Y-%m-%d') expiredAt
+        , c.wefirm_id
+        , w.name wefirmName
+        FROM client_pm c
+        INNER JOIN member m ON c.memberId = m.id
+        INNER JOIN wefirm w on c.wefirm_id = w.id
+        WHERE c.delFlag = 'N'
+        AND date_format(c.createdAt, '%Y-%m-%d') BETWEEN #{startDate} AND #{endDate}
+        <if test='nameOption != null and nameOption !=""'>
+            AND m.name LIKE CONCAT('%',#{nameOption},'%')
+        </if>
+        <if test='licenseNoOption != null and licenseNoOption !=""'>
+            AND c.licenseNo LIKE CONCAT('%',#{licenseNoOption},'%')
+        </if>
+        <if test='companyNameOption != null and companyNameOption !=""'>
+            AND c.companyName LIKE CONCAT('%',#{companyNameOption},'%')
+        </if>
+        <if test='wefirmId != null and wefirmId !=""'>
+            AND c.wefirm_id = #{wefirmId}
+        </if>
+        ORDER BY createdAt desc
+    </select>
+    
+    <select id="selectWefirmList" resultType="BoClientPmDTO" parameterType="BoClientPmDTO">
+        SELECT c.wefirm_id
+             , w.name wefirmName
+        FROM client_pm c
+                 INNER JOIN member m ON c.memberId = m.id
+                 INNER JOIN wefirm w on c.wefirm_id = w.id
+        WHERE c.delFlag = 'N'
+        GROUP BY wefirm_id
+    </select>
+
+</mapper>

@@ -1,0 +1,137 @@
+---
+# local
+spring:
+  config:
+    activate:
+      on-profile: local
+  servlet:
+    multipart:
+      maxFileSize: 10MB
+      maxRequestSize: 10MB
+  rabbitmq:
+    host: xxx
+    port: 5672
+    username: xxx
+    password: xxx
+  mail:
+    default-encoding: UTF-8
+    host: xxx.amazonaws.com
+    port: 587
+    username: 'xxx'
+    password: 'xxxx'
+    properties:
+      mail:
+        debug: true
+        transport:
+          protocol: smtp
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          ssl:
+            trust: xxx.amazonaws.com
+            enable: true
+cloud:
+  aws:
+    s3:
+      access-key: 'xx'
+      secret-key: 'xx'
+      bucket-private: r9-dev-prv-files
+      bucket-public: r9-dev-pub-files
+      service-url: 'https://s3.ap-northeast-2.amazonaws.com/'
+      region: ap-northeast-2
+    ses:
+      access-key: 'xx'
+      secret-key: 'xx'
+      region: ap-northeast-2
+cert:
+  cp-id: 'xxx'       # 본인인증 ID
+  url-code: 'xxx'      # 본인인증 URL Code
+  server: 'https://www.kmcert.com/kmcis/web/kmcisReq.jsp'
+  callback-url: 'http://localhost:8079/fo/auth/cert/callback'
+nice:
+  url: "https://api.kisline.com/nice/sb/api/xxxx/emEprSrch/unifiedSrch?"
+  client-id: xxx
+  client-secret: xxx
+sms-api:
+  account: xxx
+  from: "xxx"
+  host: https://api.bizppurio.com
+  send-api: /v2/message
+  mms-file-upload-api: /v1/file
+admin:
+  member-id: '5'
+service:
+  wss_domain: xxx
+  web_domain: xxx
+  report_domain: xxx
+
+---
+# dev
+spring:
+  config:
+    activate:
+      on-profile: dev
+  servlet:
+    multipart:
+      maxFileSize: 10MB
+      maxRequestSize: 10MB
+  rabbitmq:
+    host: xxx
+    port: 5672
+    username: xxx
+    password: xxx
+  mail:
+    default-encoding: UTF-8
+    host: email-smtp.ap-northeast-2.amazonaws.com
+    port: 587
+    username: 'xxx'
+    password: 'xxx'
+    properties:
+      mail:
+        debug: true
+        transport:
+          protocol: smtp
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          ssl:
+            trust: xxx
+            enable: true
+cloud:
+  aws:
+    s3:
+      access-key: 'xxxx'
+      secret-key: 'xxx'
+      bucket-private: r9-dev-prv-files
+      bucket-public: r9-dev-pub-files
+      service-url: 'https://s3.ap-northeast-2.amazonaws.com/'
+      region: ap-northeast-2
+    ses:
+      access-key: 'xxx'
+      secret-key: 'xxx'
+      region: ap-northeast-2
+cert:
+  cp-id: 'xxx'       # 본인인증 ID
+  url-code: 'xxx'      # 본인인증 URL Code
+  server: 'https://www.kmcert.com/kmcis/web/kmcisReq.jsp'
+  callback-url: 'https://dev.xxxx.co.kr/fo/auth/cert/callback'
+nice:
+  url: "https://api.kisline.com/nice/sb/api/xxxx/emEprSrch/unifiedSrch?"
+  client-id: xxxx
+  client-secret: xxx
+sms-api:
+  account: xxx
+  from: "xxxx"
+  host: https://api.bizppurio.com
+  send-api: /v2/message
+  mms-file-upload-api: /v1/file
+admin:
+  member-id: '5'
+service:
+  wss_domain: wss://dev.xxx.co.kr
+  web_domain: https://dev.xxx.co.kr
+  report_domain: https://dev-report.xxx.co.kr
+
+---

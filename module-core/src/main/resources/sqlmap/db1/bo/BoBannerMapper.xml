@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.bo.BoBannerMapper">
+
+    <!-- 배너 리스트 조회 -->
+    <select id="selectBannerList" parameterType="BoBannerDTO" resultType="BoBannerDTO">
+        /* com.fw.core.mapper.db1.bo.BannerMapper.selectBannerList, 배너 리스트 조회, 22.09.15, wsh , BannerMapper.xml */
+        SELECT banner_seq
+             , fn_get_common_cd(b.banner_type_cd,'BANNER_TYPE',1) AS banner_type
+             , banner_type_cd
+             , banner_nm
+             , banner_order
+             , use_flag
+             , file_seq
+             , date_format(banner_start_dt, '%Y-%m-%d') as banner_start_dt
+             , date_format(banner_end_dt, '%Y-%m-%d') as banner_end_dt
+             , link_url
+             , create_seq
+             , date_format(create_dt, '%Y-%m-%d') as create_dt
+             , update_seq
+             , date_format(update_dt, '%Y-%m-%d') as update_dt
+             , (SELECT ba.admin_nm FROM tb_admin ba WHERE  ba.admin_seq = b.create_seq) AS writer
+             , (SELECT ba.admin_nm FROM tb_admin ba WHERE  ba.admin_seq = b.update_seq) AS corrector
+        FROM tb_banner b
+        WHERE del_flag = 'N'
+        ORDER BY banner_seq
+    </select>
+
+    <!-- 배너 상세 조회 -->
+    <select id="selectBannerDetail" parameterType="BoBannerDTO" resultType="BoBannerDTO">
+        /* com.fw.core.mapper.db1.bo.BannerMapper.selectBannerDetail, 배너 상세 조회, 22.09.15, wsh , BannerMapper.xml */
+        SELECT banner_seq
+             , banner_type_cd
+             , fn_get_common_cd(banner_type_cd,'BANNER_TYPE',1) AS banner_type
+             , banner_nm
+             , banner_order
+             , use_flag
+             , file_seq
+             , date_format(banner_start_dt, '%Y-%m-%d') as banner_start_dt
+             , date_format(banner_end_dt, '%Y-%m-%d') as banner_end_dt
+             , link_url
+			 , create_seq
+             , date_format(create_dt, '%Y-%m-%d %H:%i') as create_dt
+             , update_seq
+             , date_format(update_dt, '%Y-%m-%d %H:%i') as update_dt
+          FROM tb_banner
+          WHERE banner_seq = #{bannerSeq}
+    </select>
+
+    <!-- 배너 상세 modify -->
+    <select id="selectBannerModify" parameterType="BoBannerDTO" resultType="BoBannerDTO">
+        /* com.fw.core.mapper.db1.bo.BannerMapper.selectBannerModify, 배너 상세 조회, 22.09.15, wsh , BannerMapper.xml */
+        SELECT banner_seq
+             , banner_type_cd
+             , fn_get_common_cd(banner_type_cd, 'BANNER_TYPE', 1) bannerType
+             , banner_nm
+             , banner_order
+             , use_flag
+             , date_format(banner_start_dt, '%Y-%m-%d') as banner_start_dt
+             , date_format(banner_end_dt, '%Y-%m-%d') as banner_end_dt
+             , link_url
+             , file_seq
+			 , create_seq
+             , date_format(create_dt, '%Y-%m-%d ') as create_dt
+             , update_seq
+             , date_format(update_dt, '%Y-%m-%d ') as update_dt
+          FROM tb_banner
+          WHERE banner_seq = #{bannerSeq}
+    </select>
+
+     <!-- 배너 등록-->
+    <insert id="insertBanner" parameterType="BoBannerDTO">
+        /* com.fw.core.mapper.db1.bo.BannerMapper.insertBanner, 배너등록, 22.09.15, wsh , BannerMapper.xml */
+        INSERT INTO tb_banner (
+               banner_type_cd
+             , banner_nm
+             , banner_order
+             , use_flag
+             , banner_start_dt
+             , banner_end_dt
+             , link_url
+             , create_seq
+             , create_dt
+             , file_seq
+        ) VALUES (
+               #{bannerTypeCd}
+             , #{bannerNm}
+             , #{bannerOrder}
+             , #{useFlag}
+             , #{bannerStartDt}
+             , #{bannerEndDt}
+             , #{linkUrl}
+             , #{adminSession.adminSeq}
+             , NOW()
+             , #{fileSeq}
+        )
+    </insert>
+
+    <!-- 배너 수정-->
+    <update id="updateBanner" parameterType="BoBannerDTO">
+        /* com.fw.core.mapper.db1.bo.BannerMapper.updateBanner, 배너수정, 22.09.15, wsh , BannerMapper.xml */
+        UPDATE tb_banner SET
+               use_flag = #{useFlag}
+             , banner_start_dt = #{bannerStartDt}
+             , banner_end_dt = #{bannerEndDt}
+             , link_url = #{linkUrl}
+             , update_seq = #{adminSession.adminSeq}
+             , update_dt = NOW()
+             , file_seq = #{fileSeq}
+        WHERE banner_seq = #{bannerSeq}
+    </update>
+
+    <!-- 배너 삭제 -->
+    <delete id="deleteBanner" parameterType="BoBannerDTO">
+        /* com.fw.core.mapper.db1.bo.BannerMapper.deleteBanner, 배너삭제, 22.09.15, wsh , BannerMapper.xml */
+        UPDATE tb_banner SET
+             use_flag = 'N'
+           , update_seq = #{adminSession.adminSeq}
+           , update_dt = NOW()
+           , file_seq = null
+        WHERE banner_seq = #{bannerSeq}
+    </delete>
+
+</mapper>

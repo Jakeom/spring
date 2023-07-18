@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.core.mapper.db1.bo.BoAdminIpMapper">
+
+    <!-- 관리자 접근 가능 아이피 리스트 조회 -->
+    <select id="selectAdminIpList" parameterType="BoAdminIpDTO" resultType="BoAdminIpDTO">
+        /* com.fw.core.mapper.db1.bo.AdminIpMapper.selectAdminIpList, 관리자 리스트 조회, 22.09.21, 가잘, AdminIpMapper.xml */
+        SELECT admin_ip_seq
+             , admin_seq
+             , ip
+             , del_flag
+             , create_seq
+             , date_format(create_dt, '%Y-%m-%d %H:%i') as create_dt
+          FROM tb_admin_ip
+         WHERE del_flag = 'N'
+           AND admin_seq = #{adminSeq}
+      ORDER BY admin_ip_seq
+    </select>
+
+    <!-- 관리자 아이피 등록 -->
+    <insert id="insertAdminIp" parameterType="BoAdminIpDTO">
+        /* com.fw.core.mapper.db1.bo.AdminIpMapper.insertAdminIp, 관리자 아이피 등록, 22.09.21, 가잘, AdminIpMapper.xml */
+        INSERT INTO tb_admin_ip (
+               admin_seq
+             , ip
+             , del_flag
+             , create_dt
+        ) VALUES (
+               #{adminSeq}
+             , #{ip}
+             , 'N'
+             , NOW()
+        )
+    </insert>
+
+    <!-- 관리자 아이피 수정 -->
+    <update id="updateAdminIp" parameterType="BoAdminIpDTO">
+        /* com.fw.core.mapper.db1.bo.AdminIpMapper.updateAdminIp, 관리자 아이피 수정, 22.09.22, 가잘, AdminIpMapper.xml */
+        UPDATE tb_admin_ip
+           SET ip = #{ip}
+         WHERE admin_ip_seq = #{adminIpSeq}
+    </update>
+
+    <!-- 관리자 아이피 삭제 -->
+    <delete id="deleteAdminIp" parameterType="BoAdminIpDTO">
+        /* com.fw.core.mapper.db1.bo.AdminIpMapper.deleteAdminIp, 관리자 아이피 삭제, 22.09.22, 가잘, AdminIpMapper.xml */
+        DELETE
+        FROM tb_admin_ip
+        WHERE admin_seq = #{adminSeq}
+    </delete>
+
+</mapper>

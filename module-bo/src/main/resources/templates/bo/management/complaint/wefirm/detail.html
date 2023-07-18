@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/default}">
+<body>
+	<div layout:fragment="contents" th:remove="tag">
+		<main id="content" role="main">
+			<h2 class="title">민원관리 > We펌 조회 및 관리 > 상세보기</h2>
+			<input type="hidden" data-role=wefirmId th:value="${detail.id}" />
+			<div class="row p-3">
+				<div class="col-12">
+					<table class="table table-bordered" id="mainDatatable">
+						<colgroup>
+							<col style="width:5%" />
+							<col style="width:20%" />
+							<col style="width:5%" />
+							<col style="width:20%" />
+							<col style="width:5%" />
+							<col style="width:20%" />
+							<col style="width:5%" />
+							<col style="width:20%" />
+						</colgroup>
+						<tbody>
+							<tr>
+								<th class="text-center">구분</th>
+								<td th:text="We펌"></td>
+								<th class="text-center">개설자</th>
+								<td th:text="${detail.ceoName}"></td>
+								<th class="text-center">위펌명</th>
+								<td th:text="${detail.name}"></td>
+								<th class="text-center">연락처</th>
+								<td th:text="${detail.memberPhone}"></td>
+							</tr>
+						</tbody>
+					</table>
+					<div class="mt-3 text-right">
+						<button type="button" class="btn btn-danger" data-role="forceStop">강제폐쇄</button>
+					</div>
+					<!-- Tabs-->
+					<ul class="nav nav-pills">
+						<li class="active">
+							<button type="button" id="startBtn" class="btn btn-outline-dark styleRemove" style="min-width: 160px" data-toggle="pill" href="#menu">We펌정보</button>
+						</li>
+						<li>
+							<button type="button" class="btn btn-outline-dark styleRemove" name="joinHh" style="min-width: 160px" data-toggle="pill" href="#menu1">소속헤드헌터</button>
+						</li>
+						<li>
+							<button type="button" class="btn btn-outline-dark styleRemove" style="min-width: 160px" data-toggle="pill" href="#menu2">포지션공고</button>
+						</li>
+					</ul>
+					<div class="tab-content">
+						<div id="menu" class="active tab-pane fade in">
+							<table class="table table-bordered mt-3">
+								<tr>
+									<th class="col-2 text-center">We펌 명</th>
+									<td class="col-2" th:text="${detail.name}"></td>
+									<th class="col-2 text-center">서치펌 연락처</th>
+									<td class="col-2" id="phone" th:text="${detail.memberPhone}"></td>
+								</tr>
+								<tr>
+									<th class="text-center">개설승인 일시</th>
+									<td th:text="${detail.completedAt}"></td>
+									<th class="text-center">서치펌 홈페이지 url</th>
+									<td th:text="${detail.websiteUrl}"></td>
+								</tr>
+								<tr>
+									<th class="text-center">개설자</th>
+									<td th:text="${detail.ceoName}"></td>
+									<th class="text-center">서치펌 개설 신청 파일</th>
+								</tr>
+								<tr>
+									<th class="text-center">개설자 이메일주소</th>
+									<td th:text="${detail.memberEmail}"></td>
+									<th class="text-center">We펌 회사 로고</th>
+									<td>
+										<a th:if="${detail.commonFileList ne null and detail.commonFileList.size() ne 0}" th:href="${detail.commonFileList.get(0).url}" th:text="${detail.commonFileList.get(0).originName}"></a>
+									</td>
+								</tr>
+								<tr>
+									<th class="text-center">개설자 휴대폰번호</th>
+									<td th:text="${detail.memberPhone}"></td>
+									<th class="text-center">We펌 상세설명</th>
+									<td th:text="${detail.description}"></td>
+								</tr>
+								<tr>
+									<th class="text-center">서치펌 명</th>
+									<td id="searchFirmName" th:text="${detail.sfName}"></td>
+									<th class="text-center">상태</th>
+									<td name="status" th:if="${detail.closed eq '1'}">폐쇄
+										<button type="button" class='btn btn-outline-success form-control col-3 float-right' data-role='changeStatus'>정상</button>
+									<td name="status" th:if="${detail.closed eq '0'}">정상</td>
+								</tr>
+								<tr>
+									<th class="text-center">서치펌 사업자 등록번호</th>
+									<td id="regNum" th:text="${detail.sfRegNumber}"></td>
+									<th class="text-center">폐쇄(이용정지) 일시</th>
+									<td th:text="${detail.closed}"></td>
+								</tr>
+							</table>
+							<div class="form-group text-right m-t-15">
+								<button type="button" class="btn btn-primary" data-role="update">수정하기</button>
+								<button type="button" class="btn btn-dark" data-role="save">저장하기</button>
+							</div>
+						</div>
+						<!-- Tab -->
+						<div id="menu1" class="tab-pane fade">
+							<div class="mt-3">
+								<div class="d-flex align-items-center">
+									<select id="personalInfo" class="form-control w-auto"
+										data-role="select-dropdown" data-profile="minimal">
+										<option value="name">이름</option>
+										<option value="phone">휴대번호</option>
+										<option value="email">이메일주소</option>
+									</select>
+									<input type="text" class="form-control w-auto" data-role="writer" />
+									<button type="button" class="btn btn-dark w-auto" data-role="search">검색하기</button>
+									<button type="button" class="btn btn-info" data-role="downloadExcel" id="downloadExcel">엑셀 다운로드</button>
+								</div>
+							</div>
+							<div class="mt-3">
+								<table id="datatable2" class="table mt-3">
+									<thead>
+										<tr>
+											<th>NO</th>
+											<th>We펌 가입 일시</th>
+											<th>이름</th>
+											<th>연락처</th>
+											<th>이메일</th>
+											<th>진행중공고</th>
+											<th>이력서 등록수</th>
+											<th>비고</th>
+										</tr>
+									</thead>
+								</table>
+							</div>
+						</div>
+						<div id="menu2" class="tab-pane fade">
+							<form id="searchWefirm" name="searchWefirm">
+								<div id="searchDt" class="row mt-3">
+									<div class="col-4">
+										<div class="d-flex align-items-center">
+											<input type="text" id="wefirmStartDt" name="wefirmStartDt" class="form-control form-datepicker" placeholder="날짜 선택">
+											<div class="mr-2">~</div>
+											<input type="text" id="wefirmEndDt" name="wefirmEndDt" class="form-control form-datepicker" placeholder="날짜 선택">
+										</div>
+									</div>
+									<div class="col-2">
+										<div class="d-flex align-items-center">
+											<button type="button" class="btn btn-dark" name="colorChange" id="all" data-role="all">전체</button>
+											<button type="button" class="btn btn-dark" name="colorChange" id="today" data-role="today">오늘</button>
+											<button type="button" class="btn btn-dark" name="colorChange" id="week" data-role="week">7일</button>
+											<button type="button" class="btn btn-dark" name="colorChange" id="month" data-role="month">1개월</button>
+										</div>
+									</div>
+									<div class="col-6 text-right">
+										<button type="button" class="btn btn-dark" data-role="search">검색하기</button>
+									</div>
+								</div>
+							</form>
+							<!-- 포지션공고 table -->
+							<table id="datatable3" class="table">
+								<thead>
+									<tr>
+										<th>NO</th>
+										<th>등록 일시</th>
+										<th>공고제목</th>
+										<th>담당자</th>
+										<th>상태</th>
+										<th>종료(마감)일시</th>
+									</tr>
+								</thead>
+							</table>
+							<!-- /table -->
+							<!-- Tab -->
+						</div>
+					</div>
+				</div>
+			</div>
+		</main>
+	</div>
+</body>
+</html>
