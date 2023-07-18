@@ -1,4 +1,4 @@
-Spring Cord Frame work included
+Spring Core Frame work included
 Web
 Admin
 API
